@@ -1,0 +1,254 @@
+{
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "const": "rlflow/0.2",
+      "type": "string"
+    },
+    "role": {
+      "const": "PI",
+      "type": "string"
+    },
+    "session_id": {
+      "type": "string"
+    },
+    "task_id": {
+      "type": "string"
+    },
+    "task_version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "cycle_id": {
+      "type": "string"
+    },
+    "input_state_version": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "candidate": {
+      "anyOf": [
+        {
+          "type": "object",
+          "properties": {
+            "repository": {
+              "type": "string"
+            },
+            "base_commit": {
+              "type": "string"
+            },
+            "commit": {
+              "type": "string"
+            },
+            "diff_sha256": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            }
+          },
+          "required": [
+            "repository",
+            "base_commit",
+            "commit",
+            "diff_sha256"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "evidence_refs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "requested_actions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "action": {
+            "enum": [
+              "REQUEST_EVIDENCE_DETAIL",
+              "REQUEST_REVIEW",
+              "REQUEST_REWORK",
+              "REQUEST_EXPERIMENT",
+              "REQUEST_PROPOSAL",
+              "REQUEST_CONTRACT_DECISION",
+              "REQUEST_MODEL_ESCALATION",
+              "REQUEST_DECOMPOSITION",
+              "REQUEST_COMPLETE"
+            ],
+            "type": "string"
+          },
+          "evidence_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "fields": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "purpose": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "action",
+          "evidence_ids",
+          "fields",
+          "purpose"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "payload": {
+      "type": "object",
+      "properties": {
+        "decision": {
+          "enum": [
+            "CONTINUE",
+            "ENGINEERING_DIAGNOSIS",
+            "PARAMETER_SEARCH",
+            "METHOD_REVIEW",
+            "EVALUATION_REVIEW",
+            "STOP"
+          ],
+          "type": "string"
+        },
+        "observations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "observation": {
+                "type": "string"
+              },
+              "evidence_refs": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": [
+              "observation",
+              "evidence_refs"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "inferences": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "counterevidence": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "next_prediction": {
+          "type": "string"
+        },
+        "proposal_required": {
+          "type": "boolean"
+        },
+        "task_interpretation": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "goal": {
+                  "type": "string"
+                },
+                "module_roots": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "acceptance_criteria": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "stage_id": {
+                  "type": "string"
+                },
+                "budget": {
+                  "type": "object",
+                  "properties": {
+                    "role_calls": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "wall_seconds": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "fake_starts": {
+                      "type": "integer",
+                      "minimum": 0
+                    }
+                  },
+                  "required": [
+                    "role_calls",
+                    "wall_seconds",
+                    "fake_starts"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "required": [
+                "goal",
+                "module_roots",
+                "acceptance_criteria",
+                "stage_id",
+                "budget"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "decision",
+        "observations",
+        "inferences",
+        "counterevidence",
+        "next_prediction",
+        "proposal_required",
+        "task_interpretation"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "schema_version",
+    "role",
+    "session_id",
+    "task_id",
+    "task_version",
+    "cycle_id",
+    "input_state_version",
+    "candidate",
+    "evidence_refs",
+    "requested_actions",
+    "payload"
+  ],
+  "additionalProperties": false,
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

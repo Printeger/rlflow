@@ -1,0 +1,103 @@
+{
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "const": "rlflow/0.2",
+      "type": "string"
+    },
+    "id": {
+      "type": "string"
+    },
+    "version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "producer": {
+      "type": "string"
+    },
+    "created_at": {
+      "type": "string"
+    },
+    "input_versions": {
+      "type": "object",
+      "properties": {
+        "entries": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "value": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "name",
+              "value"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "entries"
+      ]
+    },
+    "observations": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "source": {
+      "type": "string"
+    },
+    "source_sha256": {
+      "type": "string"
+    },
+    "run_source": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "analysis_source": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "coverage": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "missing": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "required": [
+    "schema_version",
+    "id",
+    "version",
+    "producer",
+    "created_at",
+    "input_versions",
+    "observations",
+    "source",
+    "source_sha256",
+    "run_source",
+    "analysis_source",
+    "coverage",
+    "missing"
+  ],
+  "additionalProperties": false,
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

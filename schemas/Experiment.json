@@ -1,0 +1,168 @@
+{
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "const": "rlflow/0.2",
+      "type": "string"
+    },
+    "id": {
+      "type": "string"
+    },
+    "version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "producer": {
+      "type": "string"
+    },
+    "created_at": {
+      "type": "string"
+    },
+    "input_versions": {
+      "type": "object",
+      "properties": {
+        "entries": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "value": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "name",
+              "value"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "entries"
+      ]
+    },
+    "hypothesis_id": {
+      "type": "string"
+    },
+    "changes": {
+      "type": "object",
+      "properties": {
+        "entries": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "value": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "name",
+              "value"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "entries"
+      ]
+    },
+    "frozen_identities": {
+      "type": "object",
+      "properties": {
+        "product": {
+          "type": "string"
+        },
+        "workload": {
+          "type": "string"
+        },
+        "method": {
+          "type": "string"
+        },
+        "evaluation": {
+          "type": "string"
+        },
+        "runtime": {
+          "type": "string"
+        },
+        "seed": {
+          "type": "string"
+        },
+        "budget": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "product",
+        "workload",
+        "method",
+        "evaluation",
+        "runtime",
+        "seed",
+        "budget"
+      ],
+      "additionalProperties": false
+    },
+    "required_observations": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "budget_request": {
+      "type": "object",
+      "properties": {
+        "role_calls": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "wall_seconds": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "fake_starts": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "role_calls",
+        "wall_seconds",
+        "fake_starts"
+      ],
+      "additionalProperties": false
+    },
+    "stop_conditions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "required": [
+    "schema_version",
+    "id",
+    "version",
+    "producer",
+    "created_at",
+    "input_versions",
+    "hypothesis_id",
+    "changes",
+    "frozen_identities",
+    "required_observations",
+    "budget_request",
+    "stop_conditions"
+  ],
+  "additionalProperties": false,
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

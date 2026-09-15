@@ -1,0 +1,240 @@
+{
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "const": "rlflow/0.2",
+      "type": "string"
+    },
+    "role": {
+      "const": "Designer",
+      "type": "string"
+    },
+    "session_id": {
+      "type": "string"
+    },
+    "task_id": {
+      "type": "string"
+    },
+    "task_version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "cycle_id": {
+      "type": "string"
+    },
+    "input_state_version": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "candidate": {
+      "anyOf": [
+        {
+          "type": "object",
+          "properties": {
+            "repository": {
+              "type": "string"
+            },
+            "base_commit": {
+              "type": "string"
+            },
+            "commit": {
+              "type": "string"
+            },
+            "diff_sha256": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            }
+          },
+          "required": [
+            "repository",
+            "base_commit",
+            "commit",
+            "diff_sha256"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "evidence_refs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "requested_actions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "action": {
+            "enum": [
+              "REQUEST_EVIDENCE_DETAIL",
+              "REQUEST_REVIEW",
+              "REQUEST_REWORK",
+              "REQUEST_EXPERIMENT",
+              "REQUEST_PROPOSAL",
+              "REQUEST_CONTRACT_DECISION",
+              "REQUEST_MODEL_ESCALATION"
+            ],
+            "type": "string"
+          },
+          "evidence_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "fields": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "purpose": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "action",
+          "evidence_ids",
+          "fields",
+          "purpose"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "payload": {
+      "type": "object",
+      "properties": {
+        "question": {
+          "type": "string"
+        },
+        "controlled_variables": {
+          "type": "object",
+          "properties": {
+            "entries": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "value": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "name",
+                  "value"
+                ],
+                "additionalProperties": false
+              }
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "entries"
+          ]
+        },
+        "frozen_identities": {
+          "type": "object",
+          "properties": {
+            "entries": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "value": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "name",
+                  "value"
+                ],
+                "additionalProperties": false
+              }
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "entries"
+          ]
+        },
+        "required_observations": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "decision_rules": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "budget_request": {
+          "type": "object",
+          "properties": {
+            "role_calls": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "wall_seconds": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "fake_starts": {
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          "required": [
+            "role_calls",
+            "wall_seconds",
+            "fake_starts"
+          ],
+          "additionalProperties": false
+        },
+        "stop_conditions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "question",
+        "controlled_variables",
+        "frozen_identities",
+        "required_observations",
+        "decision_rules",
+        "budget_request",
+        "stop_conditions"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "schema_version",
+    "role",
+    "session_id",
+    "task_id",
+    "task_version",
+    "cycle_id",
+    "input_state_version",
+    "candidate",
+    "evidence_refs",
+    "requested_actions",
+    "payload"
+  ],
+  "additionalProperties": false,
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

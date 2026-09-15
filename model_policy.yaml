@@ -1,0 +1,26 @@
+version: 1
+astra:
+  enabled: false
+  max_calls_per_stage: 1
+roles:
+  PI:
+    - {model: gpt-5.6-sol, effort: medium}
+    - {model: gpt-5.6-sol, effort: high}
+    - {model: gpt-6-astra, effort: high}
+  Engineer:
+    - {model: gpt-5.6-sol, effort: medium}
+    - {model: gpt-5.6-sol, effort: high}
+    - {model: gpt-6-astra, effort: high}
+  Evaluator:
+    - {model: gpt-5.6-sol, effort: high}
+    - {model: gpt-6-astra, effort: high}
+  Critic:
+    - {model: gpt-5.6-sol, effort: high}
+    - {model: gpt-6-astra, effort: high}
+  Designer:
+    - {model: gpt-5.6-sol, effort: medium}
+    - {model: gpt-5.6-sol, effort: high}
+    - {model: gpt-6-astra, effort: high}
+  Scout:
+    - {model: gpt-5.6-sol, effort: low}
+    - {model: gpt-5.6-sol, effort: medium}

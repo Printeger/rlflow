@@ -1,0 +1,4 @@
+#!/bin/sh
+set -eu
+RLFLOW_COPY=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+exec "$RLFLOW_COPY/.venv/bin/python" -I "$RLFLOW_COPY/bootstrap.py" "$@"

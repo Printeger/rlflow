@@ -1,0 +1,226 @@
+{
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "const": "rlflow/0.2",
+      "type": "string"
+    },
+    "role": {
+      "const": "Evaluator",
+      "type": "string"
+    },
+    "session_id": {
+      "type": "string"
+    },
+    "task_id": {
+      "type": "string"
+    },
+    "task_version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "cycle_id": {
+      "type": "string"
+    },
+    "input_state_version": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "candidate": {
+      "anyOf": [
+        {
+          "type": "object",
+          "properties": {
+            "repository": {
+              "type": "string"
+            },
+            "base_commit": {
+              "type": "string"
+            },
+            "commit": {
+              "type": "string"
+            },
+            "diff_sha256": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            }
+          },
+          "required": [
+            "repository",
+            "base_commit",
+            "commit",
+            "diff_sha256"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "evidence_refs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "requested_actions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "action": {
+            "enum": [
+              "REQUEST_EVIDENCE_DETAIL",
+              "REQUEST_REVIEW",
+              "REQUEST_REWORK",
+              "REQUEST_EXPERIMENT",
+              "REQUEST_PROPOSAL",
+              "REQUEST_CONTRACT_DECISION",
+              "REQUEST_MODEL_ESCALATION"
+            ],
+            "type": "string"
+          },
+          "evidence_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "fields": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "purpose": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "action",
+          "evidence_ids",
+          "fields",
+          "purpose"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "payload": {
+      "type": "object",
+      "properties": {
+        "verdict": {
+          "enum": [
+            "PASS",
+            "FAIL",
+            "INCONCLUSIVE",
+            "INVALID"
+          ],
+          "type": "string"
+        },
+        "conclusion_layer": {
+          "enum": [
+            "ENGINEERING",
+            "CPU",
+            "REAL_RUN",
+            "BEHAVIOR",
+            "FORMAL"
+          ],
+          "type": "string"
+        },
+        "findings": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "category": {
+                "enum": [
+                  "MUST_FIX",
+                  "NON_BLOCKING",
+                  "FOLLOW_UP",
+                  "CONTRACT_DECISION"
+                ],
+                "type": "string"
+              },
+              "evidence_refs": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "contract": {
+                "type": "string"
+              },
+              "affected_conclusion": {
+                "type": "string"
+              },
+              "close_condition": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "category",
+              "evidence_refs",
+              "contract",
+              "affected_conclusion",
+              "close_condition",
+              "description"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "evidence_coverage": {
+          "type": "array",
+          "description": "Actual evidence and checks supporting the declared conclusion layer. Scope limitations may be stated here alongside actual coverage; do not claim out-of-scope validation.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "missing_evidence": {
+          "type": "array",
+          "description": "Only evidence required by the current task, authorized stage scope and conclusion_layer that is actually missing. Must be [] for PASS. For CPU-only acceptance, absent real-run, behavior or formal evidence is a scope limitation, not a missing requirement. If required evidence is missing, list it and do not return PASS.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "suggested_categories": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "verdict",
+        "conclusion_layer",
+        "findings",
+        "evidence_coverage",
+        "missing_evidence",
+        "suggested_categories"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "schema_version",
+    "role",
+    "session_id",
+    "task_id",
+    "task_version",
+    "cycle_id",
+    "input_state_version",
+    "candidate",
+    "evidence_refs",
+    "requested_actions",
+    "payload"
+  ],
+  "additionalProperties": false,
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

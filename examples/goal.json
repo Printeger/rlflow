@@ -1,0 +1,28 @@
+{
+  "id": "PARSER-LONG-GOAL",
+  "goal": "实现冻结解析契约，动态拆分、独立检查并完成最终集成",
+  "repo": "/ABSOLUTE/STATE/workspaces/parser",
+  "module_roots": [
+    "src",
+    "tests"
+  ],
+  "protected_paths": [
+    ".git",
+    "CONTRACT.md"
+  ],
+  "budget": {
+    "role_calls": 30,
+    "wall_seconds": 36000
+  },
+  "decomposition": {
+    "max_tasks": 20,
+    "max_depth": 4
+  },
+  "criteria": [
+    {
+      "id": "C-PARSER",
+      "description": "完整满足 CONTRACT.md 的合法输入、拒绝规则及集成要求",
+      "layer": "cpu"
+    }
+  ]
+}

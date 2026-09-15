@@ -1,0 +1,166 @@
+{
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "const": "rlflow/0.2",
+      "type": "string"
+    },
+    "id": {
+      "type": "string"
+    },
+    "version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "producer": {
+      "type": "string"
+    },
+    "created_at": {
+      "type": "string"
+    },
+    "input_versions": {
+      "type": "object",
+      "properties": {
+        "entries": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "value": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "name",
+              "value"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "entries"
+      ]
+    },
+    "approval_id": {
+      "type": "string"
+    },
+    "proposal_id": {
+      "type": "string"
+    },
+    "proposal_version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "proposal_sha256": {
+      "type": "string"
+    },
+    "decision": {
+      "enum": [
+        "APPROVED",
+        "REJECTED"
+      ],
+      "type": "string"
+    },
+    "approver": {
+      "type": "string"
+    },
+    "scope": {
+      "enum": [
+        "SANDBOX_ONLY",
+        "MAINLINE_ADOPTION",
+        "STAGE_AUTHORIZATION"
+      ],
+      "type": "string"
+    },
+    "stage_id": {
+      "type": "string"
+    },
+    "budget_ref": {
+      "type": "string"
+    },
+    "budget_limits": {
+      "type": "object",
+      "properties": {
+        "role_calls": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "wall_seconds": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "fake_starts": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "role_calls",
+        "wall_seconds",
+        "fake_starts"
+      ],
+      "additionalProperties": false
+    },
+    "preconditions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "validity": {
+      "type": "object",
+      "properties": {
+        "entries": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "value": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "name",
+              "value"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "entries"
+      ]
+    }
+  },
+  "required": [
+    "schema_version",
+    "id",
+    "version",
+    "producer",
+    "created_at",
+    "input_versions",
+    "approval_id",
+    "proposal_id",
+    "proposal_version",
+    "proposal_sha256",
+    "decision",
+    "approver",
+    "scope",
+    "stage_id",
+    "budget_ref",
+    "budget_limits",
+    "preconditions",
+    "validity"
+  ],
+  "additionalProperties": false,
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

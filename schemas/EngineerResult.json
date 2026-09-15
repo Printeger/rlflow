@@ -1,0 +1,274 @@
+{
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "const": "rlflow/0.2",
+      "type": "string"
+    },
+    "role": {
+      "const": "Engineer",
+      "type": "string"
+    },
+    "session_id": {
+      "type": "string"
+    },
+    "task_id": {
+      "type": "string"
+    },
+    "task_version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "cycle_id": {
+      "type": "string"
+    },
+    "input_state_version": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "candidate": {
+      "anyOf": [
+        {
+          "type": "object",
+          "properties": {
+            "repository": {
+              "type": "string"
+            },
+            "base_commit": {
+              "type": "string"
+            },
+            "commit": {
+              "type": "string"
+            },
+            "diff_sha256": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            }
+          },
+          "required": [
+            "repository",
+            "base_commit",
+            "commit",
+            "diff_sha256"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "evidence_refs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "requested_actions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "action": {
+            "enum": [
+              "REQUEST_EVIDENCE_DETAIL",
+              "REQUEST_REVIEW",
+              "REQUEST_REWORK",
+              "REQUEST_EXPERIMENT",
+              "REQUEST_PROPOSAL",
+              "REQUEST_CONTRACT_DECISION",
+              "REQUEST_MODEL_ESCALATION"
+            ],
+            "type": "string"
+          },
+          "evidence_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "fields": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "purpose": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "action",
+          "evidence_ids",
+          "fields",
+          "purpose"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "payload": {
+      "type": "object",
+      "properties": {
+        "changes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              },
+              "suggested_category": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "path",
+              "description",
+              "suggested_category"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "candidate": {
+          "type": "object",
+          "properties": {
+            "repository": {
+              "type": "string"
+            },
+            "base_commit": {
+              "type": "string"
+            },
+            "commit": {
+              "type": "string"
+            },
+            "diff_sha256": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            }
+          },
+          "required": [
+            "repository",
+            "base_commit",
+            "commit",
+            "diff_sha256"
+          ],
+          "additionalProperties": false
+        },
+        "diff_path": {
+          "type": "string"
+        },
+        "self_tests": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "argv": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "exit_code": {
+                "type": "integer"
+              },
+              "stdout_path": {
+                "type": "string"
+              },
+              "stderr_path": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "argv",
+              "exit_code",
+              "stdout_path",
+              "stderr_path"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "unresolved_findings": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "category": {
+                "enum": [
+                  "MUST_FIX",
+                  "NON_BLOCKING",
+                  "FOLLOW_UP",
+                  "CONTRACT_DECISION"
+                ],
+                "type": "string"
+              },
+              "evidence_refs": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "contract": {
+                "type": "string"
+              },
+              "affected_conclusion": {
+                "type": "string"
+              },
+              "close_condition": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "category",
+              "evidence_refs",
+              "contract",
+              "affected_conclusion",
+              "close_condition",
+              "description"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "suggested_categories": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "changes",
+        "candidate",
+        "diff_path",
+        "self_tests",
+        "unresolved_findings",
+        "suggested_categories"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "schema_version",
+    "role",
+    "session_id",
+    "task_id",
+    "task_version",
+    "cycle_id",
+    "input_state_version",
+    "candidate",
+    "evidence_refs",
+    "requested_actions",
+    "payload"
+  ],
+  "additionalProperties": false,
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

@@ -1,0 +1,130 @@
+{
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "const": "rlflow/0.2",
+      "type": "string"
+    },
+    "id": {
+      "type": "string"
+    },
+    "version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "producer": {
+      "type": "string"
+    },
+    "created_at": {
+      "type": "string"
+    },
+    "input_versions": {
+      "type": "object",
+      "properties": {
+        "entries": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "value": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "name",
+              "value"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "entries"
+      ]
+    },
+    "owner": {
+      "type": "string"
+    },
+    "goal": {
+      "type": "string"
+    },
+    "dependencies": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "candidate": {
+      "type": "object",
+      "properties": {
+        "repository": {
+          "type": "string"
+        },
+        "base_commit": {
+          "type": "string"
+        },
+        "commit": {
+          "type": "string"
+        },
+        "diff_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      },
+      "required": [
+        "repository",
+        "base_commit",
+        "commit",
+        "diff_sha256"
+      ],
+      "additionalProperties": false
+    },
+    "module_roots": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "protected_paths": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "acceptance_criteria": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "stage_id": {
+      "type": "string"
+    },
+    "budget_ref": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema_version",
+    "id",
+    "version",
+    "producer",
+    "created_at",
+    "input_versions",
+    "owner",
+    "goal",
+    "dependencies",
+    "candidate",
+    "module_roots",
+    "protected_paths",
+    "acceptance_criteria",
+    "stage_id",
+    "budget_ref"
+  ],
+  "additionalProperties": false,
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

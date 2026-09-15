@@ -1,0 +1,155 @@
+{
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "const": "rlflow/0.2",
+      "type": "string"
+    },
+    "id": {
+      "type": "string"
+    },
+    "version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "producer": {
+      "type": "string"
+    },
+    "created_at": {
+      "type": "string"
+    },
+    "input_versions": {
+      "type": "object",
+      "properties": {
+        "entries": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "value": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "name",
+              "value"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "entries"
+      ]
+    },
+    "changes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "evidence_refs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "counterevidence": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "scope": {
+      "type": "string"
+    },
+    "stage_id": {
+      "type": "string"
+    },
+    "replaces": {
+      "type": "string"
+    },
+    "verification": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "cost": {
+      "type": "object",
+      "properties": {
+        "role_calls": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "wall_seconds": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "fake_starts": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "role_calls",
+        "wall_seconds",
+        "fake_starts"
+      ],
+      "additionalProperties": false
+    },
+    "stop_conditions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "authorization_version": {
+      "type": "string"
+    },
+    "attachments": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "sha256": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "path",
+          "sha256"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": [
+    "schema_version",
+    "id",
+    "version",
+    "producer",
+    "created_at",
+    "input_versions",
+    "changes",
+    "evidence_refs",
+    "counterevidence",
+    "scope",
+    "stage_id",
+    "replaces",
+    "verification",
+    "cost",
+    "stop_conditions",
+    "authorization_version",
+    "attachments"
+  ],
+  "additionalProperties": false,
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

@@ -1,0 +1,68 @@
+{
+  "type": "object",
+  "properties": {
+    "seq": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "event_id": {
+      "type": "string"
+    },
+    "idempotency_key": {
+      "type": "string"
+    },
+    "event_type": {
+      "type": "string"
+    },
+    "object_id": {
+      "type": "string"
+    },
+    "object_version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "previous_state_version": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "new_state_version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "producer": {
+      "type": "string"
+    },
+    "time": {
+      "type": "number",
+      "minimum": 0
+    },
+    "input_versions": {
+      "type": "string"
+    },
+    "payload": {
+      "type": "string"
+    },
+    "payload_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    }
+  },
+  "required": [
+    "seq",
+    "event_id",
+    "idempotency_key",
+    "event_type",
+    "object_id",
+    "object_version",
+    "previous_state_version",
+    "new_state_version",
+    "producer",
+    "time",
+    "input_versions",
+    "payload",
+    "payload_sha256"
+  ],
+  "additionalProperties": false,
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:rlflow:standalone:schema:RuntimeEvent"
+}

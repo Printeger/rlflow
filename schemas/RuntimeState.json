@@ -1,0 +1,783 @@
+{
+  "type": "object",
+  "properties": {
+    "version": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "paused": {
+      "type": "boolean"
+    },
+    "enabled": {
+      "type": "boolean"
+    },
+    "stages": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "AUTHORIZED",
+              "REVOKED",
+              "HOLD"
+            ]
+          },
+          "repo": {
+            "type": "string"
+          },
+          "scope": {
+            "type": "string"
+          },
+          "module_roots": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "protected_paths": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "cpu_runtime": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "root": {
+                    "type": "string"
+                  },
+                  "python": {
+                    "type": "string"
+                  },
+                  "python_sha256": {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{64}$"
+                  },
+                  "address_space_bytes": {
+                    "type": "integer",
+                    "minimum": 2147483648,
+                    "maximum": 17179869184
+                  }
+                },
+                "required": [
+                  "root",
+                  "python",
+                  "python_sha256",
+                  "address_space_bytes"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "categories": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "budget": {
+            "type": "object",
+            "properties": {
+              "role_calls": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "wall_seconds": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "fake_starts": {
+                "type": "integer",
+                "minimum": 0
+              }
+            },
+            "required": [
+              "role_calls",
+              "wall_seconds",
+              "fake_starts"
+            ],
+            "additionalProperties": false
+          },
+          "used_calls": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "used_seconds": {
+            "type": "number",
+            "minimum": 0
+          },
+          "reserved_seconds": {
+            "type": "number",
+            "minimum": 0
+          },
+          "used_fake_starts": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "authorization": {
+            "type": "string"
+          },
+          "approval_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "approval_extensions": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^A-[a-f0-9]{16}$"
+            },
+            "uniqueItems": true
+          },
+          "cpu_only": {
+            "const": true
+          },
+          "baseline": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string"
+              },
+              "head": {
+                "type": "string"
+              },
+              "tree_sha256": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              },
+              "files": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{64}$"
+                }
+              }
+            },
+            "required": [
+              "path",
+              "head",
+              "tree_sha256",
+              "files"
+            ],
+            "additionalProperties": false
+          },
+          "per_call_seconds": {
+            "type": "number",
+            "minimum": 1
+          },
+          "compute": {
+            "type": "object",
+            "properties": {
+              "limits": {
+                "type": "object",
+                "properties": {
+                  "sol": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "astra": {
+                    "type": "integer",
+                    "minimum": 0
+                  }
+                },
+                "required": [
+                  "sol",
+                  "astra"
+                ],
+                "additionalProperties": false
+              },
+              "used": {
+                "type": "object",
+                "properties": {
+                  "sol": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "astra": {
+                    "type": "integer",
+                    "minimum": 0
+                  }
+                },
+                "required": [
+                  "sol",
+                  "astra"
+                ],
+                "additionalProperties": false
+              },
+              "reserved_seconds": {
+                "type": "object",
+                "properties": {
+                  "sol": {
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  "astra": {
+                    "type": "number",
+                    "minimum": 0
+                  }
+                },
+                "required": [
+                  "sol",
+                  "astra"
+                ],
+                "additionalProperties": false
+              },
+              "used_seconds": {
+                "type": "object",
+                "properties": {
+                  "sol": {
+                    "type": "number",
+                    "minimum": 0
+                  },
+                  "astra": {
+                    "type": "number",
+                    "minimum": 0
+                  }
+                },
+                "required": [
+                  "sol",
+                  "astra"
+                ],
+                "additionalProperties": false
+              },
+              "reserved_calls": {
+                "type": "object",
+                "properties": {
+                  "sol": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "astra": {
+                    "type": "integer",
+                    "minimum": 0
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "limits",
+              "used",
+              "reserved_seconds",
+              "used_seconds"
+            ],
+            "additionalProperties": false
+          },
+          "package_id": {
+            "type": "string"
+          },
+          "command_seconds": {
+            "type": "number"
+          },
+          "reserved_calls": {
+            "type": "integer"
+          },
+          "infrastructure_seconds": {
+            "type": "number"
+          },
+          "repair_id": {
+            "type": "string"
+          },
+          "funding_stage_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "status",
+          "repo",
+          "scope",
+          "module_roots",
+          "protected_paths",
+          "categories",
+          "budget",
+          "used_calls",
+          "used_seconds",
+          "reserved_seconds",
+          "used_fake_starts",
+          "authorization",
+          "approval_id",
+          "cpu_only",
+          "baseline",
+          "per_call_seconds"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "tasks": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "stage_id": {
+            "type": "string"
+          },
+          "cycle_id": {
+            "type": "string"
+          },
+          "text": {
+            "type": "string"
+          },
+          "repo": {
+            "type": "string"
+          },
+          "baseline": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string"
+              },
+              "head": {
+                "type": "string"
+              },
+              "tree_sha256": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              },
+              "files": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{64}$"
+                }
+              }
+            },
+            "required": [
+              "path",
+              "head",
+              "tree_sha256",
+              "files"
+            ],
+            "additionalProperties": false
+          },
+          "status": {
+            "enum": [
+              "QUEUED",
+              "RUNNING",
+              "DONE",
+              "STOPPED",
+              "BUDGET_EXHAUSTED",
+              "ROLE_ERROR",
+              "INFRASTRUCTURE_ERROR",
+              "REPEATED_BLOCKER",
+              "CONTRACT_DECISION",
+              "RECONCILE",
+              "COMPUTE_BLOCKED",
+              "CONSULTED",
+              "ESCALATION_PENDING",
+              "WAITING_EXPERIMENT",
+              "WAITING_CHILDREN"
+            ]
+          },
+          "next_role": {
+            "enum": [
+              "PI",
+              "Engineer",
+              "Evaluator",
+              "Critic",
+              "Designer",
+              "Scout"
+            ]
+          },
+          "repair_rounds": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "diagnostic_after_rounds": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "results": {
+            "type": "array",
+            "items": {
+              "$ref": "RoleResult.json"
+            }
+          },
+          "findings": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "consulted": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "completion": {
+            "type": "object",
+            "properties": {
+              "implementation": {
+                "type": "boolean"
+              },
+              "cpu": {
+                "type": "boolean"
+              },
+              "real_run": {
+                "type": "boolean"
+              },
+              "behavior": {
+                "type": "boolean"
+              },
+              "formal": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "implementation",
+              "cpu",
+              "real_run",
+              "behavior",
+              "formal"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "id",
+          "version",
+          "stage_id",
+          "cycle_id",
+          "text",
+          "repo",
+          "baseline",
+          "status",
+          "next_role",
+          "repair_rounds",
+          "diagnostic_after_rounds",
+          "results",
+          "findings",
+          "consulted",
+          "completion"
+        ],
+        "additionalProperties": true
+      }
+    },
+    "sessions": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "role": {
+            "enum": [
+              "PI",
+              "Engineer",
+              "Evaluator",
+              "Critic",
+              "Designer",
+              "Scout"
+            ]
+          },
+          "task_id": {
+            "type": "string"
+          },
+          "task_version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "stage_id": {
+            "type": "string"
+          },
+          "input_state_version": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "status": {
+            "enum": [
+              "START_INTENT",
+              "RUNNING",
+              "RECONCILE",
+              "ACCEPTED",
+              "REJECTED"
+            ]
+          },
+          "directory": {
+            "type": "string"
+          },
+          "scratch": {
+            "type": "string"
+          },
+          "limit": {
+            "type": "number",
+            "minimum": 0
+          },
+          "before": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string"
+              },
+              "head": {
+                "type": "string"
+              },
+              "tree_sha256": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              },
+              "files": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{64}$"
+                }
+              }
+            },
+            "required": [
+              "path",
+              "head",
+              "tree_sha256",
+              "files"
+            ],
+            "additionalProperties": false
+          },
+          "identity": {
+            "type": [
+              "object",
+              "null"
+            ]
+          },
+          "created": {
+            "type": "number",
+            "minimum": 0
+          }
+        },
+        "required": [
+          "id",
+          "role",
+          "task_id",
+          "task_version",
+          "stage_id",
+          "input_state_version",
+          "status",
+          "directory",
+          "scratch",
+          "limit",
+          "before",
+          "identity",
+          "created"
+        ],
+        "additionalProperties": true
+      }
+    },
+    "jobs": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object"
+      }
+    },
+    "proposals": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "content": {
+            "type": "object"
+          },
+          "shown": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "version",
+          "sha256",
+          "content",
+          "shown"
+        ],
+        "additionalProperties": true
+      }
+    },
+    "approvals": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "approval_id": {
+            "type": "string"
+          },
+          "proposal_id": {
+            "type": "string"
+          },
+          "proposal_version": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "proposal_sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "decision": {
+            "enum": [
+              "APPROVED",
+              "REJECTED"
+            ]
+          },
+          "approver": {
+            "type": "string"
+          },
+          "time": {
+            "type": "number",
+            "minimum": 0
+          },
+          "reason": {
+            "type": "string"
+          },
+          "scope": {
+            "enum": [
+              "STAGE",
+              "STAGE_EXTENSION",
+              "PACKAGE",
+              "EXPERIMENT",
+              "SANDBOX_ONLY",
+              "MAINLINE_ADOPTION"
+            ]
+          },
+          "stage_id": {
+            "type": "string"
+          },
+          "budget": {
+            "type": "object",
+            "properties": {
+              "role_calls": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "wall_seconds": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "fake_starts": {
+                "type": "integer",
+                "minimum": 0
+              }
+            },
+            "required": [
+              "role_calls",
+              "wall_seconds",
+              "fake_starts"
+            ],
+            "additionalProperties": false
+          },
+          "preconditions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "approval_id",
+          "proposal_id",
+          "proposal_version",
+          "proposal_sha256",
+          "decision",
+          "approver",
+          "time",
+          "reason",
+          "scope",
+          "stage_id",
+          "budget",
+          "preconditions"
+        ],
+        "additionalProperties": true
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object"
+      }
+    },
+    "decisions": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object"
+      }
+    },
+    "historical": {
+      "type": "object"
+    },
+    "migration": {
+      "type": "object"
+    },
+    "autonomous_tasks": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true
+    },
+    "packages": {
+      "type": "object"
+    },
+    "goals": {
+      "type": "object"
+    },
+    "accounting_corrections": {
+      "type": "object"
+    },
+    "research": {
+      "type": "object"
+    },
+    "authorizations": {
+      "type": "object"
+    },
+    "repairs": {
+      "type": "object"
+    },
+    "releases": {
+      "type": "object"
+    }
+  },
+  "required": [
+    "version",
+    "paused",
+    "enabled",
+    "stages",
+    "tasks",
+    "sessions",
+    "jobs",
+    "proposals",
+    "approvals",
+    "evidence",
+    "decisions",
+    "historical",
+    "migration"
+  ],
+  "additionalProperties": false,
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:rlflow:standalone:schema:RuntimeState"
+}
