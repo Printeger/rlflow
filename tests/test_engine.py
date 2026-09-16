@@ -1,5 +1,6 @@
 """Deterministic control-plane fixtures. No real Codex/LLM sessions are launched."""
 import json
+import hashlib
 from pathlib import Path
 import subprocess
 import sys
@@ -47,7 +48,10 @@ def harness(tmp_path, monkeypatch):
     # Only the worker launch is simulated; Git and other CPU utilities stay real.
     def popen(argv, *args, **kwargs):
         if 'rlflow.worker' in argv:
-            return SimpleNamespace(pid=99999999)
+            request=json.loads(Path(argv[-1]).read_text())
+            from rlflow.startup import record
+            record(request['directory'],'READY',{'session':request['id'],'generation':request['generation'],'identity':None})
+            return SimpleNamespace(pid=99999999,poll=lambda:None)
         return original_popen(argv, *args, **kwargs)
     monkeypatch.setattr(engine.subprocess, 'Popen', popen)
     def packet(store, state, task, session):
@@ -208,6 +212,20 @@ def test_role_failure_consumes_budget(harness):
     assert state['stages']['CPU']['reserved_seconds'] == 0
 
 
+def test_explicit_resume_requeues_a_blocked_role_failure(harness, monkeypatch):
+    h = harness
+    monkeypatch.setattr(engine, 'ensure_daemon', lambda store: None)
+    sid = engine.dispatch_one(h.store)
+    state = deliver(h, sid, code=125)
+    assert state['tasks'][h.task_id]['status'] == 'ROLE_ERROR'
+    assert state['tasks'][h.task_id]['last_failure']['blocked'] is True
+    assert cli.main(['--state-dir', str(h.store.root), 'resume']) == 0
+    state = h.store.replay()
+    assert state['tasks'][h.task_id]['status'] == 'QUEUED'
+    assert state['tasks'][h.task_id]['last_failure']['blocked'] is False
+    assert engine.dispatch_one(h.store) is not None
+
+
 def test_budget_hard_stop_shared_by_new_task(harness):
     h = harness
     h.store.transact('FIXTURE_BUDGET', 'budget', lambda s: s['stages']['CPU'].update(used_calls=8))
@@ -252,10 +270,12 @@ def test_transaction_interrupt_and_rebuild(harness, monkeypatch):
     def fail_export(*args): raise OSError('projection write failed after commit')
     with monkeypatch.context() as m:
         m.setattr(h.store, '_export', fail_export)
+        h.store.transact('DURABLE', 'durable', lambda s: s.update(paused=True))
         with pytest.raises(OSError):
-            h.store.transact('DURABLE', 'durable', lambda s: s.update(paused=True))
+            h.store.export()
     assert Store(h.store.root).replay()['paused'] is True
     state = h.store.rebuild()
+    h.store.export()
     assert json.loads((h.store.root / 'state/RESEARCH_STATE.json').read_text()) == state
     h.store.transact('DURABLE', 'durable', lambda s: s.update(paused=False))
     assert h.store.replay() == state
@@ -335,6 +355,26 @@ def test_worker_stdin_is_bounded_and_release_is_bound(tmp_path, monkeypatch):
     worker.run(d2 / 'request.json')
     assert 'identity mismatch' in json.loads((d2 / 'receipt.json').read_text())['reason']
     assert not (d2 / 'codex-identity.json').exists()
+
+
+def test_worker_control_release_wait_uses_request_bound(tmp_path):
+    from rlflow import worker
+    import time
+    d = tmp_path / 'unreleased-role'
+    d.mkdir()
+    scratch = d / 'scratch'
+    scratch.mkdir()
+    request = {'id': 'S-unreleased', 'directory': str(d), 'scratch': str(scratch),
+               'repo': str(tmp_path), 'root': str(tmp_path), 'role': 'PI',
+               'schema': 'unused', 'limit': 1, 'prompt': '', 'release_wait_seconds': .05}
+    atomic(d / 'request.json', canonical(request))
+    started = time.monotonic()
+    worker.run(d / 'request.json')
+    receipt = json.loads((d / 'receipt.json').read_text())
+    assert time.monotonic() - started < .5
+    assert receipt['exit_code'] == 125
+    assert receipt['model_usage']['state'] == 'NOT_STARTED'
+    assert 'bounded release cancelled/timed out' in receipt['reason']
 
 
 def test_job_reservation_crash_never_resubmits(harness, monkeypatch):
@@ -565,6 +605,48 @@ def test_candidate_diff_includes_untracked_without_mutating_index(harness):
     assert b'new_test.py' in diff
     assert b'assert True' in diff
     assert (h.repo / '.git/index').read_bytes() == before
+
+
+def test_engineer_tracked_diff_report_is_normalized_to_full_candidate(harness):
+    h = harness
+    pi = engine.dispatch_one(h.store)
+    deliver(h, pi)
+    sid = engine.dispatch_one(h.store)
+    assert h.store.replay()['sessions'][sid]['role'] == 'Engineer'
+    (h.repo / 'parser.py').write_text('def parse(value):\n    return int(value)\n')
+    (h.repo / 'new_test.py').write_text('assert True\n')
+    result = result_for(h, sid)
+    state = h.store.replay()
+    task = state['tasks'][h.task_id]
+    session = state['sessions'][sid]
+    raw_diff = engine.git_bytes(h.repo, 'diff', task['baseline']['head'], '--')
+    raw_hash = hashlib.sha256(raw_diff).hexdigest()
+    diff_path = Path(session['scratch']) / 'candidate.diff'
+    diff_path.write_bytes(raw_diff)
+    reported = {**engine.envelope_candidate(task), 'diff_sha256': raw_hash}
+    result['candidate'] = reported
+    result['payload']['candidate'] = reported
+    result['payload']['diff_path'] = str(diff_path)
+    result['payload']['changes'].append({
+        'path': 'new_test.py', 'description': 'cover parser behavior',
+        'suggested_category': 'ENGINEERING_FIX',
+    })
+
+    after = deliver(h, sid, result)
+    expected = engine.envelope_candidate(after['tasks'][h.task_id])
+    assert after['sessions'][sid]['status'] == 'ACCEPTED'
+    assert after['tasks'][h.task_id]['results'][-1]['candidate'] == expected
+    assert after['tasks'][h.task_id]['results'][-1]['payload']['candidate'] == expected
+    directory = Path(after['sessions'][sid]['directory'])
+    assert json.loads((directory / 'result.raw.json').read_text())['candidate'] == reported
+    validation = json.loads((directory / 'validation.json').read_text())
+    assert validation['candidate_normalization'] == {
+        'kind': 'TRACKED_DIFF_TO_FULL_CANDIDATE_ENVELOPE',
+        'reported_diff_sha256': raw_hash,
+        'full_diff_sha256': expected['diff_sha256'],
+        'diff_artifact': str(diff_path.resolve()),
+        'diff_artifact_sha256': raw_hash,
+    }
 
 @pytest.mark.parametrize('roots,allowed,expected', [
     (['parser.py'], ['.'], True),

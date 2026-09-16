@@ -18,7 +18,19 @@ def project(task,research,decisions,evidence):
     selected=evidence[-12:]
     selected_ids={e['id'] for e in selected}
     selected=[e for e in evidence if e['id'] in needed and e['id'] not in selected_ids]+selected
-    return t,r,decisions[-5:],selected,history,{'sha256':digest,'roles':len(task.get('results',[])),
+    visible_decisions=[]
+    recent=decisions[-5:]
+    for index, decision in enumerate(recent):
+        if index >= len(recent)-2:
+            visible_decisions.append(decision)
+            continue
+        visible_decisions.append({
+            **{key:deepcopy(value) for key,value in decision.items() if key not in {'payload','counterevidence'}},
+            'payload_sha256':sha(decision.get('payload')),
+            'counterevidence_sha256':sha(decision.get('counterevidence',[])),
+            'history_compacted':True,
+        })
+    return t,r,visible_decisions,selected,history,{'sha256':digest,'roles':len(task.get('results',[])),
         'decisions':len(decisions),'evidence':len(evidence),'experiments':len(research.get('experiments',[])),
         'counterevidence':len(research.get('counterevidence',[]))}
 

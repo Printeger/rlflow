@@ -6,14 +6,45 @@ from .store import Conflict, sha, atomic, canonical
 from .policy import candidate, new_stage, require_stage, _validated_candidate_paths
 
 
+def _compatible_control_release(state, current, target):
+    """Return whether validated release metadata links current back to target."""
+    pending = [current]
+    seen = set()
+    while pending:
+        release_id = pending.pop()
+        if release_id == target:
+            return True
+        if release_id in seen:
+            continue
+        seen.add(release_id)
+        validation = state.get('releases', {}).get(release_id, {}).get('validation', {})
+        parents = validation.get('compatible_from')
+        if (validation.get('exit_code') != 0
+                or validation.get('isolated_state') is not True
+                or validation.get('code_identity') != release_id
+                or validation.get('compatibility_scope') != 'PACKAGE_EXTENSION_VALIDATION_ONLY'
+                or type(parents) is not list
+                or any(type(item) is not str for item in parents)):
+            continue
+        pending.extend(parents)
+    return False
+
+
+def input_contract(spec):
+    if spec.get('schema_version')!='rlflow-package/2':return None
+    return {'manifest':spec['inputs'],'module_roots':spec['module_roots'],'protected_paths':spec['protected_paths']}
+
+
 def validate(spec, root):
     spec = deepcopy(spec)
     required = {'id', 'goal', 'repo', 'module_roots', 'protected_paths', 'tasks', 'budget'}
-    if not required <= spec.keys() or set(spec) - required - {'schema_version', 'per_call_seconds', 'command_seconds', 'scout_sources', 'experiments', 'decomposition', 'parameter_search', 'control_release'}:
+    if not required <= spec.keys() or set(spec) - required - {'schema_version', 'per_call_seconds', 'command_seconds', 'scout_sources', 'experiments', 'decomposition', 'parameter_search', 'control_release', 'inputs', 'resource_policy', 'routing', 'budget_reserves', 'usage_policy'}:
         raise Conflict('invalid work package fields')
-    if spec.get('schema_version', 'rlflow-package/1') != 'rlflow-package/1':
+    if spec.get('schema_version', 'rlflow-package/1') not in {'rlflow-package/1','rlflow-package/2'}:
         raise Conflict('unsupported package version')
-    spec['schema_version'] = 'rlflow-package/1'
+    spec.setdefault('schema_version','rlflow-package/1')
+    if spec['schema_version']=='rlflow-package/1' and any(k in spec for k in ('inputs','resource_policy','routing','budget_reserves','usage_policy')):
+        raise Conflict('new governance fields require package version 2')
     if 'control_release' in spec:
         from .verification import code_identity
         if spec['control_release']!=code_identity():raise Conflict('package requires a different exact control release')
@@ -92,13 +123,32 @@ def validate(spec, root):
         if not ready:
             raise Conflict('unknown or cyclic task dependencies')
         done |= ready
+    if spec['schema_version']=='rlflow-package/2':
+        from .files import validate_inputs
+        from .resources import validate_policy
+        from .governance import reserve_policy
+        validate_inputs(spec.get('inputs'),spec['module_roots'],spec['protected_paths'])
+        validate_policy(spec.get('resource_policy'))
+        if 'usage_policy' in spec:
+            from .usage import validate_policy as validate_usage_policy
+            validate_usage_policy(spec['usage_policy'])
+        spec['budget_reserves']=reserve_policy(spec)
+        if any(t['id']=='__final_integration__' for t in spec['tasks']):raise Conflict('reserved integration task identity')
+        spec['tasks'].append({'id':'__final_integration__','text':'Independently integrate the final cumulative candidate against all original conditions and interactions: '+spec['goal'],
+            'depends_on':[t['id'] for t in spec['tasks']],
+            'criteria':[dict(c,id=t['id']+':'+c['id']) for t in spec['tasks'] for c in t['criteria']],
+            'final_integration':True})
     return spec
 
 
 def propose(store, spec):
     spec = validate(spec, store.root)
+    if input_contract(spec):
+        from .files import verify_data,verify_environment
+        verify_data(spec['repo'],spec['inputs'])
+        verify_environment(spec['inputs']['environment'])
     content = {'schema_version': 'rlflow-proposal/2', 'scope': 'PACKAGE', 'stage_id': spec['id'],
-               'package': spec, 'baseline': candidate(spec['repo']),
+               'package': spec, 'baseline': candidate(spec['repo'],input_contract(spec)),
                'execution': {'mode': 'package', 'start_on_approval': True},
                'authority': 'CPU engineering only; each higher evidence layer requires separate exact authorization'}
     digest = sha(content)
@@ -127,14 +177,17 @@ def approve_in(s, content, aid, digest):
     if 'control_release' in spec:
         from .verification import code_identity
         if spec['control_release']!=code_identity():raise Conflict('control release changed before approval')
-    if pid in s['stages'] or candidate(spec['repo']) != content['baseline']:
+    if pid in s['stages'] or candidate(spec['repo'],input_contract(spec)) != content['baseline']:
         raise Conflict('package stage exists or candidate drifted')
     # Build legacy-compatible stage; larger package pool is explicit approved content.
     small = {**spec['budget'], 'wall_seconds': min(86400, spec['budget']['wall_seconds'])}
     stage = new_stage(pid, spec['repo'], spec['goal'], small, digest, approval_id=aid,
-                      module_roots=spec['module_roots'], protected_paths=spec['protected_paths'])
+                      module_roots=spec['module_roots'], protected_paths=spec['protected_paths'],input_contract=input_contract(spec))
     stage.update(budget=spec['budget'], package_id=pid, per_call_seconds=spec['per_call_seconds'],
                  command_seconds=spec['command_seconds'], reserved_calls=0)
+    if spec['schema_version']=='rlflow-package/2':
+        stage.update(budget_reserves=spec['budget_reserves'],routing=spec['routing'],resource_policy=spec['resource_policy'],input_contract=input_contract(spec))
+    if 'usage_policy' in spec:stage['usage_policy']=spec['usage_policy']
     s['stages'][pid] = stage
     package = {'id': pid, 'version': 1, 'spec': spec, 'approval_id': aid, 'status': 'ACTIVE',
                'paused': False, 'tasks': [], 'achievements': {}, 'next_actions': []}
@@ -150,6 +203,12 @@ def approve_in(s, content, aid, digest):
             'results': [], 'findings': [], 'consulted': [], 'order': index,
             'depends_on': [mapping[d] for d in item['depends_on']], 'criteria': item['criteria'], 'research_mode': item.get('research_mode',False),
             'condition_evidence': {}, 'completion': dict.fromkeys(('implementation', 'cpu', 'real_run', 'behavior', 'formal'), False)}
+        if spec['schema_version']=='rlflow-package/2':
+            s['tasks'][tid]['input_contract']=input_contract(spec)
+            from .governance import route,integration_route
+            s['tasks'][tid]['route']=integration_route(spec) if item.get('final_integration') else route(item,spec['routing'])
+            s['tasks'][tid]['final_integration']=item.get('final_integration',False)
+            s['tasks'][tid]['next_role']=s['tasks'][tid]['route'][0]
         package['tasks'].append(tid)
         s.setdefault('autonomous_tasks', []).append(tid)
     refresh(s, pid)
@@ -170,10 +229,46 @@ def require_package(s, stage):
     spec = p['spec']
     if 'control_release' in spec:
         from .verification import code_identity
-        if spec['control_release']!=code_identity():raise Conflict('package bound control release changed')
-    for field in ('repo', 'module_roots', 'protected_paths', 'budget', 'per_call_seconds', 'command_seconds'):
+        current = code_identity()
+        if spec['control_release'] != current:
+            if not _compatible_control_release(s, current, spec['control_release']):
+                raise Conflict('package bound control release changed')
+    expected_budget = dict(spec['budget'])
+    extensions = stage.get('approval_extensions', [])
+    if len(extensions) != len(set(extensions)):
+        raise Conflict('duplicate package extension approval')
+    for extension_id in extensions:
+        extension = s['approvals'].get(extension_id, {})
+        extension_proposal = s['proposals'].get(extension.get('proposal_id'), {})
+        extension_content = extension_proposal.get('content', {})
+        if (extension.get('decision') != 'APPROVED' or extension.get('revoked')
+                or extension_proposal.get('revoked')
+                or extension_content.get('scope') != 'STAGE_EXTENSION'
+                or extension_content.get('stage_id') != stage['id']
+                or extension_content.get('recorded_budget') != expected_budget
+                or sha(extension_content) != extension.get('proposal_sha256')
+                or sha(extension_content) != extension_proposal.get('sha256')
+                or extension.get('proposal_version') != extension_proposal.get('version')):
+            raise Conflict('package extension approval invalid')
+        additional = extension_content.get('additional_budget', {})
+        for key in ('role_calls', 'wall_seconds', 'fake_starts'):
+            value = additional.get(key)
+            if type(value) is not int or value < 0:
+                raise Conflict('package extension budget invalid')
+            expected_budget[key] += value
+    if spec['schema_version']=='rlflow-package/2':
+        from .files import verify_data,verify_environment
+        verify_data(spec['repo'],spec['inputs'])
+        verify_environment(spec['inputs']['environment'])
+        if stage.get('input_contract')!=input_contract(spec):raise Conflict('input contract drift')
+        for field in ('budget_reserves','resource_policy','routing'):
+            if stage.get(field)!=spec[field]:raise Conflict('package governance drift: '+field)
+    for field in ('repo', 'module_roots', 'protected_paths', 'per_call_seconds', 'command_seconds'):
         if stage.get(field) != spec[field]:
             raise Conflict('package scope or limits drifted: ' + field)
+    if stage.get('usage_policy')!=spec.get('usage_policy'):raise Conflict('usage admission policy drift')
+    if stage.get('budget') != expected_budget:
+        raise Conflict('package scope or limits drifted: budget')
     if stage['categories'] != ['ENGINEERING_FIX'] or stage['scope'] != spec['goal'] or stage.get('cpu_runtime') is not None:
         raise Conflict('package permissions drifted')
     from .engine import task_identity
@@ -182,6 +277,9 @@ def require_package(s, stage):
     verify(s,p,list(mapping.values()))
     for item in spec['tasks']:
         task=s['tasks'][mapping[item['id']]]
+        if spec['schema_version']=='rlflow-package/2':
+            from .governance import route,integration_route
+            if task.get('input_contract')!=input_contract(spec) or task.get('route')!=(integration_route(spec) if item.get('final_integration') else route(item,spec['routing'])) or task.get('final_integration')!=item.get('final_integration',False):raise Conflict('task input/routing drift')
         if (task['criteria']!=item['criteria'] or task['text']!=item['text'] or task['repo']!=spec['repo'] or task['baseline']!=c['baseline']
                 or task['depends_on']!=[mapping[d] for d in item['depends_on']]
                 or task.get('research_mode',False)!=item.get('research_mode',False)):

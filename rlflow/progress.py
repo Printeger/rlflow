@@ -5,6 +5,7 @@ from .store import Conflict, sha
 def review(state, task, payload):
     package = state.setdefault('research', {}).setdefault(task.get('package_id', task['stage_id']), {})
     registry = package.setdefault('findings', {})
+    preexisting = set(registry)
     conditions = {c['id'] for c in task.get('criteria', [])}
     old = set(task.get('open_problem_keys', [])); current = set(); new_information = False; previously_seen = False
     for finding in payload['findings']:
@@ -13,10 +14,22 @@ def review(state, task, payload):
             raise Conflict('MUST_FIX requires contract, evidence, impact and closure')
         # Exact approved condition names are stable. Unknown associations share a
         # diagnostic bucket: prose/ID changes cannot establish a new problem.
-        condition = finding['contract'] if finding['contract'] in conditions else 'UNRESOLVED_CONTRACT_ASSOCIATION'
+        if finding['contract'] in conditions:
+            condition = finding['contract']
+        elif len(conditions) == 1:
+            # A leaf with one frozen condition has an unambiguous association
+            # even when the evaluator quotes the condition prose instead of its
+            # identifier.  Keeping it in the package-wide unknown bucket makes
+            # unrelated leaves collide with previously closed findings.
+            condition = next(iter(conditions))
+        else:
+            condition = 'UNRESOLVED_CONTRACT_ASSOCIATION'
         key = sha({'package': task.get('package_id', task['stage_id']), 'condition': condition})
         evidence = {state['evidence'][eid]['sha256'] for eid in finding['evidence_refs'] if eid in state['evidence']}
-        previously_seen |= key in registry
+        # Multiple findings in one evaluator result may belong to the same
+        # frozen condition.  Only records that predate this result count as a
+        # repeated diagnostic cycle.
+        previously_seen |= key in preexisting
         record = registry.setdefault(key, {'condition': condition, 'evidence': [], 'aliases': [], 'closed': False})
         novel = evidence - set(record['evidence'])
         # Only explicit verified relevance can establish material information;

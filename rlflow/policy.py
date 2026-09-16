@@ -33,9 +33,14 @@ def git_bytes(repo,*args):
                                     '-c','core.hooksPath=/dev/null','-C',str(repo),*args],env=env,stderr=subprocess.STDOUT)
 
 
-def git_diff_bytes(repo, base):
+def git_diff_bytes(repo, base, input_contract=None):
     """Return one binary diff including untracked files without changing .git."""
     repo = Path(repo).resolve(strict=True)
+    paths=['.']
+    if input_contract is not None:
+        from .files import source_names
+        paths=sorted(set(source_names(repo,input_contract))|set(input_contract['manifest']['source_files']))
+        if not paths:return b''
     env = {k: v for k, v in os.environ.items() if k in ('PATH', 'LANG', 'LC_ALL')}
     env.update(GIT_CONFIG_NOSYSTEM='1', GIT_CONFIG_GLOBAL='/dev/null', GIT_TERMINAL_PROMPT='0')
     with tempfile.TemporaryDirectory(prefix='rlflow-diff-') as temporary:
@@ -45,27 +50,44 @@ def git_diff_bytes(repo, base):
         command = ['/usr/bin/git', '--no-pager', '-c', 'core.fsmonitor=false',
                    '-c', 'core.hooksPath=/dev/null', '-C', str(repo)]
         untracked = subprocess.check_output(
-            [*command, 'ls-files', '--others', '--exclude-standard', '-z'],
+            [*command, 'ls-files', '--others', *(['--exclude-standard'] if input_contract is None else []), '-z','--',*paths],
             env=env, stderr=subprocess.STDOUT,
         ).split(b'\0')
         names = [name.decode('utf-8') for name in untracked if name]
         if names:
-            subprocess.check_output([*command, 'add', '-N', '--', *names], env=env,
+            subprocess.check_output([*command, 'add', '-N', '-f', '--', *names], env=env,
                                     stderr=subprocess.STDOUT)
         return subprocess.check_output(
-            [*command, 'diff', '--binary', '--no-ext-diff', '--no-textconv', base, '--', '.'],
+            [*command, 'diff', '--binary', '--no-ext-diff', '--no-textconv', base, '--', *paths],
             env=env, stderr=subprocess.STDOUT,
         )
 
 
-def candidate(repo):
+def candidate(repo, input_contract=None):
     if Path(repo).is_symlink():raise Conflict('candidate root must not be a symlink')
     repo = Path(repo).resolve(strict=True)
     metadata=repo/'.git'
     if metadata.is_symlink() or not metadata.is_dir():
         raise Conflict('candidate must be a standalone Git checkout, not a shared worktree')
+    if input_contract is not None:
+        from .files import SourceIndex,source_names
+        # Git metadata remains within the old safety boundary.
+        for p in metadata.rglob('*'):
+            info=p.lstat()
+            if stat.S_ISLNK(info.st_mode) or not (stat.S_ISDIR(info.st_mode) or stat.S_ISREG(info.st_mode)) or stat.S_ISREG(info.st_mode) and info.st_nlink!=1:
+                raise Conflict('unsafe Git metadata')
+        for name in ('objects/info/alternates','objects/info/http-alternates','commondir'):
+            if (metadata/name).exists():raise Conflict('shared Git metadata')
+        names=source_names(repo,input_contract)
+        files=SourceIndex().scan(repo,names,boundary=True)['files']
+        if source_names(repo,input_contract)!=names:raise Conflict('source membership changed during scan')
+        if Path(git(repo,'rev-parse','--show-toplevel')).resolve()!=repo or Path(git(repo,'rev-parse','--absolute-git-dir')).resolve()!=metadata:
+            raise Conflict('Git root differs from candidate')
+        return {"path":str(repo),"head":git(repo,"rev-parse","HEAD"),"tree_sha256":sha(files),"files":files}
     files = {}
-    for p in sorted(repo.rglob("*")):
+    verified_stats={}
+    paths=sorted(repo.rglob("*"))
+    for p in paths:
         rel = p.relative_to(repo)
         info=p.lstat()
         if stat.S_ISLNK(info.st_mode) or not (stat.S_ISDIR(info.st_mode) or stat.S_ISREG(info.st_mode)):
@@ -79,7 +101,12 @@ def candidate(repo):
         if p.is_symlink():
             raise Conflict(f"candidate symlink requires clarification: {rel}")
         if p.is_file():
-            files[str(rel)] = hashlib.sha256(p.read_bytes()).hexdigest()
+            from .files import stream_digest
+            files[str(rel)] = stream_digest(p, root=repo)
+            from .files import stamp
+            verified_stats[p]=stamp(info)
+    if sorted(repo.rglob('*'))!=paths or any(stamp(p.lstat())!=value for p,value in verified_stats.items()):
+        raise Conflict('legacy candidate changed during scan')
     if Path(git(repo,'rev-parse','--show-toplevel')).resolve()!=repo or Path(git(repo,'rev-parse','--absolute-git-dir')).resolve()!=metadata:
         raise Conflict('Git root differs from candidate')
     return {"path": str(repo), "head": git(repo, "rev-parse", "HEAD"), "tree_sha256": sha(files), "files": files}
@@ -207,7 +234,7 @@ def _cpu_runtime(root, python, address_space_gib):
 
 
 def new_stage(sid, repo, task, budget, authorization, *, approval_id=None,
-              module_roots=None, protected_paths=None, cpu_runtime=None):
+              module_roots=None, protected_paths=None, cpu_runtime=None, input_contract=None):
     from .model_policy import new_budget
     if type(budget.get("role_calls")) is not int or type(budget.get("wall_seconds")) is not int:
         raise Conflict("budget must contain integer role_calls and wall_seconds")
@@ -223,7 +250,7 @@ def new_stage(sid, repo, task, budget, authorization, *, approval_id=None,
             "cpu_runtime": cpu_runtime, "categories": ["ENGINEERING_FIX"], "budget": budget,
             "used_calls": 0, "used_seconds": 0, "reserved_seconds": 0, "used_fake_starts": 0,
             "authorization": authorization, "approval_id": approval_id, "cpu_only": True,
-            "baseline": candidate(repo), "per_call_seconds": min(900, budget["wall_seconds"]),
+            "baseline": candidate(repo,input_contract), "per_call_seconds": min(900, budget["wall_seconds"]),
             "compute": new_budget(budget["role_calls"])}
 
 
@@ -264,7 +291,7 @@ def make_proposal(store, sid, repo, task, budget, *, module_roots=None,
 
 
 def make_extension_proposal(store, sid, task_id, role_calls, wall_seconds, reason, *, stage_loop=False, next_role=None):
-    state = store.replay()
+    state = store.view()
     stage = require_stage(state, sid)
     if any(x["stage_id"] == sid and x["status"] in {"START_INTENT", "RUNNING", "RECONCILE"}
            for x in state["sessions"].values()):
@@ -274,9 +301,10 @@ def make_extension_proposal(store, sid, task_id, role_calls, wall_seconds, reaso
         "INFRASTRUCTURE_ERROR", "CONTRACT_DECISION", "ROLE_ERROR", "QUEUED", "BUDGET_EXHAUSTED"
     }:
         raise Conflict("task is not at an extension boundary")
+    minimum_wall_seconds = 0 if stage_loop else 1
     if (type(role_calls) is not int or type(wall_seconds) is not int
             or not 1 <= role_calls <= (100 if stage_loop else 1)
-            or not 1 <= wall_seconds <= (86400 if stage_loop else 900)
+            or not minimum_wall_seconds <= wall_seconds <= (86400 if stage_loop else 900)
             or stage['budget']['role_calls'] + role_calls > 100
             or stage['budget']['wall_seconds'] + wall_seconds > 86400):
         raise Conflict("invalid extension: cumulative maximum 100 calls / 86400 seconds; manual review allows one call / 900 seconds")
@@ -288,12 +316,12 @@ def make_extension_proposal(store, sid, task_id, role_calls, wall_seconds, reaso
         raise Conflict('resolve the contract, infrastructure failure or model escalation before authorizing a stage loop')
     if not reason.strip():
         raise Conflict("extension reason required")
-    current = candidate(task["repo"])
+    current = candidate(task["repo"],task.get("input_contract"))
     content = {
         "schema_version": "rlflow-proposal/1", "scope": "STAGE_EXTENSION",
         "stage_id": sid, "task_id": task_id, "task_version": task["version"],
         "next_role": selected_role, "repo": task["repo"], "candidate": current,
-        "candidate_diff_sha256": hashlib.sha256(git_diff_bytes(task["repo"], task["baseline"]["head"])).hexdigest(),
+        "candidate_diff_sha256": hashlib.sha256(git_diff_bytes(task["repo"], task["baseline"]["head"],task.get("input_contract"))).hexdigest(),
         "recorded_budget": dict(stage["budget"]),
         "recorded_usage": {k: stage[k] for k in ("used_calls", "used_seconds", "reserved_seconds", "used_fake_starts")},
         "additional_budget": {"role_calls": role_calls, "wall_seconds": wall_seconds, "fake_starts": 0},
@@ -316,7 +344,7 @@ def make_extension_proposal(store, sid, task_id, role_calls, wall_seconds, reaso
 
 
 def show_proposal(store, pid):
-    p = store.replay()["proposals"][pid]
+    p = store.view()["proposals"][pid]
     if sha(p["content"]) != p["sha256"]:
         raise Conflict("proposal hash mismatch")
     store.transact("PROPOSAL_SHOWN", "shown:" + p["sha256"], lambda s: s["proposals"][pid].update(shown=True), object_id=pid, producer="user-cli")

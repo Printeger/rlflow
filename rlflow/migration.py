@@ -26,7 +26,7 @@ def seed_demo(store):
     from .policy import git
     import subprocess
     repo = store.root / "workspaces/budget-parser-demo"
-    if "CPU-DEMO" in store.replay()["stages"]:
+    if "CPU-DEMO" in store.view()["stages"]:
         return repo
     if repo.exists():
         raise Conflict("unregistered demo workspace exists; preserve and inspect before adopting")

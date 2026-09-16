@@ -7,7 +7,7 @@ FIELDS = {'payload', 'evidence_refs', 'candidate', 'observations', 'counterevide
 
 
 def detail(store, session_id, request):
-    s = store.replay();se = s['sessions'][session_id];task=s['tasks'][se['task_id']]
+    s = store.view();se = s['sessions'][session_id];task=s['tasks'][se['task_id']]
     if se['status'] != 'ACCEPTED' or task['version'] != se['task_version']+1:
         raise Conflict('stale evidence request')
     if not request['purpose'].strip() or not request['fields'] or not set(request['fields']) <= FIELDS:

@@ -24,8 +24,10 @@ def test_event_replay_and_atomic_projections(store):
     store.transact('PAUSED','pause1',lambda s:s.update(paused=True),expected=0)
     store.transact('RESUMED','resume1',lambda s:s.update(paused=False),expected=1)
     expected=store.replay()
+    store.export()
     (store.root/'state/RESEARCH_STATE.json').write_text('broken projection')
     assert store.rebuild()==expected
+    store.export()
     assert json.loads((store.root/'state/RESEARCH_STATE.json').read_text())==expected
     rows=[json.loads(line) for line in (store.root/'events/events.jsonl').read_text().splitlines()]
     assert [row['seq'] for row in rows]==[1,2]
@@ -48,7 +50,8 @@ def test_commit_survives_export_interruption(store,monkeypatch):
     export=store._export
     def fail(*args): raise OSError('injected power loss before projection write')
     monkeypatch.setattr(store,'_export',fail)
-    with pytest.raises(OSError):store.transact('PAUSED','pause1',lambda s:s.update(paused=True))
+    store.transact('PAUSED','pause1',lambda s:s.update(paused=True))
+    with pytest.raises(OSError):store.export()
     assert store.replay()['version']==1 and store.replay()['paused']
     monkeypatch.setattr(store,'_export',export)
     assert store.rebuild()['version']==1

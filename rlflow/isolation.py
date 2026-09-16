@@ -508,10 +508,16 @@ if __name__ == '__main__':
         directory=Path(cfg.get('guard_directory') or tempfile.mkdtemp(prefix='rlflow-command-guard-'))
         directory.mkdir(parents=True,exist_ok=True)
         cfg['guard_directory']=str(directory);cfg['supervisor_identity']=group_identity(os.getpid())
+        import uuid
+        cfg['generation']=uuid.uuid4().hex
+        from rlflow.startup import record
+        binding={'session':'command','generation':cfg['generation'],'identity':cfg['supervisor_identity']}
+        record(directory,'PREPARING',binding)
         child=None;owned=None;interrupted=[False];timed=False
         def stop_signal(signum,frame):interrupted[0]=True
         signal.signal(signal.SIGTERM,stop_signal);signal.signal(signal.SIGINT,stop_signal)
         started=time.monotonic()
+        cfg['overall_deadline_monotonic']=started+cfg['timeout']
         guard=start_guard(directory,'command',cfg['supervisor_identity'],cfg.get('control_root',str(directory)),cfg['timeout'],'command')
         try:
             child=subprocess.Popen([sys.executable,'-I',str(Path(__file__).resolve()),'_child',json.dumps(cfg)],
@@ -519,11 +525,14 @@ if __name__ == '__main__':
             owned=group_identity(child.pid)
             while not (directory/'command-child-identity.json').exists():
                 if interrupted[0] or time.monotonic()-started>=cfg['timeout']:raise TimeoutError('command startup deadline')
-                if child.poll() is not None or time.monotonic()-started>5:raise RuntimeError('command child identity unavailable')
+                if child.poll() is not None or time.monotonic()-started>min(60,cfg['timeout']):raise RuntimeError('command child identity unavailable')
                 time.sleep(.01)
             owned=json.loads((directory/'command-child-identity.json').read_text())
             if owned!=group_identity(child.pid):raise RuntimeError('command child identity changed')
-            atomic(directory/'command-release.json',canonical({'identity':owned}))
+            binding={**binding,'identity':owned,'request_sha256':__import__('hashlib').sha256(canonical(cfg)).hexdigest()}
+            record(directory,'READY',binding)
+            record(directory,'RELEASE_COMMITTED',binding)
+            atomic(directory/'command-release.json',canonical(binding))
             while os.waitid(os.P_PID,child.pid,os.WEXITED|os.WNOHANG|os.WNOWAIT) is None:
                 if interrupted[0] or os.getppid()!=owner or time.monotonic()-started>cfg['timeout']:
                     timed=True;break
@@ -543,11 +552,14 @@ if __name__ == '__main__':
             from rlflow.jobs import owns
             from rlflow.store import atomic,canonical
             directory=Path(cfg['guard_directory']);atomic(directory/'command-child-identity.json',canonical(group_identity(os.getpid())))
-            deadline=time.monotonic()+5
+            deadline=min(time.monotonic()+60,cfg['overall_deadline_monotonic'])
             while not (directory/'command-release.json').exists():
                 if not owns(cfg['supervisor_identity']) or time.monotonic()>deadline:raise SystemExit(126)
                 time.sleep(.01)
-            if json.loads((directory/'command-release.json').read_text())['identity']!=group_identity(os.getpid()) or not owns(cfg['supervisor_identity']):raise SystemExit(126)
+            release=json.loads((directory/'command-release.json').read_text())
+            if release['identity']!=group_identity(os.getpid()) or release.get('generation')!=cfg['generation'] or not owns(cfg['supervisor_identity']):raise SystemExit(126)
+            from rlflow.startup import record
+            record(directory,'START_ACK',release)
         resource.setrlimit(resource.RLIMIT_CORE,(0,0))
         resource.setrlimit(resource.RLIMIT_CPU,(int(cfg['timeout'])+1,int(cfg['timeout'])+1))
         resource.setrlimit(resource.RLIMIT_AS,(cfg.get('memory_bytes',2*1024**3),cfg.get('memory_bytes',2*1024**3)))

@@ -156,3 +156,61 @@ def test_optional_exact_control_release_cannot_drift(harness,monkeypatch):
     p=approved(h,v)
     monkeypatch.setattr(verification,'code_identity',lambda:'0'*64)
     with pytest.raises(Conflict,match='control release'):packages.require_package(h.store.replay(),h.store.replay()['stages']['PKG'])
+
+
+def test_package_extension_is_part_of_exact_approved_budget(harness):
+    h=harness;package=approved(h);tid=package['tasks'][0]
+    state=h.store.replay();stage=state['stages']['PKG']
+    def exhaust(s):
+        s['stages']['PKG'].update(used_calls=stage['budget']['role_calls'], used_seconds=17)
+        s['tasks'][tid].update(status='BUDGET_EXHAUSTED', next_role='Engineer')
+    h.store.transact('FIXTURE_PACKAGE_EXHAUSTED','package-extension',exhaust)
+    proposal=policy.make_extension_proposal(h.store,'PKG',tid,2,600,'continue package',stage_loop=True)
+    shown=policy.show_proposal(h.store,proposal)
+    policy.decide(h.store,proposal,shown['sha256'],'APPROVED','test extension')
+    state=h.store.replay();stage=state['stages']['PKG']
+    assert packages.require_package(state,stage) is state['packages']['PKG']
+    assert stage['budget']['role_calls']==17
+    assert stage['used_calls']==15
+
+
+def test_exact_compatibility_release_keeps_bound_package_runnable(harness,monkeypatch):
+    from rlflow import verification
+    h=harness;spec=specification(h);spec['control_release']=verification.code_identity()
+    approved(h,spec);state=h.store.replay();successor='1'*64
+    state.setdefault('releases', {})[successor]={
+        'validation': {
+            'exit_code': 0,
+            'isolated_state': True,
+            'code_identity': successor,
+            'compatible_from': [spec['control_release']],
+            'compatibility_scope': 'PACKAGE_EXTENSION_VALIDATION_ONLY',
+        }
+    }
+    monkeypatch.setattr(verification,'code_identity',lambda:successor)
+    assert packages.require_package(state,state['stages']['PKG']) is state['packages']['PKG']
+
+
+def test_transitive_validated_compatibility_keeps_bound_package_runnable(harness, monkeypatch):
+    from rlflow import verification
+    h = harness
+    spec = specification(h)
+    spec['control_release'] = verification.code_identity()
+    approved(h, spec)
+    state = h.store.replay()
+    middle, successor = '1' * 64, '2' * 64
+    for release_id, parents in (
+        (middle, [spec['control_release']]),
+        (successor, [middle]),
+    ):
+        state.setdefault('releases', {})[release_id] = {
+            'validation': {
+                'exit_code': 0,
+                'isolated_state': True,
+                'code_identity': release_id,
+                'compatible_from': parents,
+                'compatibility_scope': 'PACKAGE_EXTENSION_VALIDATION_ONLY',
+            }
+        }
+    monkeypatch.setattr(verification, 'code_identity', lambda: successor)
+    assert packages.require_package(state, state['stages']['PKG']) is state['packages']['PKG']

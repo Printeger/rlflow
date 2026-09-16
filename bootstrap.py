@@ -20,12 +20,29 @@ if database.exists():
     import sqlite3
     published={};version=0
     with sqlite3.connect(database.as_uri()+'?mode=ro',uri=True) as db:
-        for previous,current,payload,digest in db.execute('SELECT previous_state_version,new_state_version,payload,payload_sha256 FROM events ORDER BY seq'):
-            raw=json.loads(payload)
-            actual=hashlib.sha256(json.dumps(raw,sort_keys=True,separators=(',',':'),ensure_ascii=False,allow_nan=False).encode()).hexdigest()
-            if previous!=version or current!=version+1 or actual!=digest:raise SystemExit('rlflow: ledger integrity failed during release selection')
-            version=current
-            if 'releases' in raw['set']:published=raw['set']['releases']
+        if db.execute("SELECT 1 FROM sqlite_master WHERE name='projection_meta'").fetchone():
+            version=db.execute('SELECT version FROM projection_meta WHERE singleton=1').fetchone()[0]
+            if version!=db.execute('SELECT COALESCE(MAX(seq),0) FROM events').fetchone()[0]:
+                raise SystemExit('rlflow: projection version mismatch; explicit recovery required')
+            def decode(value):
+                if isinstance(value,dict) and set(value) in ({'$rlflow_blob'},{'$rlflow_blob','literal'}):
+                    data=db.execute('SELECT data FROM blobs WHERE digest=?',(value['$rlflow_blob'],)).fetchone()
+                    if data is None or hashlib.sha256(data[0]).hexdigest()!=value['$rlflow_blob']:
+                        raise SystemExit('rlflow: release blob integrity mismatch')
+                    literal=value.get('literal',False);value=json.loads(data[0])
+                    if literal:return value
+                if isinstance(value,dict):return {k:decode(v) for k,v in value.items()}
+                if isinstance(value,list):return [decode(v) for v in value]
+                return value
+            for rid,value in db.execute("SELECT object_key,value FROM projection WHERE section='releases' AND object_key!=''"):
+                published[rid]=decode(json.loads(value))
+        else:
+            for previous,current,payload,digest in db.execute('SELECT previous_state_version,new_state_version,payload,payload_sha256 FROM events ORDER BY seq'):
+                raw=json.loads(payload)
+                actual=hashlib.sha256(json.dumps(raw,sort_keys=True,separators=(',',':'),ensure_ascii=False,allow_nan=False).encode()).hexdigest()
+                if previous!=version or current!=version+1 or actual!=digest:raise SystemExit('rlflow: ledger integrity failed during release selection')
+                version=current
+                if 'releases' in raw['set']:published=raw['set']['releases']
     rows=[(r.get('published_sequence',0),rid,r) for rid,r in published.items() if r.get('published_sequence')]
     if rows:
         _,rid,record=max(rows);saved={'id':rid,'path':record['path']}

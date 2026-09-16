@@ -12,7 +12,7 @@ def validate_policy(value):
             raise Conflict('invalid decomposition limit: '+key)
 
 
-def parse(state,task,session,action):
+def parse(state,task,session,action,*,check_budget=True):
     if session['role']!='PI' or not task.get('package_id'):
         raise Conflict('only package PI may propose decomposition')
     package=state['packages'][task['package_id']];policy=package['spec'].get('decomposition')
@@ -26,9 +26,12 @@ def parse(state,task,session,action):
         raise Conflict('decomposition needs nonempty children')
     if len(package['tasks'])+len(plan['children'])>policy['max_tasks']:
         raise Conflict('shared package task limit')
+    if check_budget and package['spec'].get('schema_version')=='rlflow-package/2':
+        from .governance import check_split
+        check_split(state,task,len(plan['children']))
     criteria={c['id']:c for c in task['criteria']};seen=set();covered=set()
     for child in plan['children']:
-        if not isinstance(child,dict) or set(child)!={'id','text','depends_on','condition_ids'}:
+        if not isinstance(child,dict) or (not {'id','text','depends_on','condition_ids'}<=set(child) or set(child)-{'id','text','depends_on','condition_ids','local_criteria'}):
             raise Conflict('child may only refine text, dependencies and existing conditions')
         if any(not isinstance(child[k],str) or not child[k].strip() for k in ('id','text')) or child['id'] in seen:
             raise Conflict('invalid child identity')
@@ -38,6 +41,17 @@ def parse(state,task,session,action):
                 raise Conflict('invalid child references')
         if not child['condition_ids'] or not set(child['condition_ids'])<=set(criteria):
             raise Conflict('child cannot create or weaken acceptance conditions')
+        if 'local_criteria' in child:
+            if package['spec'].get('schema_version')!='rlflow-package/2':raise Conflict('local criteria require package version 2')
+            local=child['local_criteria']
+            if not isinstance(local,list) or not local:raise Conflict('nonempty local criteria required')
+            ids=set();parents=set()
+            for c in local:
+                if not isinstance(c,dict) or set(c)!={'id','description','layer','parent_condition_id'} or any(not isinstance(v,str) or not v for v in c.values()):raise Conflict('invalid local condition')
+                parent=c['parent_condition_id']
+                if parent not in child['condition_ids'] or c['layer']!=criteria[parent]['layer'] or c['id'] in ids:raise Conflict('local condition changes parent scope/layer')
+                ids.add(c['id']);parents.add(parent)
+            if parents!=set(child['condition_ids']):raise Conflict('local criteria must bind every assigned parent condition')
         covered.update(child['condition_ids'])
     if covered!=set(criteria):raise Conflict('decomposition must retain every parent condition')
     ready=set()
@@ -67,6 +81,11 @@ def apply(state,task,session,action):
                'criteria':[deepcopy(conditions[c]) for c in child['condition_ids']],
                'research_mode':task.get('research_mode',False),'condition_evidence':{},
                'completion':dict.fromkeys(('implementation','cpu','real_run','behavior','formal'),False)}
+        if 'local_criteria' in child:
+            value['criteria']=[{k:v for k,v in c.items() if k!='parent_condition_id'} for c in child['local_criteria']]
+            value['criterion_parents']={c['id']:c['parent_condition_id'] for c in child['local_criteria']}
+        if task.get('input_contract'):
+            value['input_contract']=deepcopy(task['input_contract']);value['route']=list(task['route']);value['next_role']=value['route'][0];value['final_integration']=False
         state['tasks'][tid]=value;package['tasks'].append(tid);state.setdefault('autonomous_tasks',[]).append(tid)
     task.update(children=list(mapping.values()),status='WAITING_CHILDREN',next_role='PI')
 
@@ -84,8 +103,8 @@ def verify(state,package,root_ids):
         shadow=deepcopy(parent);shadow.pop('children',None)
         # The full package task limit was enforced at creation; validate the
         # remaining immutable scope/dependency constraints without double counting.
-        state_copy={**state,'packages':{**state['packages'],package['id']:{**package,'tasks':expected}}}
-        parse(state_copy,shadow,se,actions[0])
+        state_copy={**state,'packages':{package['id']:{**package,'tasks':expected}}}
+        parse(state_copy,shadow,se,actions[0],check_budget=False)
         from .engine import task_identity
         mapping={c['id']:task_identity(package['id'],c['text'],parent['id']+'/'+c['id']) for c in record['plan']['children']}
         if record['children']!=list(mapping.values()) or parent.get('children')!=record['children']:
@@ -96,6 +115,10 @@ def verify(state,package,root_ids):
                     'stage_id':parent['stage_id'],'package_id':package['id'],'repo':parent['repo'],'baseline':parent['baseline'],
                     'criteria':[conditions[c] for c in child['condition_ids']],
                     'depends_on':[mapping[d] for d in child['depends_on']], 'research_mode':parent.get('research_mode',False)}
+            if 'local_criteria' in child:
+                frozen['criteria']=[{k:v for k,v in c.items() if k!='parent_condition_id'} for c in child['local_criteria']]
+                frozen['criterion_parents']={c['id']:c['parent_condition_id'] for c in child['local_criteria']}
+            if parent.get('input_contract'):frozen.update(input_contract=parent['input_contract'],route=parent['route'])
             if any(t.get(k)!=v for k,v in frozen.items()):raise Conflict('derived task contract drifted')
         expected.extend(record['children'])
     if package['tasks']!=expected:raise Conflict('unregistered package task')

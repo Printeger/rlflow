@@ -173,7 +173,8 @@ def test_pause_at_final_model_gate_releases_unused_reservation(harness,monkeypat
     marker=h.store.root/'fixture-pause-before-model';marker.write_text('pause during CLI preparation')
     sid=engine.dispatch_one(h.store);se=h.store.replay()['sessions'][sid];d=Path(se['directory'])
     until(lambda:(d/'receipt.json').exists());s=engine.reconcile(h.store)
-    assert (d/'model-intent.json').exists() and not (d/'model-release.json').exists()
+    assert (d/'launch-ready.json').exists() and not (d/'model-release.json').exists()
+    assert not (h.store.root/'cli-starts.log').exists()
     assert not (h.store.root/'cli-starts.log').exists()
     assert s['stages']['PKG']['used_calls']==s['stages']['PKG']['reserved_calls']==0
     assert s['sessions'][sid]['model_accounting']=='NOT_STARTED' and engine.dispatch_one(h.store) is None

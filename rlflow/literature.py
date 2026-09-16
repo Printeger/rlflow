@@ -25,7 +25,7 @@ def arxiv(question):
 
 
 def retrieve(store,task_id,question,fetch=arxiv):
-    state=store.replay();task=state['tasks'][task_id]
+    state=store.view();task=state['tasks'][task_id]
     package=state.get('packages',{}).get(task.get('package_id'),{})
     if package.get('spec',{}).get('scout_sources',[])!=['arxiv']:
         raise Conflict('external retrieval disabled; package has no approved source')

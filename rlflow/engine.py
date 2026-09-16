@@ -2,6 +2,7 @@
 from __future__ import annotations
 import hashlib
 import json
+import copy
 import os
 from pathlib import Path
 import signal
@@ -23,10 +24,64 @@ ACTIVE = {"START_INTENT", "RUNNING", "RECONCILE"}
 
 
 def envelope_candidate(task):
-    c = candidate(task["repo"])
-    diff = git_diff_bytes(task['repo'], task['baseline']['head'])
+    c = candidate(task["repo"],task.get("input_contract"))
+    diff = git_diff_bytes(task['repo'], task['baseline']['head'],task.get('input_contract'))
     return {"repository": task["repo"], "base_commit": task["baseline"]["head"],
             "commit": c["head"], "diff_sha256": hashlib.sha256(diff).hexdigest()}
+
+
+def normalize_engineer_candidate(result, task, session, directory):
+    """Bind an Engineer report to the controller's full candidate envelope.
+
+    Git's ordinary ``diff`` omits untracked files, while rlflow deliberately
+    includes them in its candidate diff.  An Engineer can therefore report the
+    tracked Git diff it actually inspected without being able to reproduce the
+    authoritative envelope.  Accept that narrow representation mismatch only
+    when the identity fields match, the reported artifact is the exact trusted
+    tracked diff, and the controller can replace it with its independently
+    computed full envelope.  The caller preserves the raw report for audit.
+    """
+    expected = envelope_candidate(task)
+    if result.get("candidate") == expected:
+        return result, None
+    if session.get("role") != "Engineer":
+        raise ContractError("candidate or diff hash mismatch")
+    reported = result.get("candidate")
+    if not isinstance(reported, dict) or any(
+        reported.get(key) != expected[key]
+        for key in ("repository", "base_commit", "commit")
+    ):
+        raise ContractError("candidate or diff hash mismatch")
+    diff_path = result.get("payload", {}).get("diff_path")
+    if not isinstance(diff_path, str) or not diff_path:
+        raise ContractError("candidate or diff hash mismatch")
+    ref = Path(diff_path)
+    if not ref.is_absolute():
+        ref = Path(session["scratch"]) / ref
+    try:
+        resolved = ref.resolve(strict=True)
+    except OSError as exc:
+        raise ContractError("candidate or diff hash mismatch") from exc
+    scratch = Path(session["scratch"]).resolve()
+    if (not resolved.is_relative_to(scratch) or ref.is_symlink()
+            or not resolved.is_file() or resolved.stat().st_nlink != 1):
+        raise ContractError("candidate or diff hash mismatch")
+    raw_diff = git_bytes(task["repo"], "diff", task["baseline"]["head"], "--")
+    artifact = resolved.read_bytes()
+    reported_hash = reported.get("diff_sha256")
+    if artifact != raw_diff or reported_hash != hashlib.sha256(artifact).hexdigest():
+        raise ContractError("candidate or diff hash mismatch")
+    normalized = copy.deepcopy(result)
+    normalized["candidate"] = expected
+    if isinstance(normalized.get("payload", {}).get("candidate"), dict):
+        normalized["payload"]["candidate"] = expected
+    return normalized, {
+        "kind": "TRACKED_DIFF_TO_FULL_CANDIDATE_ENVELOPE",
+        "reported_diff_sha256": reported_hash,
+        "full_diff_sha256": expected["diff_sha256"],
+        "diff_artifact": str(resolved),
+        "diff_artifact_sha256": hashlib.sha256(artifact).hexdigest(),
+    }
 
 
 def interpretation_matches_stage(interpretation, stage):
@@ -76,7 +131,7 @@ def create_task(s, root, sid, text, key=None, *, consultation_role=None):
     if not Path(st["repo"]).resolve().is_relative_to(root / "workspaces"):
         raise Conflict("task repository outside isolated CPU workspaces")
     s["tasks"][task_id] = {"id": task_id, "version": 1, "stage_id": sid, "cycle_id": task_id,
-            "text": text, "repo": st["repo"], "baseline": candidate(st["repo"]),
+            "text": text, "repo": st["repo"], "baseline": candidate(st["repo"],st.get("input_contract")),
             "status": "QUEUED", "next_role": "PI", "repair_rounds": 0,
             "diagnostic_after_rounds": 3, "results": [], "findings": [], "consulted": [],
             "completion": {"implementation": False, "cpu": False, "real_run": False, "behavior": False, "formal": False}}
@@ -153,6 +208,9 @@ def packet(store, state, task, session):
         prompt += '\nHistory omitted from working context remains hash-bound in history_index.read_only_path and evidence/index.json. Inspect it via cpu_exec when prior decisions, negative results or contradictions matter. Never infer success from omission.'
         if state['packages'][task['package_id']]['spec'].get('decomposition'):
             prompt += '\nPI may REQUEST_DECOMPOSITION as its sole action, fields=[JSON string {children:[{id,text,depends_on,condition_ids}]}]. Children inherit all scope, protected paths and the same total budget. Map every immutable parent condition, use sibling IDs for acyclic dependencies, and obey approved max_tasks/max_depth. No new criteria or permissions. After children finish, integrate and independently revalidate the parent goal. A parent can be split once; refine unfinished children if needed.'
+        if package['spec'].get('schema_version')=='rlflow-package/2':
+            prompt+='\nApproved source/data/output/environment manifests and resource policy: '+canonical({'inputs':package['spec']['inputs'],'resources':package['spec']['resource_policy'],'reserves':package['spec']['budget_reserves']}).decode()
+            prompt+='\nFor approved decomposition, children may have local_criteria [{id,description,layer,parent_condition_id}], bound to assigned condition_ids. Passing local criteria cannot satisfy parent conditions; independent parent and final integration remain mandatory.'
         if task.get('research_mode'):
             prompt += '\nFor research choose an unused approved experiment ID. On independent PASS, Evaluator evidence_coverage names proven condition IDs and OBSERVATION JSON binding condition_id/evidence_id/evidence_sha256/explanation to actual raw job evidence. Fresh PI may REQUEST_COMPLETE with fields=[] only after every frozen condition is independently proved at the current candidate and due Cold Review is finished. STOP does not mean goal accomplished.'
     if session["role"] == "PI":
@@ -161,7 +219,7 @@ def packet(store, state, task, session):
         prompt += "\nImplement and self-test within the stage scope. Preserve tests' acceptance meaning and CONTRACT.md bytes. Save command stdout/stderr in your scratch directory. If adding files, use git add -N for those files so git diff includes them. Obtain git diff BASE_COMMIT SHA256 after editing and report exact candidate. Include all changed paths and suggested categories; unresolved findings are not waived."
     if session["role"] == "Evaluator":
         prompt += "\nIndependently inspect git diff against base and implementation, add boundary checks in your writable scratch, execute tests, verify acceptance and semantic categories. Candidate is read-only. PASS only at CPU layer with complete evidence. Do not accept based solely on Engineer claims."
-    if task.get('integration_review'):
+    if task.get('integration_review') or task.get('final_integration'):
         prompt += '\nThis is parent integration after child completion. Independently test every original parent condition and interactions across children against the final cumulative candidate; child PASS alone cannot close the parent. New findings must bind original conditions.'
     if task.get('mode') == 'consultation':
         prompt += '\nThis is a bounded consultation, not implementation or approval. Read the supplied candidate materials using cpu_exec. Return substantive role output. Consultation ID: '+task['consultation_id']
@@ -173,8 +231,8 @@ def packet(store, state, task, session):
 
 def dispatch_one(store, *, allow_paused=False):
     with store.lock('scheduler'):
-        snapshot=store.replay()
-        if stopped(store.root) or any(se['status'] in ACTIVE for se in snapshot['sessions'].values()):return None
+        snapshot=store.view()
+        if stopped(store.root) or bool(store.objects('sessions',ACTIVE)):return None
         if snapshot['paused'] and not allow_paused and not snapshot.get('autonomous_tasks'):return None
         pointer=store.root/'runtime/current-release.json'
         before=pointer.read_bytes() if pointer.exists() else None
@@ -191,11 +249,11 @@ def _dispatch_one(store, *, allow_paused=False):
     Daemons never pass allow_paused.
     """
     dispatch_generation = daemon_generation()
-    state = store.replay()
+    state = store.view()
     autonomous = state.get('autonomous_tasks', [])
-    if (state["paused"] and not allow_paused and not autonomous) or stopped(store.root) or any(s["status"] in ACTIVE for s in state["sessions"].values()):
+    if (state["paused"] and not allow_paused and not autonomous) or stopped(store.root) or bool(store.objects("sessions",ACTIVE)):
         return None
-    queued = [t for t in state["tasks"].values() if t["status"] == "QUEUED"]
+    queued = [t for _,t in store.objects("tasks",["QUEUED"])]
     if state['paused'] and not allow_paused:
         queued = [t for t in queued if t['id'] in autonomous]
     queued = [t for t in queued if not t.get("last_failure", {}).get("blocked", False)]
@@ -209,7 +267,7 @@ def _dispatch_one(store, *, allow_paused=False):
         return None
     task = sorted(queued, key=lambda t: (t.get('package_id', ''), t.get('order', 0), t['id']))[0]
     st = require_stage(state, task["stage_id"])
-    current = candidate(task["repo"])
+    current = candidate(task["repo"],task.get("input_contract"))
     expected_candidate = task.get("accepted_candidate", task["baseline"])
     if current != expected_candidate:
         store.transact("CANDIDATE_DRIFT", "drift:" + task["id"] + ":" + str(task["version"]),
@@ -218,6 +276,11 @@ def _dispatch_one(store, *, allow_paused=False):
     from .repairs import resource_stage
     pool = resource_stage(state, task['stage_id'])
     balance = available(pool)
+    from .governance import remaining
+    protected_balance=remaining(pool,task)
+    if protected_balance:
+        balance={**balance,'role_calls':min(balance['role_calls'],protected_balance['role_calls']),
+                 'wall_seconds':min(balance['wall_seconds'],protected_balance['wall_seconds'])}
     if balance["role_calls"] <= 0 or balance["wall_seconds"] < 1:
         store.transact("BUDGET_EXHAUSTED", "budget:" + task["id"] + ":" + str(task["version"]),
                        lambda s: s["tasks"][task["id"]].update(status="BUDGET_EXHAUSTED"), expected=state["version"])
@@ -237,6 +300,9 @@ def _dispatch_one(store, *, allow_paused=False):
         store.transact('COMPUTE_BLOCKED', 'compute-block:'+task['id']+':'+str(task['version']),
                        lambda s: s['tasks'][task['id']].update(status='COMPUTE_BLOCKED', last_error=message), expected=state['version'])
         return None
+    from .usage import admit as admit_usage
+    usage_admission=admit_usage(state,pool,compute['model'])
+    preparation_started=time.monotonic()
     sid = "S-" + uuid.uuid4().hex[:16]
     directory = store.root / "roles" / sid
     directory.mkdir(parents=True)
@@ -245,8 +311,15 @@ def _dispatch_one(store, *, allow_paused=False):
     session = {"id": sid, "role": task["next_role"], "task_id": task["id"], "task_version": task["version"],
                "stage_id": task["stage_id"], "input_state_version": state["version"] + 1,
                "status": "START_INTENT", "directory": str(directory), "scratch": str(scratch),
-               "limit": min(st["per_call_seconds"], balance["wall_seconds"]), "before": candidate(task["repo"]),
-               "identity": None, "created": time.time(), "compute": compute, "role_definition": definition, "explicit_step": allow_paused}
+               "limit": min(st["per_call_seconds"], balance["wall_seconds"]), "before": candidate(task["repo"],task.get("input_contract")),
+               "identity": None, "created": time.time(), "compute": compute, "generation": uuid.uuid4().hex, "launch_phase": "PREPARING", "role_definition": definition, "explicit_step": allow_paused}
+    if usage_admission:session['usage_admission']=usage_admission
+    from .resources import reserve_task
+    resources,guarantees,quota_scratch=reserve_task(store,st,sid)
+    if resources:session['resources']=resources
+    if guarantees:session['resource_guarantees']=guarantees
+    if quota_scratch is not None:
+        scratch=quota_scratch;session['scratch']=str(scratch)
     if task.get('pending_escalation'):
         from .escalations import materialize
         session['escalation_package'] = materialize(directory,task['pending_escalation'])
@@ -258,6 +331,8 @@ def _dispatch_one(store, *, allow_paused=False):
         if any(x['status'] in ACTIVE for x in s['sessions'].values()):
             raise Conflict('another dispatcher owns an active session')
         from .accounting import reserve as reserve_model
+        from .governance import reserve as reserve_pool
+        reserve_pool(stage,session,s["tasks"][task["id"]])
         reserve_model(stage, session)
         if task.get('pending_escalation'):
             s['decisions'][task['pending_escalation']['case_id']]['consumed_by'] = sid
@@ -281,10 +356,22 @@ def _dispatch_one(store, *, allow_paused=False):
         atomic(directory / "expected.json", canonical(expected))
         schema_path = directory / 'schema.json'
         atomic(schema_path, (CODE / 'schemas' / definition['schema']).read_bytes())
-        request = {**session, 'recovery_protocol':1, "root": str(store.root), "repo": task["repo"], "prompt": prompt,
+        writable_outputs=[]
+        if task.get('input_contract'):
+            for name in task['input_contract']['manifest']['output_directories']:
+                target=Path(task['repo'])/name
+                if target.resolve()!=target:raise Conflict('output directory contains path indirection')
+                target.mkdir(parents=True,exist_ok=True)
+                if target.resolve()!=target:raise Conflict('output directory changed during preparation')
+                writable_outputs.append(str(target))
+        request = {**session, 'recovery_protocol':2, 'overall_deadline_monotonic':preparation_started+session['limit'],
+                   'startup_policy':{'preparing_seconds':60,'release_seconds':60,'ack_seconds':60}, "root": str(store.root), "repo": task["repo"], "prompt": prompt,
                    "schema": str(schema_path),
-                   "write_roots": [str((Path(task["repo"]) / root).resolve()) for root in st["module_roots"]],
-                   "cpu_runtime": st.get("cpu_runtime"), "command_seconds": st.get("command_seconds", 120)}
+                   "write_roots": [str((Path(task["repo"]) / root).resolve()) for root in st["module_roots"]]+writable_outputs,
+                   "cpu_runtime": st.get("cpu_runtime"), "command_seconds": st.get("command_seconds", 120),
+                   # Large event stores can take more than ten seconds to durably
+                   # record ROLE_IDENTITY and re-check the release boundary.
+                   "release_wait_seconds": min(300, max(10, st.get("command_seconds", 120)))}
         atomic(directory / "request.json", canonical(request))
     except Exception as exc:
         _settle_prelaunch_failure(store, sid, f"{type(exc).__name__}: {exc}")
@@ -297,16 +384,36 @@ def _dispatch_one(store, *, allow_paused=False):
         child = subprocess.Popen([sys.executable, "-m", "rlflow.worker", str(directory / "request.json")],
                                  cwd=frozen, stdin=subprocess.DEVNULL, stdout=log, stderr=log, start_new_session=True)
     ident = identity(child.pid)
-    store.transact("ROLE_IDENTITY", sid + ":identity", lambda s: s["sessions"][sid].update(identity=ident, status="RUNNING"), object_id=sid)
+    store.transact("ROLE_PREPARING_IDENTITY",sid+":preparing-identity",lambda s:s["sessions"][sid].update(identity=ident),object_id=sid)
+    ready_deadline=time.monotonic()+min(request['release_wait_seconds'],request['limit'])
+    while not (directory/'launch-ready.json').exists():
+        if child.poll() is not None or stopped(store.root) or time.monotonic()>=ready_deadline:
+            atomic(directory/'cancel',b'preparation cancelled or timed out; reconcile original worker')
+            return sid
+        time.sleep(.02)
+    ready=json.loads((directory/'launch-ready.json').read_text())
+    if ready.get('binding')!={'session':sid,'generation':session['generation'],'identity':ident}:
+        atomic(directory/'cancel',b'worker readiness identity mismatch')
+        return sid
+    store.transact("ROLE_IDENTITY", sid + ":identity", lambda s: s["sessions"][sid].update(identity=ident, status="RUNNING", launch_phase="READY"), object_id=sid)
     # Child waits for this durable release. Unknown launches never receive a second release.
-    latest = store.replay()
+    latest = store.view()
     try:
         require_stage(latest, task['stage_id'])
-        if (stopped(store.root) or candidate(task['repo']) != session['before']
+        if (stopped(store.root) or candidate(task['repo'],task.get("input_contract")) != session['before']
                 or latest['tasks'][task['id']]['version'] != session['task_version']
                 or not runnable(latest,latest['tasks'][task['id']])):
             raise Conflict('release boundary changed')
-        atomic(directory / "release", canonical({"session": sid, "identity": ident, "control_release": frozen.name}))
+        binding={"session":sid,"identity":ident,"control_release":frozen.name,
+                 "generation":session['generation'],"request_sha256":sha(request),
+                 "candidate_sha256":sha(session['before']),"authorization":st['authorization'],
+                 "reservation_seconds":session['limit'],"resources":session.get("resources")}
+        store.transact('ROLE_RELEASE_COMMITTED',sid+':release-committed',
+                       lambda s:s['sessions'][sid].update(launch_phase='RELEASE_COMMITTED',release_binding=binding),
+                       expected=latest['version'],object_id=sid)
+        from .startup import record
+        record(directory,'RELEASE_COMMITTED',binding)
+        atomic(directory / "release", canonical(binding))
     except Conflict:
         atomic(directory / "cancel", b"authorization/STOP/candidate changed before release")
     return sid
@@ -314,7 +421,7 @@ def _dispatch_one(store, *, allow_paused=False):
 
 def _settle_prelaunch_failure(store, sid, error):
     """Close a charged role intent only when no worker request was materialized."""
-    state = store.replay()
+    state = store.view()
     session = state["sessions"].get(sid)
     if not session or session["status"] not in ACTIVE or session.get("identity") is not None:
         return False
@@ -330,6 +437,8 @@ def _settle_prelaunch_failure(store, sid, error):
         stage = resource_stage(s, se["stage_id"])
         from .accounting import settle as settle_model
         settle_model(stage, se, {'elapsed_seconds': 0, 'model_usage': {'state': 'NOT_STARTED'}})
+        from .governance import settle as settle_pool
+        settle_pool(stage,se,{'elapsed_seconds':0,'model_usage':{'state':'NOT_STARTED'}})
         se.update(status="REJECTED", error=error, prelaunch_failure=True)
         task = s["tasks"][se["task_id"]]
         if task["version"] == se["task_version"]:
@@ -342,7 +451,7 @@ def _settle_prelaunch_failure(store, sid, error):
 
 
 def _classification(task, engineer, evaluation, stage):
-    actual = candidate(task["repo"])
+    actual = candidate(task["repo"],task.get("input_contract"))
     base = task["baseline"]["files"]
     changed = {p for p in set(base) | set(actual["files"]) if base.get(p) != actual["files"].get(p)}
     declared = {c["path"]: c for c in engineer["payload"]["changes"]}
@@ -366,7 +475,7 @@ def _classification(task, engineer, evaluation, stage):
 
 
 def accept_result(store, sid):
-    state = store.replay()
+    state = store.view()
     session = state["sessions"][sid]
     if session["status"] not in ACTIVE:
         return
@@ -389,13 +498,14 @@ def accept_result(store, sid):
     current_candidate = None
     test_artifacts = []
     command_audit = None
+    candidate_normalization = None
     infrastructure_error = infrastructure_failure(d)
     try:
         stage = require_stage(state, session["stage_id"])
     except Conflict as exc:
         error, contract_error = str(exc), True
     try:
-        current_candidate = candidate(task["repo"])
+        current_candidate = candidate(task["repo"],task.get("input_contract"))
         stage = state["stages"][session["stage_id"]]
         for protected in stage.get("protected_paths", []):
             baseline = task["baseline"]["files"]
@@ -414,15 +524,22 @@ def accept_result(store, sid):
             raise ContractError("infrastructure failure: " + infrastructure_error)
         if receipt["exit_code"] != 0:
             raise ContractError("role failed: " + str(receipt))
-        result = json.loads((d / "result.json").read_text())
+        result_path = d / "result.json"
+        result_raw = result_path.read_bytes()
+        result = json.loads(result_raw)
         expected = json.loads((d / "expected.json").read_text())
         from .evidence import reachable
         validate_result(result, expected, reachable(state,task))
+        result, candidate_normalization = normalize_engineer_candidate(
+            result, task, session, d
+        )
+        if candidate_normalization:
+            atomic(d / "result.raw.json", result_raw)
+            atomic(result_path, canonical(result))
         if task["version"] != session["task_version"] or task["status"] != "RUNNING":
             raise ContractError("stale task result")
         if result["candidate"] != envelope_candidate(task):
             raise ContractError("candidate or diff hash mismatch")
-        import copy
         from .research import requests, route
         shadow = copy.deepcopy(state); shadow_task = shadow['tasks'][task['id']]
         requests(shadow, shadow_task, session, result)
@@ -445,7 +562,6 @@ def accept_result(store, sid):
                 contract_error = True
                 raise ContractError('PI cannot change approved acceptance conditions or budget')
         if task.get('package_id') and session['role'] == 'Evaluator':
-            import copy
             from .progress import review, verify_observations
             shadow = copy.deepcopy(state)
             verify_observations(shadow, shadow['tasks'][task['id']], session, result['payload'])
@@ -494,7 +610,7 @@ def accept_result(store, sid):
         repeated = previous.get("fingerprint") == fingerprint
         failure = {"kind": kind, "code": infrastructure_error, "fingerprint": fingerprint,
                    "repeated": repeated, "blocked": bool(contract_error or infrastructure_error or repeated or receipt["exit_code"] != 0)}
-    artifact = {"receipt": receipt, "result_sha256": hashlib.sha256((d / "result.json").read_bytes()).hexdigest() if (d / "result.json").exists() else None, "error": error, "classification": classification, "self_test_artifacts": test_artifacts, "command_audit": command_audit, "failure": failure}
+    artifact = {"receipt": receipt, "result_sha256": hashlib.sha256((d / "result.json").read_bytes()).hexdigest() if (d / "result.json").exists() else None, "error": error, "classification": classification, "self_test_artifacts": test_artifacts, "command_audit": command_audit, "failure": failure, "candidate_normalization": candidate_normalization}
     atomic(d / "validation.json", canonical(artifact))
     def settle(s):
         se = s["sessions"][sid]
@@ -502,6 +618,8 @@ def accept_result(store, sid):
         stage = resource_stage(s, se["stage_id"])
         from .accounting import settle as settle_model
         settle_model(stage, se, receipt)
+        from .governance import settle as settle_pool
+        settle_pool(stage,se,receipt)
         se.update(status="REJECTED" if error else "ACCEPTED", receipt=receipt, error=error)
         t = s["tasks"][se["task_id"]]
         if t["version"] != se["task_version"]:
@@ -568,7 +686,7 @@ def accept_result(store, sid):
             elif payload["decision"] == "STOP":
                 t["status"] = "STOPPED"
             elif interpretation_matches_stage(interpretation, s['stages'][t['stage_id']]):
-                t.update(next_role="Engineer", interpretation=interpretation)
+                t.update(next_role="Critic" if "Critic" in t.get("route",[]) else "Engineer", interpretation=interpretation)
             else:
                 t.update(status="CONTRACT_DECISION", last_error="task interpretation does not match stage")
         elif se["role"] == "Engineer":
@@ -580,7 +698,7 @@ def accept_result(store, sid):
             t["findings"] = payload["findings"]
             if payload["verdict"] == "PASS" and classification and classification["status"] == "AUTHORIZED":
                 t["completion"]["cpu"] = True
-                t.update(status="DONE", classification=classification, candidate=candidate(t["repo"]))
+                t.update(status="DONE", classification=classification, candidate=candidate(t["repo"],t.get("input_contract")))
                 if t.get('package_id'):
                     from .packages import cpu_complete
                     cpu_complete(s, t, eid, current_candidate)
@@ -591,10 +709,11 @@ def accept_result(store, sid):
             elif payload["verdict"] == "PASS" or any(f["category"] == "CONTRACT_DECISION" for f in payload["findings"]):
                 t.update(status="CONTRACT_DECISION", classification=classification)
             else:
+                if t.get("input_contract"):t["recovery_source"]=sid
                 t["repair_rounds"] += 1
                 t["next_role"] = "Critic" if repeated_finding or t["repair_rounds"] % t["diagnostic_after_rounds"] == 0 else "Engineer"
         elif se["role"] == "Critic":
-            t.update(next_role="PI", diagnostic=payload)
+            t.update(next_role="Engineer" if "Critic" in t.get("route",[]) else "PI", diagnostic=payload)
         elif se["role"] in {"Designer", "Scout"}:
             t.update(next_role="PI")
         requests(s, t, se, result)
@@ -611,6 +730,8 @@ def accept_result(store, sid):
             refresh(s,t['package_id'])
         return detail
     store.transact("ROLE_RESULT_REJECTED" if error else "ROLE_RESULT_ACCEPTED", sid + ":settle", settle_and_refresh, object_id=sid, expected=state["version"])
+    from .usage import reconcile as reconcile_usage
+    reconcile_usage(store,sid,price=session.get('usage_admission',{}).get('price'))
     if not error:
         for request in result['requested_actions']:
             if request['action']=='REQUEST_REVIEW' and request['fields']==['Scout']:
@@ -631,13 +752,13 @@ def accept_result(store, sid):
                     store.transact('MODEL_ESCALATION_PENDING',sid+':escalation-pending',
                                    lambda s:s['tasks'][session['task_id']].update(last_error=message),object_id=sid)
     if not error and session['role']=='Evaluator':
-        latest=store.replay();finished=latest['tasks'][session['task_id']]
+        latest=store.view();finished=latest['tasks'][session['task_id']]
         if finished.get('repair_id') and finished['completion']['cpu']:
             from .repairs import verify_repair
             engineer=next(r['session_id'] for r in reversed(finished['results']) if r['role']=='Engineer')
             verify_repair(store,finished['repair_id'],engineer,sid)
     if not error and session["role"] == "Engineer":
-        diff = git_diff_bytes(task['repo'], task['baseline']['head'])
+        diff = git_diff_bytes(task['repo'], task['baseline']['head'],task.get('input_contract'))
         atomic(d / "candidate.diff", diff)
 
 
@@ -648,7 +769,7 @@ def reconsider_result(store, sid):
     sole blocker was a CPU transport classification.  It never reserves or
     charges another role call and closes the autonomous stage on CPU PASS.
     """
-    state = store.replay()
+    state = store.view()
     session = state["sessions"].get(sid)
     if not session:
         raise Conflict("unknown session")
@@ -679,7 +800,7 @@ def reconsider_result(store, sid):
             or type(elapsed) not in (int, float) or not 0 <= elapsed < float("inf")):
         raise Conflict("saved receipt is not a successful exact-session receipt")
     validate_result(result, expected, state["evidence"])
-    current = candidate(task["repo"])
+    current = candidate(task["repo"],task.get("input_contract"))
     if current != session["before"] or current["head"] != task["baseline"]["head"]:
         raise Conflict("candidate changed after the rejected read-only evaluation")
     baseline = task["baseline"]["files"]
@@ -764,26 +885,26 @@ def reconsider_result(store, sid):
 
 def _schedule_pending(store):
     from .repairs import prepare, promote
-    for rid, repair in store.replay().get('repairs', {}).items():
-        state=store.replay();package=state.get('packages',{}).get(repair['stage_id'])
+    for rid, repair in store.objects('repairs',{'NEEDS_ISOLATED_CANDIDATE','VERIFIED_AWAITING_RELEASE'}):
+        state=store.view();package=state.get('packages',{}).get(repair['stage_id'])
         if not package or package['paused'] or package['status']!='ACTIVE':continue
         if repair['status']=='NEEDS_ISOLATED_CANDIDATE':
             prepare(store,rid)
         elif repair['status']=='VERIFIED_AWAITING_RELEASE':
             promote(store,rid)
     from . import experiments
-    for task in store.replay()['tasks'].values():
+    for _,task in store.objects('tasks',['WAITING_EXPERIMENT']):
         if task['status']=='WAITING_EXPERIMENT':
             from .packages import runnable
-            if not runnable(store.replay(),task):continue
-            snapshot=store.replay()
+            if not runnable(store.view(),task):continue
+            snapshot=store.view()
             specs=[p['content']['spec'] for p in snapshot['proposals'].values() if p['content'].get('scope')=='EXPERIMENT']
             specs+=snapshot.get('packages',{}).get(task.get('package_id'),{}).get('spec',{}).get('experiments',[])
             for specification in specs:
                 if specification['id']==task.get('experiment_request') and specification['stage_id']==task['stage_id']:
                     try: experiments.submit(store, specification)
                     except Conflict as exc:
-                        reason=str(exc);current=store.replay()['tasks'][task['id']]
+                        reason=str(exc);current=store.view()['tasks'][task['id']]
                         if current.get('last_error')!=reason:
                             store.transact('EXPERIMENT_WAIT_REASON','wait:'+task['id']+':'+str(current['version'])+':'+sha(reason),
                                 lambda s:s['tasks'][task['id']].update(last_error=reason),object_id=task['id'])
@@ -792,8 +913,13 @@ def _schedule_pending(store):
 def reconcile(store):
     from .releases import reconcile_pointer
     reconcile_pointer(store)
+    from .usage import reconcile as reconcile_usage
+    for sid,usage in store.objects('usage',['INCOMPLETE']):
+        session=store.get('sessions',sid)
+        if session is not None:
+            reconcile_usage(store,sid,price=session.get('usage_admission',{}).get('price'))
     from . import experiments
-    for jid, job in store.replay()['jobs'].items():
+    for jid, job in store.objects('jobs',pending_event_suffix=':attach'):
         if job.get('spec',{}).get('backend') in {'real','runner_cpu'}:
             observed=experiments.reconcile(store,jid)
             if observed['status'] in {'SUCCEEDED','FAILED','STOPPED'}:
@@ -804,7 +930,7 @@ def reconcile(store):
                             task.update(research_job=jid,status='QUEUED',next_role='Evaluator')
                             s['evidence'][evidence['id']].update(task_id=task['id'],package_id=task.get('package_id'))
                 store.transact('RESEARCH_JOB_ATTACHED',jid+':attach',attach,object_id=jid)
-    for sid, session in store.replay()["sessions"].items():
+    for sid, session in store.objects("sessions",ACTIVE):
         if session["status"] not in ACTIVE:
             continue
         d = Path(session["directory"])
@@ -825,7 +951,7 @@ def reconcile(store):
         elif session["status"] != "RECONCILE":
             store.transact("ROLE_RECONCILE_REQUIRED", sid + ":uncertain",
                            lambda s, sid=sid: s["sessions"][sid].update(status="RECONCILE"), object_id=sid)
-    return store.replay()
+    return store.view()
 
 
 def daemon(root):
@@ -833,10 +959,12 @@ def daemon(root):
     with store.lock("daemon", nonblocking=True):
         atomic(store.root / "runtime/daemon.json", canonical(identity(os.getpid())))
         generation = daemon_generation()
+        from .releases import watch_stamp
+        monitored = watch_stamp(CODE)
         atomic(store.root/'runtime/daemon-code.json',canonical({'generation':generation,'identity':identity(os.getpid())}))
         while True:
             try:
-                if daemon_generation() != generation:
+                if watch_stamp(CODE) != monitored:
                     print('Control code changed; daemon exits without dispatching cached code',flush=True)
                     return
                 reconcile(store)
@@ -869,7 +997,7 @@ def daemon_generation():
 
 
 def restart_daemon(store):
-    state=store.replay()
+    state=store.view()
     # The independent worker/job supervisors own active work. Restart only the dispatcher.
     # Preserve pause and autonomous selections; reconciliation precedes all new dispatch.
     path=store.root/'runtime/daemon.json'

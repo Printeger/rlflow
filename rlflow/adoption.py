@@ -14,7 +14,7 @@ def propose(store,spec):
     if not spec['replacement'].strip() or not spec['change'].strip() or not spec['stop_conditions'] or not spec['evidence_ids']:
         raise Conflict('replacement, evidence, exact change and stop conditions required')
     content={**spec,'budget':{'role_calls':0,'wall_seconds':0,'fake_starts':0},'preconditions':['independent evidence','single sandbox','separate mainline approval']}
-    snapshot=store.replay().get('research',{}).get(spec['stage_id'],{})
+    snapshot=store.view().get('research',{}).get(spec['stage_id'],{})
     content['adoption_context']={'architecture':sha(snapshot.get('architecture')), 'sandbox':sha(snapshot.get('sandbox'))}
     digest=sha(content);pid='P-'+digest[:16]
     def change(s):

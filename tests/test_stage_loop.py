@@ -101,10 +101,26 @@ def test_loop_approval_cli_starts_daemon_once_without_second_start(harness,monke
     assert h.store.replay()['tasks'][tid]==before
 
 
-@pytest.mark.parametrize('calls,seconds',[(0,100),(101,100),(1,86401),(True,100)])
+@pytest.mark.parametrize('calls,seconds',[(0,100),(101,100),(1,-1),(1,86401),(True,100)])
 def test_extension_rejects_invalid_limits(harness,calls,seconds):
     with pytest.raises(Conflict):
         policy.make_extension_proposal(harness.store,'CPU',harness.task_id,calls,seconds,'test',stage_loop=True)
+
+
+def test_loop_extension_can_add_calls_at_cumulative_wall_cap(harness):
+    h = harness
+    h.store.transact(
+        'FIXTURE_WALL_CAP', 'wall-cap',
+        lambda s: s['stages']['CPU']['budget'].update(wall_seconds=86400),
+    )
+    pid = policy.make_extension_proposal(
+        h.store, 'CPU', h.task_id, 8, 0, 'reuse remaining wall pool',
+        stage_loop=True, next_role='Critic',
+    )
+    shown = policy.show_proposal(h.store, pid)
+    assert shown['content']['additional_budget'] == {
+        'role_calls': 8, 'wall_seconds': 0, 'fake_starts': 0,
+    }
 
 
 def test_contract_block_cannot_be_bypassed_by_loop_budget(harness):

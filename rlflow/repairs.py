@@ -56,7 +56,7 @@ def prepare(store,rid):
     from .policy import new_stage,available
     from .releases import files
     from .store import atomic
-    s=store.replay();repair=s['repairs'][rid];parent=s['stages'][repair['stage_id']]
+    s=store.view();repair=s['repairs'][rid];parent=s['stages'][repair['stage_id']]
     if repair['status']!='NEEDS_ISOLATED_CANDIDATE' or not parent.get('package_id') or available(parent)['role_calls']<2:
         return False
     repo=store.root/'workspaces'/('control-repair-'+rid)
@@ -92,7 +92,7 @@ def promote(store,rid):
     import os,subprocess,sys,time
     from .releases import freeze,verify
     from .store import atomic,canonical
-    state=store.replay();repair=state['repairs'][rid]
+    state=store.view();repair=state['repairs'][rid]
     if repair['status']!='VERIFIED_AWAITING_RELEASE':return False
     if any(x['status'] in {'START_INTENT','RUNNING','RECONCILE'} for x in state['sessions'].values()):return False
     if any(j['status'] in {'START_INTENT','RUNNING','RECONCILE'} for j in state['jobs'].values()):return False

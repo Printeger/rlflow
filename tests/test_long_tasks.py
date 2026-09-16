@@ -193,4 +193,6 @@ def test_context_uses_event_order_not_renamed_object_ids():
     evidence=[{'id':str(100-i),'event_sequence':i} for i in reversed(range(30))]
     _,_,ds,es,_,_=project({}, {}, decisions,evidence)
     assert [x['event_sequence'] for x in ds]==list(range(15,20))
+    assert all(x['history_compacted'] and 'payload_sha256' in x for x in ds[:3])
+    assert all('history_compacted' not in x for x in ds[-2:])
     assert [x['event_sequence'] for x in es]==list(range(18,30))

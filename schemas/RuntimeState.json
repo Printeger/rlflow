@@ -291,6 +291,24 @@
           },
           "funding_stage_id": {
             "type": "string"
+          },
+          "budget_reserves": {
+            "type": "object"
+          },
+          "pool_usage": {
+            "type": "object"
+          },
+          "input_contract": {
+            "type": "object"
+          },
+          "resource_policy": {
+            "type": "object"
+          },
+          "routing": {
+            "type": "object"
+          },
+          "usage_policy": {
+            "type": "object"
           }
         },
         "required": [
@@ -450,6 +468,21 @@
               "formal"
             ],
             "additionalProperties": false
+          },
+          "input_contract": {
+            "type": "object"
+          },
+          "route": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "final_integration": {
+            "type": "boolean"
+          },
+          "criterion_parents": {
+            "type": "object"
           }
         },
         "required": [
@@ -561,6 +594,39 @@
           "created": {
             "type": "number",
             "minimum": 0
+          },
+          "launch_phase": {
+            "enum": [
+              "PREPARING",
+              "READY",
+              "RELEASE_COMMITTED",
+              "START_ACK",
+              "RUNNING",
+              "RECONCILE",
+              "NOT_STARTED"
+            ]
+          },
+          "generation": {
+            "type": "string"
+          },
+          "release_binding": {
+            "type": "object"
+          },
+          "budget_pool": {
+            "enum": [
+              "ordinary",
+              "integration",
+              "recovery"
+            ]
+          },
+          "resources": {
+            "type": "object"
+          },
+          "resource_guarantees": {
+            "type": "object"
+          },
+          "usage_admission": {
+            "type": "object"
           }
         },
         "required": [
@@ -759,6 +825,9 @@
       "type": "object"
     },
     "releases": {
+      "type": "object"
+    },
+    "usage": {
       "type": "object"
     }
   },

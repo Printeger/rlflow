@@ -29,3 +29,6 @@ rlflow_standalone/
 ```
 
 默认新状态路径为 `~/.local/share/rlflow-standalone/coordination/research`。建议每个独立项目显式传 `--state-dir`。本次不创建业务目标、不调用真实模型、不运行训练。
+
+2026-09-16 已同步可靠性更新，详见 [可靠性与兼容边界](docs/RELIABILITY.md)。
+独立路径与未配置项目 Runner 的默认值保持不变。

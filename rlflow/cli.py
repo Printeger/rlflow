@@ -18,7 +18,7 @@ def parser():
     p = argparse.ArgumentParser(description="rlflow 独立控制面（项目 Runner 未配置）")
     p.add_argument("--state-dir", type=Path, default=COORDINATION / "research")
     sub = p.add_subparsers(dest="command", required=True)
-    for name in ("doctor", "status", "pause", "resume", "dispatch", "self-test", "init-demo", "rebuild", "rollback", "_daemon", 'restart-daemon'):
+    for name in ("doctor", "status", "pause", "resume", "dispatch", "self-test", "init-demo", "rebuild", "storage-audit", "storage-snapshot", "storage-export", "storage-recover", "rollback", "_daemon", 'restart-daemon'):
         command = sub.add_parser(name)
         if name == 'status':
             command.add_argument('--watch', action='store_true')
@@ -94,6 +94,8 @@ def parser():
     release=sub.add_parser('deploy-control')
     release.add_argument('--report', type=Path, required=True)
     sub.add_parser('reconcile')
+    for name in ('usage','usage-reconcile'):
+        sub.add_parser(name).add_argument('session')
     adoption = sub.add_parser('propose-adoption')
     adoption.add_argument('--spec',type=Path,required=True)
     exp = sub.add_parser('propose-experiment')
@@ -127,11 +129,27 @@ def main(argv=None):
                 atomic(a.state_dir / "runtime/self-test.json", canonical({"exit_code": r.returncode, "code_identity": code_identity(),
                        "time": time.time(), "stdout": r.stdout, "stderr": r.stderr, "isolated_state": True}))
                 return r.returncode
-        store = Store(a.state_dir)
-        if a.command == "_daemon":
+        store = Store(a.state_dir,allow_rebuild=a.command in {"rebuild","storage-recover"})
+        if a.command == "storage-audit":
+            audited = store.audit()
+            matches=audited==store.view()
+            output({"version":audited["version"],"projection_matches":matches})
+            if not matches:return 1
+        elif a.command == "storage-recover":
+            output({"version":store.recover()["version"]})
+        elif a.command == "storage-snapshot":
+            output(store.snapshot())
+        elif a.command == "storage-export":
+            output(store.export())
+        elif a.command == "_daemon":
             engine.daemon(store.root)
         elif a.command == 'restart-daemon':
-            output({'daemon':engine.restart_daemon(store),'paused':store.replay()['paused']})
+            output({'daemon':engine.restart_daemon(store),'paused':store.view()['paused']})
+        elif a.command == 'usage':
+            output(store.get('usage',a.session,{'complete':False,'actual_cost_status':'UNKNOWN'}))
+        elif a.command == 'usage-reconcile':
+            from .usage import reconcile
+            output(reconcile(store,a.session))
         elif a.command == "doctor":
             from .isolation import doctor
             report = doctor(store.root)
@@ -171,7 +189,7 @@ def main(argv=None):
             if not a.stage:
                 raise Conflict('--stage is required for a legacy single task')
             task_text = a.task_file.read_text() if a.task_file is not None else a.task
-            state = store.replay()
+            state = store.view()
             if a.stage not in state["stages"]:
                 pid = make_proposal(
                     store, a.stage, a.repo, task_text,
@@ -201,7 +219,7 @@ def main(argv=None):
             from .accounting import correct_prelaunch
             output(correct_prelaunch(store, a.session)['accounting_corrections'][a.session])
         elif a.command == 'package-status':
-            output(store.replay().get('packages', {})[a.id])
+            output(store.view().get('packages', {})[a.id])
         elif a.command == 'revoke':
             from .authorizations import revoke
             output(revoke(store, a.id, a.reason))
@@ -213,25 +231,29 @@ def main(argv=None):
                         time.sleep(2)
                 except KeyboardInterrupt:
                     return 0
-            state = store.replay()
-            output({"version": state["version"], "enabled": state["enabled"], "paused": state["paused"],
-                    "packages": state.get("packages", {}), "goals": state.get("goals", {}),
-                    "autonomous_tasks": state.get('autonomous_tasks', []),
-                    "stage_loops": {tid: {'status': state['tasks'][tid]['status'],
-                                           'next_role': state['tasks'][tid]['next_role'],
-                                           'remaining': available(state['stages'][state['tasks'][tid]['stage_id']])}
-                                    for tid in state.get('autonomous_tasks', []) if tid in state['tasks']},
-                    "dispatch_policy": "paused controls manual tasks; autonomous_tasks are approved to run; pause clears both",
-                    "STOP": stopped(store.root),
-                    "tasks": {k: {q: v[q] for q in ("status", "stage_id", "next_role", "repair_rounds", "completion")} for k, v in state["tasks"].items()},
-                    "budgets": {k: {"remaining": available(v), "used_calls": v["used_calls"], "reserved_calls": v.get("reserved_calls", 0), "used_seconds": v["used_seconds"], "infrastructure_seconds": v.get("infrastructure_seconds", 0), "reserved_seconds": v["reserved_seconds"]} for k, v in state["stages"].items()},
-                    "compute_budgets": {k:v.get('compute') for k,v in state['stages'].items()},
-                    "sessions": {k: {q: v[q] for q in ("role", "status", "directory")} for k, v in state["sessions"].items()},
-                    "proposals": state["proposals"], "jobs": state["jobs"], "historical_summary": state["historical"].get("summary", {})})
+            state=store.view();connection=state['tasks'].db
+            tasks=store.summaries('tasks',('status','stage_id','next_role','repair_rounds','completion','last_error'),connection)
+            stages=store.summaries('stages',('budget','used_calls','reserved_calls','used_seconds','reserved_seconds','used_fake_starts','infrastructure_seconds','compute','budget_reserves','pool_usage'),connection)
+            sessions=store.summaries('sessions',('role','status','directory','launch_phase','generation','resources','resource_guarantees','model_accounting','receipt.resource_usage'),connection)
+            output({'version':state['version'],'projection_version':state['version'],'enabled':state['enabled'],'paused':state['paused'],
+                'packages':store.summaries('packages',('id','status','paused','tasks','achievements','next_actions'),connection),
+                'goals':store.summaries('goals',('id','description','package_id','status'),connection),
+                'autonomous_tasks':state.get('autonomous_tasks',[]),
+                'stage_loops':{tid:{'status':tasks[tid]['status'],'next_role':tasks[tid]['next_role'],'remaining':available(stages[tasks[tid]['stage_id']])} for tid in state.get('autonomous_tasks',[]) if tid in tasks},
+                'dispatch_policy':'paused controls manual tasks; autonomous_tasks are approved to run; pause clears both',
+                'STOP':stopped(store.root),'tasks':tasks,
+                'budgets':{k:{'remaining':available(v),**{field:v.get(field,0) for field in ('used_calls','reserved_calls','used_seconds','reserved_seconds','infrastructure_seconds')}} for k,v in stages.items()},
+                'budget_reserves':{k:{'limits':v['budget_reserves'],'usage':v.get('pool_usage',{})} for k,v in stages.items() if 'budget_reserves' in v},
+                'compute_budgets':{k:v.get('compute') for k,v in stages.items()},'sessions':sessions,
+                'blocked_reasons':{k:v['last_error'] for k,v in tasks.items() if v.get('last_error')},
+                'usage':store.summaries('usage',('input_tokens','output_tokens','cached_tokens','model','complete','estimated_cost','actual_cost_status'),connection),
+                'proposals':store.summaries('proposals',('id','version','sha256','shown','content.scope','content.stage_id'),connection),
+                'jobs':store.summaries('jobs',('id','stage','status','reserved_resources','used_resources','launch_phase','resource_guarantees'),connection),
+                'historical_summary':state['historical'].get('summary',{})})
         elif a.command == "logs":
             path = store.root / "runtime/daemon.log"
             if a.session:
-                se = store.replay()["sessions"][a.session]
+                se = store.view()["sessions"][a.session]
                 path = Path(se["directory"]) / "events.jsonl"
             print("\n".join(path.read_text().splitlines()[-a.lines:]) if path.exists() else "No logs yet")
         elif a.command in {"pause", "resume"}:
@@ -256,6 +278,8 @@ def main(argv=None):
                     for task in s["tasks"].values():
                         if task["status"] == "ROLE_ERROR":
                             task["status"] = "QUEUED"
+                        if task["status"] == "QUEUED" and task.get("last_failure", {}).get("kind") == "ROLE_OUTPUT":
+                            task["last_failure"]["blocked"] = False
             state = store.transact("PAUSED" if a.command == "pause" else "RESUMED", a.command + ":" + str(time.time_ns()), change_pause)
             if a.command == "resume":
                 engine.ensure_daemon(store)
@@ -265,7 +289,7 @@ def main(argv=None):
             output({"session": engine.dispatch_one(store, allow_paused=True)})
         elif a.command == "record-decision":
             engine.accept_result(store, a.session)
-            output(store.replay()["sessions"][a.session])
+            output(store.view()["sessions"][a.session])
         elif a.command == "reconsider-result":
             state = engine.reconsider_result(store, a.session)
             output({"session": state["sessions"][a.session],

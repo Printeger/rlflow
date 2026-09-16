@@ -62,7 +62,7 @@ def register_case(store, spec):
         raise Conflict('invalid escalation case fields')
     if not isinstance(spec['competing_explanations'],list) or not 1<=len(spec['competing_explanations'])<=3 or any(not isinstance(x,str) or not x.strip() or len(x)>2000 for x in spec['competing_explanations']):
         raise Conflict('need 1..3 competing explanations')
-    state=store.replay();task=state['tasks'][spec['task_id']];source=state['sessions'][spec['source_session']]
+    state=store.view();task=state['tasks'][spec['task_id']];source=state['sessions'][spec['source_session']]
     existing=state['decisions'].get(spec['id'])
     if existing:
         if all(existing.get(k)==v for k,v in spec.items()):return existing
@@ -84,11 +84,11 @@ def register_case(store, spec):
     from .engine import envelope_candidate
     source_result=json.loads((Path(source['directory'])/'result.json').read_text())
     evidence_files(store,state,task,['E-'+source['id']])
-    if candidate(task['repo']) != task.get('accepted_candidate',task['baseline']) or source_result.get('candidate')!=envelope_candidate(task):
+    if candidate(task['repo'],task.get("input_contract")) != task.get('accepted_candidate',task['baseline']) or source_result.get('candidate')!=envelope_candidate(task):
         raise Conflict('source candidate is stale')
     files=evidence_files(store,state,task,spec['evidence_refs'])
     case={**spec,'kind':'model_escalation_case','role':role,'from_step':step,'to_step':step+1,
-          'candidate':candidate(task['repo']),'authority_sha256':authority(stage,role),
+          'candidate':candidate(task['repo'],task.get("input_contract")),'authority_sha256':authority(stage,role),
           'role_sha256':load_role(role)['sha256'],'policy_sha256':p['sha256'],'files':files,
           'authorized_by':'local-user-cli','consumed_by':None}
     def save(s):
@@ -111,7 +111,7 @@ def validate_case(store,state,case_id,source_id=None):
     p=load_policy()
     if c['policy_sha256']!=p['sha256'] or c['role_sha256']!=load_role(c['role'])['sha256']:
         raise Conflict('case policy/role definition changed; new authorization required')
-    if candidate(task['repo'])!=c['candidate'] or authority(stage,c['role'])!=c['authority_sha256']:
+    if candidate(task['repo'],task.get("input_contract"))!=c['candidate'] or authority(stage,c['role'])!=c['authority_sha256']:
         raise Conflict('candidate or authority changed since case authorization')
     from .engine import envelope_candidate
     evidence_files(store,state,task,['E-'+source['id']])
@@ -124,7 +124,7 @@ def validate_case(store,state,case_id,source_id=None):
 
 
 def queue(store,case_id,*,source_id=None):
-    state=store.replay()
+    state=store.view()
     # A replayed operator request is inert, even after a later session finishes.
     case=state['decisions'].get(case_id,{})
     if case.get('queued'):
@@ -145,7 +145,7 @@ def queue(store,case_id,*,source_id=None):
         s['decisions'][case_id]['queued']=True
         return package
     store.transact('MODEL_ESCALATION_QUEUED','model-queue:'+case_id,enqueue,expected=state['version'],object_id=task['id'])
-    return store.replay()['tasks'][task['id']]
+    return store.view()['tasks'][task['id']]
 
 
 def materialize(directory,package):

@@ -68,12 +68,55 @@ def test_closed_problem_cannot_reopen_without_new_material_evidence():
     with pytest.raises(Conflict):progress.review(s,t,{'findings':[f]})
 
 
+def test_single_condition_leaf_maps_quoted_contract_prose_to_its_condition():
+    s,t=setup();s['evidence']['e']={'sha256':'1'*64}
+    f={'id':'f','category':'MUST_FIX','contract':'quoted condition prose',
+       'affected_conclusion':'CPU','close_condition':'fix','evidence_refs':['e']}
+    assert not progress.review(s,t,{'findings':[f]})
+    record=next(iter(s['research']['p']['findings'].values()))
+    assert record['condition']=='C1'
+
+
+def test_single_condition_leaf_does_not_collide_with_closed_unknown_bucket():
+    s,t=setup();s['evidence']['e']={'sha256':'1'*64}
+    s['research']={'p':{'findings':{
+        sha({'package':'p','condition':'UNRESOLVED_CONTRACT_ASSOCIATION'}):{
+            'condition':'UNRESOLVED_CONTRACT_ASSOCIATION','evidence':[],
+            'aliases':['old-other-task'],'closed':True}}}}
+    f={'id':'resource-finding','category':'MUST_FIX','contract':'resource contract prose',
+       'affected_conclusion':'CPU','close_condition':'fix','evidence_refs':['e']}
+    assert not progress.review(s,t,{'findings':[f]})
+    mapped=s['research']['p']['findings'][sha({'package':'p','condition':'C1'})]
+    assert mapped['condition']=='C1' and not mapped['closed']
+
+
+def test_multiple_findings_for_one_condition_are_one_new_diagnostic_cycle():
+    s,t=setup();s['evidence']['e']={'sha256':'1'*64}
+    finding={'category':'MUST_FIX','contract':'C1','affected_conclusion':'CPU',
+             'close_condition':'fix','evidence_refs':['e']}
+    payload={'findings':[{**finding,'id':'source-trust'},
+                         {**finding,'id':'duplicate-start'},
+                         {**finding,'id':'context-mixing'}]}
+    assert not progress.review(s,t,payload)
+    records=s['research']['p']['findings']
+    assert len(records)==1
+    assert next(iter(records.values()))['aliases']==[
+        'context-mixing','duplicate-start','source-trust']
+
+
 def test_scout_quota_and_role_authority():
     s,t=setup();action={'action':'REQUEST_REVIEW','fields':['Scout'],'purpose':'specific current question','evidence_ids':[]}
     research.requests(s,t,{'role':'PI'},{'requested_actions':[action]})
     assert t['next_role']=='Scout'
     with pytest.raises(Conflict):research.requests(s,t,{'role':'PI'},{'requested_actions':[action]})
     with pytest.raises(Conflict):research.requests(s,t,{'role':'Scout'},{'requested_actions':[{**action,'action':'REQUEST_EXPERIMENT'}]})
+
+
+def test_critic_can_request_engineering_rework_declared_by_its_schema():
+    s,t=setup();t['next_role']='PI'
+    action={'action':'REQUEST_REWORK','fields':[],'purpose':'close the independently reproduced trust-boundary finding','evidence_ids':[]}
+    research.requests(s,t,{'role':'Critic'},{'requested_actions':[action]})
+    assert t['next_role']=='Engineer'
 
 
 def test_only_raw_independently_bound_observation_can_mark_progress():

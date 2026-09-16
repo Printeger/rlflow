@@ -123,8 +123,12 @@ class JobsTest(unittest.TestCase):
         self.assertEqual(recovered['state'], 'RECONCILE')
         self.assertEqual(self.submit({'duration': .5})['nonce'], state['nonce'])
         self.assertEqual(recovered['start_attempts'], 1)
-        time.sleep(.55)
-        final = jobs.reconcile(self.root, 'j1')
+        deadline = time.monotonic() + 5
+        while True:
+            final = jobs.reconcile(self.root, 'j1')
+            if final['reconciliation']['result_artifact'] == 'identity_matches' or time.monotonic() >= deadline:
+                break
+            time.sleep(.01)
         self.assertEqual(final['state'], 'RECONCILE')
         self.assertEqual(final['reconciliation']['result_artifact'], 'identity_matches')
         self.assertFalse(final['reconciliation']['exit_evidence_available'])

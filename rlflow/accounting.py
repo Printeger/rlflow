@@ -12,20 +12,15 @@ def observe(directory, launched):
     evidence after launch remains unknown, including network/transport failures.
     """
     path = Path(directory) / 'events.jsonl'
-    raw = path.read_bytes() if path.exists() else b''
-    used = False
-    for line in raw.splitlines():
-        try: event = json.loads(line)
-        except ValueError: continue
-        if not isinstance(event, dict): continue
-        usage = event.get('usage') or {}
-        if isinstance(usage, dict) and any(type(v) is int and v > 0 for k, v in usage.items() if k in ('input_tokens', 'output_tokens', 'total_tokens')):
-            used = True
-        item = event.get('item') or {}
-        if event.get('type') == 'item.completed' and isinstance(item, dict) and item.get('type') in ('agent_message', 'reasoning', 'command_execution', 'mcp_tool_call'):
-            used = True
-    return {'state': 'USED' if used else 'UNKNOWN' if launched else 'NOT_STARTED',
-            'source': 'worker-lifecycle+cli-jsonl/1', 'events_sha256': hashlib.sha256(raw).hexdigest()}
+    from .usage import read
+    tokens=read(path)
+    used=tokens['generated'] or any((tokens.get(k) or 0)>0 for k in ('input_tokens','output_tokens','cached_tokens'))
+    digest=hashlib.sha256()
+    if path.exists():
+        with path.open('rb') as stream:
+            while block:=stream.read(1024*1024):digest.update(block)
+    return {**tokens,'state':'USED' if used else 'UNKNOWN' if launched else 'NOT_STARTED',
+            'source':'worker-lifecycle+cli-jsonl/2','events_sha256':digest.hexdigest()}
 
 
 def reserve(stage, session):
@@ -73,7 +68,7 @@ def settle(stage, session, receipt):
 
 def correct_prelaunch(store, sid):
     """Only trusted, historically explicit prelaunch failures qualify; no guesses."""
-    state = store.replay(); se = state['sessions'][sid]
+    state = store.view(); se = state['sessions'][sid]
     if sid in state.get('accounting_corrections', {}): return state
     directory = Path(se['directory'])
     if (se.get('accounting_version') == 2 or not se.get('prelaunch_failure')

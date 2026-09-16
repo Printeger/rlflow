@@ -172,7 +172,7 @@ def validate_runtime_event(event: dict) -> None:
         jsonschema.Draft202012Validator(schema).validate(event)
         payload = json.loads(event['payload'])
         inputs = json.loads(event['input_versions'])
-        if not isinstance(inputs, dict) or not isinstance(payload, dict) or set(payload) != {'set', 'details'} or not isinstance(payload['set'], dict):
+        if not isinstance(inputs, dict) or not isinstance(payload, dict) or not ((set(payload) == {'set', 'details'} and isinstance(payload['set'], dict)) or (set(payload) == {'format','put','delete','details'} and payload['format'] == 2 and isinstance(payload['put'],list) and isinstance(payload['delete'],list))):
             raise ContractError('Invalid event payload/input versions')
         if content_hash(payload) != event['payload_sha256']:
             raise ContractError('Event payload hash mismatch')

@@ -20,9 +20,9 @@ def kill_group(record):
         except ProcessLookupError:pass
 
 
-def start(directory,kind,owner,root,limit,object_id,spec=None):
+def start(directory,kind,owner,root,limit,object_id,spec=None,resources=None):
     d=Path(directory);request={'directory':str(d),'kind':kind,'owner':owner,'root':str(root),
-        'limit':limit,'id':object_id,'spec':spec,'started_wall':time.time(),'started_monotonic':time.monotonic()}
+        'limit':limit,'id':object_id,'spec':spec,'resources':resources,'started_wall':time.time(),'started_monotonic':time.monotonic()}
     path=d/'lifeguard-request.json';atomic(path,canonical(request))
     with (d/'lifeguard.log').open('ab') as log:
         proc=subprocess.Popen([sys.executable,'-m','rlflow.lifeguard',str(path)],
@@ -41,6 +41,12 @@ def run(path):
     atomic(d/'lifeguard-ready.json',canonical({'identity':identity(os.getpid()),'request_sha256':sha(request)}))
     cause='supervisor lost'
     while owns(owner):
+        resource_record=request.get('resources') or ((request.get('spec') or {}).get('resources') if request['kind']=='role' else None)
+        if resource_record:
+            from .resources import verify_group,stats
+            observed=stats(verify_group(resource_record))
+            if observed['cpu.stat']['usage_usec']>=resource_record['policy']['cpu_seconds']*1000000:
+                cause='cumulative CPU budget exceeded';break
         if (d/'lifeguard-done').exists():return
         if stopped(request['root']) or (d/'cancel').exists():cause='STOP/cancel';break
         if time.monotonic()-request['started_monotonic']>request['limit']:cause='supervisor deadline exceeded';break
@@ -62,6 +68,11 @@ def reclaim(request,cause='supervisor lost during dispatcher recovery'):
         if owns(owner):os.kill(owner['pid'],signal.SIGKILL)
     if child_file.exists():child=json.loads(child_file.read_text())
     kill_group(child)
+    resources=request.get('resources') or ((request.get('spec') or {}).get('resources') if request['kind']=='role' else None)
+    if resources:
+        from .resources import verify_group,stats
+        group=verify_group(resources);(group/'cgroup.kill').write_text('1')
+        atomic(d/'resource-usage.json',canonical(stats(group)))
     if (d/'receipt.json').exists():return
     deadline=time.monotonic()+2
     while (owns(owner) or owns(child)) and time.monotonic()<deadline:time.sleep(.01)
@@ -97,13 +108,22 @@ def reclaim(request,cause='supervisor lost during dispatcher recovery'):
 def held_role(path):
     """No CLI executes until its own durable identity and release are bound."""
     r=json.loads(Path(path).read_text());d=Path(r['directory'])
+    if r.get('resources'):
+        from .resources import enter
+        enter(r['resources'])
     atomic(d/'codex-identity.json',canonical(group_identity(os.getpid())))
-    deadline=time.monotonic()+10
+    deadline=min(time.monotonic()+r.get('release_wait_seconds',60),r.get('deadline',float('inf')))
     while not (d/'model-release.json').exists():
         if not owns(r['owner']) or time.monotonic()>deadline or stopped(r['root']):raise SystemExit(126)
         time.sleep(.01)
     release=json.loads((d/'model-release.json').read_text())
     if release['identity']!=group_identity(os.getpid()) or not owns(r['owner']) or stopped(r['root']) or (d/'cancel').exists():raise SystemExit(126)
+    if release.get('generation')!=r.get('generation') or release.get('session')!=r.get('session',release.get('session')):raise SystemExit(126)
+    from .startup import record
+    record(d,'START_ACK',{'session':release.get('session'),'generation':r.get('generation'),'identity':group_identity(os.getpid())})
+    if r.get('resources',{} ) and r['resources'].get('disk'):
+        from .resources import confine_writes
+        confine_writes(r['resources']['disk']['root'])
     os.chdir(r['scratch'])
     os.execvpe(r['argv'][0],r['argv'],os.environ)
 

@@ -13,6 +13,18 @@ def files(root=ROOT):
             for p in sorted((root/folder).rglob('*')) if p.is_file() and '__pycache__' not in p.parts} | {name:root/name for name in ('model_policy.yaml','bootstrap.py','pyproject.toml','requirements.lock')}
 
 
+def watch_stamp(root=ROOT):
+    """Fail closed on source additions, removal or metadata change between checks."""
+    from .files import stamp
+    result={}
+    for name,path in files(root).items():
+        if path.is_symlink():raise Conflict('control release contains symlink')
+        result[name]=stamp(path.stat())
+    manifest=Path(root)/'release.json'
+    if manifest.exists():result['release.json']=stamp(manifest.stat())
+    return result
+
+
 def freeze(destination, root=ROOT):
     sources=files(root);manifest={name:hashlib.sha256(p.read_bytes()).hexdigest() for name,p in sources.items()}
     digest=sha(manifest);target=Path(destination)/digest
@@ -33,6 +45,22 @@ def verify(target):
     if sha(record['files'])!=record['id']:raise Conflict('release manifest identity mismatch')
     actual={name:hashlib.sha256(p.read_bytes()).hexdigest() for name,p in files(target).items()}
     if actual!=record['files']:raise Conflict('frozen release bytes changed')
+    return record
+
+
+_VERIFIED={}
+
+
+def verify_monitored(target):
+    target=Path(target).resolve(strict=True)
+    stamp=watch_stamp(target)
+    previous=_VERIFIED.get(str(target))
+    if previous is not None:
+        if previous[0]!=stamp:raise Conflict('control release changed during monitoring; stop dispatch and revalidate')
+        return previous[1]
+    record=verify(target)
+    if watch_stamp(target)!=stamp:raise Conflict('control release changed while validating')
+    _VERIFIED[str(target)]=(stamp,record)
     return record
 
 
@@ -66,10 +94,10 @@ def committed_release(state):
 def reconcile_pointer(store):
     """Finish a committed publication after a crash before pointer export."""
     with store.lock('dispatch-release'):
-        selected=committed_release(store.replay())
+        selected=store.latest_release()
         if selected is None:return None
         target=Path(selected['path']).resolve(strict=True)
-        if not target.is_relative_to(store.root/'releases') or verify(target)['id']!=selected['id']:raise Conflict('committed control release drift')
+        if not target.is_relative_to(store.root/'releases') or verify_monitored(target)['id']!=selected['id']:raise Conflict('committed control release drift')
         pointer=store.root/'runtime/current-release.json'
         if not pointer.exists() or json.loads(pointer.read_text())!=selected:atomic(pointer,canonical(selected))
         return selected
