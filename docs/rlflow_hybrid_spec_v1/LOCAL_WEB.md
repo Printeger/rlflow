@@ -1,6 +1,6 @@
 # 本地只读 Web 服务（T06 基础切片）
 
-当前提供真实 SQLite 观测 API、SSE 和 `/` 下的只读 Dashboard 初始界面；不能据此判定 M1 完成。HTTP 服务不会创建 Store、启动 scheduler、调用模型、修改批准或预算，也不开放命令与 artifact 路径。
+当前提供真实 SQLite 观测 API、SSE 和 `/` 下的只读 Dashboard；不能据此判定 M1 完成。默认 `1.0` 配置不开放命令或修改批准。checkpoint30 新增受保护本地 `1.1` 配置，可显式启用不可执行的 DRAFT/条件批准/撤销 HTTP 服务，见 [TRUSTED_WEB_CONFIG.md](TRUSTED_WEB_CONFIG.md)。两者均不启动 scheduler、模型、lease，不提供 artifact 路径；启动不创建/迁移业务 Store。
 
 安装项目运行依赖，并对一个已存在的 rlflow state 显式启用观测：
 
@@ -38,7 +38,7 @@
 
 SSE：`domain` 有 durable id；5 秒 `heartbeat` 无 id；`resync_required` 携带 `code=RESYNC_REQUIRED` 和固定 reason，之后关闭。epoch/历史缺口、会话失效、队列溢出都要求重新获取快照。socket send 超过 2 秒直接关闭，重连使用客户端最后 durable id；已阻塞的 socket 不强行追加控制帧。每个连接仅预取一个事件，队列最多 32 帧/4 MiB，服务最多 8 条流。性能合同、遥测和日志尚未全部验收。
 
-公开 OpenAPI/docs、任意 artifact、写命令均不存在。响应设 no-store、nosniff、no-referrer、self-only CSP（包括 form-action）。UI 仅文本渲染，未将口令/session/CSRF 持久化到浏览器 storage。JavaScript 不工作时表单也只使用 POST；后端拒绝非 JSON 请求。新认证清空旧身份 DOM/缓存，认证和项目异步响应有独立 generation guard。
+公开 OpenAPI/docs 与任意 artifact 均不存在；默认配置没有写命令，显式控制配置的命令范围见 TRUSTED_WEB_CONFIG.md。响应设 no-store、nosniff、no-referrer、self-only CSP（包括 form-action）。UI 仅文本渲染，未将口令/session/CSRF 持久化到浏览器 storage。JavaScript 不工作时表单也只使用 POST；后端拒绝非 JSON 请求。新认证清空旧身份 DOM/缓存，认证和项目异步响应有独立 generation guard。
 
 打开服务的本地 URL、使用 prepare 配置的主体与口令。纯 reducer 将 snapshot 与 SSE 接缝、epoch、去重、对象版本和权威 counters 分开。总对象缓存最多200，保留最近至多30 execution/10 stage；事件摘要200，虚拟窗口只渲染可见行，方向键/Home/End/Enter可导航与读详情，阅读位置按事件ID保持。费用/模型活动/资源未知不会改为0/RUNNING；Fixture始终有标签。静止/追平/离线/隐藏/减少动画不持续运行脉冲。已接入绑定CPU返回metadata；资源、条件矩阵、完整error合同、真实运行/长期soak仍待完成。
 

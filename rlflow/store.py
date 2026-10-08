@@ -8,6 +8,7 @@ import json
 import os
 from pathlib import Path
 import sqlite3
+import stat
 import time
 import uuid
 
@@ -127,6 +128,7 @@ class Store:
         self._hybrid_authority_service = None
         self._hybrid_draft_auth_owner = None
         self._hybrid_draft_service = None
+        self._existing_identity = None
         self.root = Path(root).resolve()
         (self.root / "runtime").mkdir(parents=True, exist_ok=True)
         self.db = self.root / "runtime/research.db"
@@ -186,18 +188,179 @@ class Store:
                         or maintenance['last_complete'] and not db.execute('SELECT 1 FROM snapshots WHERE version=?',(maintenance['last_complete'],)).fetchone()):
                     raise Conflict('snapshot maintenance metadata requires explicit recovery')
 
+    @classmethod
+    def attach_existing(cls, root, *, project_id, data_mode):
+        """Attach a migrated, registered store without DDL, recovery or creation.
+
+        SQLite may maintain its WAL/SHM sidecars while reading. This is not an
+        immutable filesystem snapshot or protection against the trusted OS owner.
+        Business connections cannot recreate a missing/replaced main database.
+        """
+        from .hybrid_protocol import ID, validate_schema
+        from .observation import ObservationReader
+        validate_schema(ID, project_id)
+        if data_mode not in ('live', 'fixture'):
+            raise ValueError('invalid existing store mode')
+        store = cls.__new__(cls)
+        store.root = Path(root).resolve(strict=True)
+        store.db = store.root / 'runtime/research.db'
+        for directory in (store.root, store.root / 'runtime'):
+            directory_info = directory.lstat()
+            if (not stat.S_ISDIR(directory_info.st_mode) or directory_info.st_uid != os.geteuid()
+                    or directory_info.st_mode & 0o022):
+                raise ValueError('existing store requires protected directories')
+        info = store.db.lstat()
+        if not stat.S_ISREG(info.st_mode) or info.st_uid != os.geteuid() or info.st_mode & 0o022:
+            raise ValueError('existing store requires a regular database')
+        store._existing_identity = (info.st_dev, info.st_ino)
+        for name in ('_hybrid_auth_owner', '_hybrid_registry', '_hybrid_authority_service',
+                     '_hybrid_draft_auth_owner', '_hybrid_draft_service'):
+            setattr(store, name, None)
+        db = sqlite3.connect(store.db.as_uri() + '?mode=ro', uri=True, timeout=5)
+        try:
+            db.row_factory = sqlite3.Row
+            db.execute('PRAGMA query_only=ON')
+            db.execute('BEGIN')
+            if db.execute('PRAGMA journal_mode').fetchone()[0] != 'wal':
+                raise Conflict('existing store requires explicit WAL migration')
+            required = {
+                'events': 'seq event_id idempotency_key event_type object_id object_version previous_state_version new_state_version producer time input_versions payload payload_sha256',
+                'projection': 'section object_key value version object_status',
+                'projection_meta': 'singleton version', 'blobs': 'digest data',
+                'snapshots': 'version state sha256', 'snapshot_due': 'singleton due_version last_complete',
+                'observation_meta': 'singleton project_id store_epoch data_mode seq floor source_version paused enabled',
+                'observation_events': 'seq event_id source_event_id output_index envelope digest',
+                'observation_projection': 'kind object_id status summary',
+                'observation_counters': 'kind status count',
+            }
+            integer_columns = {'seq','object_version','previous_state_version','new_state_version','version',
+                               'singleton','due_version','last_complete','floor','source_version','paused','enabled','output_index','count'}
+            nullable = {('events','seq'),('projection','object_status'),('projection_meta','singleton'),
+                        ('blobs','digest'),('snapshots','version'),('snapshot_due','singleton'),
+                        ('observation_meta','singleton'),('observation_events','seq')}
+            table_infos = {}
+            for table, column_names in required.items():
+                kind = db.execute('SELECT type,sql FROM sqlite_master WHERE name=?',(table,)).fetchone()
+                columns = column_names.split()
+                infos = list(db.execute('PRAGMA table_xinfo(' + table + ')'))
+                table_infos[table] = infos
+                if (kind is None or kind[0] != 'table' or 'WITHOUT ROWID' in kind[1].upper()
+                        or [r[1] for r in infos] != columns
+                        or any(r[6] or r[2].upper() != ('INTEGER' if r[1] in integer_columns else
+                            'REAL' if r[1]=='time' else 'BLOB' if (table,r[1]) in {('blobs','data'),('snapshots','state')} else 'TEXT')
+                            or r[3] != int((table,r[1]) not in nullable) for r in infos)):
+                    raise Conflict('existing store requires explicit schema migration')
+            keys = {'events':('seq',), 'projection':('section','object_key'),
+                    'projection_meta':('singleton',), 'blobs':('digest',),
+                    'snapshots':('version',), 'snapshot_due':('singleton',),
+                    'observation_meta':('singleton',), 'observation_events':('seq',),
+                    'observation_projection':('kind','object_id'), 'observation_counters':('kind','status')}
+            for table, key in keys.items():
+                actual = tuple(r[1] for r in sorted(table_infos[table], key=lambda r:r[5]) if r[5])
+                if actual != key: raise Conflict('existing store primary key mismatch')
+                # INTEGER PRIMARY KEY DESC has a separate pk index and is NOT
+                # the rowid alias used by core automatic event sequence inserts.
+                if len(key)==1 and key[0] in integer_columns and any(r[3]=='pk' for r in db.execute('PRAGMA index_list(' + table + ')')):
+                    raise Conflict('existing store integer primary key is not a rowid alias')
+            for table, keys in {'events':(('event_id',),('idempotency_key',)),
+                                'observation_events':(('event_id',),('source_event_id','output_index'))}.items():
+                indexes = [r for r in db.execute('PRAGMA index_list(' + table + ')') if r[2] and not r[4]]
+                unique = {tuple(r[2] for r in db.execute('PRAGMA index_info("' + index[1].replace('"','""') + '")')) for index in indexes}
+                if not set(keys) <= unique: raise Conflict('existing store uniqueness constraints missing')
+            import re
+            for name, table, action, message in (
+                ('no_update','events','UPDATE','append only'), ('no_delete','events','DELETE','append only'),
+                ('blobs_no_update','blobs','UPDATE','immutable blob'), ('blobs_no_delete','blobs','DELETE','immutable blob'),
+                ('observation_no_update','observation_events','UPDATE','append only observations'),
+                ('observation_no_delete','observation_events','DELETE','append only observations')):
+                sql = db.execute("SELECT sql FROM sqlite_master WHERE type='trigger' AND name=?",(name,)).fetchone()
+                expected = f"CREATE TRIGGER {name} BEFORE {action} ON {table} BEGIN SELECT RAISE(ABORT,'{message}'); END"
+                normalize = lambda value:re.sub(r'\s+','',value).lower().replace('ifnotexists','')
+                if sql is None or normalize(sql[0]) != normalize(expected):
+                    raise Conflict('existing store immutable constraints missing')
+            meta = ObservationReader._meta(db)
+            if (meta['project_id'], meta['data_mode']) != (project_id, data_mode):
+                raise Conflict('existing store registration mismatch')
+            validate_schema(ID, meta['store_epoch'])
+            if (any(type(meta[k]) is not int or not 0 <= meta[k] <= 2**63-1 for k in ('seq','floor','source_version'))
+                    or meta['floor'] > meta['seq'] or any(type(meta[k]) is not int or meta[k] not in (0,1) for k in ('paused','enabled'))):
+                raise Conflict('existing store observation metadata invalid')
+            version = db.execute('SELECT version FROM projection_meta WHERE singleton=1').fetchone()[0]
+            latest = db.execute('SELECT COALESCE(MAX(seq),0) FROM events').fetchone()[0]
+            if type(version) is not int or not 0 <= version <= 2**63-1 or version != latest:
+                raise Conflict('existing store projection requires explicit recovery')
+            maintenance = db.execute('SELECT due_version,last_complete FROM snapshot_due WHERE singleton=1').fetchone()
+            if (maintenance is None or any(type(v) is not int or not 0 <= v <= version for v in maintenance)
+                    or maintenance['last_complete'] and not db.execute('SELECT 1 FROM snapshots WHERE version=?',(maintenance['last_complete'],)).fetchone()):
+                raise Conflict('existing store maintenance requires explicit recovery')
+            lock = (store.root / 'runtime/writer.lock').lstat()
+            if not stat.S_ISREG(lock.st_mode) or lock.st_uid != os.geteuid() or lock.st_mode & 0o022:
+                raise Conflict('existing store requires an existing writer lock')
+            store._existing_lock_identity = (lock.st_dev, lock.st_ino)
+            store._check_existing_identity()
+            store.store_epoch = meta['store_epoch']
+        finally:
+            db.close()
+        return store
+
+    def _check_existing_identity(self):
+        info = self.db.lstat()
+        if not stat.S_ISREG(info.st_mode) or (info.st_dev, info.st_ino) != self._existing_identity:
+            raise Conflict('existing database identity changed')
+
+    @contextlib.contextmanager
+    def read_connection(self):
+        """Read existing state without journal migration or database creation."""
+        if self._existing_identity is not None:
+            self._check_existing_identity()
+        db = sqlite3.connect(self.db.as_uri() + '?mode=ro', uri=True, timeout=5)
+        try:
+            db.row_factory = sqlite3.Row
+            db.execute('PRAGMA query_only=ON')
+            if self._existing_identity is not None:
+                self._check_existing_identity()
+            yield db
+        finally:
+            db.close()
+
     def connect(self):
-        db = sqlite3.connect(self.db, timeout=30)
+        existing = self._existing_identity is not None
+        if existing:
+            self._check_existing_identity()
+        db = sqlite3.connect(self.db.as_uri() + '?mode=rw' if existing else self.db,
+                             uri=existing, timeout=30)
         db.row_factory = sqlite3.Row
-        db.execute("PRAGMA journal_mode=WAL")
-        db.execute("PRAGMA synchronous=FULL")
+        try:
+            if existing:
+                self._check_existing_identity()
+                if db.execute('PRAGMA journal_mode').fetchone()[0] != 'wal':
+                    raise Conflict('existing store journal mode changed')
+            else:
+                db.execute("PRAGMA journal_mode=WAL")
+            db.execute("PRAGMA synchronous=FULL")
+        except BaseException:
+            db.close()
+            raise
         return db
 
     @contextlib.contextmanager
     def lock(self, name="writer", nonblocking=False):
-        with (self.root / "runtime" / (name + ".lock")).open("a") as f:
+        path = self.root / "runtime" / (name + ".lock")
+        if self._existing_identity is not None:
+            self._check_existing_identity()
+            fd = os.open(path, os.O_RDWR | os.O_NOFOLLOW)
+            info = os.fstat(fd)
+            if not stat.S_ISREG(info.st_mode) or (info.st_dev,info.st_ino) != self._existing_lock_identity:
+                os.close(fd)
+                raise Conflict('existing writer lock is not regular')
+            f = os.fdopen(fd, 'r+')
+        else:
+            f = path.open('a')
+        with f:
             fcntl.flock(f, fcntl.LOCK_EX | (fcntl.LOCK_NB if nonblocking else 0))
             try:
+                if self._existing_identity is not None:
+                    self._check_existing_identity()
                 yield
             finally:
                 fcntl.flock(f, fcntl.LOCK_UN)

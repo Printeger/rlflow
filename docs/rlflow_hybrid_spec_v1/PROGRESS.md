@@ -1,5 +1,7 @@
 # Hybrid v1 开发进度
 
+Checkpoint30完整终态：可信CLI schema1.1加载器、existing-only Store attach 已实现；旧schema1.0三元组与默认RO/prepare viewer角色不变，显式角色/catalog不授执行权。root/High14modules各301passed，原84286/81244均exit0；中央full原11956terminalexit0，913passed/32既有外部/H1skips/1既有Starlette warning274.16s，compileall/pip/diff0。FIFO与错误INTEGER rowid主键两项High finding及metadata遗漏关闭，无剩余MUST_FIX；source/logSHA见evidence/checkpoint-30-final-tests.txt。当前无live测试。启动无业务写/DDL/迁移/恢复，SQLite sidecar housekeeping不冒充绝对零文件变化。配置→ASGI HTTP闭环与CLI mock监听选项分开，不重标29TCP或旧browser/性能证据，见TRUSTED_WEB_CONFIG.md。USER package-lock保留，完整Goal active；下一goal/head有界读桥（新private source_command_key核原完整record摘要，旧记录不补填/投影version不冒充来源）与human确认UI、lease/执行、实际工程科研/B1/长期仍未完成。
+
 Checkpoint29完整终态覆盖下述live过程：protected operator DraftService/全局CAS、command1.1与defaultRO/显式opt-inHTTP写桥、actualowned socket断连容量/持久原receipt/条件批准，root/High各289定向passed，四项范围finding关闭，无剩余MUST_FIX。冻结full原10082terminal exit0：867passed/32既有外部/H1skips/1既有Starlette warning267.24s；compileall/pip/diff0、offline18checks；source/schema/logSHA见evidence/checkpoint-29-final-tests.txt，接口与边界见HYBRID_CONTROL_API.md。当前无live测试/负载，USER package-lock不动不stage。默认CLI仍只读、没有安装配置开关/确认UI/完整proposal-approval公共展示/MCP/STOP新执行/lease/model或工程科研闭环，无新browser/性能证据，完整T09/T16/M1/B1/24h/8h与M0–M5 Goal active。下一直接实现可信配置安装入口与公共读桥，再确认UI/STOP/fencing/runtime，不把本次commandSUCCEEDED当executionREADY或全Goal通过。
 
 Checkpoint29当前全量原session10082 live，audit/hybrid-v1/checkpoint-29-full-r1.log。仅查同handle直到终态，勿重起或并行测试/benchmark，source/tests/schema冻结。最新提交21c1061，29未提交，源结果见下条目标/独立终态；User package-lock保留。

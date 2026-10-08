@@ -4,6 +4,8 @@ Checkpoint29 实现：root 与独立 High 13 模块各 289 项通过，冻结全
 
 ## 可信启动
 
+Checkpoint30新增实际CLI的私有 `1.1` 配置 opt-in，旧 `1.0` 配置仍只读；具体文件、existing-only attach 与默认角色边界见 [TRUSTED_WEB_CONFIG.md](TRUSTED_WEB_CONFIG.md)。下述可信宿主注入 API 保留，HTTP 仍不能提供启动配置。
+
 `create_app(..., control_services=None)` 仍为旧只读应用，旧 1.0 CLI 配置不会自动开启写入。仅可信宿主可以显式传 `{project_id: ControlServices(drafts, approvals)}`。两个服务必须持有同一个已绑定 Store、同一个 app AuthStore，匹配固定项目、模式、实际根目录、Origin 和 Registry owner；不允许每个请求新建未绑定 Store，或用 JSON 指定 root、catalog、身份、凭据、服务或 DB。
 
 `DraftService` 使用独立 operator session guard，不将 operator 升级为 approver；ApprovalService 保留精确 human 确认。Store→Auth 锁序、writer/BEGIN 后重验、紧邻 commit 再验、真实 issued identity/服务 staged request、finally 清理与同事务 rollback 同时保护普通提交和重复请求。旧 whole-state `transact` 不可承载这些 Hybrid 服务事件。绑定仅是可信 Store 实例的服务边界，不是全数据库的 OS ACL；执行隔离仍待实现。
@@ -42,4 +44,4 @@ POST 成功返回 202 与 command DTO：schema_version、command_id、action、s
 
 root r5 原50814 终态：289 passed/1既有 warning/28.73s；独立原19197同289 passed/28.89s。日志 `audit/hybrid-v1/checkpoint-29-control-r5.log` 与 `checkpoint-29-control-high-r1.log`。实际 uvicorn/httpx 使用 disposable fixture、127.0.0.1 随机端口、owned 非 daemon 线程，真实超时后容量429、实际提交与原重试、条件性批准、最后线程/pool 回收均验证。不是 writer 仍阻塞时的下线竞态测试，不是实际用户批准或工程/科研执行。
 
-剩余：CLI 可信配置安装入口、DRAFT/批准只读公共桥与 Dashboard 明确确认 UI、MCP/skill、STOP/fencing/lease/preflight/runtime、工程科研闭环、M1/B1/NFR06 和长期24h/8h。完整 T09/T16/M0–M5 没有因 HTTP 首切片而完成。
+剩余：完整安装/迁移恢复体验、DRAFT/批准只读公共桥与 Dashboard 明确确认 UI、MCP/skill、STOP/fencing/lease/preflight/runtime、工程科研闭环、M1/B1/NFR06 和长期24h/8h。完整 T09/T16/M0–M5 没有因 HTTP 首切片而完成。

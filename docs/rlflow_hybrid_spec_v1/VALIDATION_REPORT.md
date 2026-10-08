@@ -1,5 +1,7 @@
 # 需求包离线校验报告
 
+Checkpoint30系统最新终态：root/High各301定向passed，中央full原11956terminalexit0，913passed/32既有skips/1既有warning274.16s，compileall/pip/diff0，范围无MUST_FIX。见TRUSTED_WEB_CONFIG.md/evidence/checkpoint-30-final-tests.txt；无live测试。此次无protocol/schema变更，未重跑离线validator，不把旧18checks重标为新30系统证据。CLI实际保护配置入口已接通，但确认UI/lease/STOP执行/真实工程科研/B1/长期及M0–M5全验收未完成，Goal active。本文件保留旧离线与历史实施记录。
+
 Checkpoint29系统最新终态：root/High各289定向passed、全量原10082terminal exit0，867passed/32既有skips/1既有warning267.24s，compileall/pip/diff0，范围无MUST_FIX。见HYBRID_CONTROL_API.md/evidence/checkpoint-29-final-tests.txt；当前无live测试，下段pending为历史过程。未完成CLI安装开关/确认UI/lease/STOP执行、M1–M5全验收，Goal active。本文件仍保留原离线校验与历史实施，不以18项静态检查代替系统验收。
 
 Checkpoint29当前候选：root/High13modules各289passed/1既有warning，actualowned HTTP断连与条件批准/原回执通过、范围无剩余MUST_FIX；全量原10082仍运行，尚未记新full结果。见HYBRID_CONTROL_API.md/evidence待归档；无CLI安装开关/确认UI/lease/执行，完整Goal active。下列旧checkpoint原文保留为历史，不是最新源码验收；本轮18项离线重验记录在文末。

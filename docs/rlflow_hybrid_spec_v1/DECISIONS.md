@@ -1,5 +1,13 @@
 # 开发决策记录
 
+## Checkpoint30：配置启用不能隐式初始化或升级权限
+
+旧 `load_config` 三元组与prepare viewer-only保持；单独 `load_server_config` 识别closed1.1/明确controls，角色不自动继承写入或批准。全局2MiB读取、旧64KiB接受、每catalog256KiB及项目/credential数上界各自说明，不把新的读取cap说成完全不变。NONBLOCK在fstat前防FIFO阻塞，严格JSON duplicate/nonfinite/depth门同样适用。
+
+不能用初始化型Store(root)兑现无迁移启动；existing-only attach不执行DDL/audit/rebuild/enable，并要求受保护既有文件及WAL/注册/版本一致。列顺序、类型、NULL与INTEGER rowid主键均校验，避免等名TEXT或DESC PK空库通过后首次事件seq失效；逻辑快照与SQL trace证明无业务写，不以main文件hash冒充WAL一致性或绝对零文件变化。数据库/锁inode重绑拒绝，但不宣称同UID OS攻击沙箱。
+
+配置加载后的ASGI HTTP闭环、CLI mock选项、29的真实socket与旧UI/browser/性能证据分开记录。此次不开放执行、不伪造实际用户批准，不完成确认UI、完整安装恢复/B1/长期或整个Hybrid Goal。
+
 ## Checkpoint17：测量调用与assert分离
 
 验收驱动不能在优化模式静默省略真实工作。任务no-work调用先执行，再核对结果；history/tasks入口拒绝optimized Python，真实-O负例在任何输出创建前失败。保留r1并重新完整运行任务r2，实际profile与归档业务语义分开。短块CPU分布不替代5min idle，顺序累计RSS不冒充独立control+API RSS。归档10k/真实单轴100k均有证据，后续必须组合并引入活跃工作/实际API与浏览器负载，不以可通过的窄probe缩减完整B1。

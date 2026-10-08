@@ -1,0 +1,72 @@
+Checkpoint30 trusted private web config / existing-only Store attachment
+2026-10-09. Final frozen implementation evidence. Goal remains active.
+
+Root full: original exec session 11956 TERMINAL exit0
+913 passed /32 existing external/H1 skipped /1 existing Starlette warning /274.16s
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q
+audit/hybrid-v1/checkpoint-30-full-r1.log
+SHA f2725ea7174dae766df7f302b7c2f36e7a26129d64f39331f4f97356602d17d4
+No parallel tests/benchmarks; each original handle observed terminal before next.
+No live run now; source/test SHA unchanged after full. compileall/pip check/diff0.
+Offline spec validator not rerun: no protocol/schema change, old18 static checks
+remain old evidence, not a new30 validation or substitute for system acceptance.
+
+Root final target: original 84286 TERMINAL exit0
+301 passed / 1 existing Starlette warning / 31.15s
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q
+  tests/test_web_control_config.py tests/test_web_local.py
+  tests/test_hybrid_control_api.py tests/test_hybrid_draft_service.py
+  tests/test_hybrid_draft_global_cas.py tests/test_hybrid_authority.py
+  tests/test_approval_guard_identity.py tests/test_approval_session_guard.py
+  tests/test_hybrid_registry.py tests/test_hybrid_protocol.py
+  tests/test_store_policy.py tests/test_contracts.py
+  tests/test_web_auth.py tests/test_web_api.py
+log audit/hybrid-v1/checkpoint-30-config-r4.log
+SHA cc7fad03444efca596c01426eec85bf514bc990df25a58fbae6ec7350a4dcdb4
+
+Independent native High: original 81244 TERMINAL exit0
+301 passed / 1 existing Starlette warning / 31.10s
+Same 14 modules, once; prefix env -u PYTHONPATH
+  PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 PYTHONDONTWRITEBYTECODE=1
+  .venv/bin/python -m pytest -q -p no:cacheprovider
+log audit/hybrid-v1/checkpoint-30-config-high-r1.log
+SHA e007adcdbbb24a18f914bc362c8b33e61214e03085342a2ffea881e006cab683
+No remaining MUST_FIX in this delta. Actual source hashes start/end equal.
+
+Final source/test SHA256:
+998176ab588620ea87f79110f78b8d81b433e13402718ca55d5b73551a20a23f rlflow/web.py
+d785bc6e7b3b717b4a93747c05f792c1cfae3d3f277bc1f808fb2fe0d21d8498 rlflow/store.py
+f8f921bc9743772c6ac77cc2e3129ceeefa2d473ea492bad7f655f48dc35de5a rlflow/hybrid_drafts.py
+22b0dbea29fc0296b2346382cceed8d1cbd29c1eb1a6b9eb1bea0268301ef31d tests/test_web_control_config.py
+
+Intermediate runs retained, not final passing-source evidence:
+r1 original 24826 terminal exit1: 6 failed / 287 passed / 1 warning /29.69s.
+All failures: new fixture inherits group-write umask; explicit fixture chmod fixed;
+serve does NOT auto-chmod. Damage cases now reach actual schema/metadata gates.
+7c2e72335c747839fa17c60ce043cd8a9b13336f759927d72d65fd66dc32c82b checkpoint-30-config-r1.log
+r2 original 38340 terminal exit0: 293 passed /1warning /29.81s; preceding fixes.
+162733f79a59539a79a95ed65c0a1c963cc6b68fef25f4ae4483b6ff6781cc27 checkpoint-30-config-r2.log
+r3 original 81442 terminal exit0: 295 passed /1warning /29.92s; FIFO/float fixes.
+cbcadb59662a578c592aadd975a93ccb706ff8fb8e64c4418fd0abd94c6fa37b checkpoint-30-config-r3.log
+
+High MUST_FIX closed before final target/independent run:
+1. FIFO blocked before fstat: NONBLOCK/CLOEXEC + owned subprocess timeout3s test.
+2. Equal-name TEXT/DESC events PK can break seq allocation: exact column order,
+   types, NOT NULL, hidden-column and rowid-PK gates; empty-table negative proofs.
+   floor/seq/source_version actual-int/int64 + paused/enabled finite-value gates.
+Nonfinite JSON rejection covers NaN/Infinity and finite spelling overflow 1e309.
+
+Scope: actual private configuration loader -> ASGI TestClient HTTP draft,
+human nonce confirmation, conditional approval, indexed original receipt;
+CLI uvicorn.run mocked only to verify actual loader and fixed listener options.
+Not a new actual TCP/CLI install benchmark or browser result. Prior29 actual socket
+and prior browser/performance evidence are not rebound to changed source.
+Loading changes no domain facts/versions/registration/schema; logical rows,
+sqlite_master and SQL traces compared. SQLite WAL/SHM housekeeping allowed;
+no immutable active-WAL shortcut or claim of absolute zero filesystem changes.
+Default 1.0 legacy tuple/read-only and viewer-only prepare retained; protected
+closed1.1 controls/roles/catalog explicitly enabled, shared Store/Auth, noexec.
+No UI confirmation, goal/head readbridge, lease/model/job launch, arbitrary policy
+HTTP upload, actual user approval of this development Goal, paid/GPU/vendor proof.
+Full install/migration, engineering/research/B1/24h/8h and M0-M5 remain required.
+USER package-lock.json not touched or staged. No external push.

@@ -1,5 +1,7 @@
 # M1 退出门槛审计（尚未通过）
 
+最新30终态：root/High各301定向，中央full原11956exit0，913passed/32既有skips/1warning274.16s，范围无MUST_FIX，compileall/pip/diff0。实际CLI私有1.1配置可启用不可执行事实控制，旧1.0配置仍只读；existing-only attach无迁移/恢复/业务写，不承诺绝对无SQLite sidecar变化。证据见checkpoint-30-final-tests.txt/TRUSTED_WEB_CONFIG.md；配置ASGI+CLI mock不是新TCP或browser/性能证据。确认UI、goal/head公共桥、真实执行工程科研、B1/NFR06/长期仍缺，M1/完整Goal未通过，下方旧段为各自源版本证据。
+
 最新29终态：root/High各289定向，冻结full原10082exit0，867passed/32既有skips/1warning267.24s，范围无MUST_FIX。下方候选/pending段为过程；无新browser/性能或实际工程科研闭环，M1/完整Goal仍未通过。当前production代码含显式opt-in不可执行HTTP控制，默认CLI只读；证据见checkpoint-29-final-tests.txt。
 
 最新29候选：内部持续operator认证与显式opt-in command1.1 HTTP桥已实现，root/High各289目标passed，实际owned loopback HTTP断连/容量/原重试/条件批准与正常回收；无新browser/性能/UI/安装开关/执行证据。中央full原10082仍运行，下列795全量仅绑定28，M1未通过、完整Goal active。
@@ -8,9 +10,9 @@
 
 ## 当前可运行范围
 
-既有 Store 的真实事务经同事务 observation/outbox、closed public projection/counters、snapshot/keyset page、认证只读 HTTP/SSE 接入 Dashboard。当前 UI 支持真实业务事件的拓扑/状态/原因/预算未知、有限对象与虚拟事件窗口、公共日志、绑定 CPU 工具返回、HOST/磁盘与 worker loop/supervisor telemetry；未知不转0或模型 RUNNING。默认 CLI/只读应用仍无写命令或 artifact 路径；29可由可信宿主显式注入不可执行控制服务，见HYBRID_CONTROL_API.md。两种HTTP均不启动 scheduler 或调用模型。运行方式见 LOCAL_WEB.md。
+既有 Store 的真实事务经同事务 observation/outbox、closed public projection/counters、snapshot/keyset page、认证只读 HTTP/SSE 接入 Dashboard。当前 UI 支持真实业务事件的拓扑/状态/原因/预算未知、有限对象与虚拟事件窗口、公共日志、绑定 CPU 工具返回、HOST/磁盘与 worker loop/supervisor telemetry；未知不转0或模型 RUNNING。默认1.0配置/只读应用仍无写命令或 artifact 路径；29可信宿主注入与30私有1.1配置可显式启用不可执行控制服务，见HYBRID_CONTROL_API.md/TRUSTED_WEB_CONFIG.md。均不启动 scheduler 或调用模型。运行方式见 LOCAL_WEB.md。
 
-最新生产源码冻结全回归：checkpoint29 **867 passed / 32既有外部/H1 skipped / 1既有警告 / 267.24s**，包括 Web/观测/telemetry/Store、private DRAFT/Registry/条件批准与恢复、持续operator事务guard/globalCAS、opt-in控制HTTP及实际socket断连原重试。source/log SHA 见 evidence/checkpoint-29-final-tests.txt。现有 UI checkpoint15 sandbox Chrome+Node **20 passed / 0 skipped / 9.44s**，用 owned loopback 与明确标记的业务 Fixture；HOST 资源来自实际 OS，本轮未新增 browser 结果。没有重新把这些测试跑成真实供应商闭环，也没有把节点心跳当作模型活动。
+最新生产源码冻结全回归：checkpoint30 **913 passed / 32既有外部/H1 skipped / 1既有警告 / 274.16s**，包括原控制/观测/Web/telemetry/私有事实与实际socket回归，以及新可信配置/启动边界。source/log SHA 见 evidence/checkpoint-30-final-tests.txt。现有 UI checkpoint15 sandbox Chrome+Node **20 passed / 0 skipped / 9.44s**，用 owned loopback 与明确标记的业务 Fixture；HOST 资源来自实际 OS，本轮未新增 browser 结果。没有重新把这些测试跑成真实供应商闭环，也没有把节点心跳当作模型活动。
 
 ## 场景到证据
 
@@ -23,7 +25,7 @@
 | A17 没真实事件不增加业务数 | browser heartbeat/资源不推进业务cursor/counts、不调用app RAF、reducer重复不续动效；telemetry独立sample因果age通过 | B1长时idle/时钟扰动完整矩阵未测；短范围通过 |
 | A18 浏览器失联不冒充GPU停止 | Chrome offline显示/停止脉冲、资源FRESH/STALE分域；GPU当前UNKNOWN | 未运行真实GPU，运行中GPU断网场景未证；不能为验收启用昂贵训练。受管CPU负载/后续批准GPU证据分开 |
 | A32 100k/8h | Store增量事务/marker索引、周期维护锁外、虚拟窗口geometry/缓存；100k单对象历史ratio1.041488、10k归档task；组合daemon300s与checkpoint23单项目HTTP计划10/s+50/s完整400写入/双SSE | 活跃任务/3项目/限定硬件/浏览器双端完整B1、合计RSS/WAL/无全仓库poll及8h页面/24h fixture未完成 |
-| A35 手机/键盘/减少动画 | 390px Chrome无横向溢出、虚拟事件键盘导航、reduced-motion/静止、文字状态通过 | Hybrid Web审批/STOP命令尚未接入，既有CLI/core批准/STOP不变；可信手机交互/T16/T24及完整可访问性验收未完成 |
+| A35 手机/键盘/减少动画 | 390px Chrome无横向溢出、虚拟事件键盘导航、reduced-motion/静止、文字状态通过 | Hybrid Dashboard审批/STOP交互尚未接入，29/30 HTTP条件批准已有但无STOP执行桥，既有CLI/core批准/STOP不变；可信手机交互/T16/T24及完整可访问性验收未完成 |
 
 对应测试源码：tests/test_hybrid_observation.py、test_web_api.py、test_web_local.py、test_live_stream.py、test_telemetry.py；web_checks/browser.test.mjs、reducer.test.mjs、virtual-list.test.mjs、log-view.test.mjs、telemetry-view.test.mjs。表格不使用“有测试名”代替完整场景；上述通过仅指已记录冻结执行的匹配范围。
 

@@ -1,5 +1,7 @@
 # 系统实施验收记录
 
+Checkpoint30最新终态覆盖下述旧过程：root/High14modules各301passed、原84286/81244exit0；中央full原11956terminalexit0，913passed/32既有外部/H1skips/1既有warning274.16s，compileall/pip/diff0，范围无MUST_FIX。可信CLI配置1.1与existing-only attach不迁移/恢复/写业务、不自动加roles；默认1.0仍RO。见TRUSTED_WEB_CONFIG.md/evidence/checkpoint-30-final-tests.txt。配置ASGI集成与CLI mock不冒充新TCP/UI/性能验收；无live测试，无lease或实际工程科研闭环，M1–M5完整Goal active。
+
 Checkpoint29完整终态：root/High13modules289passed/1既有warning，中央full原10082terminal exit0，867passed/32既有外部/H1skips/1既有warning267.24s。compileall/pip/diff0，offline18checks，范围finding关闭；见HYBRID_CONTROL_API.md与evidence/checkpoint-29-final-tests.txt。新增持续operator会话/DRAFT全局CAS/显式opt-inHTTP事实控制及actualsocket断连原receipt；下方live记录为历史过程，当前没有运行测试。仍无CLI安装配置/确认UI/STOP执行/lease/真实数据OSprobe或工程科研闭环，M1–M5完整目标保持active，无新browser/性能证据。
 
 Checkpoint29候选：operator fixedDraftService持续认证、全局CAS兼容桥、command1.1与默认RO/显式opt-inHTTP提交确认批准撤销及原receipt DTO已实现；旧legacy duplicate旁路、合法catalog容量、current_version摘要及uniformError/source503四finding闭合。root/High13modules各289passed/1既有warning，28.73s/28.89s，actualowned uvicorn/httpx socket断连/真实提交/原重试/条件批准+回收；offline spec18checks。当前全量原10082 live checkpoint-29-full-r1.log，源冻结，无新full结果；未接CLI安装配置、公共proposal/approval列表、确认UI、MCP/lease/STOP/执行，非完整T16/M1–M5，Goal active。

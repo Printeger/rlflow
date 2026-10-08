@@ -20,7 +20,7 @@ class DraftService:
             raise ValueError('invalid protected draft service')
         validate_schema(ID,project_id)
         self.store,self.auth,self.project_id,self.data_mode,self.origin=store,auth,project_id,data_mode,origin
-        with store.connect() as db:
+        with store.read_connection() as db:
             meta=db.execute('SELECT project_id,data_mode,store_epoch FROM observation_meta WHERE singleton=1').fetchone()
         if meta is None or tuple(meta[:2])!=(project_id,data_mode):raise ValueError('draft registration differs from protected service')
         self.store_epoch=meta['store_epoch']
