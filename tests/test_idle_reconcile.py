@@ -6,6 +6,7 @@ from tests.acceptance_tasks_v1 import task
 import pytest
 import sqlite3
 import json
+from test_engine import harness
 from rlflow.store import Conflict
 
 
@@ -94,3 +95,42 @@ def test_control_view_invalid_fields_fail_closed_and_close_reader(tmp_path,monke
     monkeypatch.setattr(store,'connect',connect)
     with pytest.raises(Conflict):store.control_view()
     with pytest.raises(sqlite3.ProgrammingError,match='closed database'):readers[0].execute('SELECT 1')
+
+
+def test_no_candidate_dispatch_avoids_full_view_but_keeps_code_guard(tmp_path,monkeypatch):
+    store=Store(tmp_path/'state')
+    store.transact_objects('TASK_PROBE_BOOTSTRAP','fixture',[('tasks','archived')],
+        lambda s:s['tasks'].update(archived=task('archived')))
+    version=store.version();calls=[];original=engine.daemon_generation
+    def generation():
+        calls.append(True);return original()
+    def forbidden(*args,**kwargs):raise AssertionError('no-candidate full view')
+    monkeypatch.setattr(engine,'daemon_generation',generation)
+    monkeypatch.setattr(store,'view',forbidden)
+    result=engine.dispatch_one(store)
+    assert result is None and calls==[True] and store.version()==version
+
+
+@pytest.mark.parametrize('change',['pause','blocked','delete','stop'])
+def test_formal_dispatch_discards_hint_candidates_on_state_change(harness,monkeypatch,change):
+    h=harness;before=h.store.replay();original=engine._dispatch_candidates;changed=[]
+    def candidates(store,state,allow_paused):
+        result=original(store,state,allow_paused)
+        if set(state)=={'version','paused','enabled','autonomous_tasks'} and not changed:
+            assert result,'fixture must reach the formal transition'
+            changed.append(True)
+            if change=='stop':(store.root/'STOP').write_text('isolated fixture stop')
+            else:
+                def mutate(s):
+                    if change=='pause':s['paused']=True
+                    elif change=='blocked':s['tasks'][h.task_id]['last_failure']={'blocked':True}
+                    else:del s['tasks'][h.task_id]
+                store.transact('FIXTURE_TRANSITION',change,mutate)
+        return result
+    def forbidden(*args,**kwargs):raise AssertionError('stale candidate reached preparation')
+    monkeypatch.setattr(engine,'_dispatch_candidates',candidates)
+    monkeypatch.setattr('rlflow.isolation.require_doctor',forbidden)
+    result=engine.dispatch_one(h.store)
+    after=h.store.replay()
+    assert changed and result is None and after['sessions']=={}
+    assert after['stages']==before['stages']

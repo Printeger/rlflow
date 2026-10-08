@@ -1,0 +1,21 @@
+Checkpoint21: inner no-candidate hint, original generation boundary retained.
+Root:
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q tests/test_idle_reconcile.py tests/test_engine.py tests/test_packages.py tests/test_releases.py
+r2 86 passed in 40.99s, exit0 (r1 82 passed before four transition cases).
+Independent High same four files: 86 passed in 67.92s, no remaining MUST_FIX.
+Frozen full:
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q
+614 passed, 32 skipped, 1 warning in 251.12s, exit0/session46989 terminal.
+Skips: established external dispatcher+H1; warning: existing Starlette DeprecationWarning.
+compileall/pip check/diff check passed. UI unchanged; no browser or CPU rerun claim.
+
+SHA256:
+2bafba19e05f46114cf022669c4b1cb0f0bdaaf516397c364d2aa6c13bf090ca  rlflow/engine.py
+59fd4eeb01ba36053e9e18e90c4475353e40716631e3a3f024840c63133746c6  tests/test_idle_reconcile.py
+575c7d1e5dee5f139b937b67d6960bcd09b05228bfcbda17b09156efd0f98828  audit/hybrid-v1/checkpoint-21-target-r2.log
+f64c63f32a0e4f62c2dbfcacddd19f605f32651738950b568eb52027ab1d1e0d  audit/hybrid-v1/checkpoint-21-high-r1.log
+14e03b15a478dbd4e7c3b7866a8b7261183bece57fe5d3324b64868ccb46751e  audit/hybrid-v1/checkpoint-21-full-r1.log
+
+Real PAUSE/blocked/delete/STOP between hint/formal reject preparation; sessions0 and stage budget unchanged.
+Hint objects never authorize real work; formal state/candidates re-read; pending/release/authority/STOP/CAS and second hash unchanged.
+No NFR06/B1/M1 or full goal pass; checkpoint18 CPU failure remains, next new finite probe measures aggregate view-elision effect only.

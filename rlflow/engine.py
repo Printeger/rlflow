@@ -242,6 +242,13 @@ def dispatch_one(store, *, allow_paused=False):
             return _dispatch_one(store, allow_paused=allow_paused)
 
 
+def _dispatch_candidates(store, state, allow_paused):
+    queued = [t for _,t in store.objects('tasks',['QUEUED'])]
+    if state['paused'] and not allow_paused:
+        queued = [t for t in queued if t['id'] in state.get('autonomous_tasks',[])]
+    return [t for t in queued if not t.get('last_failure',{}).get('blocked',False)]
+
+
 def _dispatch_one(store, *, allow_paused=False):
     """Dispatch once; an explicit operator step may run while the daemon is paused.
 
@@ -249,14 +256,17 @@ def _dispatch_one(store, *, allow_paused=False):
     Daemons never pass allow_paused.
     """
     dispatch_generation = daemon_generation()
+    # Only a no-work hint: never reserve/prepare from these candidate objects.
+    # Keep the original code-generation boundary even on the idle path.
+    hint=store.control_view()
+    if (hint['paused'] and not allow_paused and not hint['autonomous_tasks']) or stopped(store.root) or bool(store.objects('sessions',ACTIVE)):
+        return None
+    if not _dispatch_candidates(store,hint,allow_paused):return None
     state = store.view()
     autonomous = state.get('autonomous_tasks', [])
     if (state["paused"] and not allow_paused and not autonomous) or stopped(store.root) or bool(store.objects("sessions",ACTIVE)):
         return None
-    queued = [t for _,t in store.objects("tasks",["QUEUED"])]
-    if state['paused'] and not allow_paused:
-        queued = [t for t in queued if t['id'] in autonomous]
-    queued = [t for t in queued if not t.get("last_failure", {}).get("blocked", False)]
+    queued = _dispatch_candidates(store,state,allow_paused)
     if not queued:
         return None
     from .isolation import require_doctor

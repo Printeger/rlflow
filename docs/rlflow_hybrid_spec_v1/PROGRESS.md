@@ -1,5 +1,11 @@
 # Hybrid v1 开发进度
 
+Checkpoint21终态覆盖下述过程记录：inner无候选hint（非授权）+正式重新读取/generation原位完成；root86passed/40.99s、High86passed/67.92s无MUST_FIX、冻结614passed/32既有skips/1warning/251.12s，46989/91710均exit0，compileall/pip/diff通过。见CHECKPOINT_21.md/evidence。下一新独占fixture实际300s测三项视图优化合计效果（不单项归因）；代码watch未改，NFR06无全仓库轮询/B1/M1仍未通过，Goal active。
+
+Checkpoint21最新覆盖下述r2在跑记录：原9495已终态exit0，86passed/40.99s；compileall/diff通过。现在冻结全量原session46989/log audit/hybrid-v1/checkpoint-21-full-r1.log已确认live；High当前slice只读/独立复验待回，不能据root绿标完成。源码/测试冻结，恢复先查同handle（不因观察timeout重启），结果后建证据与commit，继续真正idle性能/监控安全与全M0–M5。没有新的CPU/B1/NFR06通过声明。
+
+Checkpoint21进行中：checkpoint20已提交9fdfb05/full609/32/1终态。inner generation仍原首行；closed hint与indexed候选过滤仅无候选早返回，实际工作丢弃hint对象并按原fullview重新控制/STOP/ACTIVE/queue/blocked，后续正式门原样。r1目标82passed/39.97s；追加在hint→formal之间真实PAUSE/blocked/delete/隔离STOP四种变化，r2原session9495/log audit/hybrid-v1/checkpoint-21-target-r2.log运行，源冻结，High只读复核进行中。未提交/未复测CPU/未通过NFR06，下一核对同handle→独立复验/全回归，并处理事件guard局限而非放宽安全门。Goal active，完整M1–M5仍未交付。
+
 Checkpoint20终态覆盖下述过程：closed control early gate与blob/并发snapshot/成功失败close拒绝验证完成；target89+r3新模块10passed，独立High94passed/69.91s无MUST_FIX、冻结全量609passed/32既有skips/1warning/251.96s，原63583/91575均exit0，compileall/pip/diff通过。见CHECKPOINT_20.md/evidence；inner full/generation门未改、CPU未复测。下一无候选inner视图优化与有安全边界的事件guard（不能忽略inotify mmap/mount/network限制）。Goal active，完整M1–M5仍未交付。
 
 Checkpoint20最终冻结回归进展覆盖下述过程：r2 session67982已exit0、89passed/40.39s；补5个错型/缺blob负例与失败关闭并收紧异常，r3新模块10passed/0.83s、compileall/diff通过。当前全量pytest原session63583/log audit/hybrid-v1/checkpoint-20-full-r1.log已确认live，High独立最终目标在跑（checkpoint-20-high-r1.log），源/测试冻结。下一恢复先核对原handle与日志，不因观察超时重启；结果后更新证据/提交，再推进事件失效源码guard/inner优化与实际复测。现无CPU修好/B1/M1完成声明；Goal active。

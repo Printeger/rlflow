@@ -133,6 +133,8 @@ HOST/STATE_FILESYSTEM/SUPERVISOR_PROCESS明确分域、loop限频best-effort心�
 
 ## Checkpoint18：组合历史/归档任务的真实daemon idle
 
+Checkpoint21：root86/High86passed、冻结614passed/32skipped/1warning/251.12s，四种hint/formal状态变化无准备/无新session/预算不变、无候选view trap/generation实际调用。范围/source SHA见CHECKPOINT_21.md/evidence。原长测CPU失败保留，后续新测量不混为已完成NFR06/B1。
+
 Checkpoint20 closed early gate：root89+新模块10passed、High94passed/69.91s、冻结609passed/32skipped/1warning/251.96s；source/log SHA及范围见CHECKPOINT_20.md/evidence。无新的CPU/浏览器或M1通过声明，原长测失败不变。
 
 Checkpoint19首项优化另见CHECKPOINT_19.md：target107/High78、冻结全量600passed/32skipped/1warning/241.02s，实际observer采样/cursor与兼容返回验证；新driver保存baseline。性能未复测，以下checkpoint18 CPU失败仍有效，完整Goal未完成。
