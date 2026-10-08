@@ -35,7 +35,9 @@ rlflow_standalone/
 
 ## Hybrid v1 开发中
 
-完整需求见 [PRD](docs/hybrid-v1/PRD.md)，实施状态见 [PROGRESS](docs/hybrid-v1/PROGRESS.md)，验收证据见 [系统验证记录](docs/hybrid-v1/IMPLEMENTATION_VALIDATION.md)。当前已增加严格 v1 协议、同事务只读观测桥和有界快照/增量事件读接口；Web Dashboard、Hybrid 工程/科研闭环及发布验收尚未完成。
+完整需求见 [PRD](docs/hybrid-v1/PRD.md)，实施状态见 [PROGRESS](docs/hybrid-v1/PROGRESS.md)，验收证据见 [系统验证记录](docs/hybrid-v1/IMPLEMENTATION_VALIDATION.md)。当前已有严格 v1 协议、同事务只读观测桥、有界快照/SSE、实际只读 Dashboard、CORE_STATUS 日志与绑定CPU工具返回；资源遥测、完整 Dashboard/Hybrid 工程科研闭环及发布验收尚未完成。工具返回不表示模型启动或任务成功，未知历史和费用不显示为0。
+
+本地服务的登录、启动、只读API、工具覆盖与浏览器验证说明见 [LOCAL_WEB](docs/hybrid-v1/LOCAL_WEB.md)。服务只监听loopback，不创建调度器、模型调用或HTTP写权限；Fixture必须明确标识，不能作为真实模型/GPU闭环证据。
 
 无模型调用的本机能力检查：
 

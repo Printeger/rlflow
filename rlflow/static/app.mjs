@@ -21,14 +21,14 @@ function clearLogs() {
 function logScope() { return {project:state.project,mode:state.mode,epoch:state.epoch}; }
 function logNode(row) {
   const button = text('button','', 'event-row'); button.dataset.logId = row.id;
-  const summary = text('span',`${row.severity} · CORE_STATUS`);
+  const summary = text('span',`${row.severity} · ${row.source}`);
   summary.append(text('span',`${row.object_count} objects · ${short(row.id)}`,'muted'));
   button.append(text('span',row.occurred_at.slice(11,19),'muted'),summary);
   button.title = `${row.severity} · ${row.id} · ${row.occurred_at} · Enter / 点击懒加载正文`;
   button.addEventListener('click',async () => {
     const selected = generation, ticket = logSerial, chosen = ++logDetailSerial, scope = logScope();
     try { const value = await request(`${base()}/logs/${encodeURIComponent(row.id)}`);
-      if (selected === generation && ticket === logSerial && chosen === logDetailSerial) details(`CORE_STATUS · ${row.id}`,checkLogBody(value,row,scope));
+      if (selected === generation && ticket === logSerial && chosen === logDetailSerial) details(`${row.source} · ${row.id}`,checkLogBody(value,row,scope));
     } catch (error) { if (selected === generation && ticket === logSerial && chosen === logDetailSerial) $('log-note').textContent = `正文未加载：${error.message}`; }
   }); return button;
 }
@@ -67,6 +67,7 @@ function clearObservation() {
   eventList.setItems([]);
   clearLogs(); $('log-severity').value = ''; $('log-kind').value = ''; $('log-object').value = '';
   for (const id of ['task-total','execution-total','approval-total']) $(id).textContent = 'UNKNOWN';
+  $('tool-note').textContent = '工具返回覆盖：UNKNOWN / 尚未读取。';
   for (const id of ['project-title','mode-note','cursor','sync-time','core-flags','execution-caption','object-page-note','detail-content']) $(id).textContent = '';
   $('details').close(); $('next-page').disabled = true; $('new-events').hidden = true;
   for (const id of ['execution-empty','objects-empty','events-empty']) $(id).hidden = false;
@@ -157,6 +158,7 @@ function render() {
   $('task-total').textContent = total(state,'task'); $('execution-total').textContent = total(state,'execution');
   $('approval-total').textContent = total(state,'approval');
   $('core-flags').textContent = `source paused=${state.paused} · enabled=${state.enabled} · PARTIAL`;
+  $('tool-note').textContent = state.toolCoverage ? `已公开的绑定工具返回 ${total(state,'tool_return')} · PARTIAL / LIVE_ONLY · 覆盖 seq > ${state.toolCoverage.coverage_after_seq}、source version > ${state.toolCoverage.coverage_after_source_version}；缺失/未验证调用与更早历史 UNKNOWN，不是全部调用数。` : '工具返回覆盖 UNKNOWN / 未启用；没有公开记录不等于零调用。';
   $('cursor').textContent = state.cursor; $('sync-time').textContent = `服务端同步 ${state.serverTime}`;
   const executions = [...state.objects.values()].filter(row => row.kind === 'execution').slice(0,30);
   $('executions').replaceChildren();
@@ -181,7 +183,8 @@ function render() {
   const rows = pageIds.map(key => state.objects.get(key)).filter(row => row?.kind === kind);
   $('objects').replaceChildren();
   for (const row of rows) {
-    const button = text('button','', 'object-row'), title = text('span',row.description || row.reason || short(row.id),'object-title');
+    const label = row.kind==='tool_return' ? `cpu_exec · bound return · exit ${row.exit_code} · reported ${row.wall_seconds}s` : row.description || row.reason || short(row.id);
+    const button = text('button','', 'object-row'), title = text('span',label,'object-title');
     title.append(text('span',`${row.kind} ${short(row.id)} · v${row.version}`,'muted'));
     button.append(title,text('span',row.state || 'UNKNOWN','state')); button.addEventListener('click',() => details(`${row.kind} · ${row.id}`,row));
     $('objects').append(button);

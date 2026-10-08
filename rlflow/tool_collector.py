@@ -217,6 +217,9 @@ def collect(store,sid,*,limit=32):
                         # Old collected receipts without this field stay unknown;
                         # never silently backfill historical task attribution.
                         value['task_id'] = request['task_id']
+                        value['validation_version'] = 2
+                        value['validation_digest'] = sha({'fact':fact,'witness':value['registration']['launch_witness'],
+                                                          'context':context,'task_id':value['task_id']})
             if pending:source['pending_after']=pending[-1][0]
             source.update(cursor=page['cursor'],incomplete_tail=page['incomplete_tail'],status='ACTIVE',reason=None)
             if session.get('status') not in ACTIVE and not page['has_more'] and not any(v['status']=='PENDING' for v in updates.values()):

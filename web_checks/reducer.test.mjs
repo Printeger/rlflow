@@ -59,3 +59,24 @@ test('cursor rejects unsafe JS integers, leading zeros and malformed public data
   assert.throws(() => installSnapshot({...snapshot(),project_id:'wrong'},'project_one','fixture'),SyncError);
   assert.throws(() => applyEvent(state(),event(1,[{...object(),version:-1}]),'store_one:1'),SyncError);
 });
+
+test('tool returns are closed partial facts, not execution or task success', () => {
+  const ref = 'ref_'+'1'.repeat(64);
+  const tool = {id:ref,kind:'tool_return',version:1,source_status:'COLLECTED',observability:'PARTIAL',state:'RETURNED',
+    tool:'cpu_exec',provenance:'BOUND_RETURN',exit_code:0,timed_out:false,wall_seconds:0.1,infrastructure_error:null,
+    execution_id:'ref_'+'2'.repeat(64),task_id:null,observed_at:time};
+  const next = applyEvent(state(),event(1,[tool],[{kind:'tool_return',status:'RETURNED',count:1}]),'store_one:1').state;
+  assert.equal(total(next,'tool_return'),1);assert.equal(total(next,'execution'),0);
+  for (const mutation of [{stdout:'PRIVATE'},{exit_code:true},{wall_seconds:NaN},{wall_seconds:Infinity},
+    {state:'SUCCEEDED'},{state:'TIMED_OUT'},{execution_id:'private_session'},{task_id:['ref_'+'3'.repeat(64)]},{version:2}]) {
+    assert.throws(() => applyEvent(state(),event(1,[{...tool,...mutation}]),'store_one:1'),/INVALID_TOOL_RETURN/);
+  }
+  const coverage = {status:'PARTIAL',policy:'LIVE_ONLY',coverage_after_seq:0,coverage_after_source_version:0,source:'BOUND_CPU_RETURN'};
+  const snap = snapshot();snap.projection.tool_observations=coverage;
+  assert.equal(installSnapshot(snap,'project_one','fixture').toolCoverage,coverage);
+  for (const mutation of [{status:'COMPLETE'},{coverage_after_seq:1},{coverage_after_source_version:1},{raw:'PRIVATE'}]) {
+    snap.projection.tool_observations={...coverage,...mutation};
+    assert.throws(() => installSnapshot(snap,'project_one','fixture'),/INVALID_TOOL_COVERAGE/);
+  }
+  assert.equal(state().toolCoverage,null);
+});

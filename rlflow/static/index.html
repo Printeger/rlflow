@@ -53,9 +53,10 @@
           <div id="budgets"></div>
           <p class="muted">consumed / reserved 来自 stage。unknown exposure、价表估计、主机/GPU 遥测尚未提供，不能用 0 代替。</p>
           <p class="boundary-note">目标合同、条件证据门控与完整 Hybrid 授权尚未接入此视图；任务数量不是目标完成百分比。</p>
+          <p id="tool-note" class="boundary-note">工具返回覆盖：UNKNOWN / 尚未读取。</p>
         </section>
         <section class="panel object-panel">
-          <div class="panel-heading"><h2>工作对象</h2><div class="controls"><label for="kind-select">类型</label><select id="kind-select"><option value="task">任务</option><option value="execution">执行</option><option value="experiment">实验</option><option value="job">Job</option><option value="evidence">证据</option><option value="approval">批准</option><option value="usage">Usage</option><option value="stage">Stage 预算</option></select></div></div>
+          <div class="panel-heading"><h2>工作对象</h2><div class="controls"><label for="kind-select">类型</label><select id="kind-select"><option value="task">任务</option><option value="execution">执行</option><option value="tool_return">工具返回 / 非模型启动</option><option value="experiment">实验</option><option value="job">Job</option><option value="evidence">证据</option><option value="approval">批准</option><option value="usage">Usage</option><option value="stage">Stage 预算</option></select></div></div>
           <div id="objects" class="object-list"></div>
           <p id="objects-empty" class="empty" hidden>尚无该类型对象。通过 Codex 工作入口创建目标；只读观察者没有启动权限。</p>
           <div class="control-strip"><span id="object-page-note" class="muted"></span><button id="next-page" disabled>下一页</button></div>
@@ -70,8 +71,8 @@
         </section>
       </div>
       <section class="panel logs-panel">
-        <div class="panel-heading"><h2>公共状态日志</h2><span class="muted">CORE_STATUS / TOOL_METADATA 未接入 / raw logs PRIVATE_ONLY</span></div>
-        <p class="muted">固定模板只证明核心已提交状态观测，不证明工具或模型运行。正文按需读取，不提供私有模型日志。</p>
+        <div class="panel-heading"><h2>公共观测日志</h2><span class="muted">CORE_STATUS / TOOL_METADATA / raw logs PRIVATE_ONLY</span></div>
+        <p class="muted">CORE_STATUS 为核心状态观测；TOOL_METADATA 为已验证绑定的 CPU 返回，不证明模型启动、任务成功或完整历史。正文按需读取，不提供私有模型日志。</p>
         <form id="log-filters" class="controls" method="get" action="/">
           <label for="log-severity">级别</label><select id="log-severity"><option value="">全部</option><option>INFO</option><option>WARNING</option><option>ERROR</option></select>
           <label for="log-kind">关联类型</label><select id="log-kind"><option value="">全部</option><option value="task">Task</option><option value="execution">Session</option><option value="experiment">Experiment</option></select>

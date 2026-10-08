@@ -107,7 +107,10 @@ def test_old_collected_receipt_without_task_lineage_stays_unknown(tools):
     store,sid,directory,config = tools
     execute(config);assert collector.collect(store,sid)
     receipt = next(iter(rows(store,'tool_receipts').values()))
-    def old_schema(state):state['tool_receipts'][receipt['id']].pop('task_id')
+    def old_schema(state):
+        value = state['tool_receipts'][receipt['id']]
+        value.pop('task_id');value.pop('validation_version')
+        value['validation_digest']=sha({'fact':value['fact'],'witness':value['registration']['launch_witness'],'context':value['registration']['context']})
     store.transact_objects('FIXTURE_OLD_TOOL_RECEIPT','fixture_old_tool_receipt',
                            [('tool_receipts',receipt['id'])],old_schema)
     version = store.version()
@@ -173,7 +176,11 @@ def test_outbox_failure_rolls_back_cursor_receipt_and_does_not_quarantine_source
     monkeypatch.setattr(public_logs,'commit',original)
     assert collector.collect(store,sid)
     assert len(rows(store,'tool_receipts'))==1
-    assert len(reader.events(cursor))==1
+    events = reader.events(cursor)
+    assert len(events)==2  # Separate immutable CORE_STATUS and TOOL_METADATA templates.
+    assert events[0]['payload']['source_event_id']==events[1]['payload']['source_event_id']
+    assert events[0]['payload']['upsert']==[]
+    assert len(events[1]['payload']['upsert'])==1 and events[1]['payload']['upsert'][0]['kind']=='tool_return'
     version = store.version();assert not collector.collect(store,sid);assert store.version()==version
 
 

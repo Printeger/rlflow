@@ -4,7 +4,11 @@ export const MAX_EVENTS = 200;
 const MAX_SEEN = 1000;
 const idPattern = /^[A-Za-z0-9][A-Za-z0-9_.:-]{0,159}$/;
 const kinds = new Set(['stage', 'task', 'execution', 'job', 'proposal', 'approval', 'experiment',
-  'evidence', 'hypothesis', 'decision', 'usage', 'package', 'authorization']);
+  'evidence', 'hypothesis', 'decision', 'usage', 'package', 'authorization', 'tool_return']);
+const toolFields = ['id','kind','version','source_status','observability','state','tool','provenance','exit_code','timed_out',
+  'wall_seconds','infrastructure_error','execution_id','task_id','observed_at'];
+const opaque = value => typeof value === 'string' && /^ref_[0-9a-f]{64}$/.test(value);
+const closed = (value,fields) => value && Object.keys(value).sort().join() === [...fields].sort().join();
 
 export class SyncError extends Error {
   constructor(reason, incompatible = false) { super(reason); this.incompatible = incompatible; }
@@ -24,6 +28,23 @@ export function cursor(value) {
 function checkObject(row) {
   requireThat(row && identifier(row.id) && kinds.has(row.kind) && count(row.version) && row.version > 0);
   requireThat(['PARTIAL', 'OBSERVED', 'UNKNOWN'].includes(row.observability));
+  if (row.kind === 'tool_return') {
+    requireThat(closed(row,toolFields) && opaque(row.id) && row.version===1 && row.source_status==='COLLECTED' &&
+      row.observability==='PARTIAL' && row.tool==='cpu_exec' && row.provenance==='BOUND_RETURN' &&
+      Number.isSafeInteger(row.exit_code) && row.exit_code>=-2147483648 && row.exit_code<=2147483647 &&
+      typeof row.timed_out==='boolean' && typeof row.wall_seconds==='number' && Number.isFinite(row.wall_seconds) && row.wall_seconds>=0 &&
+      [null,'CPU_SANDBOX_SETUP_FAILED'].includes(row.infrastructure_error) && opaque(row.execution_id) &&
+      (row.task_id===null || opaque(row.task_id)) && timestamp(row.observed_at), 'INVALID_TOOL_RETURN');
+    requireThat(row.state === (row.infrastructure_error!==null ? 'SETUP_FAILED' : row.timed_out ? 'TIMED_OUT' : 'RETURNED'),'INVALID_TOOL_RETURN');
+  }
+}
+function checkToolCoverage(value,seq,version) {
+  if (value===undefined || value===null) return null;
+  requireThat(closed(value,['status','policy','coverage_after_seq','coverage_after_source_version','source']) &&
+    value.status==='PARTIAL' && value.policy==='LIVE_ONLY' && value.source==='BOUND_CPU_RETURN' &&
+    count(value.coverage_after_seq) && value.coverage_after_seq<=seq && count(value.coverage_after_source_version) &&
+    value.coverage_after_source_version<=version,'INVALID_TOOL_COVERAGE');
+  return value;
 }
 function checkCounters(rows) {
   requireThat(Array.isArray(rows) && rows.length <= 1000);
@@ -76,7 +97,8 @@ export function installSnapshot(snapshot, expectedProject, expectedMode) {
   }
   return {project: expectedProject, mode: expectedMode, epoch: at.epoch, seq: at.seq, cursor: snapshot.cursor,
     sourceVersion: projection.source_state_version, paused: projection.paused, enabled: projection.enabled,
-    counters: projection.counters, objects, events: [], seen: new Map(), serverTime: snapshot.server_time};
+    counters: projection.counters, objects, events: [], seen: new Map(), serverTime: snapshot.server_time,
+    toolCoverage:checkToolCoverage(projection.tool_observations,at.seq,projection.source_state_version)};
 }
 export function applyEvent(state, event, durableId) {
   requireThat(state && event && event.schema_version === '1.0', 'INCOMPATIBLE_SCHEMA');

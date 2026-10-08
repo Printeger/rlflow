@@ -1,6 +1,8 @@
 # 公共工具返回：下一切片实施门槛
 
-2026-10-08，checkpoint11 High只读独立设计审查。本文是待实现合同，不是公共功能验收。
+2026-10-08，checkpoint11 High只读独立设计审查的设计来源。Checkpoint12已实现绑定返回的公共纵向切片，实际合同/覆盖/失败与证据见CHECKPOINT_12.md和LOCAL_WEB.md；以下保留实施门槛，不自行构成功能或完整M1验收。
+
+实现补充：新validation_version=2的digest覆盖冻结task，旧v1公开task=null；public_tool_meta独立记录公开起点，不混用epoch日志floor，损坏/缺失且有旧tool公共状态时拒绝静默重置。新tool_return严格PublicObject分支与TOOL_METADATA独立模板已同步后端/UI。历史BASELINE补回未实现，保留live-only。
 
 ## 来源与字段
 

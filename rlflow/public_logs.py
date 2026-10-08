@@ -36,6 +36,8 @@ def initialize(db, coverage):
 def build(event):
     from .observation import counted_status
     validate_event(event, data_mode=event["data_mode"])
+    if any(row['kind']=='tool_return' for row in event['payload']['upsert']):
+        return build_tools(event)
     refs, lines, states = {}, [], []
     for row in event["payload"]["upsert"]:
         status = counted_status(row.get("state")); states.append(status)
@@ -56,6 +58,22 @@ def build(event):
     body = dict(summary=summary,text=f'Core committed public observation #{event["seq"]}.\n'+"\n".join(lines),
                 refs=list(refs.values()),raw_logs="PRIVATE_ONLY",tool_metadata="UNAVAILABLE")
     validate("LogSummary",summary); validate("LogBody",body)
+    return summary,body
+
+
+def build_tools(event):
+    from .public_tools import references
+    rows = event['payload']['upsert']
+    if not rows or any(row['kind']!='tool_return' for row in rows) or event['payload']['removed']:
+        raise ProtocolError('mixed tool log template')
+    severity = 'ERROR' if any(r['state']=='SETUP_FAILED' or r['exit_code']!=0 and not r['timed_out'] for r in rows) else 'WARNING' if any(r['timed_out'] for r in rows) else 'INFO'
+    summary = dict(schema_version='1.0',id='log_'+digest(event['event_id']),project_id=event['project_id'],
+                   store_epoch=event['store_epoch'],data_mode=event['data_mode'],source='TOOL_METADATA',template_version=1,
+                   event_id=event['event_id'],seq=event['seq'],occurred_at=event['occurred_at'],severity=severity,object_count=len(rows))
+    lines = [f"cpu_exec {r['id']}: bound return {r['state']}; exit {r['exit_code']}; timed_out {r['timed_out']}; reported wall_seconds {r['wall_seconds']:.6g}" for r in rows]
+    body = dict(summary=summary,text='Core observed bound CPU tool returns. PARTIAL / live-only coverage; not model activity or task success.\n'+'\n'.join(lines),
+                refs=references(rows),raw_logs='PRIVATE_ONLY',tool_metadata='BOUND_RETURN')
+    validate('LogSummary',summary);validate('LogBody',body)
     return summary,body
 
 
@@ -144,9 +162,9 @@ def page(reader, *, severity=None, kind=None, object_id=None, after="", limit=50
                 event = json.loads(row["envelope"]); validate_event(event,data_mode=meta["data_mode"])
                 if (event["project_id"],event["store_epoch"],event["seq"],event["event_id"]) != (meta["project_id"],meta["store_epoch"],row["seq"],row["event_id"]):
                     raise ProtocolError("public log reference source identity mismatch", "RESYNC_REQUIRED")
-                candidates = event["payload"]["upsert"]+event["payload"]["removed"]
-                member = any(r["kind"]==kind and r["id"]==object_id for r in candidates)
-                member = member or kind=="task" and any(r.get("task_id")==object_id for r in event["payload"]["upsert"])
+                from .public_tools import references
+                candidates = references(event['payload']['upsert']+event['payload']['removed'])
+                member = any(r['kind']==kind and r['id']==object_id for r in candidates)
                 if not member or severity is not None and summary["severity"] != severity:
                     raise ProtocolError("public log reference mismatch", "RESYNC_REQUIRED")
             if len(items)==limit: has_more=True;break

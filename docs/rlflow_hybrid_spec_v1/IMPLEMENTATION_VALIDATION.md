@@ -116,3 +116,7 @@ REGISTER先于CPU副作用、固定有界hash-chain journal、登记当时launch
 ## Checkpoint11：历史任务关联前置
 
 private VERIFIED工具返回保存已核验request.task_id，旧缺失不补、后续session不重分配。target200passed/73.49s，High独立4passed；冻结 **507passed/32skipped/1warning/188.76s**，compileall/pip check/diff通过。首次target audit断言API错误已修复且原失败保留，见CHECKPOINT_11.md/evidence/checkpoint-11-final-tests.txt。公共集成方案见PUBLIC_TOOL_IMPLEMENTATION_NOTES.md，尚未启用工具projection/log/API/UI，static未改无browser重跑声明，完整Goal继续。
+
+## Checkpoint12：绑定工具返回公共纵向切片
+
+实际model-free CPU→private collector→closed public projection/query、独立TOOL_METADATA与task/execution筛选、v2绑定冻结task、live-only覆盖/旧v1 UNKNOWN、epoch/损坏覆盖拒绝、工具日志故障整体回滚已验证。目标166passed/1warning/93.28s；最终冻结protocol/tools43passed/25.72s，全回归 **532passed/32skipped/1warning/200.39s**。High23passed/31deselected/23.93s，三类MUST_FIX关闭。Chrome+Node **15passed/0skipped/6.46s**，截图已查看；工具browsercase序列化Fixture证明DB/API/SSE/UI而非CPU/vendor，与真实CPU后台证据分开。compileall/pip check/diff通过；入口不存在、旧单event断言、top-level闭合声明失败及主动停止的首轮full均保留，见CHECKPOINT_12.md/evidence/checkpoint-12-final-tests.txt。资源telemetry/freshness、完整M1–M5和长期gate仍未完成。

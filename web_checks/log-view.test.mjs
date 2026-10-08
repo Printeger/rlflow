@@ -21,3 +21,13 @@ test('body must match selected summary and never accept raw/private extra fields
     assert.throws(() => checkLogBody({...value,...mutation},summary,scope));
   }
 });
+
+test('tool metadata uses its own template and cannot change old CORE_STATUS meaning',() => {
+  const summary = {...row(3),source:'TOOL_METADATA'};
+  const value = {summary,text:'Core observed bound CPU return; not model activity.',refs:[{kind:'tool_return',id:'ref_'+'1'.repeat(64),version:1}],raw_logs:'PRIVATE_ONLY',tool_metadata:'BOUND_RETURN'};
+  assert.equal(checkLogBody(value,summary,scope),value);
+  assert.throws(() => checkLogBody({...value,tool_metadata:'UNAVAILABLE'},summary,scope));
+  const old = row(3);
+  assert.throws(() => checkLogBody({...value,summary:old},old,scope));
+  assert.throws(() => checkLogBody({...value,raw_logs:'PUBLIC'},summary,scope));
+});

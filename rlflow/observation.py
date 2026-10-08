@@ -14,7 +14,7 @@ import uuid
 from datetime import datetime, timezone
 from pathlib import Path
 
-from .hybrid_protocol import ATTEMPT_STATES, GOAL_STATES, TASK_STATES, ProtocolError, parse_cursor, validate, validate_event
+from .hybrid_protocol import ATTEMPT_STATES, GOAL_STATES, TASK_STATES, PUBLIC_KINDS, ProtocolError, parse_cursor, validate, validate_event
 
 SECTIONS = {"stages": "stage", "tasks": "task", "sessions": "execution", "jobs": "job",
             "proposals": "proposal", "approvals": "approval", "experiments": "experiment",
@@ -150,6 +150,17 @@ def commit(db, source_event_id, event_type, payload, source_version, timestamp):
     meta = db.execute("SELECT * FROM observation_meta WHERE singleton=1").fetchone()
     if meta is None: return
     upsert, removed, touched = [], [], set()
+    from .public_tools import coverage as tool_coverage, promote
+    tool_scope = tool_coverage(db,meta)
+    tools = []
+    if tool_scope is not None and event_type=='ROLE_TOOL_OBSERVED' and source_version>tool_scope['coverage_after_source_version']:
+        for section,key,value in payload['put']:
+            if section!='tool_receipts' or not key:continue
+            row = promote(key,value,utc(timestamp))
+            if row is None:continue
+            if db.execute("SELECT 1 FROM observation_projection WHERE kind='tool_return' AND object_id=?",(row['id'],)).fetchone():continue
+            db.execute('INSERT INTO observation_projection VALUES(?,?,?,?)',('tool_return',row['id'],row['state'],json.dumps(row,sort_keys=True,separators=(',',':'),allow_nan=False)))
+            _counter(db,'tool_return',row['state'],1);touched.add(('tool_return',row['state']));tools.append(row)
     for section, key, value in payload["put"]:
         if section not in SECTIONS or not key: continue
         kind, identity = SECTIONS[section], public_id(key)
@@ -187,7 +198,11 @@ def commit(db, source_event_id, event_type, payload, source_version, timestamp):
     if len(counters) > 1000: raise ProtocolError("observation counters exceed contract bound")
     # Keep every public object change; split oversized commits rather than drop facts.
     batches = max(1, (max(len(upsert),len(removed)) + MAX_PAGE - 1)//MAX_PAGE)
-    for index in range(batches):
+    groups = [(upsert[i*MAX_PAGE:(i+1)*MAX_PAGE],removed[i*MAX_PAGE:(i+1)*MAX_PAGE]) for i in range(batches)]
+    # TOOL_METADATA owns a separate immutable log template; never reinterpret
+    # old CORE_STATUS events or mix tool facts into that historical template.
+    groups += [(tools[i:i+MAX_PAGE],[]) for i in range(0,len(tools),MAX_PAGE)]
+    for index,(batch_upsert,batch_removed) in enumerate(groups):
         seq += 1
         event = {"schema_version": "1.0", "store_epoch": meta["store_epoch"], "project_id": meta["project_id"],
                  "seq": seq, "event_id": "evt_" + uuid.uuid4().hex, "type": "legacy.observed",
@@ -198,8 +213,8 @@ def commit(db, source_event_id, event_type, payload, source_version, timestamp):
                  "payload": {"source_event_id": public_id(source_event_id), "source_event_type": public_text(event_type),
                              "source_state_version": source_version, **flags,
                              "counters": counters,
-                             "upsert": upsert[index*MAX_PAGE:(index+1)*MAX_PAGE],
-                             "removed": removed[index*MAX_PAGE:(index+1)*MAX_PAGE]}}
+                             "upsert": batch_upsert,
+                             "removed": batch_removed}}
         validate_event(event, data_mode=meta["data_mode"])
         encoded = json.dumps(event,ensure_ascii=False,sort_keys=True,separators=(",",":"),allow_nan=False)
         if len(encoded.encode()) > 2*1024*1024: raise ProtocolError("observation exceeds bounded event size")
@@ -221,12 +236,16 @@ def enable(store, project_id, *, data_mode="live"):
                 raise ProtocolError("observer identity is immutable")
             from .public_logs import initialize as initialize_logs
             initialize_logs(db,existing["seq"])
+            from .public_tools import initialize as initialize_tools
+            initialize_tools(db,existing['seq'],existing['source_version'])
             return existing["store_epoch"]
         version = db.execute("SELECT version FROM projection_meta WHERE singleton=1").fetchone()[0]
         epoch = "store_" + uuid.uuid4().hex
         db.execute("INSERT INTO observation_meta VALUES(1,?,?,?,0,0,?,1,0)", (project_id,epoch,data_mode,version))
         from .public_logs import initialize as initialize_logs
         initialize_logs(db,0)
+        from .public_tools import initialize as initialize_tools
+        initialize_tools(db,0,version)
         # One-time, explicit observation migration. Subsequent writes are incremental.
         rows = []
         for row in db.execute("SELECT section,object_key,value FROM projection"):
@@ -269,12 +288,12 @@ class ObservationReader:
     @staticmethod
     def _page(db, *, limit, kind=None, after=""):
         if type(limit) is not int or not 1 <= limit <= MAX_PAGE: raise ProtocolError("invalid page limit")
-        if kind is not None and kind not in SECTIONS.values(): raise ProtocolError("unknown object kind")
+        if kind is not None and kind not in PUBLIC_KINDS: raise ProtocolError("unknown object kind")
         # Keyset ordering includes kind so equal IDs in different sections do not collide.
         if after:
             if "/" not in after: raise ProtocolError("invalid object page cursor")
             after_kind, after_id = after.split("/",1)
-            if after_kind not in SECTIONS.values() or not valid_id(after_id):
+            if after_kind not in PUBLIC_KINDS or not valid_id(after_id):
                 raise ProtocolError("invalid object page cursor")
         else:
             after_kind, after_id = "", ""
@@ -298,6 +317,8 @@ class ObservationReader:
                      "projection": {"source_state_version": meta["source_version"], "paused": bool(meta["paused"]),
                                     "enabled": bool(meta["enabled"]), "counters": counters,
                                     "objects": self._page(db,limit=limit), "observability": "PARTIAL"}}
+            from .public_tools import coverage
+            value['projection']['tool_observations'] = coverage(db,meta)
             validate("Snapshot", value)
             return value
 

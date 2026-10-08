@@ -49,3 +49,5 @@ Checkpoint09发现源：冻结478passed/32skipped/1warning/146.63s，target56pas
 Checkpoint10 private core collector/ledger：target205passed/59.70s，冻结505passed/32skipped/1warning/172.21s，两项High MUST_FIX关闭。见CHECKPOINT_10.md/evidence。恢复/事务/公平扫描及完整绑定已证明，private VERIFIED仍非模型/vendor启动证明；公共工具projection/API/UI、资源、M1–M5及长期验收继续保留。
 
 Checkpoint11 private历史task关联：target200passed/73.49s，High独立4passed，冻结507passed/32skipped/1warning/188.76s，compileall/pip check/diff通过。见CHECKPOINT_11.md/evidence。缺失旧关联保持未知，公共metadata/UI尚未启用，后续安全集成门槛见PUBLIC_TOOL_IMPLEMENTATION_NOTES.md；完整Goal保持活跃。
+
+Checkpoint12公共绑定工具返回：最终冻结532passed/32skipped/1warning/200.39s，protocol/tools43passed，target166passed，High23passed/31deselected，Chrome+Node15passed/0skipped。闭合projection/独立模板/筛选/事务/覆盖/旧合同兼容证据见CHECKPOINT_12.md/evidence及LOCAL_WEB.md；三类High finding关闭，实际CPU后台与序列化browser Fixture不混同vendor证明。资源、完整M1–M5/B1/长期验收继续推进。

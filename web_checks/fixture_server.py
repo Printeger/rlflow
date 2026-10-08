@@ -8,7 +8,8 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import uvicorn
 from rlflow.observation import ObservationReader, enable
-from rlflow.store import Store
+from rlflow.store import Store, sha
+from rlflow import tool_journal, tool_collector
 from rlflow.web_api import Project, create_app
 from rlflow.web_auth import AuthStore, Credential, Principal
 
@@ -56,6 +57,26 @@ def main():
                 elif command["op"] == "usage":
                     store.transact_objects("USAGE_OBSERVED",command["id"],[("usage",command["id"])],
                         lambda s:s.setdefault("usage",{}).update({command["id"]:{"status":command["status"],"task_id":"initial"}}))
+                elif command['op']=='tool':
+                    # Serialized trusted-core fixture for UI routing, NOT a CPU
+                    # execution or vendor proof. Real CPU→collector is separately
+                    # exercised in tests/test_public_tools.py. No raw tool text.
+                    context = dict(schema_version='1.0',session='fixture_session',generation='fixture_generation',
+                                   request_sha256='1'*64,candidate_sha256='2'*64)
+                    source = tool_collector.source_id(context['session'],context['generation'])
+                    registration = dict(schema_version='1.0',kind='CPU_REGISTER',epoch=tool_journal.digest(context),
+                                        ordinal=1,previous_sha256='0'*64,command_digest=sha(command['id']),intent_sha256='3'*64,
+                                        context=context,launch_witness=dict.fromkeys(('release_sha256','model_release_sha256','ack_sha256'),'4'*64))
+                    registration['record_sha256']=tool_journal.digest(registration)
+                    fact = dict(schema_version='1.0',kind='CPU_EXEC_RETURN',tool='cpu_exec',context=context,
+                                intent_sha256='3'*64,result_sha256='5'*64,state='RETURNED',exit_code=1,timed_out=False,
+                                wall_seconds=.125,infrastructure_error=None)
+                    receipt = tool_collector._receipt(source,registration)
+                    receipt.update(status='COLLECTED',verification='VERIFIED',fact=fact,task_id='initial',validation_version=2,
+                                   validation_digest=sha(dict(fact=fact,witness=registration['launch_witness'],context=context,task_id='initial')))
+                    key = receipt['id']
+                    store.transact_objects('ROLE_TOOL_OBSERVED',command['id'],[('tool_receipts',key)],
+                                           lambda s:s.setdefault('tool_receipts',{}).update({key:receipt}))
                 else: raise ValueError("unknown fixture control")
                 print(json.dumps({"reply": command["op"], "head": ObservationReader(store.root).head()}), flush=True)
         finally:

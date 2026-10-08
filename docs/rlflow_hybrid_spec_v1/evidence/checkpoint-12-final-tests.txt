@@ -1,0 +1,41 @@
+Checkpoint12 2026-10-08; frozen code; root sole writer, High read-only review.
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q tests/test_public_tools.py tests/test_tool_collector.py tests/test_tool_journal.py tests/test_tool_return_facts.py tests/test_hybrid_observation.py tests/test_public_logs.py tests/test_web_api.py tests/test_web_local.py
+166passed/1warning/93.28s; audit/hybrid-v1/checkpoint-12-tools-target-r4.log. Before final top-level closure declaration fix.
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q tests/test_hybrid_protocol.py tests/test_public_tools.py
+43passed/25.72s; audit/hybrid-v1/checkpoint-12-protocol-tools-final.log; final frozen schema.
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q -rs
+532passed/32skipped/1warning/200.39s; audit/hybrid-v1/checkpoint-12-full-pytest-r2.log; final frozen code.
+Skips baseline external dispatcher18/H1 implementation14; warning installed Starlette anyio alias deprecated, no new skip.
+node --test web_checks/*.test.mjs
+15passed/0failed/0skipped/6456.34204ms; audit/hybrid-v1/checkpoint-12-browser-r1.log.
+node --test web_checks/reducer.test.mjs web_checks/log-view.test.mjs web_checks/virtual-list.test.mjs
+14passed/0failed/0skipped/118.911402ms; audit/hybrid-v1/checkpoint-12-node-unit.log.
+.venv/bin/python -m compileall -q rlflow tests/test_public_tools.py tests/test_tool_collector.py web_checks/fixture_server.py: exit0
+.venv/bin/python -m pip check: No broken requirements found.
+git diff --check: exit0
+High independent promotion/oldv1/task/coverage/live-only/epoch/old-log subset23passed/31deselected/23.93s; findings closed. Final PublicObject union + strict oneOf read-only review approved, no additional pytest claimed.
+Screenshots desktop/logs/mobile inspected; 390px no overflow. Browser/server stopped and owned temporary fixture cleaned by test.
+Browser tool case is SERIALIZED core fixture, not CPU/vendor execution. Actual model-free CPU→collector→public query proof is test_public_tools separately.
+Failures preserved: initial74passed/26.07s before findings; r2 nonexistent test_local_web.py no tests; r3 target165passed/1failed/59.74s old one-event expectation; protocol diagnosis17passed/1failed/0.06s missing top-level additionalProperties; known failed full explicitly SIGINT336passed/24skipped/1failed/159.46s, not success.
+SHA256
+b2e7c72886d57b20f8b3f9f8053b03eeb0983237fca2db82cfeb76be825d1847 rlflow/public_tools.py
+c4de6aa7e881488647b0d79649fc87b7173080a63c4b385fd521235d7a60cf7c rlflow/observation.py
+146bb696d16f6dc44a33cda46b82bc035752aeb827091ad626fb5bd299d0cacb rlflow/public_logs.py
+68cc55b82e60720145dcd008a791ad4f804cff542e53aeff2e40fd3457bc2ab3 rlflow/hybrid_protocol.py
+ba81ece24bfa3c1f416c654b4aadad7003484883abaaf937f24a1bbd4a525efe rlflow/tool_collector.py
+abd1a1dd41f9c566f50b6628e08060e208af0ea934eaf773f47ca1bff53f276d schemas/ToolLedger.json
+2ae65725cd654cbef51984e7050a91d0c6cf38a32ea04409db6626d74cb6837b tests/test_public_tools.py
+d1f09453d3df12c4deef4327068cb2acf9bc62382f37e39b4a194955d7d26e95 tests/test_tool_collector.py
+256de806b7aafbc63bc0b81ad4e129e2889af94e3ee0b566cb0bcb7f7524eab2 rlflow/static/app.mjs
+1d48dd320b19aa35f26c49a9641085a25a394b0d33293d0f4f00dce4df62b0ef rlflow/static/reducer.mjs
+3c5b750353d3aa4bebb2ab5adc76f8e9c534d78307e16fa5273d78d8571b1ccf rlflow/static/log-view.mjs
+bb5b811339a34e6f1fd1b3017e2173b1c919f15e44a7c23734bac88bfda5d6e9 rlflow/static/index.html
+2edd12a2c83147964bcc3ab67fac3ded74a739b4ed437aaadc97074f324bbc7a web_checks/browser.test.mjs
+3f0a77b5069a1a403f5be72670c5898ff64aa5b56981b1197a4fbd8383d84e6e web_checks/fixture_server.py
+e862692afadc23182ce02b3e430370f2d871c43d645c4e42933f62f004dcf1cf audit/hybrid-v1/checkpoint-12-browser-r1.log
+4fbd4fef2a8ffb2cb7388af7569a3b330f21d0719fead57f579475bf93812cb7 audit/hybrid-v1/checkpoint-12-tools-target-r4.log
+a22f7bf627f8a9682dc95cd5aaefdf025408644aa63627909ee61f726157df4f audit/hybrid-v1/checkpoint-12-protocol-tools-final.log
+3478010040cf22806a6d420a695c03b81fd50e610ed1363b9366c5b4730baf76 audit/hybrid-v1/checkpoint-12-full-pytest-r2.log
+f7efbcf62a47c3d3680a721375dcd7e9dd2f19b1cb48fafa65419a3652684473 audit/hybrid-v1/checkpoint-12-full-pytest.log
+d4f130dd5403fd56812b95ee2569abc461c266f9e89e28a722d9ed4d2fc5942f audit/hybrid-v1/checkpoint-12-tools-target-r3.log
+No paid/vendor model run, GPU/training, remote write/push or publication. Resource telemetry/worker freshness, B1/soak, full M1–M5 remain incomplete.

@@ -6,7 +6,7 @@ const fields = ['schema_version','id','project_id','store_epoch','data_mode','so
 export function checkLogSummary(row,scope) {
   if (!closed(row,fields) || row.schema_version !== '1.0' ||
       !identifier(row.id) || !identifier(row.event_id) || row.project_id !== scope.project || row.data_mode !== scope.mode ||
-      row.store_epoch !== scope.epoch || row.source !== 'CORE_STATUS' || row.template_version !== 1 || !count(row.seq) ||
+      row.store_epoch !== scope.epoch || !['CORE_STATUS','TOOL_METADATA'].includes(row.source) || row.template_version !== 1 || !count(row.seq) ||
       !count(row.object_count) || !['INFO','WARNING','ERROR'].includes(row.severity) ||
       typeof row.occurred_at !== 'string' || !row.occurred_at.endsWith('Z') || !Number.isFinite(Date.parse(row.occurred_at))) throw new SyncError('INVALID_LOG_SUMMARY',true);
 }
@@ -27,8 +27,9 @@ export function checkLogPage(value,scope,previousHigh=null) {
 export function checkLogBody(value,summary,scope) {
   checkLogSummary(value?.summary,scope);
   if (!closed(value,['summary','text','refs','raw_logs','tool_metadata']) || fields.some(key => value.summary[key] !== summary[key]) || typeof value.text !== 'string' || value.text.length>65536 ||
-      !Array.isArray(value.refs) || value.refs.length>600 || value.raw_logs!=='PRIVATE_ONLY' || value.tool_metadata!=='UNAVAILABLE') throw new SyncError('INVALID_LOG_BODY',true);
-  const kinds = ['stage','task','execution','job','proposal','approval','experiment','evidence','hypothesis','decision','usage','package','authorization'];
+      !Array.isArray(value.refs) || value.refs.length>600 || value.raw_logs!=='PRIVATE_ONLY' ||
+      value.tool_metadata!==(summary.source==='TOOL_METADATA' ? 'BOUND_RETURN' : 'UNAVAILABLE')) throw new SyncError('INVALID_LOG_BODY',true);
+  const kinds = ['stage','task','execution','job','proposal','approval','experiment','evidence','hypothesis','decision','usage','package','authorization','tool_return'];
   if (value.refs.some(row => !closed(row,['kind','id','version']) || !kinds.includes(row.kind) || typeof row.id !== 'string' || !/^ref_[0-9a-f]{64}$/.test(row.id) || row.version !== null && !count(row.version))) throw new SyncError('INVALID_LOG_REFS',true);
   return value;
 }

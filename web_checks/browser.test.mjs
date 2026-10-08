@@ -165,6 +165,35 @@ test('real local Dashboard: durable SSE, offline recovery, identity clearing and
     // Snapshot intentionally does not synthesize historical event rows.
     await control({op:'usage',id:'refresh_observed',status:'UNKNOWN'});
     await page.waitForFunction(() => !!document.querySelector('#events .event-row'));
+    // Serialized trusted-core fixture: verifies routing/UI, NOT CPU/vendor
+    // execution. Real CPU→core promotion has separate Python integration proof.
+    const bound = await control({op:'tool',id:'serialized_tool_fixture'});
+    await page.waitForFunction(at => document.querySelector('#cursor').textContent===at,bound.head.cursor);
+    assert.match(await page.locator('#tool-note').textContent(),/绑定工具返回 1.*PARTIAL \/ LIVE_ONLY/);
+    assert.equal(await page.locator('.execution-node').getAttribute('data-state'),'STARTING');
+    await page.locator('#kind-select').selectOption('tool_return');
+    await page.waitForFunction(() => document.querySelector('#objects').textContent.includes('cpu_exec'));
+    assert.match(await page.locator('#objects').textContent(),/bound return · exit 1/);
+    await page.locator('#objects .object-row').click();
+    const metadata = JSON.parse(await page.locator('#detail-content').textContent());
+    assert.equal(metadata.state,'RETURNED');assert.equal(metadata.provenance,'BOUND_RETURN');
+    assert.equal(metadata.task_id,publicTask);assert.equal(metadata.command,undefined);
+    await page.locator('#close-details').click();
+    await page.locator('#log-severity').selectOption('ERROR');
+    await page.locator('#log-kind').selectOption('execution');await page.locator('#log-object').fill(metadata.execution_id);
+    await page.locator('#log-filters button').click();
+    await page.waitForFunction(id => document.querySelector('#log-note').textContent.includes('execution '+id+' · 本页 1'),metadata.execution_id);
+    assert.match(await page.locator('#logs').textContent(),/TOOL_METADATA/);
+    await page.locator('#logs [data-log-id]').first().click();
+    await page.waitForFunction(() => document.querySelector('#details').open);
+    assert.match(await page.locator('#detail-content').textContent(),/BOUND_RETURN/);
+    assert.match(await page.locator('#detail-content').textContent(),/not model activity or task success/);
+    assert.doesNotMatch(await page.locator('#detail-content').textContent(),/fixture_generation|PRIVATE_TOOL_OUTPUT|command_digest/);
+    await page.locator('#close-details').click();
+    await page.locator('#kind-select').selectOption('task');
+    await page.locator('#log-kind').selectOption('');await page.locator('#log-object').fill('');
+    await page.locator('#log-severity').selectOption('');await page.locator('#log-filters button').click();
+    await page.waitForFunction(() => document.querySelector('#log-note').textContent.includes('ALL · 全部关联'));
     assert.ok(await page.locator('.object-row').count() <= 50);
     assert.equal(await page.evaluate(() => localStorage.length+sessionStorage.length),0);
     await mkdir(resolve(repo,'web_checks/artifacts'),{recursive:true});

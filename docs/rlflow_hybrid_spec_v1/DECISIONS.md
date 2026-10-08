@@ -77,3 +77,9 @@ append-only refs增加INSERT成员/severity guard；只读路径仍防御异常�
 ## 2026-10-08：冻结工具返回的任务关联
 
 公开工具筛选不能从当前session追认历史task。首次VERIFIED返回在原collector事务保存request.task_id，request对照DB且提交CAS覆盖task_id；旧COLLECTED缺字段保持未知、UNVERIFIED不添加。ToolLedger字段optional兼容旧事件/replay。公共转换必须独立闭合，不把private receipts直接加入通用观察allowlist。该前置不启用公共metadata或新authority。
+
+## 2026-10-08：工具返回公共转换与覆盖
+
+专用closed promotion只取已提交可信receipt；PublicObject通用/工具变体互斥闭合，SHA是trusted core内部一致校验而非抵抗同权限恶意DB writer的签名。新validation_version=2绑定task，旧v1不追认。只读API/UI同步新kind与TOOL_METADATA模板，工具返回不表示模型启动/成功/authority。
+
+工具feature公开起点与event retention floor分开。优先live-only，不隐式回填旧COLLECTED；public_tool_meta缺失/损坏却已有旧公共工具状态拒绝重新初始化。工具日志与CORE_STATUS分同事务观察batch，原模板/count状态解释逐字段保持不变，共享refs验证task/execution筛选。资源telemetry以后必须独立sample ID/时间，不占durable业务seq。

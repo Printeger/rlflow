@@ -54,9 +54,9 @@ def obj(properties, required=None):
 
 
 PUBLIC_KINDS = ("stage", "task", "execution", "job", "proposal", "approval", "experiment",
-                "evidence", "hypothesis", "decision", "usage", "package", "authorization")
+                "evidence", "hypothesis", "decision", "usage", "package", "authorization", "tool_return")
 PUBLIC_PROPERTIES = {
-    "id": ID, "kind": enum(*PUBLIC_KINDS), "version": {"type": "integer", "minimum": 1},
+    "id": ID, "kind": enum(*(k for k in PUBLIC_KINDS if k!='tool_return')), "version": {"type": "integer", "minimum": 1},
     "source_status": nullable(TEXT), "observability": enum("OBSERVED", "PARTIAL", "UNKNOWN"),
     "state": nullable(TEXT), "role": nullable(TEXT), "model_id": nullable(TEXT),
     "description": TEXT, "reason": TEXT, "candidate_hash": nullable(HASH),
@@ -70,12 +70,34 @@ PUBLIC_PROPERTIES = {
     "reserved_seconds": nullable({"type": "number", "minimum": 0}),
     "limit_seconds": nullable({"type": "number", "minimum": 0}),
 }
-PUBLIC_OBJECT = obj(PUBLIC_PROPERTIES, ["id", "kind", "version", "source_status", "observability"])
+OPAQUE_ID = {"type":"string","pattern":"^ref_[0-9a-f]{64}$"}
+TOOL_RETURN = obj({"id":OPAQUE_ID,"kind":{"const":"tool_return"},"version":{"const":1},
+                   "source_status":{"const":"COLLECTED"},"observability":{"const":"PARTIAL"},
+                   "state":enum("RETURNED","TIMED_OUT","SETUP_FAILED"),"tool":{"const":"cpu_exec"},
+                   "provenance":{"const":"BOUND_RETURN"},"exit_code":{"type":"integer","minimum":-2147483648,"maximum":2147483647},
+                   "timed_out":{"type":"boolean"},"wall_seconds":{"type":"number","minimum":0},
+                   "infrastructure_error":nullable(enum("CPU_SANDBOX_SETUP_FAILED")),
+                   "execution_id":OPAQUE_ID,"task_id":nullable(OPAQUE_ID),"observed_at":{**TIME,"pattern":"Z$"}})
+TOOL_RETURN['allOf'] = [{
+    'if':{'properties':{'infrastructure_error':{'const':'CPU_SANDBOX_SETUP_FAILED'}}},
+    'then':{'properties':{'state':{'const':'SETUP_FAILED'}}},
+    'else':{
+        'if':{'properties':{'timed_out':{'const':True}}},
+        'then':{'properties':{'state':{'const':'TIMED_OUT'}}},
+        'else':{'properties':{'state':{'const':'RETURNED'}}},
+    },
+}]
+PUBLIC_OBJECT = obj({name:{} for name in set(PUBLIC_PROPERTIES)|set(TOOL_RETURN['properties'])},[])
+PUBLIC_OBJECT['oneOf'] = [obj(PUBLIC_PROPERTIES, ["id", "kind", "version", "source_status", "observability"]),TOOL_RETURN]
+TOOL_COVERAGE = obj({"status":{"const":"PARTIAL"},"policy":{"const":"LIVE_ONLY"},
+                     "coverage_after_seq":COUNT,"coverage_after_source_version":COUNT,"source":{"const":"BOUND_CPU_RETURN"}})
 COUNTER = obj({"kind": enum(*PUBLIC_KINDS), "status": TEXT, "count": COUNT})
 PAGE = obj({"items": array(PUBLIC_OBJECT), "next_cursor": nullable(TEXT), "total": COUNT})
 
 OBJECTS = {
     "PublicObject": PUBLIC_OBJECT,
+    "ToolReturn": TOOL_RETURN,
+    "ToolCoverage": TOOL_COVERAGE,
     "Error": obj({"code": enum(*ERROR_CODES), "message": TEXT, "retryable": {"type": "boolean"},
                   "correlation_id": ID, "details": obj({"current_version": COUNT}, [])},
                  ["code", "message", "retryable", "correlation_id"]),
@@ -109,7 +131,9 @@ OBJECTS = {
                      "cursor": TEXT, "server_time": TIME, "data_mode": enum("live", "fixture"),
                      "projection": obj({"source_state_version": COUNT, "paused": {"type": "boolean"},
                                         "enabled": {"type": "boolean"}, "counters": array(COUNTER, 1000),
-                                        "objects": PAGE, "observability": enum("PARTIAL", "OBSERVED")})}),
+                                    "objects": PAGE, "observability": enum("PARTIAL", "OBSERVED"),
+                                    "tool_observations":nullable(TOOL_COVERAGE)},
+                                   ["source_state_version","paused","enabled","counters","objects","observability"]) }),
     "ObjectPage": obj({"items": array(PUBLIC_OBJECT), "next_cursor": nullable(TEXT), "total": COUNT,
                        "cursor": TEXT, "project_id": ID, "data_mode": enum("live", "fixture")}),
     "Heartbeat": obj({"server_time": TIME, "cursor": TEXT}),
@@ -121,18 +145,18 @@ OBJECTS = {
 }
 OBJECTS.update({
     "LogSummary": obj({"schema_version": {"const": VERSION}, "id": ID, "project_id": ID,
-                       "store_epoch": ID, "data_mode": enum("live", "fixture"), "source": enum("CORE_STATUS"),
+                       "store_epoch": ID, "data_mode": enum("live", "fixture"), "source": enum("CORE_STATUS", "TOOL_METADATA"),
                        "template_version": {"const": 1}, "event_id": ID, "seq": COUNT,
                        "occurred_at": TIME, "severity": enum("INFO", "WARNING", "ERROR"), "object_count": COUNT}),
     "LogBody": obj({"summary": obj({"schema_version": {"const": VERSION}, "id": ID, "project_id": ID,
-                       "store_epoch": ID, "data_mode": enum("live", "fixture"), "source": enum("CORE_STATUS"),
+                       "store_epoch": ID, "data_mode": enum("live", "fixture"), "source": enum("CORE_STATUS", "TOOL_METADATA"),
                        "template_version": {"const": 1}, "event_id": ID, "seq": COUNT,
                        "occurred_at": TIME, "severity": enum("INFO", "WARNING", "ERROR"), "object_count": COUNT}),
                     "text": {"type": "string", "maxLength": 65536},
                     "refs": array(obj({"kind": enum(*PUBLIC_KINDS), "id": ID, "version": nullable(COUNT)}), 600),
-                    "raw_logs": enum("PRIVATE_ONLY"), "tool_metadata": enum("UNAVAILABLE")}),
+                    "raw_logs": enum("PRIVATE_ONLY"), "tool_metadata": enum("UNAVAILABLE", "BOUND_RETURN")}),
     "LogPage": obj({"items": array(obj({"schema_version": {"const": VERSION}, "id": ID, "project_id": ID,
-                       "store_epoch": ID, "data_mode": enum("live", "fixture"), "source": enum("CORE_STATUS"),
+                       "store_epoch": ID, "data_mode": enum("live", "fixture"), "source": enum("CORE_STATUS", "TOOL_METADATA"),
                        "template_version": {"const": 1}, "event_id": ID, "seq": COUNT,
                        "occurred_at": TIME, "severity": enum("INFO", "WARNING", "ERROR"), "object_count": COUNT})),
                     "next_cursor": nullable(TEXT), "high_water": TEXT, "coverage_after_seq": COUNT,
@@ -172,6 +196,12 @@ OBJECTS.update({
                         "quantity": {"type": "string", "pattern": r"^-?[0-9]+(\.[0-9]+)?$"},
                         "source_id": ID, "idempotency_key": ID, "recorded_at": TIME}),
 })
+
+OBJECTS['LogBody']['allOf'] = [{
+    'if':{'properties':{'summary':{'properties':{'source':{'const':'TOOL_METADATA'}}}}},
+    'then':{'properties':{'tool_metadata':{'const':'BOUND_RETURN'}}},
+    'else':{'properties':{'tool_metadata':{'const':'UNAVAILABLE'}}},
+}]
 
 
 @lru_cache(maxsize=1)
