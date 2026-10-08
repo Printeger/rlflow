@@ -111,6 +111,10 @@ critical domain/control保持原FIFO；optional source独立task和单latest pay
 
 Checkpoint18补充：严格allowlist只读备份100k fixture历史，再事务增加10k归档task，不由label暗授调度权限。使用独立Python wrapper的PDEATHSIG与完整父身份前后检查，不用多线程父中的preexec_fn；所有启动后打印/测量均在直接child cleanup finally。源码冻结单次300s真实daemon结果1.773328%单核CPU，未达目标，不改阈值或混用API/B1证据。全仓库watch仍违反NFR06独立条件；下一优化保留同read事务/授权/STOP/prepare前后generation。first基线未序列化明确披露，raw rows独立计算亦未达标，下一driver修复不篡改本次证据。见IDLE_PERFORMANCE.md。
 
+## Checkpoint25：新增显式1.1，不把研究类型替换成数据集假设
+
+新增独立urn/schema_version的proposal1.1，保留1.0原字节/hash/验证；工具（空为none）、5个registry/profile hash、dataset ID/version/purpose/access与冻结rule ID/hash必须明确声明，仍是不可执行DRAFT。High基于CTL-02/CTL-07/§5.2/EXP-02指出PRD并不强制每research拥有注册dataset，因此删除初始跨字段收窄，任意Goal可明确NONE并不伪造数据引用；REGISTERED模式仍非空。实际方法确需数据但声明NONE时，后续approval/adapter必须拒绝，T19不能拿NONE作metrics证据。声明hash不是可信注册表核验、路径不是dataset引用；旧draft必须新建版本补齐，不能静默回填默认权限。command/HTTP/skill入口尚未升级，不拿内部DRAFT测试代替可信交互。
+
 ## Checkpoint24：按显式前置推进私有合同基础，不提前开放执行
 
 T09的前置是T01/T03，不是完整M1退出门槛；IMPLEMENTATION_PLAN§3亦说明顺序不要求全部串行。选同一Store三optional私有集合，不复用legacy package goals或approval，不新增initial marker或第二Store；只实现不可执行DRAFT/内容绑定幂等/不可变revision+原receipt/CAS head。新增事务、回放与完整snapshot（含周期maint）转换/closure校验，避免只在便利函数验证。原schema1.0的tool/evaluation缺口明确保留，不能默认补权；下一schema修订与可信human批准必须精确确认且执行层仍等待STOP/lease/隔离。M1/B1/长期和M2–M5完整Goal不因此变为通过。见HYBRID_GOAL_DRAFTS.md。

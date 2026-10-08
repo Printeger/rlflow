@@ -1,6 +1,6 @@
 # 持久未批准合同草案（T09 首切片）
 
-Checkpoint24。这是完整 T09 的增量基础，不是可信审批、调度、工程/科研闭环或 M1–M5 完成声明。T01/T03 前置已经具备；完整 M1/B1 与长期证据缺口继续保留。没有启动真实模型/GPU，也没有把开发 Goal 交给 rlflow。
+Checkpoint24–25。这是完整 T09 的增量基础，不是可信审批、调度、工程/科研闭环或 M1–M5 完成声明。T01/T03 前置已经具备；完整 M1/B1 与长期证据缺口继续保留。没有启动真实模型/GPU，也没有把开发 Goal 交给 rlflow。
 
 ## 存储与可信边界
 
@@ -42,9 +42,15 @@ result = propose(
 
 expected_revision=0 创建版本1，后续修订必须匹配当前合同 revision；它不是全局 Store version。返回不是命令已经执行、目标 READY 或用户已批准。HTTP/skill 接入将在后续可信命令层完成，不能把上面的示例变成模型可自行构造 human principal 的批准桥。
 
-原 proposal schema1.0 缺完整 allowed-tools 与 evaluation-data 边界；只允许保存为未批准草案，不默认补权限。后续批准门必须补齐版本化合同、精确 scope/hash/diff、真实 human approver、有效期/撤销、可靠 STOP 与执行前 gate，缺任何必需边界拒绝执行。局部条件/global evidence 与完成门控亦仍待 T10/T13 等，不从 DRAFT 数量推算进展。
+原 proposal schema1.0 缺完整 allowed-tools 与 evaluation-data 边界；只允许保存为未批准草案，不默认补权限。新增独立 `goal_v1_1.schema.json`（urn:rlflow:spec:goal-proposal:1.1），GoalContract 与内部 propose 通过版本判别 oneOf 接受1.0/1.1；1.0原字节保持不变。旧合同需以新 revision 显式补齐，不改变旧 hash 或回填默认权限。
+
+1.1 必填 allowed_tools（空集合表示无工具）、5个 registry/profile SHA256 声明，以及闭合 evaluation_data：冻结 evaluation_rule ID/hash；EXPLICIT_NONE 的 datasets 必须为空，REGISTERED_DATASETS 必须非空，每个数据引用必须带 dataset_id/version_hash/purpose/access，同 ID 不允许多个边界。研究并不必然使用注册数据集，理论或生成输入可显式 NONE；具体方法确需数据时后续可信批准/adapter 必须拒绝 NONE。路径不能充当数据注册引用，声明 hash 不能充当实际可信注册表验证。
+
+`command.schema.json` 的 submit_goal 仍仅接受1.0；尚无1.1 HTTP/MCP/skill提交桥。后续批准门必须完成实际工具/模板/数据/profile注册核验、精确 scope/hash/diff、真实 human approver、有效期/撤销、可靠 STOP 与执行前 gate，缺任何必需边界拒绝执行。局部条件/global evidence 与完成门控亦仍待 T10/T13 等，不从 DRAFT 数量推算进展。
 
 ## 验证记录
+
+Checkpoint25 root最终三模块 **80passed/2.75s**、独立High **80passed/3.31s**；范围MUST_FIX（强制所有研究声明dataset）按PRD修正，范围内无剩余MUST_FIX。冻结全回归原83613终态exit0：**689passed/32既有外部/H1skips/1既有Starlette warning/238.29s**。覆盖独立版本验证、必填嵌套字段、数据边界原子拒绝、真实1.1 DRAFT持久化/恢复与1.0→1.1不可变版本升级。源码和日志SHA见 `evidence/checkpoint-25-final-tests.txt`；没有新增browser/性能/供应商闭环证据。
 
 Root 首批23passed；相关7模块 r2/r3/r4/r5 分别148/155/157/160passed。High静态指出并关闭：入口外容量绕过、周期snapshot漏closure、错原receipt版本恢复、重复marker造成SQL/replay差异。统一重试 producer tuple 的最终增量：root新模块 **36passed/2.79s**，独立同7模块 **161passed/9.91s**，当前范围无剩余MUST_FIX；冻结全回归 **663passed/32既有外部/H1skips/1既有Starlette warning/234.49s**。各原handle已terminal exit0，不把旧160结果当最终版证据。未新增browser/性能负载结果，旧性能证据仍绑定旧源码。
 

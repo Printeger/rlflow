@@ -1,5 +1,7 @@
 # 需求包离线校验报告
 
+Checkpoint25终态：schema1.1 显式工具/registry-profile hash/评价数据与冻结规则声明兼容旧1.0不可变版本；仍仅UNAPPROVED DRAFT。root/独立High三模块80passed，冻结全量689passed/32既有skips/1既有warning/238.29s，原83613已terminal exit0，不再live。范围MUST_FIX关闭，见HYBRID_GOAL_DRAFTS.md/evidence/checkpoint-25-final-tests.txt。无1.1 command/HTTP/MCP/skill桥、实际registry核验或审批/lease/执行；无新增browser/性能证据，完整T09/M1/B1/长期与M2–M5继续开发，Goal active，无新增外部阻塞，用户package-lock保留。
+
 Checkpoint24真实Store草案首切片：DRAFT/UNAPPROVED、私有immutable contract/command receipt与CAS head，内容与项目绑定，同事务/回放/完整snapshot（含周期）守卫闭合。root36passed/独立161passed、四项MUST_FIX关闭，冻结完整663passed/32既有外部/H1skips/1warning/234.49s（原66508终态exit0）。见HYBRID_GOAL_DRAFTS.md与evidence/checkpoint-24-final-tests.txt；无新browser/性能负载，不虚称T09可信批准/执行或M1–M5/完整Goal完成。
 
 Checkpoint23有限组合HTTP独立终态：100k历史+10k归档task、400实际Store写/双SSE各400完整事件/128查询（64snapshot+64page），核心100401/公共100451、task精确不变/session0/source unchanged/ownedAPI TERM-reaped。submit-call→完整帧p95 246.724ms、snapshot8.144/page10.167ms，完整raw独立重算精确匹配；root21passed/10.21s、High21passed/10.65s，三项MUST_FIX关闭。见HTTP_PERFORMANCE.md与evidence/checkpoint-23-http.jsonl/final-tests.txt。生产未改，不虚称full/browser重跑，不代表DOM延迟/B1/完整NFR/M1或M0–M5 Goal通过。

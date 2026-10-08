@@ -165,7 +165,7 @@ OBJECTS.update({
                     "artifact_root": TEXT, "host_pool_id": ID, "config_hash": HASH,
                     "data_mode": enum("live", "fixture")}),
     "GoalContract": obj({"id": ID, "version": {"type": "integer", "minimum": 1},
-                         "hash": HASH, "proposal": {"$ref": "urn:rlflow:spec:goal-proposal:1.0"},
+                         "hash": HASH, "proposal": {"oneOf": [{"$ref": "urn:rlflow:spec:goal-proposal:1.0"}, {"$ref": "urn:rlflow:spec:goal-proposal:1.1"}]},
                          "state": enum(*GOAL_STATES), "approval_id": nullable(ID),
                          "outcome": nullable(enum("SUCCESS", "NOT_SUPPORTED", "INCONCLUSIVE"))}),
     "Approval": obj({"id": ID, "project_id": ID, "proposal_hash": HASH,
@@ -230,7 +230,7 @@ OBJECTS['Telemetry'] = obj({
 def schemas():
     root = Path(__file__).with_name("hybrid_schemas")
     values = {name: json.loads((root / f"{name}.schema.json").read_text())
-              for name in ("event", "command", "goal", "payloads")}
+              for name in ("event", "command", "goal", "goal_v1_1", "payloads")}
     return values
 
 

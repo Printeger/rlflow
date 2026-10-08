@@ -1,5 +1,7 @@
 # 阻塞与证据缺口
 
+Checkpoint25终态：schema1.1 显式工具/registry-profile hash/评价数据与冻结规则声明兼容旧1.0不可变版本；仍仅UNAPPROVED DRAFT。root/独立High三模块80passed，冻结全量689passed/32既有skips/1既有warning/238.29s，原83613已terminal exit0，不再live。范围MUST_FIX关闭，见HYBRID_GOAL_DRAFTS.md/evidence/checkpoint-25-final-tests.txt。无1.1 command/HTTP/MCP/skill桥、实际registry核验或审批/lease/执行；无新增browser/性能证据，完整T09/M1/B1/长期与M2–M5继续开发，Goal active，无新增外部阻塞，用户package-lock保留。
+
 目前仍可推进开发，没有需要终止完整 Goal 的外部阻塞。
 
 Checkpoint24按T01/T03推进T09未批准合同基础，四项High安全/恢复MUST_FIX关闭，独立最终161项相关回归、冻结完整663passed/32既有skips/1warning已通过。可信human批准/schema工具与评价边界、STOP/lease/runtime仍是可继续开发缺口，不是外部权限阻塞；没有把草案或legacy批准变成Hybrid执行权限。完整M1/B1/长期/安装科研等原门槛保留。

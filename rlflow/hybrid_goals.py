@@ -18,7 +18,7 @@ from .web_auth import Principal
 SECTIONS = ('hybrid_goal_contracts', 'hybrid_goal_heads', 'hybrid_goal_commands')
 MAX_BYTES = 256 * 1024
 ACTOR = obj({'id': ID, 'kind': enum('human', 'agent')})
-PROPOSAL = {'$ref': 'urn:rlflow:spec:goal-proposal:1.0'}
+PROPOSAL = deepcopy(OBJECTS['GoalContract']['properties']['proposal'])
 REQUEST = obj({'action': {'const': 'propose_goal_draft'}, 'project_id': ID,
                'data_mode': enum('live', 'fixture'), 'actor': ACTOR,
                'idempotency_key': ID, 'expected_revision': COUNT, 'proposal': PROPOSAL})
@@ -98,6 +98,9 @@ def validate_request(request):
         verification = condition['verification']
         if len(condition['description']) > 4000 or len(verification['rule']) > 4000 or len(verification['evidence_required']) > 200 or any(len(v) > 4000 for v in verification['evidence_required']):
             raise ProtocolError('invalid bounded verification rule')
+    if p['schema_version']=='1.1':
+        datasets=p['evaluation_data']['datasets']
+        if len({d['dataset_id'] for d in datasets})!=len(datasets):raise ProtocolError('dataset IDs must bind one version and access boundary')
 
 
 def validate_record(section, key, record):

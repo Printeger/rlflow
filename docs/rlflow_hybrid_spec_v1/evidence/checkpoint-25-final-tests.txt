@@ -1,0 +1,29 @@
+Checkpoint25: explicit schema1.1 UNAPPROVED declarations only, not approval/execution
+Parent HEAD: 4f48e68
+Root final three modules: 80 passed in 2.75s; session84196 terminal exit0
+Independent High final three modules: 80 passed in 3.31s; session8520 terminal exit0
+Root frozen full: 689 passed, 32 existing external/H1 skipped, 1 existing
+Starlette warning in 238.29s; original session83613 terminal exit0
+Three-module scope: tests/test_hybrid_goal_v1_1.py tests/test_hybrid_goals.py tests/test_hybrid_protocol.py
+Root runner: PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q
+Independent runner: env -u PYTHONPATH PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 PYTHONDONTWRITEBYTECODE=1 .venv/bin/python -m pytest -q -p no:cacheprovider
+Full argv: PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q
+Compileall/git diff --check: exit0 before full
+High scope MUST_FIX closed: research may explicitly declare NONE; PRD does not
+require registered datasets for all theoretical/generated-input research.
+No remaining MUST_FIX in final independent schema review.
+Final independent source/log/docs review: all eight hashes matched actual bytes;
+all three terminal tails matched; no remaining MUST_FIX, no tests rerun.
+Legacy goal.schema.json unchanged; registry hashes are declarations, not validated authority.
+command.submit_goal still schema1.0; no new HTTP/MCP/skill write route.
+No approval, lease, dispatch, model/GPU or browser/performance rerun.
+Prior performance results stay bound to their original sources.
+SHA256:
+56bc2fe045d60cb89a11f99ccd2d4fdbbebf048186848bf4f84488869762a988  rlflow/hybrid_goals.py
+b7ffe80a275766c86a83a0afb0ebd03a8059faef2898c80cfc9fad7aff973dd4  rlflow/hybrid_protocol.py
+44e607d02ee63594255578506bafb013b992df9161ee1121bd327ef22fa730a1  rlflow/hybrid_schemas/goal.schema.json
+1441d138d1cb70613bcf98aabdef4b0a537b2e935f8dc66ae2b7f5fa7e19d7da  rlflow/hybrid_schemas/goal_v1_1.schema.json
+23c65a1ac1f3ec7f1aa6c9efe3764e415400559f50c402279871a891303f55ab  tests/test_hybrid_goal_v1_1.py
+4f84d1dd09265a90dba8955807f5759b43cb6d11059f205cfb81c419b3a8d813  audit/hybrid-v1/checkpoint-25-full-r1.log
+e82efe1150a2a6507c40284565734a62a695d9bc062d858eceba67bc3de02b10  audit/hybrid-v1/checkpoint-25-high-schema-r1.log
+7a1ca020f0809da47684e10f5af094d55f15852a21f6baad90c8590707fc3fd0  audit/hybrid-v1/checkpoint-25-schema-r3.log
