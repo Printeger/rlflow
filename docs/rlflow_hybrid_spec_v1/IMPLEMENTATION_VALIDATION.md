@@ -104,3 +104,7 @@ r3冻结最终 **430 passed/32 skipped/1 warning/143.61s**，编译/diff check�
 ## Checkpoint08：private工具返回provenance基础
 
 新worker上下文/CPU bound intent/闭合return fact与crash/replay/换代/隐私负例通过。目标 **68passed/1skipped/46.63s**，High独立31passed/1deselected；最终冻结全回归 **455passed/32skipped/1warning/145.80s**，compileall/pip check/diff通过。命令/hash见CHECKPOINT_08.md/evidence/checkpoint-08-final-tests.txt。private记录不证明放行/STARTED/RUNNING或完整STOP，尚无public collector/API/UI工具条目，UI仍未接入。没有模型/GPU/公开部署；M1–M5继续保留。
+
+## Checkpoint09：执行前工具发现源
+
+REGISTER先于CPU副作用、固定有界hash-chain journal、登记当时launch witness及fd分页/checkpoint拒绝已实现。目标56passed/4.31s，High父目录durability finding修复后独立54passed/1deselected；冻结全回归 **478passed/32skipped/1warning/146.63s**。compileall/pip check/diff通过。首轮52passed/1failed为oversize测试断言顺序错误，正确拒绝保留，未减少测试。见CHECKPOINT_09.md/TOOL_DISCOVERY_PROTOCOL.md/evidence/checkpoint-09-final-tests.txt；core pending/事务cursor、公开collector/工具UI与资源仍未实现，M1–M5继续推进。

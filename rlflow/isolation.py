@@ -19,6 +19,14 @@ import subprocess
 import sys
 import tempfile
 import time
+if __package__:
+    from . import tool_journal
+else:
+    # The trusted MCP/supervisor also launches this module as an isolated file.
+    import importlib.util
+    _journal_spec = importlib.util.spec_from_file_location('rlflow_tool_journal',Path(__file__).with_name('tool_journal.py'))
+    tool_journal = importlib.util.module_from_spec(_journal_spec)
+    _journal_spec.loader.exec_module(tool_journal)
 
 CODEX = '/usr/local/bin/codex'
 PINNED_VERSION = '0.161.0'
@@ -294,6 +302,13 @@ def persistent_cpu_exec(config, args):
     digest = hashlib.sha256(json.dumps({'id': command_id}, sort_keys=True).encode()).hexdigest()
     path = Path(config['audit']).parent / 'commands' / digest
     path.mkdir(parents=True, exist_ok=True)
+    # fsync of intent's directory does not persist its own parent dentry.
+    # Both newly possible levels must survive BEFORE the journal can promise
+    # that a command path exists, and before any execution side effect.
+    for directory in (path.parent,path.parent.parent):
+        fd = os.open(directory,os.O_RDONLY|os.O_DIRECTORY|os.O_NOFOLLOW)
+        try:os.fsync(fd)
+        finally:os.close(fd)
     intent = {'command_id': command_id, 'command': args['command'], 'timeout': args.get('timeout',60),
               'candidate': config['candidate'], 'role': config['role'],
               'permissions': {k:config.get(k) for k in ('write_roots','read_extra','execute_extra','command_seconds')}}
@@ -328,6 +343,9 @@ def persistent_cpu_exec(config, args):
                 return value
             raise IsolationError('Command outcome unknown; inspect checkpoint, do not re-execute')
         save('intent.json', intent)
+        if context is not None:
+            # Registration failure must precede every possible tool side effect.
+            tool_journal.register(config,intent,digest)
         value = cpu_exec(args['command'], config['candidate'], config['scratch'], config['role'],
                          timeout=args.get('timeout',60), read_extra=config.get('read_extra'),
                          write_roots=config.get('write_roots'), execute_extra=config.get('execute_extra'),
@@ -382,7 +400,8 @@ def codex_command(role: str, candidate: str | Path, scratch: str | Path,
                   memory_bytes: int = 2 * 1024**3,
                   model: str = 'gpt-5.6-sol', effort: str = 'medium', command_seconds: int = 120,
                   _census_catalog: dict | None = None,
-                  tool_context: dict | None = None) -> tuple[list[str], dict[str,str]]:
+                  tool_context: dict | None = None,
+                  tool_launch_directory: str | None = None) -> tuple[list[str], dict[str,str]]:
     """Return argv/env; caller writes prompt to stdin and captures JSONL stdout.
 
     Output's parent is trusted control storage; it MUST be disjoint from role
@@ -423,6 +442,9 @@ def codex_command(role: str, candidate: str | Path, scratch: str | Path,
         'execute_extra':execute_extra or [],'memory_bytes':memory_bytes,'command_seconds':command_seconds,
         'audit':str(trusted/(output.name+'.commands.jsonl'))}
     if tool_context is not None:tool_config['tool_context'] = tool_context
+    if tool_launch_directory is not None:
+        if tool_context is None:raise IsolationError('Launch witness requires tool context')
+        tool_config['tool_launch_directory'] = str(Path(tool_launch_directory).resolve(strict=True))
     config_path.write_text(json.dumps(tool_config))
     argv = [CODEX,'exec','--ignore-user-config','--ignore-rules','--ephemeral','--skip-git-repo-check',
             '--sandbox','workspace-write','-C',str(scratch),'--json','--output-schema',str(Path(schema).resolve()),

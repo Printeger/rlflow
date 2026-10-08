@@ -65,3 +65,7 @@ append-only refs增加INSERT成员/severity guard；只读路径仍防御异常�
 ## 2026-10-08：工具provenance与执行authority分离
 
 先在现有可信CPU工具链增加闭合request/generation指针及private return fact，不将原始events.jsonl/命令输出公开。PREPARE context只绑定身份，不声称已release；返回state不声称STARTED/RUNNING或成功。result先提交、fact可幂等补齐且无伪造的绝对发生时间，intent-only不重执行。后续collector必须独立对照DB release/session、request与startup proof、实际permissions；逐工具STOP/授权marker另属受控runtime安全门槛，不由provenance替代。
+
+## 2026-10-08：REGISTER优先于工具副作用
+
+只在返回后append journal会漏掉result已提交而通知前崩溃的命令。因此以执行前durable REGISTER建立后续pending发现key，返回通知非正确性依赖；未来core bounded indexed pending轮转，不glob目录。目录入口与journal均fsync后才执行。fd reader保存source identity+offset/checkpoint链，partial/替换/破损不能静默归零；登记当时缺launch witness不能事后补release授权。private发现协议见TOOL_DISCOVERY_PROTOCOL.md。

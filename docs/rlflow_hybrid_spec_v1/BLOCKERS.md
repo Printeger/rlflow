@@ -4,6 +4,8 @@
 
 Checkpoint08：private工具返回事实基础与全回归455/32通过，独立High范围无MUST_FIX。公开collector尚待开发而非外部阻塞；需要bounded发现、可信release/权限核验、事务幂等写入，不能将现private context/hash当放行证明。其余环境证据缺口如下保留。
 
+Checkpoint09：执行前REGISTER/有界reader与全回归478/32通过，High父目录durability finding关闭。继续core pending/事务offset与公开collector，没有新的外部阻塞；partial尾修复、源恢复/历史coverage不能静默处理，仍属待实现恢复合同。
+
 本切片故障不是外部阻塞：冻结全回归暴露 guardian teardown race 与角色可写 default guard 控制目录，已经按完整真实身份和控制文件隔离修复，最终 r3 368 passed / 32 skipped，High 范围内阻塞 finding 全部关闭。没有删除测试、延长业务终止门槛或忽略 cleanup 错误。
 
 1. 原 Codex 版本不匹配已修复：0.161.0 的工具注册、隔离测试通过；使用独立空 HOME 的固定 census catalog 与本机 localhost 拒绝端点，零模型调用。真实 runtime 的供应商 usage/interrupt/恢复仍未验证，不能把 doctor 通过当作真实业务闭环通过。

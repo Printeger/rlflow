@@ -69,7 +69,8 @@ def run(path):
                                       execute_extra=execute_extra or None,
                                       write_roots=request.get('write_roots'),
                                       memory_bytes=runtime['address_space_bytes'] if runtime else 2*1024**3,
-                                      command_seconds=request.get('command_seconds',120),tool_context=tool_context)
+                                      command_seconds=request.get('command_seconds',120),tool_context=tool_context,
+                                      tool_launch_directory=str(d) if tool_context is not None else None)
             if resource_record and resource_record.get('disk'):
                 home=artifact_dir/'codex-home';home.mkdir(mode=0o700)
                 original=Path(env.get('CODEX_HOME',str(Path(env.get('HOME',str(Path.home())))/'.codex')))

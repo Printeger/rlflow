@@ -42,3 +42,5 @@ Checkpoint06：CORE_STATUS后端/API，目标80passed，独立High日志27passed
 Checkpoint07：公共日志UI筛选/固定high-water分页/按需正文/虚拟窗口/覆盖说明已接入；最终Chrome/reducer/geometry/log-validator **13 passed/0 skipped/5.85s**，相关Python **39 passed/1 warning/5.21s**。High发现的详情残留与ref类型隐式转换已修复并独立复验，刷新失败保留同项目页及迟到响应隔离通过。见CHECKPOINT_07.md；后端未改，未虚称重跑430全量。下一项工具metadata/资源，完整Goal保持活跃。
 
 Checkpoint08：worker新MCP config含closed request/generation指针，bound intent补scratch/memory与private fixed return fact，回放/崩溃不重复执行。目标68passed/1skipped，独立High31passed/1deselected范围无MUST_FIX；最终全回归 **455 passed/32 skipped/1 warning/145.80s**。见CHECKPOINT_08.md与evidence/checkpoint-08-final-tests.txt。公开工具collector尚未实现，UI保持未接入；下一项bounded发现/可信release核验/事务公共事实，然后资源。完整Goal仍活跃。
+
+Checkpoint09：执行前durable REGISTER与closed bounded fd reader已实现，杜绝只依赖返回通知的漏发现窗口；登记时缺launch witness不事后升级。High父目录fsync MUST_FIX关闭，target56passed，独立54passed/1deselected；冻结全回归 **478 passed/32 skipped/1 warning/146.63s**。见CHECKPOINT_09.md/TOOL_DISCOVERY_PROTOCOL.md及evidence。下一项core indexed pending/事务cursor与receipt语义digest、完整release/permission核验及公共工具事实接入，然后资源；M1–M5/完整Goal仍未完成。

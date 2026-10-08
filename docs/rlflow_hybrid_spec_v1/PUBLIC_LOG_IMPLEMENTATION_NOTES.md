@@ -10,6 +10,8 @@
 
 工具metadata collector仍必须先验证trusted request/release/DB session及startup proof，固定 `commands/<sha(command_id)>`映射并核对role/candidate/permissions与command/argv/cwd/checkpoint来源绑定；tool_context/hash本身不能当放行证明。resource.disk模式可能将role日志symlink到raw；初版拒绝follow并明确UNAVAILABLE，或只通过已校验resource record定位批准raw根，不把symlink当授权。逐工具STOP/授权marker属于受控runtime后续，当前private return记录不实现或取代该边界。
 
+Checkpoint09增加执行前durable REGISTER和有界fd reader，登记时捕获已有launch witness、null不事后升级。没有core pending/事务offset或公开collector接入，Web仍不读journal。完整协议/容量/损坏拒绝与下一阶段合同见TOOL_DISCOVERY_PROTOCOL.md；不以private source当公开工具验收。
+
 ## 下一候选切片
 
 先接入明确标为 `CORE_STATUS` 的真实状态日志：来源为已经校验、同事务提交的公共domain envelope，不读取raw模型文件；正文仅从kind/opaque ID/version/有限状态/seq生成固定模板，禁止复制description/reason/source任意文本。这是真正的core状态日志，不是stdout/stderr/工具日志替代，不宣称完整T05完成。
