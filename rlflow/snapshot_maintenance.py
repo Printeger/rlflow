@@ -29,6 +29,7 @@ def maintain(store,*,seconds=5,max_bytes=32*1024*1024,max_rows=100000,max_nodes=
                 if version<due['due_version']:return False
                 tip=db.execute('SELECT event_id,payload_sha256,new_state_version FROM events WHERE seq=?',(version,)).fetchone()
                 if tip is None or tip['new_state_version']!=version:return False
+                registration=store._goal_registration(db)
                 budget=[max_bytes]
                 nodes=[max_nodes]
                 def parse(raw):
@@ -62,14 +63,20 @@ def maintain(store,*,seconds=5,max_bytes=32*1024*1024,max_rows=100000,max_nodes=
                     value=decode(parse(raw))
                     if row['object_key']=='':state[row['section']]=value
                     else:state.setdefault(row['section'],{})[row['object_key']]=value
+                # Resolve only the command keys in this consistent snapshot;
+                # the UNIQUE idempotency-key index avoids any history scan.
+                source_events={key:store._goal_event(db,key) for key in state.get('hybrid_goal_commands',{})}
             check()
             from .contracts import validate_runtime_state
             validate_runtime_state(state);check()
+            from .hybrid_goals import validate_complete
+            validate_complete(state,registration,source_events.get);check()
             raw=canonical(state);check()
             if len(raw)>max_bytes:return False
             digest=hashlib.sha256(raw).hexdigest();check()
             with store.lock(nonblocking=True),sqlite3.connect(store.db,timeout=0) as db:
                 db.execute('BEGIN IMMEDIATE')
+                if store._goal_registration(db)!=registration:return False
                 current=db.execute('SELECT event_id,payload_sha256,new_state_version FROM events WHERE seq=?',(version,)).fetchone()
                 head=db.execute('SELECT version FROM projection_meta WHERE singleton=1').fetchone()
                 if current!=tuple(tip) or head is None or head[0]<version:return False

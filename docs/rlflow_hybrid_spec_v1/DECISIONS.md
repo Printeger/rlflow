@@ -111,6 +111,10 @@ critical domain/control保持原FIFO；optional source独立task和单latest pay
 
 Checkpoint18补充：严格allowlist只读备份100k fixture历史，再事务增加10k归档task，不由label暗授调度权限。使用独立Python wrapper的PDEATHSIG与完整父身份前后检查，不用多线程父中的preexec_fn；所有启动后打印/测量均在直接child cleanup finally。源码冻结单次300s真实daemon结果1.773328%单核CPU，未达目标，不改阈值或混用API/B1证据。全仓库watch仍违反NFR06独立条件；下一优化保留同read事务/授权/STOP/prepare前后generation。first基线未序列化明确披露，raw rows独立计算亦未达标，下一driver修复不篡改本次证据。见IDLE_PERFORMANCE.md。
 
+## Checkpoint24：按显式前置推进私有合同基础，不提前开放执行
+
+T09的前置是T01/T03，不是完整M1退出门槛；IMPLEMENTATION_PLAN§3亦说明顺序不要求全部串行。选同一Store三optional私有集合，不复用legacy package goals或approval，不新增initial marker或第二Store；只实现不可执行DRAFT/内容绑定幂等/不可变revision+原receipt/CAS head。新增事务、回放与完整snapshot（含周期maint）转换/closure校验，避免只在便利函数验证。原schema1.0的tool/evaluation缺口明确保留，不能默认补权；下一schema修订与可信human批准必须精确确认且执行层仍等待STOP/lease/隔离。M1/B1/长期和M2–M5完整Goal不因此变为通过。见HYBRID_GOAL_DRAFTS.md。
+
 ## Checkpoint23：先闭合 HTTP 测量证据，不修改性能合同
 
 新增独占fixture单writer/父-owned readonly loopback API有限驱动，默认生产SSE配置，双独立consumer各真实重连，并发bounded snapshot/page。绝对发行计划保存完整分母与lag；逐计划write/连续核心version/非duplicate/至少一个outbox来源覆盖，允许一对多，不用客户端与现存outbox相等掩盖bridge遗漏。异常保存有界public帧/原因并立即传播，正常cleanup之前核对API存活，异常/强制KILL拒绝成功；父死亡SIGKILL防uvicorn graceful延存，正常TERM-reap。异步finally先回收API再等待executor，不宣称取消线程写回滚或硬deadline。提交调用→HTTP帧上界与DOM可见/真实commit区分；实际单档案32s数据不代替完整B1/NFR/M1/长期。见HTTP_PERFORMANCE.md。

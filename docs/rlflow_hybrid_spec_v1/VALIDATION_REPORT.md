@@ -1,5 +1,7 @@
 # 需求包离线校验报告
 
+Checkpoint24真实Store草案首切片：DRAFT/UNAPPROVED、私有immutable contract/command receipt与CAS head，内容与项目绑定，同事务/回放/完整snapshot（含周期）守卫闭合。root36passed/独立161passed、四项MUST_FIX关闭，冻结完整663passed/32既有外部/H1skips/1warning/234.49s（原66508终态exit0）。见HYBRID_GOAL_DRAFTS.md与evidence/checkpoint-24-final-tests.txt；无新browser/性能负载，不虚称T09可信批准/执行或M1–M5/完整Goal完成。
+
 Checkpoint23有限组合HTTP独立终态：100k历史+10k归档task、400实际Store写/双SSE各400完整事件/128查询（64snapshot+64page），核心100401/公共100451、task精确不变/session0/source unchanged/ownedAPI TERM-reaped。submit-call→完整帧p95 246.724ms、snapshot8.144/page10.167ms，完整raw独立重算精确匹配；root21passed/10.21s、High21passed/10.65s，三项MUST_FIX关闭。见HTTP_PERFORMANCE.md与evidence/checkpoint-23-http.jsonl/final-tests.txt。生产未改，不虚称full/browser重跑，不代表DOM延迟/B1/完整NFR/M1或M0–M5 Goal通过。
 
 Checkpoint17归档任务规模：r2真实100/1k/10k任务+每档audit==replay，无工作阶段core/cursor不变且session0；10k scoped/legacy写p95=7.061/14.747ms、viewkeys2.677ms，无工作CPU p50=10.257ms/次非5min平均。High测量assert省略调用finding关闭，两driver拒绝-O及真实负例；root20passed、独立7passed、原始分布/来源SHA归档。见TASK_PERFORMANCE.md/evidence。生产未改，无全量/browser重跑；旧100k额外RO真实audit通过且DB字节不变。不代表活跃闭环/组合B1/M1 gate，继续完整Goal。

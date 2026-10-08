@@ -830,6 +830,9 @@
     "usage": {
       "type": "object"
     },
+    "hybrid_goal_contracts": {"type": "object"},
+    "hybrid_goal_heads": {"type": "object"},
+    "hybrid_goal_commands": {"type": "object"},
     "tool_sources": {
       "type":"object","additionalProperties":{"$ref":"ToolLedger.json#/$defs/source"}
     },

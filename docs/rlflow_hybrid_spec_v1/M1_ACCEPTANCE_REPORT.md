@@ -1,12 +1,12 @@
 # M1 退出门槛审计（尚未通过）
 
-2026-10-08，当前生产 checkpoint `4623b42`。此文件补齐 IMPLEMENTATION_PLAN §5 要求的 M1 报告；**不是 M1 完成声明**。M0–M5 的完整目标不变，剩余开发没有外部阻塞。
+2026-10-09，最新源码 checkpoint24（私有不可执行草案）；此前性能绑定 checkpoint21/旧源码，不自动推广到新代码。此文件补齐 IMPLEMENTATION_PLAN §5 要求的 M1 报告；**不是 M1 完成声明**。M0–M5 的完整目标不变，剩余开发没有外部阻塞。
 
 ## 当前可运行范围
 
 既有 Store 的真实事务经同事务 observation/outbox、closed public projection/counters、snapshot/keyset page、认证只读 HTTP/SSE 接入 Dashboard。当前 UI 支持真实业务事件的拓扑/状态/原因/预算未知、有限对象与虚拟事件窗口、公共日志、绑定 CPU 工具返回、HOST/磁盘与 worker loop/supervisor telemetry；未知不转0或模型 RUNNING。HTTP 不启动 scheduler 或调用模型，没有写命令或 artifact 路径。运行方式见 LOCAL_WEB.md。
 
-生产源码冻结全回归：checkpoint15 **586 passed / 32既有外部依赖 skipped / 1既有警告 / 215.49s**，其中包括 Web/观测/telemetry/Store。现有 sandbox Chrome+Node **20 passed / 0 skipped / 9.44s**，用 owned loopback 与明确标记的业务 Fixture；HOST 资源来自实际 OS。source/log SHA 见 evidence/checkpoint-15-final-tests.txt。没有重新把这些测试跑成真实供应商闭环，也没有把节点心跳当作模型活动。
+最新生产源码冻结全回归：checkpoint24 **663 passed / 32既有外部/H1 skipped / 1既有警告 / 234.49s**，其中包括 Web/观测/telemetry/Store 与 private draft。source/log SHA 见 evidence/checkpoint-24-final-tests.txt。现有 UI checkpoint15 sandbox Chrome+Node **20 passed / 0 skipped / 9.44s**，用 owned loopback 与明确标记的业务 Fixture；HOST 资源来自实际 OS，本轮未新增 browser 结果。没有重新把这些测试跑成真实供应商闭环，也没有把节点心跳当作模型活动。
 
 ## 场景到证据
 
@@ -31,6 +31,6 @@ Checkpoint22新的同100k/10k归档档案daemon-only300.000624s实测单核CPU0.
 
 M1 gate **未通过**，不是失败即停止整个Goal。真实历史固定单对象cardinality 10k→100k探针已终态exit0、ratio1.041488≤2与recover==audit==replay通过，见 HISTORY_PERFORMANCE.md；只证明该单轴，不代替完整B1。随后按证据测真实10k任务/活跃工作、B1读写与idle、维护RSS/WAL，并继续真实来源与长期场景。不能通过删除历史、放宽时限、编造counter或无说明跳过来通过。
 
-M2–M5 待执行：GoalContract/可信authority/命令/STOP/lease/runtime/结算/独立评审、实验与科研状态、资源可靠性、安装迁移、可信远程与历史纯回放。可按依赖开展设计/静态探索，但可写闭环上线必须满足可信批准与可靠STOP，不由只读Dashboard通过代替。
+M2–M5 未完整交付：T09私有持久DRAFT基础按T01/T03前置实施，immutable合同/receipt与CAS head不授予权限；见HYBRID_GOAL_DRAFTS.md。可信authority/命令/STOP/lease/runtime/结算/独立评审、实验与科研状态、资源可靠性、安装迁移、可信远程与历史纯回放仍待执行。按显式依赖推进，但可写闭环上线必须满足可信批准与可靠STOP，不由只读Dashboard或草案持久化代替。
 
 Checkpoint18补测两轴组合：真实100k历史backup+10k归档任务，daemon-only 300.000899s单核CPU1.773328%，未达<1%；业务与来源不变、sessions0、采样RSS38.016MiB。原始证据见IDLE_PERFORMANCE.md；没有API/活跃工作/限定B1硬件，不宣称NFR06通过，且当前逐秒全控制仓库watch本身违反无全仓库轮询条件。下一项是保留安全不变量的空闲热路径优化，不降低验收门槛。

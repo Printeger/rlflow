@@ -1,0 +1,31 @@
+Checkpoint24: persistent UNAPPROVED DRAFT only; not full T09/M1/B1/Goal
+Parent HEAD: a9c6155
+Root final new module: 36 passed in 2.79s; session30841 terminal exit0
+Independent High final seven modules: 161 passed in 9.91s; session27011 terminal exit0
+Root frozen full suite: 663 passed, 32 existing external/H1 skipped, 1 existing
+Starlette warning in 234.49s; session66508 terminal exit0
+Independent pytest module scope:
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q tests/test_hybrid_goals.py tests/test_store_policy.py tests/test_contracts.py tests/test_hybrid_protocol.py tests/test_hybrid_observation.py tests/test_snapshot_maintenance.py tests/test_idle_reconcile.py
+Independent runner additionally used env -u PYTHONPATH,
+PYTHONDONTWRITEBYTECODE=1 and -p no:cacheprovider (no rerun required).
+Exact full argv:
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q
+Compileall/pip check/git diff --check: exit0
+Four High MUST_FIX closed: persistent capacity guard, periodic snapshot closure,
+receipt original core-event binding on restore, duplicate existing collection marker.
+Final producer tuple delta independently reviewed and tested; no remaining MUST_FIX.
+Final independent source/log/document review: all nine listed hashes and actual
+tails matched; draft/auth/performance scope explicit; no remaining MUST_FIX.
+No model/GPU/production scheduler; finite isolated fixture processes only.
+No browser/CPU/HTTP performance rerun; prior performance stays bound to old sources.
+Snapshot/source faults only injected in disposable test clones, never user state.
+SHA256:
+63caf3395b1cb057756986b67ac90b3a8c250bf8fd3911c636e88f9e64ffad04  rlflow/hybrid_goals.py
+94ebdba552afca7f8a963eeccbdea248f222e1d25d5148cc0ff72c0e69654051  rlflow/contracts.py
+2e3e45c15d76ba7137d6b5e5d33149c54197480fdfc2027d2ccc9a1ee5fcf00c  rlflow/store.py
+be869f2d687fb19438f6486ef9cadd47fb9b82050a506767fe36ee69731bb8c6  rlflow/snapshot_maintenance.py
+df2db0e3b6ff7455ba5af93f80971649ca1a9ae1bca0aedb53ff7ffe360e465e  schemas/RuntimeState.json
+aa07d9d4891efb9fefddf8ae357916eb132532578ff7447e41b1c8381960baaf  tests/test_hybrid_goals.py
+7dc44d2e3c2418027615e648c608ec21b85e4ab9744596c4d2c2a6250d8d676f  audit/hybrid-v1/checkpoint-24-full-r1.log
+010abb1e6fe1efcba47ba9a9b29c1884f7a79e4dee4a927322e60ed961e11e55  audit/hybrid-v1/checkpoint-24-high-target-r2.log
+f577ecd0a3530b921bbf8389fda4fc440b365515455ded3dcc300f93aba8f6b8  audit/hybrid-v1/checkpoint-24-goals-r6.log

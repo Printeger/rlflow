@@ -2,6 +2,8 @@
 
 目前仍可推进开发，没有需要终止完整 Goal 的外部阻塞。
 
+Checkpoint24按T01/T03推进T09未批准合同基础，四项High安全/恢复MUST_FIX关闭，独立最终161项相关回归、冻结完整663passed/32既有skips/1warning已通过。可信human批准/schema工具与评价边界、STOP/lease/runtime仍是可继续开发缺口，不是外部权限阻塞；没有把草案或legacy批准变成Hybrid执行权限。完整M1/B1/长期/安装科研等原门槛保留。
+
 Checkpoint23组合100k/10k真实API的有限400写/双SSE/128查询已终态并独立重算，root+High相关21tests通过；无新增外部阻塞。完整B1仍缺3项目/活跃Goal/限定硬件/浏览器可见与合计资源，长期及独立无全仓库poll要求未完成。下一按依赖推进完整M1验收与T09–T25，不把HTTP延迟子证据当作M1或完整Goal完成。
 
 Checkpoint17归档任务cardinality与优化模式拒绝已验证，无新外部阻塞；10k短循环CPU中位数只提示后续idle诊断，不虚称5min NFR失败/通过。下一项组合真实100k/10k、有限实际idle/活跃工作与B1；完整M1/M2–M5继续保留。

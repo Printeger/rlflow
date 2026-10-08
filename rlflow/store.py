@@ -62,7 +62,8 @@ def initial():
 
 
 _UNLOADED = object()
-PRIVATE_HOT_SECTIONS = frozenset(('tool_sources','tool_receipts','tool_scan'))
+PRIVATE_HOT_SECTIONS = frozenset(('tool_sources','tool_receipts','tool_scan',
+    'hybrid_goal_contracts','hybrid_goal_heads','hybrid_goal_commands'))
 
 
 class ObjectMap(dict):
@@ -206,12 +207,20 @@ class Store:
             payload = json.loads(row["payload"])
             if sha(payload) != row["payload_sha256"] or row["previous_state_version"] != state["version"]:
                 raise Conflict("event integrity/version mismatch")
-            self._apply(state, payload, db)
+            self._apply(state, payload, db, row)
             state["version"] = row["new_state_version"]
         validate_runtime_state(state)
+        from .hybrid_goals import validate_complete
+        validate_complete(state,self._goal_registration(db),lambda k:self._goal_event(db,k))
         return state
 
-    def _apply(self, state, payload, db):
+    def _apply(self, state, payload, db, event):
+        goal_sections = ('hybrid_goal_contracts','hybrid_goal_heads','hybrid_goal_commands')
+        if (any(s in goal_sections for s,k,v in payload.get('put', [])) or any(s in goal_sections for s,k in payload.get('delete', [])) or set(payload.get('set', {})) & set(goal_sections)):
+            from .hybrid_goals import validate_transition
+            decoded = {**payload, 'put': [[s,k,self._decode_value(db,v)] for s,k,v in payload.get('put', [])]}
+            validate_transition(decoded, lambda s,k:({} if s in state else None) if k=='' else state.get(s,{}).get(k), event_type=event['event_type'],
+                key=event['idempotency_key'], object_id=event['object_id'], producer=event['producer'], version=event['new_state_version'], registration=self._goal_registration(db))
         if payload.get("format") == 2:
             for section, key, value in sorted(payload["put"], key=lambda row:(row[0],row[1])):
                 value = self._decode_value(db, value)
@@ -369,6 +378,13 @@ class Store:
 
     def _commit(self, db, event_type, key, payload, previous, object_id, producer, inputs):
         ver = previous + 1
+        from .hybrid_goals import validate_transition, SECTIONS as goal_sections
+        if any(s in goal_sections for s,k,v in payload['put']) or any(s in goal_sections for s,k in payload['delete']):
+            def lookup(section,objkey):
+                if objkey=='':return {} if db.execute('SELECT 1 FROM projection WHERE section=? LIMIT 1',(section,)).fetchone() else None
+                row=db.execute('SELECT value FROM projection WHERE section=? AND object_key=?',(section,objkey)).fetchone()
+                return self._decode_value(db,json.loads(row[0])) if row else None
+            validate_transition(payload,lookup,event_type=event_type,key=key,object_id=object_id,producer=producer,version=ver,registration=self._goal_registration(db))
         source_event_id = uuid.uuid4().hex
         timestamp = time.time()
         # Preserve the unencoded patch for the small allowlisted public bridge.
@@ -397,6 +413,17 @@ class Store:
         if row and (row["event_type"] != event_type or row["object_id"] != object_id):
             raise Conflict("idempotency key reused for different operation")
         return row is not None
+
+    @staticmethod
+    def _goal_registration(db):
+        if not db.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='observation_meta'").fetchone():return None
+        row=db.execute('SELECT project_id,data_mode FROM observation_meta WHERE singleton=1').fetchone()
+        return tuple(row) if row else None
+
+    @staticmethod
+    def _goal_event(db,key):
+        row=db.execute('SELECT event_type,producer,object_id,new_state_version FROM events WHERE idempotency_key=?',(key,)).fetchone()
+        return tuple(row) if row else None
 
     def transact(self, event_type, key, mutate, *, expected=None, object_id="control", producer="orchestrator", inputs=None):
         """Legacy whole-state callback; new hot paths should use transact_objects."""
@@ -492,13 +519,18 @@ class Store:
                 if hashlib.sha256(row["state"]).hexdigest()!=row["sha256"]: raise Conflict("snapshot integrity mismatch")
                 state=json.loads(row["state"])
                 if state["version"]!=row["version"]: raise Conflict("snapshot version mismatch")
+                validate_runtime_state(state)
+                from .hybrid_goals import validate_complete
+                validate_complete(state,self._goal_registration(db),lambda k:self._goal_event(db,k))
             else: state=initial()
             for event in db.execute("SELECT * FROM events WHERE seq>? ORDER BY seq",(state["version"],)):
                 validate_runtime_event(dict(event))
                 if event["previous_state_version"]!=state["version"]: raise Conflict("event version mismatch")
-                self._apply(state,json.loads(event["payload"]),db)
+                self._apply(state,json.loads(event["payload"]),db,event)
                 state["version"]=event["new_state_version"]
             validate_runtime_state(state)
+            from .hybrid_goals import validate_complete
+            validate_complete(state,self._goal_registration(db),lambda k:self._goal_event(db,k))
             self._replace_projection(db,state)
             return state
 
@@ -506,6 +538,8 @@ class Store:
         with self.lock(), self.connect() as db:
             db.execute("BEGIN IMMEDIATE")
             state=self.replay(db);raw=canonical(state)
+            from .hybrid_goals import validate_complete
+            validate_complete(state,self._goal_registration(db),lambda k:self._goal_event(db,k))
             db.execute("INSERT OR REPLACE INTO snapshots VALUES(?,?,?)",(state["version"],raw,hashlib.sha256(raw).hexdigest()))
             db.execute('UPDATE snapshot_due SET due_version=CASE WHEN due_version<=? THEN 0 ELSE due_version END,last_complete=MAX(last_complete,?) WHERE singleton=1',(state['version'],state['version']))
             return {"version":state["version"],"sha256":hashlib.sha256(raw).hexdigest()}

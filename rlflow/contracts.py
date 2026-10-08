@@ -162,6 +162,8 @@ def validate_runtime_state(state: dict) -> None:
     try:
         jsonschema.Draft202012Validator(schema, registry=registry).validate(state)
         canonical_bytes(state)
+        from .hybrid_goals import validate_persisted
+        validate_persisted(state)
     except (jsonschema.ValidationError, ValueError) as exc:
         raise ContractError('Invalid persisted runtime state: ' + str(exc)) from exc
 

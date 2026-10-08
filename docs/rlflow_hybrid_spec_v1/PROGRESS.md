@@ -1,5 +1,13 @@
 # Hybrid v1 开发进度
 
+Checkpoint24独立/完整终态覆盖下述过程：新私有DRAFT persistence/不可变revision+原receipt/CAS head/事务项目与内容绑定/手动周期snapshot+recover闭合完成；四项High MUST_FIX与producer tuple增量均关闭。最终root新模块36passed2.79s、High7模块161passed9.91s，冻结全回归 **663passed/32既有外部/H1skips/1既有warning/234.49s**，原66508 terminal exit0（30841/27011亦已终态），compileall/pip/diff通过。见HYBRID_GOAL_DRAFTS.md/evidence/checkpoint-24-final-tests.txt；无browser/性能重跑，不把旧0.85%或HTTP246.7ms归到新代码。仅T09草案首切片，完整可信批准/工具与评价数据/schema1.1、STOP/lease/runtime/M1/B1/长期及M0–M5 Goal仍未完成；下一继续1.1精确边界和真实human认证批准，独立设计进行中。用户package-lock保留不stage，Goal active。
+
+Checkpoint24冻结全回归进行中：四项High MUST_FIX及重试producer一致性补齐；root最终goal模块36passed/2.79s，独立最终7模块161passed/9.91s，30841/27011已终态exit0。当前全量pytest原66508 live，日志audit/hybrid-v1/checkpoint-24-full-r1.log；源码/测试/schema冻结，不因观察timeout另起suite。compileall/pip check/diff已通过，无browser/benchmark新结果（旧性能证据只绑定旧源码）。HYBRID_GOAL_DRAFTS.md记录draft无批准边界与完整T09待办；下一真实human审批/schema1.1独立设计只读并行，不执行approve/模型/调度。Goal active，用户package-lock保留。
+
+Checkpoint24/T09 draft代码实现中（未提交）：新增hybrid_goals.py，同Store三个optional private-hot集合（immutable contracts/commands、CAS heads），内容namespace eventkey+requesthash object_id、原receipt/coreevent version返回、canonical hash/服务端JSONpointerdiff；DRAFT/UNAPPROVED/approval与outcome null，无HTTP write/approve/调度/legacy authority改动。不改initial；RuntimeState/runtime validator、commit同事务registration/不可变转换、audit/recover/manual+periodic snapshot完整closure+indexed原事件核验已接入。High指出capacity入口绕过、周期snapshot漏closure、恢复receipt错原版本及重复marker导致SQL/replay分歧，已分别补守卫/真实负例，静态再复核中。root r1 23passed1.72s、r2相关148passed8.52s、r3 155passed9.08s、r4 157passed9.26s；当前r5原session77671运行源码冻结、不能因观察timeout重启。尚未独立测试/full回归，不声称T09/M1/Goal完成。旧schema1.0缺evaluation-data/tools仍仅存不完整草案，未来批准必需补齐新版本再确认。用户package-lock保留不stage。
+
+Checkpoint24/T09开始（仅调查、尚未代码修改）：checkpoint23已提交a9c6155。已重读PRD§5/§14/命令合同、GoalContract/Approval/proposal schema、legacy contracts/Store/RuntimeState/web_auth；legacy goals由packages写ACTIVE/DONE，不能冒充Hybrid合同，Store._existing不绑定payload，新的幂等必须显式内容绑定。考虑独立optional私有合同revision/head，复用同一Store事件+projection事务/恢复，不新增初始marker破坏旧fixture，不启动HTTP写路由/调度；High独立架构探索进行中。evaluation-data/tool范围在原proposal尚未完整，需要版本兼容设计；持久draft不等于可信approve/完整T09/A01/A02/A29通过。下一闭合设计→实现draft切片/确定性负例，再按依赖可信批准/STOP/执行闭环。完整M1 gate/B1/长期及M2–M5仍缺，Goal active；无新live进程，用户package-lock保留。
+
 Checkpoint23独立终态覆盖下述过程记录：原79247已exit0/API1198582 TERM-15/reaped/ownsfalse；100k+10k归档档案真实32秒400写、两SSE各400事件/各一次重连、128查询全部完成，core100401/public100451/task10000 exact/session0/source不变。submit-call→HTTP完整帧p95 246.724ms、snapshot8.144/page10.167ms；全计划/发行lag/raw/digest/核心来源与hash独立逐项重算精确吻合，无剩余MUST_FIX。Root21passed/10.21s、High21passed/10.65s；生产源码未改，未新增full/browser重跑。见HTTP_PERFORMANCE.md/evidence。仅单项目归档HTTP子证据，非DOM/B1/NFR/M1通过。下一按前置T01/T03推进T09合同与可信主体基础（不提前启用可写闭环），并保留完整B1/无全仓库poll/长期等M1缺口；Goal active，用户package-lock保留。
 
 Checkpoint23进行中（未提交）：新增有限HTTP并发驱动，生产默认SSE参数、两条独立连接各真实Last-Event-ID重连、并发snapshot/page、绝对计划30s×10/s+2s×50/s共400次真实Store写。保存全部计划/发行lag/调用返回/完整收帧并按最终outbox+digest核对；分phase统计，不把commit-return负差冒充真实commit latency；完整core/task/session/source不变量、最终校验失败raw与owned API回收均覆盖。相关r4 **16passed/5.66s**，30731终态exit0；High完整驱动只读复核中，尚未100k/10k负载。默认pytest受到全局ROS插件缺lark影响，沿用禁用第三方plugin自动加载的既有测试环境；r3文件名错误无测试执行亦保留。生产源码未改，用户package-lock不stage；完整B1/NFR06/M1–M5仍未完成，Goal active。
@@ -52,7 +60,8 @@ Checkpoint17：归档任务100/1k/10k真实Store/公共桥探针r2终态exit0、
 | T05 | 启动释放、CORE_STATUS、绑定工具公共返回与资源纵向切片已验证，完整观测未完成 | private ledger→closed projection/TOOL_METADATA；真实OS/loop HB/独立telemetry SSE/API/UI、age与因果barrier；不授予authority或证明vendor/STARTED；完整来源闭环与M1 gate待验证 |
 | T06 | 只读基础切片实现，未完整验收 | 同源登录/project scope/短期 Bearer、snapshot/page、bounded durable SSE、loopback CLI；无写命令/任意 artifact；见 LOCAL_WEB.md |
 | T07–T08 | 只读 UI、虚拟事件/公共日志/工具返回与资源面板已实现，未完整验收 | 真实 snapshot/SSE reducer、预算/分页/详情、虚拟窗口/锚点/键盘、日志、离线/身份隔离、closed工具metadata、真实HOST与worker来源/陈旧/版本屏障；Chrome QA通过；B1/真实完整闭环与M1 gate待完成 |
-| T09–T17 | 未开始 | 合同、策略、受控 Runtime、单写、独立评审、预算、skill、控制与恢复 |
+| T09 | 未批准合同持久化首切片已实现，完整任务未完成 | 私有immutable revision/原receipt、CAS head、内容绑定幂等/事务项目绑定、snapshot与恢复闭合；可信human批准/schema工具与评价边界仍待实现 |
+| T10–T17 | 未开始 | 策略、受控 Runtime、单写、独立评审、预算、skill、控制与恢复 |
 | T18–T20 | 未开始 | 本地与 fixture 实验 adapter、科研状态、证据页面 |
 | T21–T22 | 未开始 | 资源隔离、故障/性能/24h 与 8h soak |
 | T23–T25 | 未开始 | 安装/迁移、可信远程、历史回放 |
