@@ -1,5 +1,9 @@
 # M1 退出门槛审计（尚未通过）
 
+Checkpoint34当前系统full：原71114 terminalexit0，1197passed/32既有外部H1skip/1warning/350.10s，source SHA一致，root/High最终service各43passed且范围MUST关闭。下段34LIVE为旧过程。新增持久准备与recover闭合仍非执行权限，未新增HTTP/browser/B1/NFR06/soak证明；M1/M0–M5仍未通过。见HYBRID_PERSISTENT_PREPARATION.md/evidence/checkpoint-34-final-tests.txt，Goal active。
+
+Checkpoint34新增持久source-bound preparation、真实copy/原seal/owner/CAS及snapshot/recover closure，无执行权限或M1性能新证明；最终service root/High各43passed、中央full原71114 LIVE尚无终态。旧33full1003、旧32browser/性能只绑定旧source，不重标。B1/NFR06/24h/8h、lease/预算/STOP/实际工程科研/安装与M0–M5全部验收仍缺；见HYBRID_PERSISTENT_PREPARATION.md，Goal active。
+
 Checkpoint33内部exec准备物料不增加M1性能或执行通过声明：root/High各115passed、full1003/32既有skip/1warning终态，source/seal/path范围证据见HYBRID_EXEC_PREPARATION.md。无新HTTP/browser/B1/NFR06/soak，T11–T17执行准入及M0–M5仍缺；Goal active。下一持久source-bound准备，不把不可执行物料当真实运行状态。
 
 Checkpoint32完整终态：root/独立High同三组顺序一次，各34Node、2实际browser、134backend终态exit0；10source/testSHA一致，三项MUST_FIX闭合。中央full原36465 terminalexit0：949passed/32既有外部H1 skips/1既有Starlettewarning/286.41s；compileall/py_compile/pip check/node syntax/diff0，当前无live测试。UI已接真实head/human私有review/显式DRAFT/精确条件批准撤销/不确定原键重试；large合法int64无法精确显示时拒绝批准，old401不注销新身份。证据与范围见HYBRID_CONTROL_UI.md/evidence/checkpoint-32-final-tests.txt，Sites local-only无上传托管。原SSE/日志/移动端保留，但完整公共Goal条件页/SSE映射、lease/STOP执行、工程科研、M1/B1/NFR06/24h/8h和M0–M5全验收仍未通过，Goal active。USERpackage-lock保留；下一真实不可执行codex-exec准备物料→lease/budget/可靠STOP，不把条件事实当可写执行闭环。
@@ -18,7 +22,7 @@ Checkpoint31 完整终态：root 原87433与独立High原56356均 terminal exit0
 
 既有 Store 的真实事务经同事务 observation/outbox、closed public projection/counters、snapshot/keyset page、认证只读 HTTP/SSE 接入 Dashboard。当前 UI 支持真实业务事件的拓扑/状态/原因/预算未知、有限对象与虚拟事件窗口、公共日志、绑定 CPU 工具返回、HOST/磁盘与 worker loop/supervisor telemetry；未知不转0或模型 RUNNING。默认1.0配置/只读应用仍无写命令或 artifact 路径；29可信宿主注入与30私有1.1配置可显式启用不可执行控制服务，见HYBRID_CONTROL_API.md/TRUSTED_WEB_CONFIG.md。均不启动 scheduler 或调用模型。运行方式见 LOCAL_WEB.md。
 
-最新生产源码冻结全回归：checkpoint33 **1003 passed / 32既有外部/H1 skipped / 1既有警告 / 286.87s**，source/log SHA 见 evidence/checkpoint-33-final-tests.txt；root/独立High各115内部adapter/既有隔离与工程定向通过。此前checkpoint32的root/独立High各34Node+2真实sandbox Chrome browser+134backend通过，绑定32 UI范围：既有SSE/离线/日志/资源/身份/nativePOST与新角色控制、原nonce/原键重试、JS精度/XSS/移动端负例共同核验；33没有重跑或重标这些browser证明。owned loopback业务Fixture明确隔离，HOST资源为实际OS；旧checkpoint15的20项结果仅绑定旧源码。这些测试不是实际供应商/lease/工程科研闭环，也不把节点心跳当模型活动。
+最新生产源码冻结全回归：checkpoint34 **1197 passed / 32既有外部/H1 skipped / 1既有警告 / 350.10s**，source/log SHA 见 evidence/checkpoint-34-final-tests.txt；root/独立High最终service增量各43通过（31.78/31.94s），pre-fix九modules各366只绑定旧源。此前checkpoint32的root/独立High各34Node+2真实sandbox Chrome browser+134backend通过，绑定32 UI范围：既有SSE/离线/日志/资源/身份/nativePOST与新角色控制、原nonce/原键重试、JS精度/XSS/移动端负例共同核验；33/34没有重跑或重标这些browser证明。owned loopback业务Fixture明确隔离，HOST资源为实际OS；旧checkpoint15的20项结果仅绑定旧源码。这些测试不是实际供应商/lease/工程科研闭环，也不把节点心跳当模型活动。
 
 ## 场景到证据
 

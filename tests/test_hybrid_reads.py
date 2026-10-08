@@ -11,7 +11,7 @@ from rlflow.hybrid_authority import SECTIONS as AUTHORITY
 from rlflow.hybrid_reads import HybridReader, ReadBudget
 from rlflow.hybrid_protocol import validate
 from rlflow.snapshot_maintenance import maintain
-from rlflow.store import Conflict, canonical
+from rlflow.store import Conflict, canonical, sha
 from rlflow.web_auth import Principal
 from tests.test_hybrid_control_api import setup, login, post, prepare, approve_payload, submit_payload, BASE, ORIGIN
 from tests.test_hybrid_registry import catalog
@@ -221,6 +221,51 @@ def test_fact_state_and_expiry_and_new_revision_are_separate_from_execution(tmp_
         assert post(client,revoke,headers,'revoke').status_code==202
         a=r.review(ref(p))['authority'];assert a['recorded_state']=='REVOKED' and a['revoked_at']
         assert a['lifetime_status']=='EXPIRED' and a['execution_enabled'] is False
+
+
+@pytest.mark.parametrize('damage', ['extra_put', 'extra_delete', 'extra_marker', 'duplicate_put',
+                                   'duplicate_marker', 'format', 'marker_value', 'extra_top', 'set_top',
+                                   'put_type', 'delete_type', 'descriptor'])
+@pytest.mark.parametrize('domain', ['draft', 'authority'])
+def test_original_source_must_be_closed_payload_not_filtered_subset(tmp_path, damage, domain):
+    store, _, p, app, pair, _, _ = setup(tmp_path)
+    secret = 'PRIVATE_SOURCE_SENTINEL'
+    with TestClient(app, base_url=ORIGIN) as client:
+        headers = login(client); assert post(client, submit_payload(p), headers, 'draft').status_code == 202
+        view = prepare(client, p, headers)
+        assert post(client, approve_payload(view), headers, 'approve').status_code == 202
+        with store.connect() as db:
+            event_type = 'HYBRID_GOAL_DRAFTED' if domain == 'draft' else 'HYBRID_GOAL_APPROVED'
+            row = db.execute('SELECT idempotency_key,payload FROM events WHERE event_type=?', (event_type,)).fetchone()
+            payload = json.loads(row['payload'])
+            if damage == 'extra_put': payload['put'].append(['usage', 'injected', {'text': secret}])
+            elif damage == 'extra_delete': payload['delete'].append(['usage', 'injected'])
+            elif damage == 'extra_marker': payload['put'].append(['usage', '', {}])
+            elif damage == 'duplicate_put': payload['put'].append(deepcopy(next(r for r in payload['put'] if r[1])))
+            elif damage == 'duplicate_marker': payload['put'].append(deepcopy(next(r for r in payload['put'] if not r[1])))
+            elif damage == 'format': payload['format'] = 1
+            elif damage == 'extra_top': payload['unknown'] = secret
+            elif damage == 'set_top': payload['set'] = {'usage': {'unknown': secret}}
+            elif damage == 'put_type': payload['put'] = {}
+            elif damage == 'delete_type': payload['delete'] = {}
+            elif damage == 'descriptor': payload['put'].append(['invalid'])
+            else: next(r for r in payload['put'] if not r[1])[2] = {'text': secret}
+            # Recomputed payload self-hash must not hide mutation outside the
+            # filtered three authority objects or duplicate collection markers.
+            # Privileged corruption injection only in this disposable fixture;
+            # restore the original append-only trigger before any source read.
+            trigger = db.execute("SELECT sql FROM sqlite_master WHERE type='trigger' AND name='no_update'").fetchone()[0]
+            db.execute('DROP TRIGGER no_update')
+            db.execute('UPDATE events SET payload=?,payload_sha256=? WHERE idempotency_key=?',
+                       (canonical(payload).decode(), sha(payload), row['idempotency_key']))
+            db.execute(trigger)
+            db.execute('UPDATE snapshot_due SET due_version=?', (store.version(),))
+        with pytest.raises(Conflict): reader(pair).review(ref(p))
+        response = client.get(BASE+'/goals/'+ref(p)+'/review')
+        assert response.status_code == 503 and secret not in response.text
+        with pytest.raises(Conflict): store.snapshot()
+        assert maintain(store) is False
+        assert not store.objects('sessions') and not store.objects('tasks')
 
 
 def test_large_legal_goal_diff_and_literal_registry_review_remain_readable(tmp_path):

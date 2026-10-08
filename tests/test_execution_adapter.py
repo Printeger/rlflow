@@ -8,7 +8,7 @@ import subprocess
 import pytest
 
 from rlflow import isolation
-from rlflow.execution_adapter import CodexExecAdapter, PreparationPlan, FILES, _digest
+from rlflow.execution_adapter import CodexExecAdapter, PreparationPlan, PreparationBundle, FILES, _digest
 from rlflow.hybrid_goals import digest
 from rlflow.hybrid_protocol import ProtocolError
 from rlflow.hybrid_registry import Registry
@@ -277,3 +277,73 @@ def test_model_cache_unsupported_effort_does_not_fallback(setup):
         'supported_reasoning_levels': [{'effort': 'high'}]}]}))
     with pytest.raises(isolation.IsolationError, match='effort'): adapter.materialize_preparation(plan)
     assert len(calls) == 1 and not list(adapter.root.iterdir())
+
+
+def test_unpublished_bundle_carries_original_expected_seal_before_publish(setup):
+    adapter, plan, _, _, _, calls = setup
+    bundle = adapter.build_preparation(plan); expected = json.loads(bundle.raw)
+    assert bundle.path.is_dir() and not (adapter.root/plan.id).exists()
+    assert expected['execution_enabled'] is False and expected['plan_hash'] == _digest(plan.raw)
+    assert expected['stage_name'] == bundle.path.name and set(expected['seal']['file_lengths']) == set(FILES)
+    for name in FILES:
+        assert expected['seal']['file_lengths'][name] == (bundle.path/name).stat().st_size
+        assert expected['seal']['manifest']['files'][name] == _digest((bundle.path/name).read_bytes())
+    before = adapter.verify_bundle(bundle)
+    assert adapter.build_preparation(plan) is bundle and len(calls) == 1
+    result = adapter.publish_preparation(bundle)
+    assert result == before and not bundle.path.exists() and (adapter.root/plan.id).is_dir()
+    assert adapter.publish_preparation(bundle) == result and adapter.verify_bundle(bundle) == result
+    assert adapter.materialize_preparation(plan) == result and len(calls) == 1
+    assert bundle.raw == canonical(expected)  # original intent bytes survive publication unchanged
+
+
+def test_foreign_or_forged_bundle_cannot_publish(setup):
+    adapter, plan, _, _, _, calls = setup; bundle = adapter.build_preparation(plan)
+    forged = PreparationBundle(bundle.plan_id, bundle.raw, bundle.path)
+    with pytest.raises(PermissionError): adapter.publish_preparation(forged)
+    with pytest.raises(PermissionError): adapter.verify_bundle(forged)
+    other = CodexExecAdapter(adapter.registry, adapter.root)
+    with pytest.raises(PermissionError): other.publish_preparation(bundle)
+    assert len(calls) == 1 and bundle.path.exists() and not (adapter.root/plan.id).exists()
+
+
+def test_provisional_tamper_does_not_rebuild_or_publish(setup):
+    adapter, plan, _, _, _, calls = setup; bundle = adapter.build_preparation(plan)
+    (bundle.path/'packet.json').write_bytes(b'{}')
+    with pytest.raises(Conflict): adapter.publish_preparation(bundle)
+    with pytest.raises(Conflict): adapter.build_preparation(plan)
+    assert len(calls) == 1 and bundle.path.exists() and not (adapter.root/plan.id).exists()
+
+
+def test_publish_does_not_overwrite_destination_that_appeared(setup):
+    adapter, plan, _, _, _, calls = setup; bundle = adapter.build_preparation(plan)
+    destination = adapter.root/plan.id; destination.mkdir(mode=0o700)
+    (destination/'retained').write_text('retained')
+    with pytest.raises(Conflict): adapter.publish_preparation(bundle)
+    assert (destination/'retained').read_text() == 'retained' and bundle.path.exists() and len(calls) == 1
+
+
+def test_publication_fsync_failure_preserves_unknown_material_no_auto_retry(setup, monkeypatch):
+    adapter, plan, _, _, _, calls = setup; bundle = adapter.build_preparation(plan)
+    original = os.fsync; inode = adapter.root.stat().st_ino
+    def failing(fd):
+        if os.fstat(fd).st_ino == inode: raise OSError('explicit publish fsync failure')
+        return original(fd)
+    monkeypatch.setattr(os, 'fsync', failing)
+    with pytest.raises(OSError): adapter.publish_preparation(bundle)
+    destination = adapter.root/plan.id
+    original_raw = (destination/'manifest.json').read_bytes()
+    assert destination.exists() and plan.id not in adapter._seals and not bundle.path.exists()
+    with pytest.raises(Conflict): adapter.materialize_preparation(plan)
+    with pytest.raises((Conflict, OSError)): adapter.publish_preparation(bundle)
+    assert (destination/'manifest.json').read_bytes() == original_raw and len(calls) == 1
+
+
+def test_unpublished_final_fsync_failure_does_not_leave_bundle_or_stage(setup, monkeypatch):
+    adapter, plan, _, _, _, _ = setup; original = os.fsync; inode = adapter.root.stat().st_ino
+    def failing(fd):
+        if os.fstat(fd).st_ino == inode: raise OSError('explicit stage durability failure')
+        return original(fd)
+    monkeypatch.setattr(os, 'fsync', failing)
+    with pytest.raises(OSError): adapter.build_preparation(plan)
+    assert not adapter._bundles and not adapter._seals and not list(adapter.root.iterdir())

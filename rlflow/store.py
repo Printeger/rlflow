@@ -63,9 +63,11 @@ def initial():
 
 
 _UNLOADED = object()
+PREPARATION_READ_BYTES = 64*1024**2
 PRIVATE_HOT_SECTIONS = frozenset(('tool_sources','tool_receipts','tool_scan',
     'hybrid_goal_contracts','hybrid_goal_heads','hybrid_goal_commands',
-    'hybrid_approval_facts','hybrid_approval_revocations','hybrid_approval_heads','hybrid_approval_commands'))
+    'hybrid_approval_facts','hybrid_approval_revocations','hybrid_approval_heads','hybrid_approval_commands',
+    'hybrid_preparation_intents','hybrid_preparation_results'))
 
 
 class ObjectMap(dict):
@@ -128,6 +130,7 @@ class Store:
         self._hybrid_authority_service = None
         self._hybrid_draft_auth_owner = None
         self._hybrid_draft_service = None
+        self._hybrid_preparation_service = None
         self._existing_identity = None
         self.root = Path(root).resolve()
         (self.root / "runtime").mkdir(parents=True, exist_ok=True)
@@ -214,7 +217,7 @@ class Store:
             raise ValueError('existing store requires a regular database')
         store._existing_identity = (info.st_dev, info.st_ino)
         for name in ('_hybrid_auth_owner', '_hybrid_registry', '_hybrid_authority_service',
-                     '_hybrid_draft_auth_owner', '_hybrid_draft_service'):
+                     '_hybrid_draft_auth_owner', '_hybrid_draft_service', '_hybrid_preparation_service'):
             setattr(store, name, None)
         db = sqlite3.connect(store.db.as_uri() + '?mode=ro', uri=True, timeout=5)
         try:
@@ -383,9 +386,26 @@ class Store:
         validate_complete(state,self._goal_registration(db),lambda k:self._goal_event(db,k),lambda k:self._goal_source(db,k))
         from .hybrid_authority import validate_complete as authority_complete
         authority_complete(state,self._goal_registration(db),lambda k:self._authority_event(db,k))
+        self._preparation_complete(db,state)
         return state
 
     def _apply(self, state, payload, db, event):
+        preparation_decoded=False
+        from .hybrid_preparation import SECTIONS as preparation_sections, EVENTS as preparation_events, validate_transition as preparation_transition
+        if (event['event_type'] in preparation_events or
+                any(s in preparation_sections for s,k,v in payload.get('put',[])) or
+                any(s in preparation_sections for s,k in payload.get('delete',[])) or
+                set(payload.get('set',{})) & set(preparation_sections)):
+            from .hybrid_reads import ReadBudget
+            budget=ReadBudget(db,PREPARATION_READ_BYTES)
+            try:
+                decoded={**payload,'put':[[s,k,budget.decode(v)] for s,k,v in payload.get('put',[])]}
+            except (ValueError,TypeError,KeyError,RecursionError):
+                raise Conflict('preparation replay decoding exceeds safe envelope') from None
+            preparation_transition(decoded,lambda s,k:({} if s in state else None) if k=='' else state.get(s,{}).get(k),
+                event_type=event['event_type'],key=event['idempotency_key'],object_id=event['object_id'],producer=event['producer'],
+                version=event['new_state_version'],registration=self._goal_registration(db))
+            payload=decoded;preparation_decoded=True
         from .hybrid_authority import SECTIONS as authority_sections, validate_transition as authority_transition
         if (any(s in authority_sections for s,k,v in payload.get('put',[])) or any(s in authority_sections for s,k in payload.get('delete',[])) or set(payload.get('set',{})) & set(authority_sections)):
             decoded={**payload,'put':[[s,k,self._decode_value(db,v)] for s,k,v in payload.get('put',[])]}
@@ -400,7 +420,7 @@ class Store:
                 key=event['idempotency_key'], object_id=event['object_id'], producer=event['producer'], version=event['new_state_version'], registration=self._goal_registration(db))
         if payload.get("format") == 2:
             for section, key, value in sorted(payload["put"], key=lambda row:(row[0],row[1])):
-                value = self._decode_value(db, value)
+                if not preparation_decoded:value = self._decode_value(db, value)
                 if key == "": state[section] = value
                 else: state.setdefault(section, {})[key] = value
             for section, key in payload["delete"]:
@@ -555,6 +575,16 @@ class Store:
 
     def _commit(self, db, event_type, key, payload, previous, object_id, producer, inputs, *, _authorization=None):
         ver = previous + 1
+        from .hybrid_preparation import SECTIONS as preparation_sections, EVENTS as preparation_events, validate_transition as preparation_transition
+        if (event_type in preparation_events or any(s in preparation_sections for s,k,v in payload['put']) or
+                any(s in preparation_sections for s,k in payload['delete'])):
+            service=self._check_preparation_guard(db,_authorization)
+            def preparation_lookup(section,objkey):
+                if objkey=='':return {} if db.execute('SELECT 1 FROM projection WHERE section=? LIMIT 1',(section,)).fetchone() else None
+                return _authorization.budget.object(section,objkey)
+            preparation_transition(payload,preparation_lookup,event_type=event_type,key=key,object_id=object_id,
+                producer=producer,version=ver,registration=self._goal_registration(db))
+            service.check_live_write(db,payload,_authorization)
         from .hybrid_authority import SECTIONS as authority_sections, validate_transition as authority_transition
         if any(s in authority_sections for s,k,v in payload['put']) or any(s in authority_sections for s,k in payload['delete']):
             access=self._check_hybrid_guard(db,_authorization)
@@ -666,6 +696,58 @@ class Store:
         if self._hybrid_auth_owner is None or registration is None:raise PermissionError('protected authority owner required')
         return self._hybrid_auth_owner.check_approval_guard(guard,project_id=registration[0])
 
+    def bind_hybrid_preparation(self, service):
+        from .hybrid_preparation_service import PreparationService
+        if type(service) is not PreparationService or service.store is not self:
+            raise TypeError('invalid preparation owner')
+        with self.lock():
+            if self._hybrid_preparation_service not in (None,service):
+                raise Conflict('preparation owner cannot be rebound in-place')
+            self._hybrid_preparation_service=service
+
+    def _check_preparation_guard(self, db, guard):
+        service=self._hybrid_preparation_service
+        if service is None:raise PermissionError('protected preparation owner required')
+        service.check_guard(db,guard)
+        return service
+
+    def _preparation_complete(self, db, state):
+        from .hybrid_preparation import validate_complete
+        validate_complete(state,self._goal_registration(db),lambda k:self._preparation_event(db,k))
+
+    def _preparation_event(self, db, key, *, max_bytes=5*1024**2, _parse=None, _decode=None):
+        """Indexed closed original single-object preparation event proof."""
+        from .hybrid_preparation import SECTIONS
+        from .hybrid_goals import check_bytes,digest
+        if _parse is None and _decode is None:
+            from .hybrid_reads import ReadBudget
+            # A <=4MiB decoded record can expand to >16MiB encoded descriptors
+            # for inert marker-looking literal values. Match the live envelope.
+            budget=ReadBudget(db,PREPARATION_READ_BYTES);_parse,_decode=budget.parse,budget.decode
+        row=db.execute('SELECT event_type,producer,object_id,new_state_version,payload_sha256,CASE WHEN length(CAST(payload AS BLOB))<=? THEN payload END AS payload FROM events WHERE idempotency_key=?',(max_bytes,key)).fetchone()
+        if row is None:return None
+        if row['payload'] is None:raise Conflict('preparation source exceeds bound')
+        payload=(_parse or json.loads)(row['payload'].encode())
+        if sha(payload)!=row['payload_sha256']:raise Conflict('preparation source integrity mismatch')
+        if (not isinstance(payload,dict) or set(payload)!={'format','put','delete','details'} or
+                payload.get('format')!=2 or not isinstance(payload['put'],list) or
+                not isinstance(payload['delete'],list) or payload['delete']):
+            raise Conflict('preparation original source shape mismatch')
+        decoded=[];seen=set()
+        for item in payload['put']:
+            if not isinstance(item,list) or len(item)!=3 or not all(isinstance(v,str) for v in item[:2]):
+                raise Conflict('preparation original descriptor invalid')
+            section,objkey,value=item
+            if section not in SECTIONS or (section,objkey) in seen:
+                raise Conflict('preparation original duplicate or extra object')
+            seen.add((section,objkey));value=_decode(value) if _decode else self._decode_value(db,value)
+            check_bytes(value,4*1024**2)
+            if not objkey:
+                if value!={}:raise Conflict('preparation original marker differs')
+            else:decoded.append((section,objkey,digest(value)))
+        if len(decoded)!=1:raise Conflict('preparation original single object required')
+        return ((row['event_type'],row['producer'],row['object_id'],row['new_state_version']),decoded)
+
     def _authority_event(self, db, key, *, max_bytes=3*1024*1024, _parse=None, _decode=None):
         """Indexed original fact/receipt/head witness, not snapshot self-hashes."""
         from .hybrid_authority import SECTIONS, digest
@@ -674,13 +756,27 @@ class Store:
         if row['payload'] is None:raise Conflict('authority source exceeds bounded witness')
         payload=(_parse or json.loads)(row['payload'].encode())
         if sha(payload)!=row['payload_sha256']:raise Conflict('authority source payload integrity mismatch')
-        decoded=[]
-        for section,objkey,value in payload.get('put',[]):
-            if section in SECTIONS and objkey:
-                value=_decode(value) if _decode else self._decode_value(db,value)
-                from .hybrid_goals import check_bytes
-                check_bytes(value,1024*1024)
-                decoded.append((section,objkey,digest(value)))
+        if (not isinstance(payload,dict) or set(payload)!={'format','put','delete','details'}
+                or payload.get('format')!=2 or not isinstance(payload['put'],list)
+                or not isinstance(payload['delete'],list) or payload['delete']):
+            raise Conflict('authority original source shape mismatch')
+        decoded=[];seen=set()
+        for item in payload['put']:
+            if not isinstance(item,list) or len(item)!=3 or not all(isinstance(v,str) for v in item[:2]):
+                raise Conflict('authority original object descriptor invalid')
+            section,objkey,value=item
+            if section not in SECTIONS or (section,objkey) in seen:
+                raise Conflict('authority original source duplicate or extra object')
+            seen.add((section,objkey))
+            value=_decode(value) if _decode else self._decode_value(db,value)
+            from .hybrid_goals import check_bytes
+            check_bytes(value,1024*1024)
+            if not objkey:
+                if value!={}:raise Conflict('authority original collection marker mismatch')
+            else:decoded.append((section,objkey,digest(value)))
+        if len(decoded)!=3 or {s for s,k,h in decoded} not in (
+                {SECTIONS[0],SECTIONS[2],SECTIONS[3]},{SECTIONS[1],SECTIONS[2],SECTIONS[3]}):
+            raise Conflict('authority original source requires three objects')
         return ((row['event_type'],row['producer'],row['object_id'],row['new_state_version']),sorted(decoded))
 
     @staticmethod
@@ -696,10 +792,15 @@ class Store:
         if row['payload'] is None:raise Conflict('draft source exceeds bounded witness')
         payload=(_parse or json.loads)(row['payload'].encode())
         if sha(payload)!=row['payload_sha256']:raise Conflict('draft source payload integrity mismatch')
-        if payload.get('format')!=2 or payload.get('delete'):
+        if (not isinstance(payload,dict) or set(payload)!={'format','put','delete','details'}
+                or payload.get('format')!=2 or not isinstance(payload['put'],list)
+                or not isinstance(payload['delete'],list) or payload['delete']):
             raise Conflict('draft original source shape mismatch')
         decoded=[];seen=set();markers=set()
-        for section,objkey,value in payload.get('put',[]):
+        for item in payload['put']:
+            if not isinstance(item,list) or len(item)!=3 or not all(isinstance(v,str) for v in item[:2]):
+                raise Conflict('draft original object descriptor invalid')
+            section,objkey,value=item
             if section not in SECTIONS or (section,objkey) in seen:
                 raise Conflict('draft original source duplicate or extra object')
             seen.add((section,objkey))
@@ -718,7 +819,8 @@ class Store:
         with self.lock(), self.connect() as db:
             db.execute("BEGIN IMMEDIATE")
             from .hybrid_authority import EVENTS as authority_events
-            if event_type in authority_events.values() or (event_type=='HYBRID_GOAL_DRAFTED' and self._hybrid_draft_auth_owner is not None):
+            from .hybrid_preparation import EVENTS as preparation_events
+            if event_type in preparation_events or event_type in authority_events.values() or (event_type=='HYBRID_GOAL_DRAFTED' and self._hybrid_draft_auth_owner is not None):
                 raise PermissionError('Hybrid service events require guarded object transactions')
             if self._existing(db,key,event_type,object_id):
                 db.commit()
@@ -781,6 +883,8 @@ class Store:
                     raise Conflict('authorization guard unavailable')
                 if authorization is not None:authorization.check()
                 from .hybrid_authority import EVENTS as authority_events
+                from .hybrid_preparation import EVENTS as preparation_events
+                if event_type in preparation_events:self._check_preparation_guard(db,authorization)
                 if event_type in authority_events.values():self._check_hybrid_guard(db,authorization)
                 if event_type=='HYBRID_GOAL_DRAFTED' and self._hybrid_draft_auth_owner is not None:
                     self._check_draft_guard(db,authorization,object_id)
@@ -832,6 +936,7 @@ class Store:
                 validate_complete(state,self._goal_registration(db),lambda k:self._goal_event(db,k),lambda k:self._goal_source(db,k))
                 from .hybrid_authority import validate_complete as authority_complete
                 authority_complete(state,self._goal_registration(db),lambda k:self._authority_event(db,k))
+                self._preparation_complete(db,state)
             else: state=initial()
             for event in db.execute("SELECT * FROM events WHERE seq>? ORDER BY seq",(state["version"],)):
                 validate_runtime_event(dict(event))
@@ -843,6 +948,7 @@ class Store:
             validate_complete(state,self._goal_registration(db),lambda k:self._goal_event(db,k),lambda k:self._goal_source(db,k))
             from .hybrid_authority import validate_complete as authority_complete
             authority_complete(state,self._goal_registration(db),lambda k:self._authority_event(db,k))
+            self._preparation_complete(db,state)
             self._replace_projection(db,state)
             return state
 
@@ -854,6 +960,7 @@ class Store:
             validate_complete(state,self._goal_registration(db),lambda k:self._goal_event(db,k),lambda k:self._goal_source(db,k))
             from .hybrid_authority import validate_complete as authority_complete
             authority_complete(state,self._goal_registration(db),lambda k:self._authority_event(db,k))
+            self._preparation_complete(db,state)
             db.execute("INSERT OR REPLACE INTO snapshots VALUES(?,?,?)",(state["version"],raw,hashlib.sha256(raw).hexdigest()))
             db.execute('UPDATE snapshot_due SET due_version=CASE WHEN due_version<=? THEN 0 ELSE due_version END,last_complete=MAX(last_complete,?) WHERE singleton=1',(state['version'],state['version']))
             return {"version":state["version"],"sha256":hashlib.sha256(raw).hexdigest()}

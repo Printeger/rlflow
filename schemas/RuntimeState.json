@@ -837,6 +837,8 @@
     "hybrid_approval_revocations": {"type": "object"},
     "hybrid_approval_heads": {"type": "object"},
     "hybrid_approval_commands": {"type": "object"},
+    "hybrid_preparation_intents": {"type": "object"},
+    "hybrid_preparation_results": {"type": "object"},
     "tool_sources": {
       "type":"object","additionalProperties":{"$ref":"ToolLedger.json#/$defs/source"}
     },

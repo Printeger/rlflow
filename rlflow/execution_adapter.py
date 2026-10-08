@@ -72,6 +72,13 @@ class PreparationPlan:
     raw: bytes
 
 
+@dataclass(frozen=True, eq=False)
+class PreparationBundle:
+    plan_id: str
+    raw: bytes
+    path: Path
+
+
 class CodexExecAdapter:
     def __init__(self, registry, control_root):
         if type(registry) is not Registry: raise TypeError('protected immutable Registry required')
@@ -85,7 +92,7 @@ class CodexExecAdapter:
         self._scope = (config['project_id'], config['data_mode'])
         self.root = self._path(control_root)
         self._root_identity = self._directory(self.root, private=True)
-        self._plans = {}; self._seals = {}; self._lock = threading.RLock()
+        self._plans = {}; self._seals = {}; self._bundles = {}; self._lock = threading.RLock()
 
     @staticmethod
     def _path(path):
@@ -193,9 +200,9 @@ class CodexExecAdapter:
             return b''.join(blocks)
         finally: os.close(fd)
 
-    def _verify(self, plan):
-        value = self._issued(plan); directory = self.root/plan.id
-        seal = self._seals.get(plan.id)
+    def _verify(self, plan, *, directory=None, seal=None):
+        value = self._issued(plan); directory = directory if directory is not None else self.root/plan.id
+        seal = seal if seal is not None else self._seals.get(plan.id)
         if seal is None: raise Conflict('preparation has no actual seal; restart requires persistent service')
         for name, identity in seal['directories'].items():
             if self._directory(directory/name, private=True) != identity: raise Conflict('preparation directory changed')
@@ -207,7 +214,8 @@ class CodexExecAdapter:
         contents = {}
         for name, digest in manifest['files'].items():
             data = self._read(directory/name, remaining); remaining -= len(data)
-            if digest != _digest(data): raise Conflict('preparation artifact changed')
+            if digest != _digest(data) or len(data) != seal['file_lengths'][name]:
+                raise Conflict('preparation artifact changed')
             contents[name] = data
         if (_parse(contents['packet.json']) != value['packet'] or
                 _parse(contents['result.schema.json']) != value['result_schema']):
@@ -218,12 +226,35 @@ class CodexExecAdapter:
     def verify_materialization(self, plan):
         with self._guard(): return self._verify(plan)
 
-    def materialize_preparation(self, plan):
+    def _bundle(self, bundle):
+        if type(bundle) is not PreparationBundle or self._bundles.get(bundle.plan_id) is not bundle:
+            raise PermissionError('actual adapter-issued provisional bundle required')
+        plan = self._plans[bundle.plan_id]; self._issued(plan)
+        return plan, _parse(bundle.raw)
+
+    def verify_bundle(self, bundle):
+        with self._guard():
+            plan, value = self._bundle(bundle)
+            if plan.id in self._seals: return self._verify(plan)
+            return self._verify(plan, directory=bundle.path, seal=value['seal'])
+
+    def build_preparation(self, plan):
+        """Build unpublished material; return original expected seal before publish.
+
+        The future protected service must commit this seal in its immutable core
+        intent before publish. This primitive itself still grants no authority.
+        """
         with self._guard():
             value = self._issued(plan); destination = self.root/plan.id
-            if destination.exists() or destination.is_symlink(): return self._verify(plan)
+            if plan.id in self._bundles:
+                bundle = self._bundles[plan.id]; _, expected = self._bundle(bundle)
+                if plan.id in self._seals: self._verify(plan)
+                else: self._verify(plan, directory=bundle.path, seal=expected['seal'])
+                return bundle
+            if destination.exists() or destination.is_symlink():
+                raise Conflict('unknown preparation destination already exists')
             temporary = Path(tempfile.mkdtemp(prefix='.preparing-', dir=self.root))
-            temporary_identity = self._directory(temporary, private=True); published = False
+            temporary_identity = self._directory(temporary, private=True); retained = False
             try:
                 (temporary/'control').mkdir(mode=0o700); (temporary/'scratch').mkdir(mode=0o700)
                 atomic(temporary/'packet.json', canonical(value['packet']))
@@ -255,10 +286,14 @@ class CodexExecAdapter:
                 atomic(config_path, canonical(moved(_parse(self._read(config_path, MAX_ARTIFACT_BYTES)))))
                 atomic(temporary/'command-plan.json', canonical({'argv': rewritten,
                     'execution_enabled': False, 'state': 'PREPARATION_ONLY'}))
-                files = {}; total = 0
+                files = {}; lengths = {}; total = 0
                 for name in FILES:
                     path = temporary/name; path.chmod(0o600)
                     data = self._read(path, MAX_ARTIFACT_BYTES-total); total += len(data); files[name] = _digest(data)
+                    lengths[name] = len(data)
+                    fd = os.open(path, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK | os.O_CLOEXEC)
+                    try: os.fsync(fd)
+                    finally: os.close(fd)
                 manifest = {'plan_hash': _digest(plan.raw), 'files': files, 'execution_enabled': False}
                 raw = canonical(manifest)
                 if total+len(raw) > MAX_ARTIFACT_BYTES: raise Conflict('preparation artifacts exceed bound')
@@ -266,20 +301,49 @@ class CodexExecAdapter:
                 directories = {name: self._directory(temporary/name, private=True) for name in ('', 'control', 'scratch')}
                 self._issued(plan); self._root()
                 if destination.exists() or destination.is_symlink(): raise Conflict('preparation destination appeared')
-                os.rename(temporary, destination); published = True
-                fd = os.open(self.root, os.O_RDONLY | os.O_DIRECTORY | os.O_CLOEXEC)
-                try: os.fsync(fd)
-                finally: os.close(fd)
-                self._seals[plan.id] = {'manifest_hash': _digest(raw), 'manifest': manifest, 'directories': directories}
-                return self._verify(plan)
+                seal = {'manifest_hash': _digest(raw), 'manifest': manifest, 'directories': directories,
+                        'file_lengths': lengths}
+                for directory in (temporary/'control', temporary/'scratch', temporary, self.root):
+                    fd = os.open(directory, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW | os.O_CLOEXEC)
+                    try: os.fsync(fd)
+                    finally: os.close(fd)
+                self._verify(plan, directory=temporary, seal=seal)
+                bundle = PreparationBundle(plan.id, canonical({'schema_version': '1.0',
+                    'plan_hash': _digest(plan.raw), 'stage_name': temporary.name, 'seal': seal,
+                    'execution_enabled': False}), temporary)
+                self._bundles[plan.id] = bundle; retained = True
+                return bundle
             finally:
                 # Remove only this call's own unpublished staging directory.
-                # Published or unknown directories are never overwritten.
-                if not published and temporary.exists():
+                # Retained or unknown directories are never overwritten.
+                if not retained and temporary.exists():
                     self._root()
                     if self._directory(temporary, private=True) != temporary_identity:
                         raise Conflict('preparation staging directory changed')
                     shutil.rmtree(temporary)
+
+    def publish_preparation(self, bundle):
+        with self._guard():
+            plan, expected = self._bundle(bundle); destination = self.root/plan.id
+            if plan.id in self._seals: return self._verify(plan)
+            self._verify(plan, directory=bundle.path, seal=expected['seal'])
+            if destination.exists() or destination.is_symlink(): raise Conflict('preparation destination appeared')
+            os.rename(bundle.path, destination)
+            # A failure after rename leaves unknown published material. Never
+            # overwrite/rebuild/reseal it automatically; reconcile needs core intent.
+            fd = os.open(self.root, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW | os.O_CLOEXEC)
+            try: os.fsync(fd)
+            finally: os.close(fd)
+            self._seals[plan.id] = expected['seal']
+            return self._verify(plan)
+
+    def materialize_preparation(self, plan):
+        """Compatibility internal convenience; no persistent intent is implied."""
+        with self._guard():
+            self._issued(plan)
+            destination = self.root/plan.id
+            if destination.exists() or destination.is_symlink(): return self._verify(plan)
+        return self.publish_preparation(self.build_preparation(plan))
 
     def start(self, *args, **kwargs):
         raise PermissionError('Hybrid source, controller/writer lease, budget and STOP release gates unavailable')

@@ -1,0 +1,99 @@
+Checkpoint34: source-bound persistent non-executing preparation
+Base: 718070c (checkpoint33). Branch: hybrid-v1.
+All commands use PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 and .venv/bin/python.
+
+Actual terminal results (not inferred from progress text):
+- Domain r2 original7327 exit0: 181 passed/1 existing warning/19.38s.
+- Service r1 original52972 exit0: 190 passed/1 existing warning/23.31s.
+- Service r2 original35101 exit0: nine modules, 358 passed/1 warning/58.53s.
+- Service r3 original78937 exit1: 362 passed/1 fixture failure/61.01s.
+  Twenty alias descriptors exhausted raw budget before the intended expansion
+  path; safe rejection was 'blob unavailable', not the expected budget message.
+  Fixture changed to ten aliases and requires exactly two parses. Product bounds
+  were not relaxed. Original failing log retained.
+- Service r4 original14537 exit0: nine modules, 363 passed/1 warning/61.46s.
+- Service r5 original21117 exit0: nine modules, 366 passed/1 warning/75.86s.
+- Independent High original81090 exit0: exact same nine modules ONCE,
+  366 passed/1 warning/76.31s; 15 source/test/schema hashes unchanged.
+  This evidence is PRE-replay-decoding fix and is not relabeled as current source.
+- Service r6 original73917 exit1: 370 passed/1 fixture failure/77.43s.
+  A hash-correct 600-level DAG reached later record-shape rejection rather than
+  the intended recursion exception. Fixture changed to 1200 levels; product
+  record checks and expected rejection type were not weakened.
+- Final service increment original74480 exit0: 43 passed/1 warning/31.78s.
+- Independent High increment original73704 exit0: exact service module ONCE,
+  43 passed/1 warning/31.94s; 15 source/test/schema hashes unchanged.
+  Independent final review: preparation replay budget/decoded reuse MUST closed;
+  no remaining MUST_FIX in this preparation slice.
+- Central full original71114 exit0: 1197 passed, 32 existing external/H1 skips,
+  1 existing Starlette warning, 350.10s. Full source/test/schema hashes unchanged.
+- compileall -q rlflow tests: exit0. pip check: exit0, no broken requirements.
+- git diff --check: exit0. No live test handles remain.
+
+Nine-module argv (r2-r6 and High81090):
+.venv/bin/python -m pytest -q tests/test_hybrid_preparation_service.py tests/test_hybrid_preparation.py tests/test_hybrid_preparation_sources.py tests/test_hybrid_snapshot.py tests/test_execution_adapter.py tests/test_hybrid_reads.py tests/test_hybrid_authority.py tests/test_hybrid_goals.py tests/test_snapshot_maintenance.py
+Final increment argv (root74480 and High73704):
+.venv/bin/python -m pytest -q tests/test_hybrid_preparation_service.py
+Central full argv (root71114): .venv/bin/python -m pytest -q
+
+Log SHA256 (ignored local audit logs retained, not overwritten):
+1e86d1fc54be6aff71d0b65fb88c9fe729ff819c543e638d001be92562cf8399 checkpoint-34-domain-r2.log
+b12dbca3891a3e05b9d72938bb024371f5cbae7d77d40f2fdeffe97a448c4dd8 checkpoint-34-service-r1.log
+4ab5d3e051402ab29a2026b32045f91bee495d12d6179622d69bed1064c76b4a checkpoint-34-service-r2.log
+7d30de9954cc26f40fbd04d01eb4227642f0a97160b0f86e203646059cf08021 checkpoint-34-service-r3.log
+05606f68c5ba60031b9ebd8d0187b3f95f6b588247eeed7c0150bbd29a7325b6 checkpoint-34-service-r4.log
+5fc932cab99a4756a22ea39dfde7abfa607fc69ba38f81905703393d57733031 checkpoint-34-service-r5.log
+01b58b1f1e2f03696c3352e4fc612aa9defb7d7b30c490dff9e8d7c932857312 checkpoint-34-service-r6.log
+054654974d6dce35ccd93e47066b46e0be63ee68946f9c3b20fe7fb884ff2c94 checkpoint-34-service-r7.log
+3770a2447fe22316647ac7af7c8592410d82ab67a3efa265134f1e7d3caf45c9 checkpoint-34-high-final-r1.log
+0dcaa9d0f6295c1facffb609ead0648590520b97167047fe89d6e2a615a5b31b checkpoint-34-high-replay-r1.log
+36cf2d9bf18a89dd299f740b3c602a799a3f73356170d506caa221ed79aa5f25 checkpoint-34-full-r1.log
+
+Full before/after exact source/test/schema SHA256:
+078b5031ac40be8ffa713744e4b7803bd958a0067510b1b3d6e567ce1c250535 rlflow/contracts.py
+7b2fdaf8a731365f7155330320f6de1bba0a451be8200453692c2fa29fa175a1 rlflow/execution_adapter.py
+2f4ad7f06b960c43d901d92f79e0b52a736b3eafdae932dc0511b79e938c8ec4 rlflow/hybrid_preparation.py
+d1976ae5545f47ada4f3f29764ba875535b04f817cc841b0897e550e94b1b708 rlflow/hybrid_preparation_service.py
+ee9f7a3aff1ede069f3912955cba0ae7e34281924b71332b8007510d24126700 rlflow/hybrid_preparation_sources.py
+bf5b4561a1ddca214bf9cbb502fd308a277a1f3a59e5cb4c60850ec9f0243dc8 rlflow/hybrid_snapshot.py
+5a7e78a2053b639ae9e7ce985e24dbcb4b109217c51bde520bec5da77f09c694 rlflow/snapshot_maintenance.py
+63c262234acc69ac82827376fcb53b7c501469d098c9e7ca78dd745f494eeeb8 rlflow/store.py
+02de060339e166a3ac8cd1e387bb47d9d711d27ad8d693301f97ee4c9cc7e3e8 schemas/RuntimeState.json
+0d7b02ee1d7e45fdf909312baf45516f94c1bc47b622a8ea9a8630a92b300e34 tests/test_execution_adapter.py
+850ac226d6e8598ffed1cbac4c877829187a4b20a51cf09c266bc43782761630 tests/test_hybrid_preparation.py
+b80fc330333ea68c1ce59868dc514c22e9d419d129b7303158cfd47790a41d57 tests/test_hybrid_preparation_service.py
+fa04f236ffbf83e4d991162ddc2e8aad3328cce0490c4b5d390d72bea6413342 tests/test_hybrid_preparation_sources.py
+12d76f319e68f4067b6bba8517dceaf078a41e8cb32702dfa94d26d2ee10f0cd tests/test_hybrid_reads.py
+e72c9d18070192b4ae4f9860a6179b67b646c8a52b714e7a42718118bbf9f509 tests/test_hybrid_snapshot.py
+
+Earlier staged-component results retained in audit/hybrid-v1 and PROGRESS:
+snapshot r1 55pass; snapshot+adapter r2 112pass and independent High112pass
+bind only their old two source hashes; r3 113pass; bundle r2 original39398
+119pass; original-source r1 original78025 exit1 182pass/7 fixture failures
+(append-only trigger prevented intended corruption injection), fixed only the
+disposable fixture to save/drop/restore the exact trigger BEFORE exercising
+product readers; source r2 original38085 exit0 189pass, source r3 original27520
+exit0 218pass; domain r1 original22385 exit0 32pass. These are not current full
+source proofs. Production append-only triggers were not disabled or relaxed.
+
+Scope:
+- Actual bounded private copy/inventory/hash, original issued provisional seal,
+  immutable source-bound intent BEFORE publication, owner-guarded current-source
+  completion, indexed original Goal/Authority/Preparation point proofs and
+  audit/manual+periodic snapshot/recover closure; nonexecuting repeat/UNKNOWN.
+- Actual legal <4MiB result-schema capacity fixture generates >16MiB encoded
+  blob through real preparation/persistence and full closure/retry. It overrides
+  role schema only in the test; it is not a production role/model-access proof.
+- Every preparation replay event has a bounded decoder and reuses decoded
+  payload. Deep DAG rejection is sanitized; self-reference fixture has invalid
+  SHA and is NOT a valid-cycle traversal proof.
+- PREPARED does not grant execution; all release gates remain UNVERIFIED and
+  adapter.start always refuses. No account, native model generation, external
+  paid service, GPU, public deployment, new HTTP/UI dispatch, lease, reservation,
+  reliable STOP, restart adoption or real engineering/research loop is proved.
+- No new browser, B1/NFR/performance, soak or offline-validator run. Earlier
+  checkpoint32 browser and older performance numbers remain old-source evidence.
+- Per-read/per-event bounds are not a whole-audit SQL/JSON pre-read memory limit,
+  disk hard quota, kernel IO timeout or arbitrary in-process Python sandbox.
+- USER package-lock.json remains untouched and unstaged. No remote push.
+Goal stays active: continue T11/T12/T14/T17 and all M0-M5/long-run acceptance.

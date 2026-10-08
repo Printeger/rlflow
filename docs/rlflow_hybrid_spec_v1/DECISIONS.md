@@ -1,5 +1,13 @@
 # 开发决策记录
 
+## Checkpoint34：先持久化原seal，再发布；准备事实不继承执行权限
+
+实际固定owner服务与实际issued snapshot/plan/bundle分离于caller JSON；有限copy/hash/native metadata在业务writer外，两次事实提交均在writer+同DB事务重验完整原来源、当前head、Registry/epoch/TTL和global CAS。intent保存原expectedseal后才能publish；PREPARED completion还必须索引核验原intent事件。失败/重启物料不由本地manifest自证，原键只返原fact；显式reconcile当前仅UNKNOWN，无自动重建/adoption/model调用。
+
+同事务64MiB raw/expanded/node累计读预算覆盖合法literal约6x编码与重复alias，不在纯record cap之后才控制解析；每prep event恢复解码单独同64MiB界并复用已校验decoded payload，不走二次legacy decoder。历史重复核原Goal/approval三对象pointproof与prep链接，但不要求今天heads/expiry，也不冒充独立全链audit或wholelegacy SQL/JSON预读取资源界。Goal→Authority→Preparation闭合用于audit与manual/periodic snapshot/recovery；周期默认32MiB仍可安全defer，病理合法容量test显式64MiB。
+
+独立范围MUST均已修复与增量复验，中央full原71114真实terminalexit0，1197passed/32既有skip/1warning/350.10s，冻结SHA不变。没有lease、budget reservation、OS/account证明、STOP/release或执行授权；全部gates仍UNVERIFIED/start拒绝。见HYBRID_PERSISTENT_PREPARATION.md；不是T11/M2或完整Goal终点，后续必须继续统一准入及可靠执行/恢复。
+
 ## Checkpoint33：内部 exec 准备不能恢复或启动执行
 
 复用实际 isolation.codex_command 生成受保护的 packet/schema/argv/MCP/masking 物料，不造第二份 native policy。Registry profile闭合、版本锁、明确model/effort、CPU禁网/no delegation；paths/role/config输入及目录身份入plan，签发对象+原内存seal防止篡改后重算manifest。未知/重启物料拒绝，而不是仅凭本地文件恢复。无Store/HTTP/worker/预算/ACK/release；start无条件拒绝，source_authority及所有执行门UNVERIFIED。阶段选择把有限物料机制先确定性验证，再加source-bound持久intent和统一admission；不是用准备状态代替完整T11/T12/T14/T17。16MiB仅最终物料/读取上界，非临时磁盘硬配额；seal不证明候选内容或OS资源。OpenAI Docs用于区分exec和AppServer官方接口形态；不把官方通用说明当本地固定CLI/账号运行证明。见HYBRID_EXEC_PREPARATION.md。

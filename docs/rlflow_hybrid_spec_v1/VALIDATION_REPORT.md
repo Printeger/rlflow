@@ -1,5 +1,9 @@
 # 需求包离线校验报告
 
+Checkpoint34系统完整终态：中央full原71114 exit0，1197passed/32既有skip/1warning/350.10s，15SHA一致、compileall/pip/diff0；最终service root/High各43passed，范围MUST关闭。见HYBRID_PERSISTENT_PREPARATION.md/evidence/checkpoint-34-final-tests.txt。旧34LIVE/33/32为历史；旧离线18checks/Browser/性能未重跑、不重标。准备非release，start仍拒绝，完整T11–17/M1/M0–M5验收仍未完成，Goal active。
+
+Checkpoint34系统WIP：持久准备与原source/seal、actualowner、CAS、audit/snapshot/recover闭合及bounded prep replay已接线，最终service root/High各43passed、范围MUST闭合；中央full原71114 LIVE尚无终态。pre-fix九modules366结果不能改称修复后完整定向结果；旧离线18checks/Browser/性能未重跑，不归此source。执行门全UNVERIFIED/start拒绝，T11/M1/M0–M5完整验收仍未通过；见HYBRID_PERSISTENT_PREPARATION.md，Goal active。
+
 Checkpoint33系统终态：内部exec准备物料root/High各115passed、中央full原77231exit0，1003passed/32既有skips/1既有warning/286.87s，compileall/pip/diff0及冻结source一致。所有执行门UNVERIFIED/start拒绝，无持久准备/HTTP/worker/release；不代替T11/T12/T14/T17、M1/B1/长期或M0–M5完整验收。具体范围与首次失败/修复/独立证据见HYBRID_EXEC_PREPARATION.md/evidence/checkpoint-33-final-tests.txt；本文件旧离线18checks未重标为33新证明，Goal active。
 
 Checkpoint32完整终态：root/独立High同三组顺序一次，各34Node、2实际browser、134backend终态exit0；10source/testSHA一致，三项MUST_FIX闭合。中央full原36465 terminalexit0：949passed/32既有外部H1 skips/1既有Starlettewarning/286.41s；compileall/py_compile/pip check/node syntax/diff0，当前无live测试。UI已接真实head/human私有review/显式DRAFT/精确条件批准撤销/不确定原键重试；large合法int64无法精确显示时拒绝批准，old401不注销新身份。证据与范围见HYBRID_CONTROL_UI.md/evidence/checkpoint-32-final-tests.txt，Sites local-only无上传托管。原SSE/日志/移动端保留，但完整公共Goal条件页/SSE映射、lease/STOP执行、工程科研、M1/B1/NFR06/24h/8h和M0–M5全验收仍未通过，Goal active。USERpackage-lock保留；下一真实不可执行codex-exec准备物料→lease/budget/可靠STOP，不把条件事实当可写执行闭环。
