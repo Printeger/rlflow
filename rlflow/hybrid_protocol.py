@@ -211,6 +211,7 @@ RESOURCE_HEARTBEAT = obj({'status':enum('FRESH','STALE','UNKNOWN'),'counter':nul
 OBJECTS['Telemetry'] = obj({
     'schema_version':{'const':VERSION},'sample_id':ID,'sampler_epoch':ID,'sample_seq':{'type':'integer','minimum':1},
     'observed_at':{**TIME,'pattern':'Z$'},'project_id':ID,'store_epoch':ID,'data_mode':enum('live','fixture'),
+    'source_state_version':nullable(COUNT),
     'source':{'const':'CORE_OS_SAMPLE'},'observability':{'const':'PARTIAL'},'sample_age_seconds':MEASURE,
     'host':obj({
         'cpu':obj({'scope':{'const':'HOST'},'status':enum('KNOWN','UNKNOWN'),

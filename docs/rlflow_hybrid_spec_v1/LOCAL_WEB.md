@@ -75,6 +75,8 @@ node --test web_checks/reducer.test.mjs web_checks/virtual-list.test.mjs web_che
 
 Checkpoint13新增认证只读 `GET /api/v1/projects/{project_id}/telemetry`，返回独立latest-only真实OS样本或null，完整合同见RESOURCE_TELEMETRY.md。新prepare显式初始化空slot；旧observer必须可信终端显式enable，GET不会升级。core reconcile做nonblocking采样，单独Web服务不启动scheduler/模型或后台sampler，因此无core采样时不会假造资源。sample_age与worker freshness不同于server heartbeat；来源陈旧、generation变化和未知GPU不显示0。Dashboard telemetry SSE/资源面板下一项接入，现有browser通过不证明它们已交付。
 
+Checkpoint14已将资源面板接入同一个项目SSE的独立 `event: telemetry`（无id），不再需额外HTTP轮询。每秒source读取/面板渲染，sample_id去重、source版本因果barrier、陈旧年龄及UNKNOWN/PARTIAL明确显示；HOST内存/磁盘不是项目quota，占用不能混用。单独Web无core时仍无样本；已有checkpoint13槽缺新causal witness则worker双UNKNOWN直到下一实际采样，GET不回填。Chrome QA的telemetry控制仅stdin触发实际OS采样，不增加HTTP写指令，不启动scheduler。资源显示不代表M1 gate或资源强制已验收。
+
 ```bash
 PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q tests/test_telemetry.py
 ```

@@ -99,6 +99,7 @@ def sample(store):
         seq = previous['sample_seq']+1 if same else 1
         value = dict(schema_version='1.0',sample_id=epoch+':'+str(seq),sampler_epoch=epoch,sample_seq=seq,
                      observed_at=utc(),project_id=meta['project_id'],store_epoch=meta['store_epoch'],data_mode=meta['data_mode'],
+                     source_state_version=meta['source_version'],
                      source='CORE_OS_SAMPLE',observability='PARTIAL',sample_age_seconds=0,host=host,
                      gpu=dict(scope='GPU',status='UNKNOWN',utilization_percent=None,memory_used_bytes=None),
                      workers=workers,workers_truncated=truncated)
@@ -146,7 +147,9 @@ def latest(reader):
             if not sources.number(age):return None
         except (OSError,ValueError,TypeError):return None
         if len(row['body'].encode())>65536 or hashlib.sha256(row['body'].encode()).hexdigest()!=row['digest']:raise ProtocolError('telemetry integrity mismatch','RESYNC_REQUIRED')
-        value = json.loads(row['body']);validate('Telemetry',value)
+        value = json.loads(row['body'])
+        value.setdefault('source_state_version',None)  # Old slot has no causal witness.
+        validate('Telemetry',value)
         if any(value[k]!=meta[k] for k in ('project_id','store_epoch','data_mode')) or value['sampler_epoch']!=row['sampler_epoch'] or value['sample_seq']!=row['sample_seq'] or value['sample_id']!=row['sampler_epoch']+':'+str(row['sample_seq']):
             raise ProtocolError('telemetry scope mismatch','RESYNC_REQUIRED')
         value['sample_age_seconds']=age
@@ -163,7 +166,7 @@ def latest(reader):
         except (ValueError,TypeError,KeyError,AttributeError,RecursionError,OverflowError):
             retained = set()
         for worker in value['workers']:
-            if worker['execution_id'] not in retained:
+            if value['source_state_version'] is None or worker['execution_id'] not in retained:
                 worker['process'].update(status='UNKNOWN',cpu_seconds=None,rss_bytes=None)
                 worker['heartbeat'].update(status='UNKNOWN',counter=None,age_seconds=None)
         for worker in value['workers']:

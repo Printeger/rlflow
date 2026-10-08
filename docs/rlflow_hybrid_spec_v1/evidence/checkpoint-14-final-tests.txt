@@ -1,0 +1,99 @@
+Checkpoint14 final frozen evidence (2026-10-08; baseline9e00dcb)
+Scope: telemetry SSE/real HOST resource UI and model-free worker freshness; NOT full M1/B1/Hybrid completion.
+Commands:
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q tests/test_live_stream.py tests/test_web_api.py tests/test_web_local.py tests/test_telemetry.py tests/test_hybrid_protocol.py
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q tests/test_live_stream.py tests/test_telemetry.py (independent High)
+node --test web_checks/telemetry-view.test.mjs (independent High)
+node --test web_checks/*.test.mjs
+node --check rlflow/static/app.mjs
+node --check rlflow/static/telemetry-view.mjs
+.venv/bin/python -m compileall -q rlflow web_checks/fixture_server.py
+.venv/bin/python -m pip check (No broken requirements found)
+git diff --check (passed)
+High review: causal source barrier and query/queue age findings closed; optional serialization failure does not kill durable stream.
+High temporary Store: FRESH/KNOWN before causal field removal, null/worker double UNKNOWN after readonly migration; whole stored slot unchanged.
+Browser: sandbox Chrome; owned loopback fixture, real HOST OS sampled via stdin only, no scheduler/models/GPU. Resource first CPU unknown then actual delta%; business cursor unchanged. Business fixture not vendor proof.
+Desktop/mobile screenshots viewed; existing 390px horizontal overflow assertion passes. Fixture/browser ended.
+Failed target r4 and high r1: misplaced parsed age assertion NameError; moved exact21s assert to intended helper test, not deleted/weakened. All logs preserved.
+562 passed/32 established external dependency skipped/1 established Starlette warning.
+Raw logs/artifacts live in current working environment; frozen source/log SHA and captured summaries tracked below.
+2b7d54f896d80562df29f8c4558dba9a0c8ff4d8b4be163f11fce61bbd6979aa  rlflow/hybrid_protocol.py
+d3ee28ac2d2b84a8cb5c4949ab9e689ce879a255592d573bde95eb3af425d323  rlflow/live_stream.py
+a354637703a5c04b2c953a0a78c8f1581afc291a92efc1ddc8edbd141c7ac8f1  rlflow/telemetry.py
+95e8ec3ef4354c4194e931d5425f44ec9ff4aadef127ed214c4261e74d40d904  rlflow/static/app.mjs
+e12584f36eb64b4301d82e987ae8c15db83fa888e8229571a47270ab8f7f9b7d  rlflow/static/index.html
+8544a21a73deaaf9828dc0e6710b9527d136ca8fb3743319100a933f729e6d7a  rlflow/static/style.css
+60285a3466d7ef4ca067f9987a70ff043655e316d48c8c4976e7bbcb9c4fd0ed  rlflow/static/telemetry-view.mjs
+ee94eb77b73afc90b05db5b9efa10a5fe98c930c44057bfbc47d179b17ca214a  tests/test_live_stream.py
+f462cd71f9bbea3d7dacfadfff0aa6a4d6d1b14ede185dd2fd35263de3d0eadb  tests/test_telemetry.py
+9bb69396ad65a5f9ff0e2e0f2c7915f9f3ec67012995683a4a018fc2d79d8f72  web_checks/fixture_server.py
+df998455ce2323053a6cdf055d8c997edfa35e23d9623b5097819ab72ec718ec  web_checks/browser.test.mjs
+0c652c912c38fb540fff0e68c93ac150d7016859e2b1bbef57768daa3a922ff6  web_checks/telemetry-view.test.mjs
+69a4e45655e2de9160dde60896a97afaaecb1cc45ff0ef768974658c2566e415  audit/hybrid-v1/checkpoint-14-target-r1.log
+de00cddf0cd2b16b8528a86bddc0ff9e5664be9adad0d03f30442db938945ce8  audit/hybrid-v1/checkpoint-14-target-r2.log
+3410df4f8fdd71aa9d8334eb091cbaa540fe71b90c9b8488311f12d30b90ae99  audit/hybrid-v1/checkpoint-14-target-r3.log
+6b4990177714289a42220403616361a43d54fa19cdda51f5c10ce1101a0b8b53  audit/hybrid-v1/checkpoint-14-target-r4.log
+fcca8a77e8283835691a264d04cc781dda9805820d51bd67650797613bd5a21f  audit/hybrid-v1/checkpoint-14-target-r5.log
+854edce9e4bafa1b7bcdc3773eee3e5ff26dcb498e9861a6fb49de3656b65d1e  audit/hybrid-v1/checkpoint-14-high-r1.log
+1e44e0dee08da800c3733290f8650d07f69333cca6650a16e7b4c33aa0643a10  audit/hybrid-v1/checkpoint-14-high-r2.log
+827a09b8bd65ed8132a1504c7c97baff5902d0340111d5b2ac524d6e6599c7e8  audit/hybrid-v1/checkpoint-14-full-r1.log
+1d4d87a64333c056c5c689c7ac58c957fc029a86dd0c95df0439176d4d85cc00  audit/hybrid-v1/checkpoint-14-browser-r1.log
+1f37f9a415ebc8a1efc51ddf10fd65ad3ff0c4299b2f0b5d2c12f18bfea1bcef  audit/hybrid-v1/checkpoint-14-browser-r2.log
+b1259fa45c3be0bb63e4c1d2347046b2fafc1896f734d9e36f0754d7a16db1b8  web_checks/artifacts/dashboard-desktop.png
+27fb5279a9931f39d3891593374c19d59db03db9b9570b9fe50730e72a4dcf6e  web_checks/artifacts/dashboard-mobile.png
+
+Final captured summaries:
+..s..................................................................... [ 60%]
+........s........................sssssss................................ [ 72%]
+........................................................................ [ 84%]
+........................................................................ [ 96%]
+..................                                                       [100%]
+=============================== warnings summary ===============================
+.venv/lib/python3.12/site-packages/starlette/testclient.py:37
+  /home/mint/rl_dev/rlflow_standalone/.venv/lib/python3.12/site-packages/starlette/testclient.py:37: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = typing.Callable[[], typing.ContextManager[anyio.abc.BlockingPortal]]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+562 passed, 32 skipped, 1 warning in 209.07s (0:03:29)
+...............................................................          [100%]
+=============================== warnings summary ===============================
+.venv/lib/python3.12/site-packages/starlette/testclient.py:37
+  /home/mint/rl_dev/rlflow_standalone/.venv/lib/python3.12/site-packages/starlette/testclient.py:37: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = typing.Callable[[], typing.ContextManager[anyio.abc.BlockingPortal]]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+63 passed, 1 warning in 5.78s
+  ---
+  duration_ms: 0.241464
+  ...
+# Subtest: initial snapshot floor and unbound legacy slot suppress worker freshness
+ok 4 - initial snapshot floor and unbound legacy slot suppress worker freshness
+  ---
+  duration_ms: 0.189593
+  ...
+# Subtest: closed scope/status/bounds and malformed data are rejected without private extras
+ok 5 - closed scope/status/bounds and malformed data are rejected without private extras
+  ---
+  duration_ms: 0.439317
+  ...
+1..5
+# tests 5
+# suites 0
+# pass 5
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 65.766968
+  ...
+1..20
+# tests 20
+# suites 0
+# pass 20
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 9190.148166
+

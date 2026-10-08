@@ -23,4 +23,14 @@ core 核验 closed schema、session/generation、request/candidate digest、DB r
 
 先在 readonly transaction 选取有界来源，锁外读取 OS/worker，最后使用既有 writer lock 的非阻塞模式及 SQLite timeout=0。project/mode/epoch、slot、witness 和所选 session 字段 CAS；竞争或来源错误丢弃样本。独立 latest slot 不生成业务 audit/outbox。counter witness 按 session 索引持久化，不因32个批次上界丢失；每批最多32个 witness 读/写及32个 GC候选，轮转删除终态/已删除 session，不全扫历史。source descriptor<=64KiB、heartbeat/witness<=4KiB、public body<=64KiB、本批binding<=32；深嵌套 JSON/序列化异常显式隔离，不能从可丢弃旁路中断 core。boot/epoch 变化不展示旧样本，损坏 public slot digest/scope 要求 RESYNC，而不是相信该内容；缺表/孤立witness不由GET或enable静默重置历史。
 
-本切片不是历史曲线、资源强制或 M1 gate：SSE 的独立可丢弃 telemetry 帧、UI 样本版本/陈旧处理及资源显示仍需接入；B1、长期 soak 和完整 M0–M5 仍待验收。部署为保护状态目录的既有 local-only 服务，不公开发布。
+Checkpoint13原后端切片不包含SSE/UI；Checkpoint14已接入下述实时消费。仍不是历史曲线、资源强制或完整M1 gate：B1、长期 soak 和完整 M0–M5 仍待验收。部署为保护状态目录的既有 local-only 服务，不公开发布。
+
+## Checkpoint14：SSE 与 Dashboard
+
+现有项目级SSE新增 `event: telemetry`，无 `id`、不推进 durable cursor。默认每秒一次读取（配置不能超过10次/秒），与domain读取独立async task；只保留一个最新payload槽，不进critical FIFO。domain/control优先且可丢弃pending sample释放容量；optional读取或增龄/校验/序列化失败只drop，不停止domain追平。帧发送前重新校验≤64KiB及byte cap，auth逐帧沿用原策略。业务send timeout、resync与8连接上界不变。
+
+query发起之前记monotonic基准，真正选中发送时保守累加query/queue elapsed到sample_age与heartbeat age，重新计算STALE。覆盖服务端排队，不声称跨机器网络零延迟freshness证明。相同sample_id不重复发送/不续鲜；重连可重新送当前样本但携其真实年龄。
+
+新增`source_state_version`为原采样读取meta的source版本，不消费领域序号、也不事后贴当前head。旧checkpoint13槽无此因果witness时只读返回null且worker双UNKNOWN，不修改原slot/digest；HOST保留as-of，下一真实core采样写新合同。客户端worker barrier从snapshot.sourceVersion初始化，任execution domain upsert/remove提高全局O(1)屏障，旧source版本的新sample_seq仍不能恢复worker；宁可暂时全批UNKNOWN，不把同sid旧generation当新活动。
+
+纯TelemetryView模块校验闭合scope/字段/状态/数字/≤32worker与唯一opaque execution ID；重复/迟到sample_seq和退休sampler epoch不更新接收时钟，最多保留16个退休epoch后要求重建快照。独立performance.now计算样本与worker陈旧，不靠server heartbeat；项目/身份/快照epoch切换清空样本。资源单独每秒渲染，不改变业务计数、cursor、事件脉冲或rAF。HOST CPU差分、HOST available/total memory、STATE_FILESYSTEM available/total、GPU UNKNOWN以及supervisor CPU/RSS/loop freshness均明确标范围、年龄和PARTIAL；保留陈旧as-of值，不伪造趋势曲线。

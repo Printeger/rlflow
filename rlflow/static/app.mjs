@@ -1,6 +1,7 @@
 import {installSnapshot, applyEvent, mergePage, total, cursor, objectKey, SyncError} from './reducer.mjs';
 import {VirtualList} from './virtual-list.mjs';
 import {checkLogPage,checkLogBody} from './log-view.mjs';
+import {TelemetryView} from './telemetry-view.mjs';
 
 const $ = id => document.getElementById(id);
 const motionPreference = matchMedia('(prefers-reduced-motion: reduce)');
@@ -9,6 +10,7 @@ let lastHeard = 0, connection = 'NOT CONNECTED', caughtUp = false, pageIds = [],
 let renderTimer = null, pendingHighlights = new Map(), pageSerial = 0, unread = 0;
 let raf = null, pulseTimer = null;
 let authGeneration = 0, authController = null;
+let telemetry = null, telemetryError = '';
 const pulses = new Map();
 const eventList = new VirtualList($('events'), eventNode, event => event.event_id);
 let logSerial = 0, logDetailSerial = 0, logPage = null, logNext = null, logPending = 0;
@@ -63,6 +65,7 @@ function beginAuth() {
 function clearObservation() {
   ++generation; ++pageSerial; closeStream(); clearTimeout(renderTimer); renderTimer = null;
   state = null; project = null; pageIds = []; nextPage = null; unread = 0; lastHeard = 0;
+  telemetry = null;telemetryError='';renderResources();
   for (const id of ['executions','budgets','objects','events']) $(id).replaceChildren();
   eventList.setItems([]);
   clearLogs(); $('log-severity').value = ''; $('log-kind').value = ''; $('log-object').value = '';
@@ -78,6 +81,21 @@ function text(tag, value, className) {
   if (className) node.className = className; return node;
 }
 function number(value) { return value === null || value === undefined ? 'UNKNOWN' : String(value); }
+function bytes(value) {return value===null || value===undefined ? 'UNKNOWN' : `${(value/1024**3).toFixed(2)} GiB`;}
+function renderResources() {
+  const value=telemetry?.current(performance.now());
+  $('resource-status').textContent=value ? `${value.freshness} · sample age ${value.sample_age_seconds.toFixed(1)}s` : `UNKNOWN${telemetryError ? ' / '+telemetryError : ' / 尚无已验证样本'}`;
+  $('resource-status').dataset.freshness=value?.freshness || 'UNKNOWN';
+  const cpu=value?.host.cpu,memory=value?.host.memory,disk=value?.host.disk;
+  $('resource-cpu').textContent=cpu?.status==='KNOWN' ? `${cpu.utilization_percent.toFixed(1)}%` : 'UNKNOWN';
+  $('resource-memory').textContent=memory?.status==='KNOWN' ? `${bytes(memory.available_bytes)} / ${bytes(memory.total_bytes)}` : 'UNKNOWN';
+  $('resource-disk').textContent=disk?.status==='KNOWN' ? `${bytes(disk.available_bytes)} / ${bytes(disk.total_bytes)}` : 'UNKNOWN';
+  $('resource-note').textContent=value ? `CORE_OS_SAMPLE · PARTIAL · 本批 ${value.workers.length} worker${value.workers_truncated ? '（轮转未覆盖全部）' : ''} · ${value.observed_at} · ${value.sample_id}；仅最新样本，无历史曲线。` : '资源来源未启用/不可用不表示零；服务端心跳不刷新资源样本。';
+  for (const node of document.querySelectorAll('.worker-health')) {
+    const worker=value?.workers.find(w=>w.execution_id===node.dataset.executionId),h=worker?.heartbeat,p=worker?.process;
+    node.textContent=`worker loop ${h?.status || 'UNKNOWN'}${h?.age_seconds!==null && h?.age_seconds!==undefined ? ' · age '+h.age_seconds.toFixed(1)+'s' : ''} · supervisor ${p?.status==='KNOWN' ? 'CPU '+p.cpu_seconds.toFixed(2)+'s / RSS '+bytes(p.rss_bytes) : 'UNKNOWN'}（非模型活动/进程树）`;
+  }
+}
 function short(value) { return value ? value.slice(0,14) + (value.length > 14 ? '…' : '') : '未提供'; }
 function base() { return `/api/v1/projects/${encodeURIComponent(project.id)}`; }
 function setConnection(value) {
@@ -131,6 +149,8 @@ function nodeButton(row) {
     text('div',`usage ${row.usage_status || 'UNKNOWN'} · scope 未提供`,'node-line'),
     text('div',row.startup_observation ? `CLI_RELEASE_ACK · ${row.startup_released_at}` : '尚未观测启动释放 ACK','node-line'));
   if (row.task_id) button.append(text('div',`关联 task ${short(row.task_id)}`,'node-line'));
+  const health = text('div','worker loop UNKNOWN · supervisor resources UNKNOWN','node-line worker-health');
+  health.dataset.executionId=row.id;button.append(health);
   button.append(text('div',row.reason || row.description || '没有已公开的触发原因。','node-description'));
   button.addEventListener('click',() => details(`${row.kind} · ${row.id}`,row));
   return button;
@@ -167,6 +187,7 @@ function render() {
     if (pendingHighlights.has(key)) highlight(button,key,pendingHighlights.get(key));
   }
   pendingHighlights.clear(); $('execution-empty').hidden = executions.length > 0;
+  renderResources();
   $('execution-caption').textContent = `缓存显示 ${executions.length} / 后端 ${total(state,'execution')} · 最多 30`;
   const stages = [...state.objects.values()].filter(row => row.kind === 'stage'); $('budgets').replaceChildren();
   for (const row of stages.slice(0,10)) {
@@ -217,6 +238,8 @@ function openStream(selected) {
       const value = JSON.parse(message.data), result = applyEvent(state,value,message.lastEventId);
       state = result.state; lastHeard = performance.now();
       if (!result.duplicate) {
+        telemetry?.invalidateWorkers([...value.payload.upsert.filter(r=>r.kind==='execution').map(r=>r.id),
+          ...value.payload.removed.filter(r=>r.kind==='execution').map(r=>r.id)],value.payload.source_state_version);
         if (logPage && value.seq>cursor(logPage.high_water).seq) {logPending++;updateLogPending();}
         const kind = $('kind-select').value;
         for (const row of value.payload.upsert) {
@@ -230,6 +253,11 @@ function openStream(selected) {
         scheduleRender();
       }
     } catch (error) { failStream(error,selected); }
+  });
+  current.addEventListener('telemetry',message => {
+    if (selected!==generation || current!==source || !telemetry) return;
+    try {if (telemetry.accept(JSON.parse(message.data),performance.now())) renderResources();}
+    catch { telemetryError='样本合同被拒绝；重建快照重试';telemetry=null;renderResources(); }
   });
   current.addEventListener('heartbeat',message => {
     if (selected !== generation || current !== source) return;
@@ -270,6 +298,7 @@ function failStream(error, selected) {
 }
 async function selectProject() {
   const selected = ++generation; ++pageSerial; closeStream();
+  telemetry=null;telemetryError='';renderResources();
   project = projects.find(value => value.id === $('project-select').value);
   if (state?.project !== project?.id) clearLogs();
   else {++logSerial; ++logDetailSerial; $('details').close(); $('detail-title').textContent = ''; $('detail-content').textContent = '';}
@@ -280,6 +309,7 @@ async function selectProject() {
     const snapshot = await request(`${base()}/snapshot`);
     if (selected !== generation) return;
     state = installSnapshot(snapshot,project.id,project.data_mode); lastHeard = performance.now(); pageIds = []; nextPage = null; unread = 0;
+    telemetry = new TelemetryView({project:state.project,mode:state.mode,epoch:state.epoch,sourceVersion:state.sourceVersion});
     if (logPage && cursor(logPage.high_water).epoch !== state.epoch) clearLogs();
     if (logPage) {logPending = Math.max(0,state.seq-cursor(logPage.high_water).seq);updateLogPending();}
     $('project-title').textContent = project.id;
@@ -336,6 +366,6 @@ $('reduce-motion').addEventListener('change',stopPulses); motionPreference.addEv
 document.addEventListener('visibilitychange',stopPulses);
 window.addEventListener('offline',() => setConnection('OFFLINE'));
 window.addEventListener('online',() => { if (state && session && source) setConnection('RECONNECTING'); });
-setInterval(() => { if (state && source && lastHeard && performance.now() - lastHeard > 15000 && connection !== 'STALE') setConnection('STALE'); },1000);
+setInterval(() => { if (state && source && lastHeard && performance.now() - lastHeard > 15000 && connection !== 'STALE') setConnection('STALE');renderResources(); },1000);
 const bootAuth = beginAuth();
 authenticated(bootAuth).catch(() => { if (bootAuth.ticket === authGeneration) $('login-panel').hidden = false; });

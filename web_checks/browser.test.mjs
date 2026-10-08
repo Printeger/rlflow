@@ -46,6 +46,17 @@ test('real local Dashboard: durable SSE, offline recovery, identity clearing and
     };
     await login('local');
     await page.waitForFunction(() => document.querySelector('#connection').textContent === 'LIVE');
+    assert.match(await page.locator('#resource-status').textContent(),/UNKNOWN/);
+    const beforeResource=await page.locator('#cursor').textContent();
+    await control({op:'telemetry'});
+    await page.waitForFunction(()=>document.querySelector('#resource-status').textContent.includes('FRESH'));
+    assert.doesNotMatch(await page.locator('#resource-memory').textContent(),/UNKNOWN/);
+    assert.match(await page.locator('#resource-cpu').textContent(),/UNKNOWN/); // First real counter baseline.
+    assert.equal(await page.locator('#cursor').textContent(),beforeResource);
+    await new Promise(resolve=>setTimeout(resolve,1100));await control({op:'telemetry'});
+    await page.waitForFunction(()=>document.querySelector('#resource-cpu').textContent.includes('%'));
+    assert.match(await page.locator('.worker-health').first().textContent(),/worker loop UNKNOWN/);
+    assert.match(await page.locator('#resource-note').textContent(),/CORE_OS_SAMPLE/);
     assert.equal(await page.locator('#task-total').textContent(),'1');
     assert.equal(await page.locator('.execution-node').getAttribute('data-state'),'STARTING');
     assert.match(await page.locator('#mode-note').textContent(),/FIXTURE/);

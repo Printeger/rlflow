@@ -9,7 +9,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import uvicorn
 from rlflow.observation import ObservationReader, enable
 from rlflow.store import Store, sha
-from rlflow import tool_journal, tool_collector
+from rlflow import tool_journal, tool_collector, telemetry
 from rlflow.web_api import Project, create_app
 from rlflow.web_auth import AuthStore, Credential, Principal
 
@@ -54,6 +54,8 @@ def main():
                     with auth._lock: auth._sessions.clear()
                 elif command["op"] == "burst":
                     for index in range(command["count"]): task(f'burst_{index}', f'Bounded fixture {index}')
+                elif command['op']=='telemetry':
+                    if not telemetry.sample(store):raise ValueError('fixture sample rate or source unavailable')
                 elif command["op"] == "usage":
                     store.transact_objects("USAGE_OBSERVED",command["id"],[("usage",command["id"])],
                         lambda s:s.setdefault("usage",{}).update({command["id"]:{"status":command["status"],"task_id":"initial"}}))

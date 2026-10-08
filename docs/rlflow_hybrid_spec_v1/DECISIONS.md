@@ -86,3 +86,7 @@ append-only refs增加INSERT成员/severity guard；只读路径仍防御异常�
 # Checkpoint13：资源观测旁路与freshness
 
 保留唯一控制权威：资源采样采用独立latest-only SQLite slot、不入业务events/outbox；同writer lock非阻塞+SQLite timeout=0，竞争丢样，不等待业务30秒锁。indexed active keyset每批32、公平轮转；per-session heartbeat witness独立索引持久化且有界GC，不用易淘汰的单批RAM/map冒充完整高水位。首次/丢witness须实际counter+clock前进才confirm；latest读取累加age并核验当前session binding，修正采样停止或generation变化后的错误freshness。HOST、STATE_FILESYSTEM、SUPERVISOR_PROCESS明确分域，GPU来源未实现为UNKNOWN/null；FRESH不是model STARTED。SSE/UI随后集成，后端切片不作为M1完成门槛。接口、边界及High修复见RESOURCE_TELEMETRY.md/CHECKPOINT_13.md。
+
+## Checkpoint14：可丢弃遥测与因果 freshness
+
+critical domain/control保持原FIFO；optional source独立task和单latest payload槽，共享byte cap，不让可丢弃来源失败/序列化失败中断durable追平。增龄基准在query前，选送时补偿query/queue elapsed；网络时间不能精确观测不承诺零延迟。原采样source_state_version是因果下界，不是领域seq，也不能事后读取新head贴版本；旧槽缺witness时null/workerUNKNOWN，保留原body/digest。UI使用snapshot/domain全局O(1) execution barrier，宁可短暂全批UNKNOWN，不维护无界ID版本表、也不让较新sample_seq解除旧generation屏障。资源更新只渲染独立面板，不产生业务动画/计数/历史曲线。见CHECKPOINT_14.md。

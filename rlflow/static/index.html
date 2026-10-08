@@ -51,9 +51,18 @@
         <section class="panel budget-panel">
           <div class="panel-heading"><h2>预算与观察边界</h2><span class="muted">SOURCE SCOPED</span></div>
           <div id="budgets"></div>
-          <p class="muted">consumed / reserved 来自 stage。unknown exposure、价表估计、主机/GPU 遥测尚未提供，不能用 0 代替。</p>
+          <p class="muted">consumed / reserved 来自 stage。unknown exposure、价表估计尚未提供，不能用 0 代替。</p>
           <p class="boundary-note">目标合同、条件证据门控与完整 Hybrid 授权尚未接入此视图；任务数量不是目标完成百分比。</p>
           <p id="tool-note" class="boundary-note">工具返回覆盖：UNKNOWN / 尚未读取。</p>
+          <div class="resource-heading"><h3>资源与 worker 健康</h3><span id="resource-status" class="unknown">UNKNOWN / 尚无样本</span></div>
+          <div class="resource-grid">
+            <div><span>HOST CPU / aggregate</span><strong id="resource-cpu">UNKNOWN</strong></div>
+            <div><span>HOST memory / available / total</span><strong id="resource-memory">UNKNOWN</strong></div>
+            <div><span>STATE_FILESYSTEM / available / total</span><strong id="resource-disk">UNKNOWN</strong></div>
+            <div><span>GPU / 未接入来源</span><strong class="unknown">UNKNOWN</strong></div>
+          </div>
+          <p id="resource-note" class="muted">资源来源未启用/不可用不表示零。</p>
+          <p class="boundary-note">主机资源不是项目配额；磁盘不是项目占用。worker loop freshness 不是模型活动，supervisor CPU/RSS 不覆盖后代进程树。陈旧值保留 as-of 标记，不推断当前运行。</p>
         </section>
         <section class="panel object-panel">
           <div class="panel-heading"><h2>工作对象</h2><div class="controls"><label for="kind-select">类型</label><select id="kind-select"><option value="task">任务</option><option value="execution">执行</option><option value="tool_return">工具返回 / 非模型启动</option><option value="experiment">实验</option><option value="job">Job</option><option value="evidence">证据</option><option value="approval">批准</option><option value="usage">Usage</option><option value="stage">Stage 预算</option></select></div></div>
@@ -84,7 +93,7 @@
         <div class="control-strip"><button id="log-new" hidden></button><button id="log-next" disabled>下一日志页</button></div>
         <p id="log-empty" class="empty" hidden>当前覆盖范围与筛选下无日志；不代表没有历史业务事件。</p>
       </section>
-      <footer class="footer"><span id="sync-time">尚未同步</span><span id="cursor">无 durable cursor</span><span>资源与 worker freshness：UNKNOWN</span></footer>
+      <footer class="footer"><span id="sync-time">尚未同步</span><span id="cursor">无 durable cursor</span><span>Telemetry 独立于 durable 业务序号</span></footer>
     </div>
   </main>
   <dialog id="details"><div class="panel-heading"><h2 id="detail-title">公开详情</h2><button id="close-details" aria-label="关闭详情">关闭 ×</button></div><p class="muted">仅公开投影/事件，不包含原始私有日志、文件路径或模型思维过程。</p><pre id="detail-content"></pre></dialog>

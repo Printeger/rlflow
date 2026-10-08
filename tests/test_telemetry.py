@@ -1,5 +1,6 @@
 """Model-free OS sources and independent, non-authoritative latest slot."""
 import copy
+import hashlib
 import json
 import os
 import sqlite3
@@ -167,6 +168,16 @@ def test_changed_generation_cannot_reuse_latest_fresh_worker(observed):
     store.transact_objects('FIXTURE_CHANGE','change',[('sessions','worker_one')],lambda s:s['sessions']['worker_one'].update(generation='new'))
     value = reader.telemetry()['workers'][0]
     assert value['heartbeat']['status']==value['process']['status']=='UNKNOWN'
+
+
+def test_old_slot_without_causal_witness_never_gets_current_head_version(observed):
+    store,reader=observed;worker_fixture(store);assert telemetry.sample(store)
+    with sqlite3.connect(store.db) as db:
+        value=json.loads(db.execute('SELECT body FROM telemetry_latest').fetchone()[0]);value.pop('source_state_version')
+        body=canonical(value);db.execute('UPDATE telemetry_latest SET body=?,digest=?',(body.decode(),hashlib.sha256(body).hexdigest()))
+    value=reader.telemetry()
+    assert value['source_state_version'] is None and value['workers'][0]['heartbeat']['status']=='UNKNOWN'
+    assert value['host']['memory']['status']=='KNOWN'
 
 
 def test_old_boot_or_epoch_sample_not_returned(observed,monkeypatch):
