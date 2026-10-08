@@ -1,5 +1,7 @@
 # 系统实施验收记录
 
+Checkpoint26：可信启动immutable Registry纯核验实现，整proposal+整catalog（含policy/rules）scope绑定，工具/命令依赖、网络三层subset、数据version/purpose/access与冻结rule逐项拒绝。root130passed3.45s、独立High130passed3.43s，原96925/3366皆terminal exit0，范围无MUST_FIX。见HYBRID_REGISTRY.md/evidence/checkpoint-26-final-tests.txt。结果NOT_EXECUTABLE，无auth/approve/routes/Store写入/执行/数据文件或资源能力探测；既有源码入口未变，此次针对性回归，全量689仅绑定25。下一自持Registry/AuthStore的真实session批准事实与单写恢复闭合，不能信caller attestation。完整T09/M1/B1/长期/M2–M5仍待开发，Goal active，无新增外部阻塞，USER package-lock保留。
+
 Checkpoint25终态：schema1.1 显式工具/registry-profile hash/评价数据与冻结规则声明兼容旧1.0不可变版本；仍仅UNAPPROVED DRAFT。root/独立High三模块80passed，冻结全量689passed/32既有skips/1既有warning/238.29s，原83613已terminal exit0，不再live。范围MUST_FIX关闭，见HYBRID_GOAL_DRAFTS.md/evidence/checkpoint-25-final-tests.txt。无1.1 command/HTTP/MCP/skill桥、实际registry核验或审批/lease/执行；无新增browser/性能证据，完整T09/M1/B1/长期与M2–M5继续开发，Goal active，无新增外部阻塞，用户package-lock保留。
 
 Checkpoint24草案基础：私有不可变合同/内容绑定原receipt/CAS head在同Store事务持久化，DRAFT/UNAPPROVED无批准/执行权限。事务与回放/手动周期snapshot+recover全部守卫闭合，四项High MUST_FIX修复；root最终36passed、独立161passed，无剩余阻塞；冻结完整 **663passed/32既有外部/H1skips/1warning/234.49s**，66508终态exit0。源码/log SHA与确切命令见evidence/checkpoint-24-final-tests.txt、实现边界见HYBRID_GOAL_DRAFTS.md。无browser/benchmark新增结果，不声称完整T09/可信审批、M1–M5或Goal通过。

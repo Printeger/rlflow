@@ -93,6 +93,10 @@ append-only refs增加INSERT成员/severity guard；只读路径仍防御异常�
 工具feature公开起点与event retention floor分开。优先live-only，不隐式回填旧COLLECTED；public_tool_meta缺失/损坏却已有旧公共工具状态拒绝重新初始化。工具日志与CORE_STATUS分同事务观察batch，原模板/count状态解释逐字段保持不变，共享refs验证task/execution筛选。资源telemetry以后必须独立sample ID/时间，不占durable业务seq。
 # Checkpoint13：资源观测旁路与freshness
 
+## Checkpoint26：先冻结可信注册内容，不将内容匹配解释为执行准入
+
+新增独立纯Registry，不接写路由/执行器，protected-startup配置canonical bounded copy至immutable bytes。五binding域隔离含project/mode，dataset域含评价rules；scope_hash绑定整proposal+整config及policy，使只变policy也使旧确认失效。参数schema仅check_schema，不加载远程ref/运行argv；network三层subset、dataset access精确匹配，protected不可降为READ_ONLY。OPAQUE profile/policy configuration只绑定内容，不将未知能力当允许；数据版本仍须后续adapter核验实际来源。下一ApprovalService须服务自持catalogfresh resolve+真实human session，不接caller attestation或Principal当批准。root/High130回归，无剩余MUST_FIX，旧全量/性能不重标；完整T09与M1–M5保留。
+
 Checkpoint22在新独占同档案保留旧失败，真实300s daemon CPU0.849998%且显式baseline精确独立复算。只评价三项view-elision合计观察，不个别归因/不主张显著性，不由CPU子阈值解除全仓库轮询/API+B1/长期及完整目标；源未改不重跑已绑定614回归。见IDLE_PERFORMANCE.md/evidence。
 
 Checkpoint21保留generation原首行，仅无候选closed hint否决时跳过inner完整view；实际候选必须重新正式读，不使用早门对象或改变权限/预算。四种实际状态变更拒绝验证，独立High关闭范围问题。三项视图优化只在新一次实际测量评估合计效果，不据614绿推断CPU。见CHECKPOINT_21.md。

@@ -1,6 +1,6 @@
 # M1 退出门槛审计（尚未通过）
 
-2026-10-09，最新源码 checkpoint25（私有不可执行草案与schema1.1声明）；此前性能绑定 checkpoint21/旧源码，不自动推广到新代码。此文件补齐 IMPLEMENTATION_PLAN §5 要求的 M1 报告；**不是 M1 完成声明**。M0–M5 的完整目标不变，剩余开发没有外部阻塞。
+2026-10-09，既有入口最新全量绑定 checkpoint25（私有不可执行草案与schema1.1声明）；checkpoint26新增未接执行入口的纯Registry，root/独立四模块130passed，未重跑全量或性能。此前性能绑定 checkpoint21/旧源码，不自动推广到新代码。此文件补齐 IMPLEMENTATION_PLAN §5 要求的 M1 报告；**不是 M1 完成声明**。M0–M5 的完整目标不变，剩余开发没有外部阻塞。
 
 ## 当前可运行范围
 

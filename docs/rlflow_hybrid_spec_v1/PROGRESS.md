@@ -1,5 +1,7 @@
 # Hybrid v1 开发进度
 
+Checkpoint26：可信启动immutable Registry纯核验实现，整proposal+整catalog（含policy/rules）scope绑定，工具/命令依赖、网络三层subset、数据version/purpose/access与冻结rule逐项拒绝。root130passed3.45s、独立High130passed3.43s，原96925/3366皆terminal exit0，范围无MUST_FIX。见HYBRID_REGISTRY.md/evidence/checkpoint-26-final-tests.txt。结果NOT_EXECUTABLE，无auth/approve/routes/Store写入/执行/数据文件或资源能力探测；既有源码入口未变，此次针对性回归，全量689仅绑定25。下一自持Registry/AuthStore的真实session批准事实与单写恢复闭合，不能信caller attestation。完整T09/M1/B1/长期/M2–M5仍待开发，Goal active，无新增外部阻塞，USER package-lock保留。
+
 Checkpoint25终态：schema1.1 显式工具/registry-profile hash/评价数据与冻结规则声明兼容旧1.0不可变版本；仍仅UNAPPROVED DRAFT。root/独立High三模块80passed，冻结全量689passed/32既有skips/1既有warning/238.29s，原83613已terminal exit0，不再live。范围MUST_FIX关闭，见HYBRID_GOAL_DRAFTS.md/evidence/checkpoint-25-final-tests.txt。无1.1 command/HTTP/MCP/skill桥、实际registry核验或审批/lease/执行；无新增browser/性能证据，完整T09/M1/B1/长期与M2–M5继续开发，Goal active，无新增外部阻塞，用户package-lock保留。
 
 Checkpoint25独立目标回归已终态：范围MUST_FIX（研究强制dataset）关闭，root最终3modules80passed2.75s，High80passed3.31s、原84196/8520皆exit0；旧1.0字节保持、1.1只是显式未批准声明，不构成授权。当前新一次全量pytest原session83613 live，日志audit/hybrid-v1/checkpoint-25-full-r1.log；源码/测试/schema冻结，无parallel tests或benchmark，恢复只查同handle，不因观察timeout重启。最新已提交仍4f48e68（663结果绑定24），schema25未提交。下一核对全量终态/归档与commit，再按High方案实现固定AuthStore/Origin/project service的真实human session批准事实；未实现1.1 command/HTTP/MCP提交、实际registry核验、审批/lease/闭环，不虚称T09/M1/M2–M5完成。Goal active，用户package-lock保持。
@@ -68,7 +70,7 @@ Checkpoint17：归档任务100/1k/10k真实Store/公共桥探针r2终态exit0、
 | T05 | 启动释放、CORE_STATUS、绑定工具公共返回与资源纵向切片已验证，完整观测未完成 | private ledger→closed projection/TOOL_METADATA；真实OS/loop HB/独立telemetry SSE/API/UI、age与因果barrier；不授予authority或证明vendor/STARTED；完整来源闭环与M1 gate待验证 |
 | T06 | 只读基础切片实现，未完整验收 | 同源登录/project scope/短期 Bearer、snapshot/page、bounded durable SSE、loopback CLI；无写命令/任意 artifact；见 LOCAL_WEB.md |
 | T07–T08 | 只读 UI、虚拟事件/公共日志/工具返回与资源面板已实现，未完整验收 | 真实 snapshot/SSE reducer、预算/分页/详情、虚拟窗口/锚点/键盘、日志、离线/身份隔离、closed工具metadata、真实HOST与worker来源/陈旧/版本屏障；Chrome QA通过；B1/真实完整闭环与M1 gate待完成 |
-| T09 | 未批准合同持久化首切片已实现，完整任务未完成 | 私有immutable revision/原receipt、CAS head、内容绑定幂等/事务项目绑定、snapshot与恢复闭合；可信human批准/schema工具与评价边界仍待实现 |
+| T09 | 未批准合同/1.1声明/可信注册内容核验已实现，完整任务未完成 | 私有immutable revision/原receipt、CAS head、恢复闭合；显式工具/评价数据及整config scope绑定；真实human批准/实际数据来源与能力核验、lease仍待实现 |
 | T10–T17 | 未开始 | 策略、受控 Runtime、单写、独立评审、预算、skill、控制与恢复 |
 | T18–T20 | 未开始 | 本地与 fixture 实验 adapter、科研状态、证据页面 |
 | T21–T22 | 未开始 | 资源隔离、故障/性能/24h 与 8h soak |

@@ -1,0 +1,22 @@
+Checkpoint26: immutable protected-startup Registry, NOT_EXECUTABLE confirmation only
+Parent HEAD: 1f1e6fa
+Root four modules: 130 passed in 3.45s; session96925 terminal exit0
+Independent High four modules: 130 passed in 3.43s; session3366 terminal exit0
+Modules: tests/test_hybrid_registry.py tests/test_hybrid_goal_v1_1.py tests/test_hybrid_goals.py tests/test_hybrid_protocol.py
+Root runner: PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q
+Independent runner: env -u PYTHONPATH PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 PYTHONDONTWRITEBYTECODE=1 .venv/bin/python -m pytest -q -p no:cacheprovider
+Compileall/git diff --check: exit0
+Independent source/security review: no remaining MUST_FIX.
+Final independent source/log/docs check: all four SHA and two terminal tails
+matched; Parent HEAD matched; no remaining MUST_FIX. No tests rerun.
+Only new pure module/tests; existing Store/runtime/HTTP/UI code paths unchanged.
+Proportionate four-module regression, no full suite rerun. 689/32/1 belongs to25.
+No auth/approval/lease/write route/model/GPU/production scheduler/OS or data probe.
+No browser/CPU/HTTP performance rerun, prior results retain original source binding.
+Whole proposal + whole config/policy scope hash; no caller attestation trusted.
+Data hash is registered declaration; profile hash is config, not enforceability.
+SHA256:
+f289bbcd83eb25cc6bd4cd9ae52e546adb1aa499971de8bb493535d263bfa079  rlflow/hybrid_registry.py
+e60e2b13103c93262374bcc6e6e6857f7e5e90609825665e154bce72b5504c5d  tests/test_hybrid_registry.py
+9c97dadcca74722f85a3354e1e707a5dee590bbd86f87bc8fb70e3701c8ca73e  audit/hybrid-v1/checkpoint-26-registry-r1.log
+caf137e353e5a3c0b8384708fab9677edf447e54daf3aff59ae19a59f8148cc5  audit/hybrid-v1/checkpoint-26-high-registry-r1.log
