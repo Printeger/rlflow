@@ -1,6 +1,6 @@
 # 本地只读 Web 服务（T06 基础切片）
 
-当前提供真实 SQLite 观测 API 和 SSE，**尚未交付 Dashboard 静态界面**，不能据此判定 M1 完成。HTTP 服务不会创建 Store、启动 scheduler、调用模型、修改批准或预算，也不开放命令与 artifact 路径。
+当前提供真实 SQLite 观测 API、SSE 和 `/` 下的只读 Dashboard 初始界面；不能据此判定 M1 完成。HTTP 服务不会创建 Store、启动 scheduler、调用模型、修改批准或预算，也不开放命令与 artifact 路径。
 
 安装项目运行依赖，并对一个已存在的 rlflow state 显式启用观测：
 
@@ -29,12 +29,15 @@
 | `GET /api/v1/projects/{id}/snapshot` | 同一事务内投影与 durable cursor，初始最多 30 对象 |
 | `GET /api/v1/projects/{id}/objects?kind=execution&after=...&limit=50` | keyset 公共对象页，最多 200，不读取私有日志/文件 |
 | `GET /api/v1/projects/{id}/events?after={cursor}` | 单项目完整 durable SSE；重连 Last-Event-ID 优先 |
+| `GET /api/v1/projects/{id}/domain-events/{event_id}` | 懒加载单个有界公共事件，project/epoch/seq/digest 校验，不读取私有日志 |
 
 每个读事务都重新校验 project/data_mode，避免数据源替换时越项目泄漏。无权限项目返回 404；源不可用或身份不一致不返回内部 SQLite 错误和路径。原公共字段 allowlist/脱敏仍适用。ROLE_IDENTITY 不是实际运行证据：T05 尚未完成，旧 RUNNING 仍映射 STARTING，usage/cost 缺证据仍 UNKNOWN。
 
 SSE：`domain` 有 durable id；5 秒 `heartbeat` 无 id；`resync_required` 携带 `code=RESYNC_REQUIRED` 和固定 reason，之后关闭。epoch/历史缺口、会话失效、队列溢出都要求重新获取快照。socket send 超过 2 秒直接关闭，重连使用客户端最后 durable id；已阻塞的 socket 不强行追加控制帧。每个连接仅预取一个事件，队列最多 32 帧/4 MiB，服务最多 8 条流。性能合同、遥测和日志尚未全部验收。
 
-公开 OpenAPI/docs、任意 artifact、写命令均不存在。响应设 no-store、nosniff、no-referrer、self-only CSP。未来 UI 必须使用文本渲染，不得将业务内容插入 HTML，且不把口令/session/CSRF 持久化到浏览器 storage。
+公开 OpenAPI/docs、任意 artifact、写命令均不存在。响应设 no-store、nosniff、no-referrer、self-only CSP（包括 form-action）。UI 仅文本渲染，未将口令/session/CSRF 持久化到浏览器 storage。JavaScript 不工作时表单也只使用 POST；后端拒绝非 JSON 请求。新认证清空旧身份 DOM/缓存，认证和项目异步响应有独立 generation guard。
+
+打开服务的本地 URL、使用 prepare 配置的主体与口令。纯 reducer 将 snapshot 与 SSE 接缝、epoch、去重、对象版本和权威 counters 分开。总对象缓存最多 200，其中保留最近至多 30 execution/10 stage；事件只缓存最近 200 条紧凑摘要，详情按需请求。费用/模型活动/资源未知不会改写为 0/RUNNING；Fixture 始终显示隔离标签。静止/追平/离线/隐藏/减少动画不持续运行脉冲。日志、资源遥测、条件矩阵、列表虚拟化、完整错误合同、真实运行和长期 soak 仍待完成。
 
 ## 验证
 
@@ -43,3 +46,12 @@ PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q tests/test_web_au
 ```
 
 包括真实 loopback socket 上提交后的 SSE 事件与 Last-Event-ID 重连；不是模拟业务模型成功。独立 High 审查关闭了读源 TOCTOU 和健康积压误判；最终系统审查仍未完成。
+
+可选隔离浏览器 QA（需本机已有可用 sandbox Chrome，不自动安装或关闭 sandbox）：
+
+```bash
+npm ci --prefix web_checks
+node --test web_checks/reducer.test.mjs web_checks/browser.test.mjs
+```
+
+测试启动 stdin 控制、loopback 临时 fixture，检查实际持久化提交到 SSE/DOM、离线追平、208 项总数与有界窗口、XSS 文本、键盘详情、手机无横向溢出、身份更换和迟到认证、无 JS 原生 POST；结束关闭 Chrome、服务并清理其唯一临时目录。截图保存在忽略的 web_checks/artifacts；不触碰真实 state、模型、GPU或根目录用户 package-lock。

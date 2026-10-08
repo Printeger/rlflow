@@ -15,7 +15,7 @@
 | T04 | 初始事务观测桥已验证，性能验收未完成 | 只读 bounded snapshot/page、增量 counters、同事务 outbox、epoch、真实进程故障测试；B1 100k 与备份恢复集成待验证 |
 | T05 | 启动释放事实切片已验证，完整观测未完成 | trusted core 校验完整绑定链并持久化一次 CLI_RELEASE_ACK；短命/换代/文件安全覆盖；仍 STARTING，vendor 活动/日志/资源另待验证 |
 | T06 | 只读基础切片实现，未完整验收 | 同源登录/project scope/短期 Bearer、snapshot/page、bounded durable SSE、loopback CLI；无写命令/任意 artifact；见 LOCAL_WEB.md |
-| T07–T08 | 未完成 | 前端、日志/资源真实观测、浏览器与完整 M1 验收尚待完成 |
+| T07–T08 | 初始只读 UI 已实现，未完整验收 | 真实 snapshot/SSE reducer、卡片/预算/事件/分页/详情、离线/身份隔离；Fixture Chrome QA 通过；日志/资源、虚拟化、真实运行与完整 M1 验收待完成 |
 | T09–T17 | 未开始 | 合同、策略、受控 Runtime、单写、独立评审、预算、skill、控制与恢复 |
 | T18–T20 | 未开始 | 本地与 fixture 实验 adapter、科研状态、证据页面 |
 | T21–T22 | 未开始 | 资源隔离、故障/性能/24h 与 8h soak |
@@ -31,4 +31,6 @@ High 独立 Web 复核的项目读源 TOCTOU、健康 backlog 误判/过量预�
 
 最新 checkpoint 03：68 项 startup/protocol/observation 回归及独立 High 审查通过；冻结全回归 **399 passed / 32 skipped / 135.90s**。新启动观测不改 source status/phase/预算/批准，明确 CLI_RELEASE_ACK 不是模型 RUNNING。证据见 CHECKPOINT_03.md。
 
-下一项：实现 T07 只读 Dashboard 与纯 reducer、真实浏览器 QA，补齐 T05 日志/资源，再进行 T08/M1 验收。web_checks 独立 npm 环境可用，实际 Chrome sandbox 启动通过；尚无 UI 验收。M1–M5 和完整 Goal 仍未完成。
+下一项：完成 T07/T08 列表虚拟化和完整动效/连接恢复检查，补齐 T05 日志/资源及真实来源端到端，再进行 M1 验收。初始 UI 的真实 Chrome sandbox Fixture 测试已通过，不代表真实模型运行或 8h soak。M1–M5 和完整 Goal 仍未完成。
+
+最新 checkpoint 04：冻结全回归 **402 passed / 32 skipped / 139.90s**，browser+reducer **9 passed / 0 skipped**，High 初始 UI 三项 MUST_FIX 全部关闭。实际登录/snapshot/SSE/详情/离线恢复/手机/身份隔离证明见 CHECKPOINT_04.md，未覆盖完整 M1。

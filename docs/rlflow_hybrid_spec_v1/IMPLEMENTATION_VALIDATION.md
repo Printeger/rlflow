@@ -78,3 +78,9 @@ ec46e1f68eb5181dde7eb140a28a956620c4dadfe172bc090ac2415d3b98015c  tests/test_hyb
 High 发现的两类问题已修：持久化前 candidate/limit/resources 必须再绑定；malformed optional proof 不能通过 None generation 或缺失/无效时间/hashes 伪造公共 ACK、不能阻止核心写入。时间字段命名 startup_released_at，避免伪称实际 execution.started。
 
 独立 npm 检查环境（不动根用户 package-lock）已安装并锁定 playwright-core 1.55.1。实际 Chrome 151.0.7922.108 在 sandbox=true、disable-gpu、无账号 env 下 about:blank 启动并退出，证明后续浏览器 QA 工具可用；不属于 T07 UI 或 8h soak 验收。
+
+## Checkpoint 04：初始只读 UI
+
+最终冻结 **402 passed / 32 skipped / 1 warning / 139.90s**，实际 browser+reducer r2 **9 passed / 0 skipped / 3.99s**；编译/diff check 通过。命令、哈希与输出见 evidence/checkpoint-04-final-tests.txt，失败过程和独立审查见 CHECKPOINT_04.md。High 复验独立 Python34/reducer8通过，首次 render/原生POST/跨主体cache+DOM/迟到认证三项阻塞关闭。
+
+真实本地 Fixture HTTP→SQLite committed outbox→SSE→DOM 的任务总数、bounded windows、offline/catchup、详情、XSS、keyboard/mobile、identity switch 和 native no-JS POST 已证明；Fixture明示，不等于运行器模型执行。未知费用/资源仍 UNKNOWN，未实现日志/资源/virtualization/完整error与筛选/真实来源E2E/8hsoak。完整 M1 和 M2–M5 仍未完成。

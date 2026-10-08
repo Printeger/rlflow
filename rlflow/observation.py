@@ -67,7 +67,7 @@ def summary(section, key, value, version):
     for target, field in (("description", "description"), ("reason", "reason"), ("role", "role"), ("launch_phase", "launch_phase")):
         if isinstance(raw.get(field), str): result[target] = public_text(raw[field])
     if "description" not in result:
-        for name in ("objective", "title", "summary"):
+        for name in ("objective", "title", "summary", "text"):
             if isinstance(raw.get(name), str):
                 result["description"] = public_text(raw[name]); break
     for field in ("task_id", "parent_id"):
@@ -295,11 +295,32 @@ class ObservationReader:
             validate("Snapshot", value)
             return value
 
-    def page(self, *, kind=None, after="", limit=50):
+    def page(self, *, kind=None, after="", limit=50, include_cursor=False):
         with self.connect() as db:
             db.execute("BEGIN")
-            self._checked_meta(db)
-            return self._page(db,kind=kind,after=after,limit=limit)
+            meta = self._checked_meta(db)
+            result = self._page(db,kind=kind,after=after,limit=limit)
+            if include_cursor:
+                result.update(project_id=meta["project_id"], data_mode=meta["data_mode"], cursor=f'{meta["store_epoch"]}:{meta["seq"]}')
+                validate("ObjectPage", result)
+            return result
+
+    def event(self, event_id):
+        """One public event by opaque ID, no path access or unbounded history."""
+        if not valid_id(event_id): raise ProtocolError("invalid public event ID")
+        with self.connect() as db:
+            db.execute("BEGIN")
+            meta = self._checked_meta(db)
+            row = db.execute("SELECT seq,envelope,digest FROM observation_events WHERE event_id=?", (event_id,)).fetchone()
+            if row is None or row["seq"] <= meta["floor"]:
+                raise ProtocolError("public event not found", "NOT_FOUND")
+            if hashlib.sha256(row["envelope"].encode()).hexdigest() != row["digest"]:
+                raise ProtocolError("event integrity mismatch", "RESYNC_REQUIRED")
+            event = json.loads(row["envelope"])
+            if event["project_id"] != meta["project_id"] or event["store_epoch"] != meta["store_epoch"] or event["seq"] != row["seq"] or event["event_id"] != event_id:
+                raise ProtocolError("public event identity mismatch", "RESYNC_REQUIRED")
+            validate_event(event,data_mode=meta["data_mode"])
+            return event
 
     def head(self):
         """Small consistent metadata read; no projection scan or process probes."""
@@ -324,7 +345,7 @@ class ObservationReader:
                 if row["seq"] != seq+1 or event["seq"] != row["seq"]:
                     raise ProtocolError("durable sequence gap or mismatch", "RESYNC_REQUIRED")
                 # An explicit epoch rotation requires a fresh snapshot, not rewritten history.
-                if event["store_epoch"] != meta["store_epoch"]: raise ProtocolError("restored history requires snapshot", "RESYNC_REQUIRED")
+                if event["project_id"] != meta["project_id"] or event["store_epoch"] != meta["store_epoch"]: raise ProtocolError("restored history requires snapshot", "RESYNC_REQUIRED")
                 validate_event(event,data_mode=meta["data_mode"])
                 result.append(event)
                 seq = row["seq"]

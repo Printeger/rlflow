@@ -4,10 +4,12 @@ from __future__ import annotations
 import asyncio
 import json
 from dataclasses import dataclass
+from pathlib import Path
 from urllib.parse import urlsplit
 
 from fastapi import FastAPI, HTTPException, Request
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, FileResponse
+from starlette.staticfiles import StaticFiles
 
 from .hybrid_protocol import ProtocolError
 from .live_stream import LiveStream
@@ -37,7 +39,7 @@ class SameOriginBoundary:
                 message = dict(message)
                 security = {b"cache-control": b"no-store", b"x-content-type-options": b"nosniff",
                             b"referrer-policy": b"no-referrer", b"content-security-policy":
-                            b"default-src 'self'; script-src 'self'; style-src 'self'; connect-src 'self'; img-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'"}
+                            b"default-src 'self'; script-src 'self'; style-src 'self'; connect-src 'self'; img-src 'self'; object-src 'none'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'"}
                 message["headers"] = [(k, v) for k, v in message.get("headers", []) if k not in security] + list(security.items())
             await send(message)
 
@@ -99,7 +101,7 @@ def create_app(projects, auth, *, origin="http://127.0.0.1:8765", max_streams=8,
         try:
             return await asyncio.to_thread(call, **kwargs)
         except ProtocolError as exc:
-            raise HTTPException(409 if exc.code == "RESYNC_REQUIRED" else 400, "observation request rejected") from None
+            raise HTTPException(409 if exc.code == "RESYNC_REQUIRED" else 404 if exc.code == "NOT_FOUND" else 400, "observation request rejected") from None
         except Exception:
             raise HTTPException(503, "observation source unavailable") from None
 
@@ -165,7 +167,12 @@ def create_app(projects, auth, *, origin="http://127.0.0.1:8765", max_streams=8,
     @app.get("/api/v1/projects/{project_id}/objects")
     async def objects(request: Request, project_id: str, kind: str | None = None, after: str = "", limit: int = 50):
         reader = await reader_for(request, project_id)
-        return await read(reader.page, kind=kind, after=after, limit=limit)
+        return await read(reader.page, kind=kind, after=after, limit=limit, include_cursor=True)
+
+    @app.get("/api/v1/projects/{project_id}/domain-events/{event_id}")
+    async def domain_event(request: Request, project_id: str, event_id: str):
+        reader = await reader_for(request, project_id)
+        return await read(reader.event, event_id=event_id)
 
     @app.get("/api/v1/projects/{project_id}/events")
     async def events(request: Request, project_id: str, after: str = ""):
@@ -187,4 +194,9 @@ def create_app(projects, auth, *, origin="http://127.0.0.1:8765", max_streams=8,
         active_streams += 1
         return response
 
+    static = Path(__file__).with_name("static")
+    @app.get("/", include_in_schema=False)
+    async def index():
+        return FileResponse(static / "index.html")
+    app.mount("/static", StaticFiles(directory=static), name="static")
     return app

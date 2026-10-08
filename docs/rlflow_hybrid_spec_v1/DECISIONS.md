@@ -41,3 +41,9 @@ SSE 单事件预取、32 帧/4MiB queue、8 流；heartbeat 不写 durable id。
 # 2026-10-08：启动观测的证据语义
 
 START_ACK 写于 exec 前，故仅公开 CLI_RELEASE_ACK/startup_released_at，不能填实际 execution.started/started_at 或升 RUNNING。observer 在 trusted core 中采集，不在 Web GET 中读取私有启动文件或写 Store；短命事实在 receipt acceptance 前再次采集。完整绑定与事务再检查，不因当前 PID 已终止、批准已变化或 STOP 已发生而抹掉合法历史事实。无效 optional proof 仅显示观察不足，不阻断核心事务。
+
+## 2026-10-08：本地只读 UI 与认证生命周期
+
+沿用 Python 服务和无构建 ESM，不增加外部部署、云存储或第二个写入服务。Sites 技能用于 local-only 预览与 browser QA；本机 portable Chrome 在 sandbox=true/disable-gpu 下运行，Fixture 明确标识。纯 reducer 不读取时钟或权限，业务变化仅来自已提交 domain，heartbeat 只更新连接/同步时间。公共分页增加事务内 cursor/project/mode，拒绝迟到页复活已删除对象。
+
+静态 shell 匿名可读但无业务内容；认证 identity 重新确认时清空全部旧 DOM/缓存/details，而非只设置 state=null。认证 ticket+AbortController 与项目 generation 分开，注销时先失效迟到响应。口令原生 fallback POST，CSP form-action self；全部业务文本 textContent。每个详情读取同事务绑定 project/epoch/seq/eventID/digest。对象总缓存 200，保留最近至多 30 execution/10 stage 防止无关任务洪流隐藏执行，紧凑事件摘要 200，不缓存 200 份最大 envelope。未接入的费用、授权条件、日志、资源明确 UNKNOWN/未提供，不能以 Fixture UI 通过宣称 M1 完成。

@@ -31,3 +31,7 @@
 # 系统 Checkpoint 02 补充
 
 2026-10-08：认证只读 API/SSE 基础和 command guardian 控制隔离修复的最终回归 **368 passed / 32 skipped / 115.80s**。真实 loopback HTTP/SSE 重连与 High 只读复核已通过。详细失败过程、修复、冻结 SHA256、证据路径见 IMPLEMENTATION_VALIDATION.md 与 CHECKPOINT_02.md；这不是 M1 或完整 Goal 完成结论。
+
+## 系统 Checkpoint 03–04 补充
+
+启动释放事实切片冻结 **399 passed / 32 skipped / 135.90s**；初始只读 UI 冻结 **402 passed / 32 skipped / 139.90s**，sandbox Chrome Fixture browser+reducer **9 passed**。High UI 初始范围 MUST_FIX 关闭；详细输出/哈希/失败记录见 CHECKPOINT_03.md、CHECKPOINT_04.md 与 IMPLEMENTATION_VALIDATION.md。Fixture、CLI_RELEASE_ACK 和连接 LIVE 都不能证明供应商模型 RUNNING；日志/资源、完整 M1、M2–M5 与长期验收仍未完成。

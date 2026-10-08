@@ -29,6 +29,40 @@ def login(client):
     return client.post("/api/v1/login", headers={"Origin": ORIGIN}, json={"principal_id": "local", "passphrase": PHRASE})
 
 
+def test_static_shell_is_local_csp_and_native_post_without_private_files(web):
+    store, auth, app, client = web
+    response = client.get("/")
+    assert response.status_code == 200
+    assert 'method="post" action="/api/v1/login"' in response.text
+    assert "form-action 'self'" in response.headers["content-security-policy"]
+    for asset in ("app.mjs", "reducer.mjs", "style.css"):
+        result = client.get("/static/" + asset)
+        assert result.status_code == 200 and result.headers["cache-control"] == "no-store"
+    for path in ("/static/../store.py", "/static/%2e%2e/store.py", "/research.db", "/runtime/research.db"):
+        assert client.get(path).status_code == 404
+    # Native form fallback rejects non-JSON without echoing a credential.
+    result = client.post("/api/v1/login", headers={"Origin": ORIGIN}, data={"passphrase": PHRASE})
+    assert result.status_code == 403 and PHRASE not in result.text
+
+
+def test_public_event_detail_and_page_cursor_are_scoped_consistent_reads(web):
+    store, auth, app, client = web
+    store.transact_objects("USAGE_OBSERVED", "ui_event", [("usage", "ui_session")],
+                           lambda s: s.setdefault("usage", {}).update(ui_session={"input_tokens": 7}))
+    reader = ObservationReader(store.root)
+    event = reader.events(reader.head()["cursor"].rsplit(":", 1)[0] + ":0")[0]
+    url = f'/api/v1/projects/project_one/domain-events/{event["event_id"]}'
+    assert client.get(url).status_code == 401
+    login(client)
+    assert client.get(url).json() == event
+    page = client.get("/api/v1/projects/project_one/objects?kind=usage").json()
+    assert page["cursor"] == reader.head()["cursor"]
+    assert page["project_id"] == "project_one" and page["data_mode"] == "fixture"
+    validate("ObjectPage", page)
+    assert client.get(url.replace("project_one", "project_two")).status_code == 404
+    assert client.get(url.rsplit("/", 1)[0] + "/not_found").status_code == 404
+
+
 def test_anonymous_routes_and_same_origin_dns_boundary(web):
     store, auth, app, client = web
     assert client.get("/health").json() == {"ready": True}

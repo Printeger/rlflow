@@ -24,6 +24,31 @@ def change_usage(store, key="s1", **values):
                                   lambda s: s.setdefault("usage", {}).update(session1=values))
 
 
+def test_public_event_detail_rejects_same_digest_cross_project_and_rotated_history(observed):
+    import hashlib
+    store, reader = observed
+    before = reader.snapshot()["cursor"]
+    change_usage(store, input_tokens=1)
+    event = reader.events(before)[0]
+    assert reader.event(event["event_id"]) == event
+    original = dict(event)
+    event["project_id"] = "project_other"
+    encoded = json.dumps(event, separators=(",", ":"))
+    with store.connect() as db:
+        # Deliberate fixture corruption bypasses append-only guards to exercise
+        # defensive reads; production exposes no operation that does this.
+        db.execute("DROP TRIGGER observation_no_update")
+        db.execute("UPDATE observation_events SET envelope=?,digest=? WHERE event_id=?",
+                   (encoded, hashlib.sha256(encoded.encode()).hexdigest(), event["event_id"]))
+        db.commit()
+    for call in (lambda: reader.event(event["event_id"]), lambda: reader.events(before)):
+        with pytest.raises(ProtocolError, match="identity mismatch|restored history"):
+            call()
+    rotate_epoch(store)
+    with pytest.raises(ProtocolError) as error: reader.event(original["event_id"])
+    assert error.value.code == "NOT_FOUND"
+
+
 def test_snapshot_stream_seam_and_idempotency(observed):
     store, reader = observed
     before = reader.snapshot()

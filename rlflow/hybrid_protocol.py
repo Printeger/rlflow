@@ -110,6 +110,8 @@ OBJECTS = {
                      "projection": obj({"source_state_version": COUNT, "paused": {"type": "boolean"},
                                         "enabled": {"type": "boolean"}, "counters": array(COUNTER, 1000),
                                         "objects": PAGE, "observability": enum("PARTIAL", "OBSERVED")})}),
+    "ObjectPage": obj({"items": array(PUBLIC_OBJECT), "next_cursor": nullable(TEXT), "total": COUNT,
+                       "cursor": TEXT, "project_id": ID, "data_mode": enum("live", "fixture")}),
     "Heartbeat": obj({"server_time": TIME, "cursor": TEXT}),
     "Resync": obj({"code": {"const": "RESYNC_REQUIRED"}, "reason": TEXT}),
     "StartupObservation": obj({"kind": {"const": "CLI_RELEASE_ACK"}, "generation": ID,

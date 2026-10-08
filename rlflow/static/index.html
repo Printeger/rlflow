@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="rlflow 本地只读实时观测。业务事实来自持久化后端事件，不使用模拟计数。">
+  <title>rlflow · Live observation</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <script type="module" src="/static/app.mjs"></script>
+</head>
+<body>
+  <header class="masthead">
+    <a class="brand" href="/" aria-label="rlflow 首页"><span class="brand-mark">r/</span> rlflow <span class="muted">HYBRID</span></a>
+    <span class="observer-tag">READ-ONLY OBSERVER</span>
+    <span id="connection" class="status-pill" role="status">NOT CONNECTED</span>
+  </header>
+  <main>
+    <section id="login-panel" class="panel login-panel">
+      <div class="eyebrow">LOCAL CONTROL PLANE / AUTHENTICATION</div>
+      <h1>观察真实工作，保留未知。</h1>
+      <p>此页面只读取已持久化的状态与事件，不会启动 Agent 或训练。</p>
+      <form id="login-form" method="post" action="/api/v1/login">
+        <label for="principal">本地主体</label><input id="principal" name="principal" value="local" autocomplete="username" required maxlength="160">
+        <label for="passphrase">登录口令</label><input id="passphrase" name="passphrase" type="password" autocomplete="current-password" required maxlength="1024">
+        <button type="submit">连接观测面板 →</button>
+      </form>
+      <p id="login-error" class="error" role="alert"></p>
+      <p class="muted">尚未配置？在可信本地终端执行 <code>python -m rlflow.web prepare --help</code>。没有默认口令。</p>
+    </section>
+    <div id="dashboard" hidden>
+      <section class="project-heading">
+        <div><div class="eyebrow">PERSISTED STATE / LIVE EVENT STREAM</div><h1 id="project-title">项目观测</h1></div>
+        <div class="controls"><label for="project-select">项目</label><select id="project-select"></select><button id="refresh">重建快照</button><button id="logout">退出</button></div>
+      </section>
+      <div id="mode-note" class="notice"></div>
+      <div id="error-banner" class="notice error" role="alert" hidden></div>
+      <section class="metrics" aria-label="后端状态摘要">
+        <div class="metric"><span>TASKS / 后端总数</span><strong id="task-total">—</strong></div>
+        <div class="metric"><span>EXECUTIONS / 后端总数</span><strong id="execution-total">—</strong></div>
+        <div class="metric"><span>APPROVALS / 可观测对象</span><strong id="approval-total">—</strong></div>
+        <div class="metric"><span>ACTUAL COST / 实测费用</span><strong class="unknown">UNKNOWN</strong></div>
+      </section>
+      <div class="live-layout">
+        <section class="panel execution-panel">
+          <div class="panel-heading"><h2>执行观测</h2><span id="execution-caption" class="muted">最多 30 个实际对象</span></div>
+          <p class="muted">STARTING ≠ 模型运行。CLI_RELEASE_ACK 只证明 wrapper 收到启动释放。</p>
+          <div id="executions" class="execution-grid"></div>
+          <p id="execution-empty" class="empty">当前缓存没有执行记录。没有新增虚构 Agent 节点。</p>
+          <div class="control-strip"><label class="check"><input id="reduce-motion" type="checkbox">减少动画</label><span id="core-flags" class="muted"></span></div>
+        </section>
+        <section class="panel budget-panel">
+          <div class="panel-heading"><h2>预算与观察边界</h2><span class="muted">SOURCE SCOPED</span></div>
+          <div id="budgets"></div>
+          <p class="muted">consumed / reserved 来自 stage。unknown exposure、价表估计、主机/GPU 遥测尚未提供，不能用 0 代替。</p>
+          <p class="boundary-note">目标合同、条件证据门控与完整 Hybrid 授权尚未接入此视图；任务数量不是目标完成百分比。</p>
+        </section>
+        <section class="panel object-panel">
+          <div class="panel-heading"><h2>工作对象</h2><div class="controls"><label for="kind-select">类型</label><select id="kind-select"><option value="task">任务</option><option value="execution">执行</option><option value="experiment">实验</option><option value="job">Job</option><option value="evidence">证据</option><option value="approval">批准</option><option value="usage">Usage</option><option value="stage">Stage 预算</option></select></div></div>
+          <div id="objects" class="object-list"></div>
+          <p id="objects-empty" class="empty" hidden>尚无该类型对象。通过 Codex 工作入口创建目标；只读观察者没有启动权限。</p>
+          <div class="control-strip"><span id="object-page-note" class="muted"></span><button id="next-page" disabled>下一页</button></div>
+        </section>
+        <section class="panel events-panel">
+          <div class="panel-heading"><h2>持久事件</h2><span class="muted">最近 200 条 / 无私有日志</span></div>
+          <label for="event-filter" class="sr-only">按 ID、类型、状态或原因筛选事件</label><input id="event-filter" type="search" placeholder="筛选 task / session / experiment ID、类型、原因…" maxlength="200">
+          <p class="muted">首次历史追平不播放旧脉冲。心跳只证明连接正常；不增加 usage 或业务计数。</p>
+          <div id="events" class="event-list" tabindex="0" aria-label="持久事件列表"></div>
+          <button id="new-events" hidden>查看新增事件</button>
+          <p id="events-empty" class="empty">本次连接尚无新业务事件。面板保持静止。</p>
+        </section>
+      </div>
+      <footer class="footer"><span id="sync-time">尚未同步</span><span id="cursor">无 durable cursor</span><span>资源与 worker freshness：UNKNOWN</span></footer>
+    </div>
+  </main>
+  <dialog id="details"><div class="panel-heading"><h2 id="detail-title">公开详情</h2><button id="close-details" aria-label="关闭详情">关闭 ×</button></div><p class="muted">仅公开投影/事件，不包含原始私有日志、文件路径或模型思维过程。</p><pre id="detail-content"></pre></dialog>
+</body>
+</html>

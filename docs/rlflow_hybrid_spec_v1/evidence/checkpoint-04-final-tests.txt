@@ -1,0 +1,31 @@
+2026-10-08: initial read-only Dashboard checkpoint, not M1 acceptance.
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q
+Exit 0. Source/tests frozen during final execution.
+402 passed, 32 skipped, 1 warning in 139.90s (0:02:19)
+Raw log: audit/hybrid-v1/checkpoint-04-final-pytest.log
+32 external-dependency skips retained; Starlette TestClient anyio alias deprecation retained.
+
+node --test web_checks/reducer.test.mjs web_checks/browser.test.mjs
+Exit 0. 9 tests, 9 passed, 0 skipped. 3988.093306 ms.
+Raw log: audit/hybrid-v1/checkpoint-04-final-browser-r2.log
+Initial instrumentation failure retained: checkpoint-04-final-browser.log
+Google Chrome 151.0.7922.108, sandbox=true, --disable-gpu.
+playwright-core 1.55.1. Loopback-owned fixture; no model/GPU calls.
+Screenshots visually inspected, ignored local artifacts:
+web_checks/artifacts/dashboard-desktop.png
+web_checks/artifacts/dashboard-mobile.png
+
+.venv/bin/python -m compileall -q rlflow web_checks/fixture_server.py
+git diff --check
+Both exit 0.
+
+SHA256 frozen source and browser test:
+ebce51c23c862c6b7ec2467b1f93dce5046f5bc563aa3fff08f9f62e4afc5489  rlflow/static/app.mjs
+dab67e1f813332b1fa1455e58f43ee4129fe2eca160f281be62e1b7c9fb94223  rlflow/static/reducer.mjs
+615df002ba79e6d47556237d2fc6626f214c4d551c2884680c9cd183f22012cb  rlflow/static/index.html
+1b0c4593ee18759f4c805a5a2e2bb8b2ab3567a78bbf3f49519ffd1c55c0cb41  rlflow/static/style.css
+ddb9a7adff9daecdf48fe11ba74a4bccf63e8c7595c8ac592898fcc37cbe1770  rlflow/observation.py
+3449af383a04414607da2f57b1f102172c031e17229242741f72cf5073bbd2e9  rlflow/hybrid_protocol.py
+1a2fad23d77ed58a10cdb67082a5ffd848c9208b19f87e7a9e4b932ed3aaffc5  rlflow/web_api.py
+790d4140fdc643dfbfb7474ad2cc451cdd356f2432b0f5ad39944b52f82113dc  web_checks/browser.test.mjs
+81091627e0551d6d75568ce161196855036b4c35dd96a16aca9ddb29a8307981  web_checks/fixture_server.py
