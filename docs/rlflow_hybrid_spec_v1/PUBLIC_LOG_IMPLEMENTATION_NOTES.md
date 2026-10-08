@@ -17,3 +17,5 @@
 首次升级对历史日志必须明确策略：没有日志不冒充没有业务事件；如果从enable时开启则公开coverage开始点，后续离线backfill分批且不得修改原domain字节。未建立合同前不能偷偷让新核心写入在缺表旧库失败，不能隐式Web迁移。
 
 测试至少包含同事务故障回滚/幂等、severity/ref分页与query plan、缺正文/哈希破损/epoch拒绝、跨项目源替换、私有reasoning/HTML/秘密/command/env完全不入固定正文、首次启用coverage、公共lazy详情/UI筛选与reading anchor、真实model-free核心事件到浏览器日志。随后继续工具metadata、资源telemetry与真实来源端到端，保留完整M1缺口。
+
+独立High最终补充：每个entry绑定object kind/id/version、template_version并有唯一约束；未核实前后状态差异只能称“状态观测”，不能模板声称发生转换。日志pagination固定首次请求high-water mark并绑定epoch/筛选，日志游标不得混为SSE消费cursor。新LogSummary/LogBody/LogPage闭合合同，正文和entry-ref只指向同项目public event。generation/request仅取同次提交可信session元数据，没有request时明确无绑定；CORE_STATUS不重读启动文件、不证明CLI模型工具运行。UI必须区分CORE_STATUS可用、TOOL_METADATA待接入、raw logs PRIVATE_ONLY。
