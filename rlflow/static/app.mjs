@@ -1,4 +1,5 @@
 import {installSnapshot, applyEvent, mergePage, total, cursor, objectKey, SyncError} from './reducer.mjs';
+import {VirtualList} from './virtual-list.mjs';
 
 const $ = id => document.getElementById(id);
 const motionPreference = matchMedia('(prefers-reduced-motion: reduce)');
@@ -8,6 +9,7 @@ let renderTimer = null, pendingHighlights = new Map(), pageSerial = 0, unread = 
 let raf = null, pulseTimer = null;
 let authGeneration = 0, authController = null;
 const pulses = new Map();
+const eventList = new VirtualList($('events'), eventNode, event => event.event_id);
 function beginAuth() {
   authController?.abort(); authController = new AbortController();
   return {ticket:++authGeneration, signal:authController.signal};
@@ -16,6 +18,7 @@ function clearObservation() {
   ++generation; ++pageSerial; closeStream(); clearTimeout(renderTimer); renderTimer = null;
   state = null; project = null; pageIds = []; nextPage = null; unread = 0; lastHeard = 0;
   for (const id of ['executions','budgets','objects','events']) $(id).replaceChildren();
+  eventList.setItems([]);
   for (const id of ['task-total','execution-total','approval-total']) $(id).textContent = 'UNKNOWN';
   for (const id of ['project-title','mode-note','cursor','sync-time','core-flags','execution-caption','object-page-note','detail-content']) $(id).textContent = '';
   $('details').close(); $('next-page').disabled = true; $('new-events').hidden = true;
@@ -83,6 +86,20 @@ function nodeButton(row) {
   button.addEventListener('click',() => details(`${row.kind} · ${row.id}`,row));
   return button;
 }
+function eventNode(event) {
+  const button = text('button','', 'event-row'); button.dataset.eventId = event.event_id;
+  const summary = text('span',event.source_event_type);
+  summary.append(text('span',`${event.changed_count} changes · ${short(event.event_id)}`,'muted'));
+  button.append(text('span',event.occurred_at.slice(11,19),'muted'),summary);
+  button.title = `${event.source_event_type} · ${event.event_id} · ${event.occurred_at} · 点击读取完整公共事件`;
+  button.addEventListener('click',async () => {
+    const selected = generation;
+    try { const full = await request(`${base()}/domain-events/${encodeURIComponent(event.event_id)}`);
+      if (selected === generation) details(event.event_id,full);
+    } catch (error) { if (selected === generation) problem(error.message); }
+  });
+  return button;
+}
 function scheduleRender() {
   if (renderTimer !== null) return;
   renderTimer = setTimeout(() => { renderTimer = null; render(); },34);
@@ -122,27 +139,8 @@ function render() {
     $('objects').append(button);
   }
   $('objects-empty').hidden = rows.length > 0; $('next-page').disabled = !nextPage;
-  const box = $('events'), oldTop = box.scrollTop, atTop = oldTop < 12;
-  const oldAnchor = atTop ? null : [...box.children].find(node => node.getBoundingClientRect().bottom > box.getBoundingClientRect().top);
-  const anchorId = oldAnchor?.dataset.eventId, anchorOffset = oldAnchor ? oldAnchor.getBoundingClientRect().top - box.getBoundingClientRect().top : null;
-  const filter = $('event-filter').value.toLowerCase(); box.replaceChildren();
-  for (const event of state.events.filter(event => JSON.stringify(event).toLowerCase().includes(filter))) {
-    const button = text('button','', 'event-row'); button.dataset.eventId = event.event_id;
-    const summary = text('span',event.source_event_type);
-    summary.append(text('span',` · ${event.changed_count} changes · ${short(event.event_id)}`,'muted'));
-    button.append(text('span',event.occurred_at.slice(11,19),'muted'),summary);
-    button.addEventListener('click',async () => {
-      const selected = generation;
-      try { const full = await request(`${base()}/domain-events/${encodeURIComponent(event.event_id)}`);
-        if (selected === generation) details(event.event_id,full);
-      } catch (error) { if (selected === generation) problem(error.message); }
-    }); box.append(button);
-  }
-  box.scrollTop = atTop ? 0 : oldTop;
-  if (anchorId) {
-    const anchor = [...box.children].find(node => node.dataset.eventId === anchorId);
-    if (anchor) box.scrollTop += anchor.getBoundingClientRect().top - box.getBoundingClientRect().top - anchorOffset;
-  }
+  const filter = $('event-filter').value.toLowerCase();
+  eventList.setItems(state.events.filter(event => JSON.stringify(event).toLowerCase().includes(filter)));
   $('events-empty').hidden = state.events.length > 0;
   $('new-events').hidden = !unread; $('new-events').textContent = `查看新增 ${unread} 条事件`;
 }

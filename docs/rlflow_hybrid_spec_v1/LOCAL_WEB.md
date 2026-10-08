@@ -37,7 +37,7 @@ SSE：`domain` 有 durable id；5 秒 `heartbeat` 无 id；`resync_required` 携
 
 公开 OpenAPI/docs、任意 artifact、写命令均不存在。响应设 no-store、nosniff、no-referrer、self-only CSP（包括 form-action）。UI 仅文本渲染，未将口令/session/CSRF 持久化到浏览器 storage。JavaScript 不工作时表单也只使用 POST；后端拒绝非 JSON 请求。新认证清空旧身份 DOM/缓存，认证和项目异步响应有独立 generation guard。
 
-打开服务的本地 URL、使用 prepare 配置的主体与口令。纯 reducer 将 snapshot 与 SSE 接缝、epoch、去重、对象版本和权威 counters 分开。总对象缓存最多 200，其中保留最近至多 30 execution/10 stage；事件只缓存最近 200 条紧凑摘要，详情按需请求。费用/模型活动/资源未知不会改写为 0/RUNNING；Fixture 始终显示隔离标签。静止/追平/离线/隐藏/减少动画不持续运行脉冲。日志、资源遥测、条件矩阵、列表虚拟化、完整错误合同、真实运行和长期 soak 仍待完成。
+打开服务的本地 URL、使用 prepare 配置的主体与口令。纯 reducer 将 snapshot 与 SSE 接缝、epoch、去重、对象版本和权威 counters 分开。总对象缓存最多200，保留最近至多30 execution/10 stage；事件摘要200，虚拟窗口只渲染可见行，方向键/Home/End/Enter可导航与读详情，阅读位置按事件ID保持。费用/模型活动/资源未知不会改为0/RUNNING；Fixture始终有标签。静止/追平/离线/隐藏/减少动画不持续运行脉冲。日志、资源、条件矩阵、完整error合同、真实运行/长期soak仍待完成。
 
 ## 验证
 
@@ -51,7 +51,7 @@ PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q tests/test_web_au
 
 ```bash
 npm ci --prefix web_checks
-node --test web_checks/reducer.test.mjs web_checks/browser.test.mjs
+node --test web_checks/reducer.test.mjs web_checks/virtual-list.test.mjs web_checks/browser.test.mjs
 ```
 
 测试启动 stdin 控制、loopback 临时 fixture，检查实际持久化提交到 SSE/DOM、离线追平、208 项总数与有界窗口、XSS 文本、键盘详情、手机无横向溢出、身份更换和迟到认证、无 JS 原生 POST；结束关闭 Chrome、服务并清理其唯一临时目录。截图保存在忽略的 web_checks/artifacts；不触碰真实 state、模型、GPU或根目录用户 package-lock。
