@@ -21,6 +21,9 @@ def test_strict_backup_and_finite_actual_daemon(source,tmp_path):
     result=measure(source.db,tmp_path/'probe',tasks=2,min_events=4,seconds=.2,warmup=.1)
     assert result['source_unchanged'] and result['business_unchanged'] and result['sessions']==0
     assert result['five_minute_interval'] is False and result['full_B1_pass'] is False
+    last=result['sample_rows'][-1];first=result['baseline']
+    assert result['elapsed_seconds']==last['time']-first['time']
+    assert result['single_core_cpu_percent']==100*(last['cpu_seconds']-first['cpu_seconds'])/(last['time']-first['time'])
 
 
 def test_fixture_label_cannot_authorize_arbitrary_source(source,tmp_path):

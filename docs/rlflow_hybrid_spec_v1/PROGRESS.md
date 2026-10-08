@@ -1,5 +1,11 @@
 # Hybrid v1 开发进度
 
+Checkpoint19终态覆盖下述过程记录：目标r2 107passed/1warning/36.03s、High独立78passed/1warning/48.43s无MUST_FIX、冻结全量600passed/32既有external skips/1warning/241.02s，全部原handle终态exit0，compileall/pip/diff通过。reconcile默认API不变/daemon省尾view、未来测量显式baseline已验证，见CHECKPOINT_19.md/evidence。未复测CPU、未改变checkpoint18失败，下一consistent indexed dispatch早门与事件失效watch，完整Goal active。
+
+Checkpoint19进行中（未提交/未验收）：checkpoint18已提交0405b8d，保留CPU未达标证据。第一最小生产优化reconcile新增默认True的return_view，仅daemon传False省掉丢弃的尾view，所有实际reconcile/采样/安全门未变；driver新显式baseline修复未来精确复算。r1目标107passed/1既有warning/36.11s、High静态无MUST_FIX；按review建议追加真实telemetry发布/core+cursor不变断言，r2原工具session34190/log audit/hybrid-v1/checkpoint-19-target-r2.log运行中，源码/测试冻结，恢复先检查此handle而非重跑。剩余全回归、独立测试/复核、更多indexed空闲dispatch及事件失效watch待做；未复测CPU、无性能通过声明。用户package-lock.json仍不改不stage；Goal保持active。
+
+Checkpoint19最新覆盖上述在跑状态：r2 session34190已终态exit0，107passed/1warning/36.03s；compileall/diff通过。当前全量pytest原工具session77356运行中，日志audit/hybrid-v1/checkpoint-19-full-r1.log；High独立目标复验进行中，日志checkpoint-19-high-r1.log。源码/测试持续冻结，恢复先检查两个真实运行结果，勿重起长测/全量。下一完整性验收/文档/提交后继续安全空闲热路径优化，原CPU基线与checkpoint18 SHA不可改写。
+
 Checkpoint18 组合idle终态exit0：100k真实历史只读backup+10k DONE/all-false归档任务，真实daemon测300.000899s，CPU单核1.773328% **未达<1%**，采样RSS39862272bytes；core100001/public100051、sessions0、业务/来源不变、子进程已回收。telemetry最终seq297只证明采样进展。短回归13passed/2.54s，High启动安全无剩余MUST_FIX；终态独立复核进行中。session90403已终态不重启；见IDLE_PERFORMANCE.md/evidence/checkpoint-18-idle.jsonl。原始结果保留，不调阈值；逐秒全控制仓库watch也不满足NFR06无全仓库轮询条款。下一项优化空闲view/key枚举及事件失效式代码guard，保留STOP/授权/代码generation门，再以新版本复测。完整B1、M1 gate及M2–M5未完成，Goal保持active。
 
 Checkpoint17：归档任务100/1k/10k真实Store/公共桥探针r2终态exit0、每档audit==replay/core61/session0；10k scoped/legacy write p95=7.061/14.747ms、viewkeys2.677ms、无工作CPU p50=10.257ms/次，不能等同5min idle或活跃闭环。High发现assert可删除调用的测量保真缺陷已修：实际调用移出assert、两driver拒绝-O、实际负例验证；root20passed、独立7passed。见TASK_PERFORMANCE.md/evidence。生产未改；下一项组合100k/10k、有限idle/活跃工作与完整B1，M1 gate及M2–M5仍未完成，Goal active。

@@ -133,6 +133,8 @@ HOST/STATE_FILESYSTEM/SUPERVISOR_PROCESS明确分域、loop限频best-effort心�
 
 ## Checkpoint18：组合历史/归档任务的真实daemon idle
 
+Checkpoint19首项优化另见CHECKPOINT_19.md：target107/High78、冻结全量600passed/32skipped/1warning/241.02s，实际observer采样/cursor与兼容返回验证；新driver保存baseline。性能未复测，以下checkpoint18 CPU失败仍有效，完整Goal未完成。
+
 有限真实300.000899s区间，100k实际历史backup+10k实际归档task，CPU单核1.773328% **未达<1%**；采样RSS39862272bytes、sessions0、core100001/public100051保持不变、来源SHA不变、daemon诊断空、直接child已TERM/reap，父exit0。原始301采样见evidence/checkpoint-18-idle.jsonl，精确基线未单独存储限制及raw区间独立重算同样未达标见IDLE_PERFORMANCE.md。root短回归13passed/2.54s，独立High13passed/2.53s且raw重算/DB不变式/身份/SHA核验一致、无剩余MUST_FIX；pip check/diff通过。生产未改，不新增全量/浏览器通过声明；NFR06全仓库轮询条件亦未满足，完整Goal保持active，下一安全热路径优化而非调阈值。
 
 ## Checkpoint14：独立 telemetry SSE 与资源 UI

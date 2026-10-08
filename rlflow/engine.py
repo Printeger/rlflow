@@ -916,7 +916,12 @@ def _schedule_pending(store):
                                 lambda s:s['tasks'][task['id']].update(last_error=reason),object_id=task['id'])
 
 
-def reconcile(store):
+def reconcile(store, *, return_view=True):
+    """Reconcile actual pending work; legacy callers retain the returned view.
+
+    The daemon discards that view, so it can avoid enumerating archived keys.
+    This flag does not skip any reconciliation, sampling or authority check.
+    """
     from .releases import reconcile_pointer
     reconcile_pointer(store)
     from .usage import reconcile as reconcile_usage
@@ -965,7 +970,7 @@ def reconcile(store):
     scan_tools(store)
     from .telemetry import sample as sample_telemetry
     sample_telemetry(store)
-    return store.view()
+    return store.view() if return_view else None
 
 
 def daemon(root):
@@ -983,7 +988,7 @@ def daemon(root):
                 if watch_stamp(CODE) != monitored:
                     print('Control code changed; daemon exits without dispatching cached code',flush=True)
                     return
-                reconcile(store)
+                reconcile(store, return_view=False)
                 pointer=store.root/'runtime/current-release.json'
                 if pointer.exists() and Path(json.loads(pointer.read_text())['path']).resolve()!=CODE:
                     from .releases import handoff

@@ -159,7 +159,7 @@ def measure(source,output,*,tasks=10000,min_events=100000,seconds=300,warmup=5):
         task_count=db.execute("SELECT count(*) FROM projection WHERE section='tasks' AND object_key!=''").fetchone()[0]
     if session_count or task_count!=tasks or fingerprint(Path(source).resolve())!=manifest['source_fingerprint']:raise RuntimeError('fixture/source invariants changed')
     elapsed=last['time']-first['time'];percent=100*(last['cpu_seconds']-first['cpu_seconds'])/elapsed
-    result={'elapsed_seconds':elapsed,'single_core_cpu_percent':percent,'cpu_target_met':percent<1,
+    result={'baseline':first,'elapsed_seconds':elapsed,'single_core_cpu_percent':percent,'cpu_target_met':percent<1,
             'five_minute_interval':elapsed>=300,'sampled_peak_rss_bytes':max(r['rss_bytes'] for r in rows),
             'sessions':session_count,'tasks':task_count,'exit_code':exit_code,'sample_rows':rows,
             'source_unchanged':True,'business_unchanged':True,'full_B1_pass':False,

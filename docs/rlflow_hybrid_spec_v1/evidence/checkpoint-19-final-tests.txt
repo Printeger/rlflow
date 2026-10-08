@@ -1,0 +1,21 @@
+Checkpoint19: reconcile return optimization + future idle baseline fidelity; no CPU pass claimed.
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q tests/test_idle_reconcile.py tests/test_acceptance_idle_v1.py tests/test_engine.py tests/test_releases.py tests/test_snapshot_maintenance.py tests/test_telemetry.py
+Root r2: 107 passed, 1 warning in 36.03s, exit0 (target-r1 107/36.11s before observer assertion enhancement).
+Independent High: tests/test_idle_reconcile.py tests/test_acceptance_idle_v1.py tests/test_engine.py tests/test_telemetry.py
+78 passed, 1 warning in 48.43s; no remaining first-slice MUST_FIX.
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q
+Frozen full: 600 passed, 32 skipped, 1 warning in 241.02s, exit0/session77356 terminal.
+32 established external dispatcher+H1 skips, one existing Starlette DeprecationWarning, not hidden or new skips.
+compileall/diff check/pip check passed. No browser rerun, UI unchanged. No CPU rerun.
+
+SHA256:
+6bd0142c542e096ce0e9d79749d6314bb2188c9b79fb715e0bec18d1174b9272  rlflow/engine.py
+e0457c07636dfc77c9a90454ce9a8e07c093576052eab5fdfea3229f112b2d34  tests/acceptance_idle_v1.py
+4db64b118aef88cfe27d4297827bc07ba5955bf45e9a26720d34d7d7d6f23cf6  tests/test_acceptance_idle_v1.py
+84eb83e80462e39027cde430558e82fba8da338bf0a630752d36650a3bd9b741  tests/test_idle_reconcile.py
+b0e7442a14baacde7912372fdad9ed472a456b4984a744929aa8877c282770e5  audit/hybrid-v1/checkpoint-19-target-r2.log
+1cea264a4f7fef0e39a592dd48ae40876b73f70577fef80c6c8e8b810c0f9c3a  audit/hybrid-v1/checkpoint-19-high-r1.log
+47eef75ba8d595330cc6dc89b6d6a9f7e7fa7c866b28cf4c66a8d72be867f3b7  audit/hybrid-v1/checkpoint-19-full-r1.log
+
+Checkpoint18 preserved result: daemon CPU1.773328% above target, no full B1/NFR06/M1 pass.
+Next: indexed consistent dispatch early gate and event-invalidated source guard; do not weaken authority/STOP/generation for performance.
