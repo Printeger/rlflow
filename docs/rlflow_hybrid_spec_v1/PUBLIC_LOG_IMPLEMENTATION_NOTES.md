@@ -1,12 +1,14 @@
 # 公共日志后续实现边界
 
-2026-10-08，checkpoint06已实现CORE_STATUS同事务存储、闭合LogSummary/Body/Page与scoped API，实际证据见CHECKPOINT_06.md。以下方案保留设计来源，不本身作为验收；UI/工具metadata/资源与完整日志仍待完成。
+2026-10-08，checkpoint06已实现CORE_STATUS同事务存储、闭合LogSummary/Body/Page与scoped API，checkpoint07已接入日志UI。以下方案保留设计来源，不本身作为验收；公开工具metadata/资源与完整日志仍待完成。
 
 ## 已核实的源风险
 
 独立High只读复核现有worker/engine/cpu工具源：`events.jsonl`包含reasoning/agent_message/MCP args/results，stderr/supervisor有trace与私有路径，commands/intent/result包含command、stdout/stderr、cwd/checkpoint。public_text正则是辅助脱敏，不是将整段原文变成可公开内容的许可证。禁止Web请求直接tail这些文件。
 
-现有CPU命令intent/result缺session/generation/request哈希，不能凭目录名字认归属。工具metadata collector必须先验证trusted request/release，固定 `commands/<sha(command_id)>`映射并核对role/candidate/permissions与command/argv/cwd/checkpoint来源绑定。resource.disk模式可能将role日志symlink到raw；初版拒绝follow并明确UNAVAILABLE，或只通过已校验resource record定位批准raw根，不把symlink当授权。
+原CPU命令intent/result缺session/generation/request哈希，不能凭目录名字认归属。checkpoint08的新worker为recovery_protocol>=2的MCP config加入闭合tool_context，含session/generation/request_sha256/candidate_sha256；新bound intent还绑定scratch/memory和既有role/candidate/permissions。正常返回后产生私有return-observation.json固定状态及intent/result摘要，不复制命令/输出/路径，不证明STARTED/RUNNING、release或授权。旧config不生成bound事实，历史不回填。
+
+工具metadata collector仍必须先验证trusted request/release/DB session及startup proof，固定 `commands/<sha(command_id)>`映射并核对role/candidate/permissions与command/argv/cwd/checkpoint来源绑定；tool_context/hash本身不能当放行证明。resource.disk模式可能将role日志symlink到raw；初版拒绝follow并明确UNAVAILABLE，或只通过已校验resource record定位批准raw根，不把symlink当授权。逐工具STOP/授权marker属于受控runtime后续，当前private return记录不实现或取代该边界。
 
 ## 下一候选切片
 

@@ -41,3 +41,5 @@ Checkpoint05虚拟事件窗口：geometry/reducer/browser11通过，Web/CLI回�
 Checkpoint06公共CORE_STATUS日志后端/API：冻结430passed/32skipped/143.61s，浏览器回归11passed，High本范围MUST_FIX关闭。见CHECKPOINT_06.md/evidence/checkpoint-06-final-tests.txt；状态日志不证明工具/模型实际运行，日志UI、工具metadata、资源、完整M1–M5仍待交付。
 
 Checkpoint07公共日志UI：Chrome/Node13passed/0skipped/5.85s，相关Python39passed/1warning/5.21s，High本范围MUST_FIX关闭，语法/编译/diff通过。见CHECKPOINT_07.md/evidence/checkpoint-07-final-tests.txt。本轮没有后端全量重跑，工具metadata/资源及M1–M5、长期验收仍待完成。
+
+Checkpoint08工具private provenance：最终全回归455passed/32skipped/1warning/145.80s，目标68passed/1skipped/46.63s，High范围无MUST_FIX。见CHECKPOINT_08.md/evidence/checkpoint-08-final-tests.txt。可信request指针与固定返回事实不授予authority，也不代表public工具metadata已接入；collector/资源/完整M1–M5仍待交付。

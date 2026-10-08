@@ -244,18 +244,61 @@ def cpu_exec(command: str, candidate: str | Path, scratch: str | Path,
             'stderr':stderr.decode(errors='replace')[-100000:]}
 
 
+def tool_context_valid(value):
+    """Provenance pointer only; this does NOT grant release/command authority."""
+    return (isinstance(value, dict) and set(value) == {'schema_version','session','generation','request_sha256','candidate_sha256'}
+            and value['schema_version'] == '1.0'
+            and all(isinstance(value[k], str) and re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9_.:-]{0,159}', value[k])
+                    for k in ('session','generation'))
+            and all(isinstance(value[k], str) and re.fullmatch(r'[0-9a-f]{64}', value[k])
+                    for k in ('request_sha256','candidate_sha256')))
+
+
+def tool_digest(value):
+    return hashlib.sha256(json.dumps(value,ensure_ascii=False,sort_keys=True,separators=(',',':'),allow_nan=False).encode()).hexdigest()
+
+
+def tool_return_observation(intent, result):
+    """Fixed private return fact, never command/output text or model activity.
+
+    An intent alone does not prove launch. A return can be a sandbox setup
+    failure; no STARTED/RUNNING or process termination claim is inferred here.
+    Public collectors must independently bind the committed release/request.
+    """
+    import math
+    if not tool_context_valid(intent.get('tool_context')):
+        raise IsolationError('Invalid tool context')
+    code, elapsed = result.get('exit_code'), result.get('wall_seconds')
+    if (type(code) is not int or not -2**31 <= code < 2**31 or type(result.get('timed_out')) is not bool
+            or type(elapsed) not in (int,float) or not math.isfinite(elapsed) or elapsed < 0
+            or result.get('infrastructure_error') not in (None,'CPU_SANDBOX_SETUP_FAILED')):
+        raise IsolationError('Invalid CPU return metadata')
+    state = ('SETUP_FAILED' if result.get('infrastructure_error') else
+             'TIMED_OUT' if result['timed_out'] else 'RETURNED')
+    return {'schema_version':'1.0','kind':'CPU_EXEC_RETURN','tool':'cpu_exec',
+            'context':intent['tool_context'],'intent_sha256':tool_digest(intent),
+            'result_sha256':tool_digest(result),'state':state,'exit_code':code,
+            'timed_out':result['timed_out'],'wall_seconds':elapsed,
+            'infrastructure_error':result.get('infrastructure_error')}
+
+
 def persistent_cpu_exec(config, args):
     """An explicit command ID is a checkpoint, not permission to rerun an unknown launch."""
     import uuid
     command_id = args.get('command_id', uuid.uuid4().hex)
     if not isinstance(command_id, str) or not command_id or len(command_id) > 200:
         raise IsolationError('Invalid command ID')
+    context = config.get('tool_context')
+    if context is not None and not tool_context_valid(context):
+        raise IsolationError('Invalid tool context')
     digest = hashlib.sha256(json.dumps({'id': command_id}, sort_keys=True).encode()).hexdigest()
     path = Path(config['audit']).parent / 'commands' / digest
     path.mkdir(parents=True, exist_ok=True)
     intent = {'command_id': command_id, 'command': args['command'], 'timeout': args.get('timeout',60),
               'candidate': config['candidate'], 'role': config['role'],
               'permissions': {k:config.get(k) for k in ('write_roots','read_extra','execute_extra','command_seconds')}}
+    if context is not None:
+        intent.update(tool_context=context,scratch=config['scratch'],memory_bytes=config.get('memory_bytes',2*1024**3))
     def save(name, value):
         raw = json.dumps(value, sort_keys=True).encode()
         tmp = path / (name + '.' + uuid.uuid4().hex)
@@ -266,13 +309,23 @@ def persistent_cpu_exec(config, args):
         try: os.fsync(fd)
         finally: os.close(fd)
     import fcntl
+    def record_return(value):
+        if context is None:return
+        observation = tool_return_observation(intent,value)
+        name = 'return-observation.json'
+        if (path/name).exists():
+            if json.loads((path/name).read_text()) != observation:
+                raise IsolationError('CPU return observation mismatch')
+        else:save(name,observation)
     with (path/'lock').open('a') as lock:
         fcntl.flock(lock, fcntl.LOCK_EX)
         if (path/'intent.json').exists():
             if json.loads((path/'intent.json').read_text()) != intent:
                 raise IsolationError('Command ID content mismatch')
             if (path/'result.json').exists():
-                return json.loads((path/'result.json').read_text())
+                value = json.loads((path/'result.json').read_text())
+                record_return(value)
+                return value
             raise IsolationError('Command outcome unknown; inspect checkpoint, do not re-execute')
         save('intent.json', intent)
         value = cpu_exec(args['command'], config['candidate'], config['scratch'], config['role'],
@@ -281,7 +334,9 @@ def persistent_cpu_exec(config, args):
                          memory_bytes=config.get('memory_bytes',2*1024**3),
                          command_seconds=config.get('command_seconds',120), artifact_dir=path)
         value['checkpoint'] = str(path)
+        if context is not None:tool_return_observation(intent,value)
         save('result.json', value)
+        record_return(value)
         return value
 
 
@@ -326,13 +381,15 @@ def codex_command(role: str, candidate: str | Path, scratch: str | Path,
                   execute_extra: list[str] | None = None,
                   memory_bytes: int = 2 * 1024**3,
                   model: str = 'gpt-5.6-sol', effort: str = 'medium', command_seconds: int = 120,
-                  _census_catalog: dict | None = None) -> tuple[list[str], dict[str,str]]:
+                  _census_catalog: dict | None = None,
+                  tool_context: dict | None = None) -> tuple[list[str], dict[str,str]]:
     """Return argv/env; caller writes prompt to stdin and captures JSONL stdout.
 
     Output's parent is trusted control storage; it MUST be disjoint from role
     writable paths. It stores the MCP config, audit and constrained catalog.
     """
     if role not in ROLES: raise IsolationError('Unknown role')
+    if tool_context is not None and not tool_context_valid(tool_context):raise IsolationError('Invalid tool context')
     candidate, scratch, output = (Path(p).resolve() for p in (candidate,scratch,output))
     trusted = output.parent
     for p in (candidate,scratch):
@@ -361,10 +418,12 @@ def codex_command(role: str, candidate: str | Path, scratch: str | Path,
     catalog_path = trusted/(output.name+'.models.json')
     catalog_path.write_text(json.dumps({'models':models}))
     config_path = trusted/(output.name+'.mcp.json')
-    config_path.write_text(json.dumps({'role':role,'candidate':str(candidate),'scratch':str(scratch),
+    tool_config = {'role':role,'candidate':str(candidate),'scratch':str(scratch),
         'read_extra':read_extra or [],'write_roots':write_roots,
         'execute_extra':execute_extra or [],'memory_bytes':memory_bytes,'command_seconds':command_seconds,
-        'audit':str(trusted/(output.name+'.commands.jsonl'))}))
+        'audit':str(trusted/(output.name+'.commands.jsonl'))}
+    if tool_context is not None:tool_config['tool_context'] = tool_context
+    config_path.write_text(json.dumps(tool_config))
     argv = [CODEX,'exec','--ignore-user-config','--ignore-rules','--ephemeral','--skip-git-repo-check',
             '--sandbox','workspace-write','-C',str(scratch),'--json','--output-schema',str(Path(schema).resolve()),
             '--output-last-message',str(output),'-m',model]

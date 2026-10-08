@@ -100,3 +100,7 @@ r3冻结最终 **430 passed/32 skipped/1 warning/143.61s**，编译/diff check�
 ## Checkpoint07：公共日志 UI
 
 最终Chrome/reducer/geometry/log-validator **13 passed/0 skipped/5.85s**，相关Python logs/API/local **39 passed/1 warning/5.21s**；模块语法/fixture编译/diff通过。列表不预读正文、索引过滤/固定high-water下一页、独立业务cursor、虚拟DOM、503同项目保留/恢复、乱序body与身份重置后迟到list/body隔离已验证。High本范围无剩余MUST_FIX，具体修复/过程失败/hash/命令见CHECKPOINT_07.md及evidence/checkpoint-07-final-tests.txt。未改后端且未重跑全量430/32；工具metadata/资源/完整M1–M5继续保留。
+
+## Checkpoint08：private工具返回provenance基础
+
+新worker上下文/CPU bound intent/闭合return fact与crash/replay/换代/隐私负例通过。目标 **68passed/1skipped/46.63s**，High独立31passed/1deselected；最终冻结全回归 **455passed/32skipped/1warning/145.80s**，compileall/pip check/diff通过。命令/hash见CHECKPOINT_08.md/evidence/checkpoint-08-final-tests.txt。private记录不证明放行/STARTED/RUNNING或完整STOP，尚无public collector/API/UI工具条目，UI仍未接入。没有模型/GPU/公开部署；M1–M5继续保留。

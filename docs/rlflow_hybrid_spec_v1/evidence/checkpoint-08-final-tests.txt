@@ -1,0 +1,29 @@
+2026-10-08 checkpoint08 frozen evidence; private provenance foundation only.
+
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q -rs
+audit/hybrid-v1/checkpoint-08-full-pytest.log
+455 passed, 32 skipped, 1 warning in 145.80s (0:02:25)
+Skips: existing external dispatcher18/H1 14. Warning: Starlette anyio alias deprecation.
+
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q tests/test_tool_return_facts.py tests/test_command_checkpoints.py tests/test_cpu_approval.py tests/test_process_recovery.py tests/test_startup_observation.py tests/test_startup_v3.py
+audit/hybrid-v1/checkpoint-08-targeted-final.log
+68 passed, 1 skipped in 46.63s
+
+Independent High read-only command/fact subset: 31 passed, 1 deselected in 3.56s.
+No MUST_FIX in private foundation; public collector/authority marker/STOP remains unimplemented.
+
+.venv/bin/python -m compileall -q rlflow tests/test_tool_return_facts.py
+.venv/bin/python -m pip check
+git diff --check
+All exit 0; No broken requirements found.
+
+SHA256:
+e55ea11974bbb57a1c06e68030bb354a5f996454b124ab00f0d579b30ddb9636  rlflow/isolation.py
+1743e0a33cce5e6526c603f22bcf4b2d91be79877cea4bd880426c0925180515  rlflow/worker.py
+549ba2a142a485899c279f170ccd69321e2193db0d59a1a91227dc60f7b9962d  tests/test_tool_return_facts.py
+3dc93a3b375b79873c2660af4de32c6f6f5c982c1841850e43b2b9e1c31c0a00  tests/test_cpu_approval.py
+282400bdbdfbbc3e2f427bfbf3ae297326f5b51d2196b8bbdab01d809f459507  audit/hybrid-v1/checkpoint-08-targeted-final.log
+ac47ffa3628fb0d08b79d3f964bc9ff90bc293042ee152b3e52be964dd9e5ac3  audit/hybrid-v1/checkpoint-08-full-pytest.log
+
+No model/GPU/train/public listener/production/push; root package-lock untouched.
+No new browser run: static/Web unchanged, checkpoint07 actual browser evidence retained.

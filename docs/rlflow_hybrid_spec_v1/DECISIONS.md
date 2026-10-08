@@ -61,3 +61,7 @@ append-only refs增加INSERT成员/severity guard；只读路径仍防御异常�
 ## 2026-10-08：日志显示与业务消费隔离
 
 公共日志页固定high-water，单页50条替换而非无界累计，虚拟DOM与SSE消费位置独立。SSE新增仅显示可能不匹配筛选的提交数；改变过滤必须读首页，不借日志滚动修改domain cursor。正文只在用户选择后读取，list/detail serial处理乱序，身份/项目/epoch清理隐藏dialog的内容而非仅close。同项目刷新失败保留已验证页，明确OFFLINE；不为资源/工具未知提供模拟数据。
+
+## 2026-10-08：工具provenance与执行authority分离
+
+先在现有可信CPU工具链增加闭合request/generation指针及private return fact，不将原始events.jsonl/命令输出公开。PREPARE context只绑定身份，不声称已release；返回state不声称STARTED/RUNNING或成功。result先提交、fact可幂等补齐且无伪造的绝对发生时间，intent-only不重执行。后续collector必须独立对照DB release/session、request与startup proof、实际permissions；逐工具STOP/授权marker另属受控runtime安全门槛，不由provenance替代。

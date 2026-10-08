@@ -38,4 +38,10 @@ def test_cpu_exec_is_only_preapproved_tool(tmp_path, monkeypatch):
         assert mcp['role'] == role
         assert mcp['write_roots'] == [str(write_root)]
         assert env['CUDA_VISIBLE_DEVICES'] == ''
-    assert len(calls) == len(isolation.ROLES)
+    context = {'schema_version':'1.0','session':'session_one','generation':'generation_one',
+               'request_sha256':'1'*64,'candidate_sha256':'2'*64}
+    isolation.codex_command('Engineer',tmp_path/'candidate',tmp_path/'scratch',tmp_path/'schema',
+                           tmp_path/'control/bound-result',tool_context=context)
+    bound = json.loads((tmp_path/'control/bound-result.mcp.json').read_text())
+    assert bound['tool_context'] == context
+    assert len(calls) == len(isolation.ROLES)+1

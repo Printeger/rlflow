@@ -7,7 +7,7 @@ import signal
 import subprocess
 import sys
 import time
-from .store import atomic, canonical
+from .store import atomic, canonical, sha
 from .policy import stopped
 from .jobs import identity
 
@@ -58,6 +58,10 @@ def run(path):
             if runtime:
                 read_extra.append(runtime['root'])
                 execute_extra.append(runtime['root'])
+            tool_context = None
+            if request.get('recovery_protocol',1) >= 2:
+                tool_context = {'schema_version':'1.0','session':request['id'],'generation':request['generation'],
+                                'request_sha256':sha(request),'candidate_sha256':sha(request['before'])}
             argv, env = codex_command(request['role'], Path(request['repo']), Path(request['scratch']),
                                       Path(request['schema']), artifact_dir / 'result.json',
                                       model=compute.get('model', 'gpt-5.6-sol'), effort=compute.get('effort', 'medium'),
@@ -65,7 +69,7 @@ def run(path):
                                       execute_extra=execute_extra or None,
                                       write_roots=request.get('write_roots'),
                                       memory_bytes=runtime['address_space_bytes'] if runtime else 2*1024**3,
-                                      command_seconds=request.get('command_seconds',120))
+                                      command_seconds=request.get('command_seconds',120),tool_context=tool_context)
             if resource_record and resource_record.get('disk'):
                 home=artifact_dir/'codex-home';home.mkdir(mode=0o700)
                 original=Path(env.get('CODEX_HOME',str(Path(env.get('HOME',str(Path.home())))/'.codex')))
