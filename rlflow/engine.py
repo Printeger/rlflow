@@ -970,6 +970,8 @@ def reconcile(store):
 
 def daemon(root):
     store = Store(root)
+    from .snapshot_maintenance import Maintenance
+    maintenance=Maintenance(store)
     with store.lock("daemon", nonblocking=True):
         atomic(store.root / "runtime/daemon.json", canonical(identity(os.getpid())))
         generation = daemon_generation()
@@ -988,6 +990,7 @@ def daemon(root):
                     handoff(store.root,identity(os.getpid()))
                     return
                 dispatch_one(store)
+                maintenance.tick()
             except Exception as exc:
                 print(time.strftime("%FT%T"), type(exc).__name__, str(exc), flush=True)
             time.sleep(1)

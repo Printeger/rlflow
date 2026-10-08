@@ -1,5 +1,7 @@
 # 系统实施验收记录
 
+Checkpoint15 周期快照维护：冻结全回归586passed/32既有外部依赖skipped/1既有warning/215.49s，定向108passed，独立High37passed/无新增MUST_FIX，Chrome+Node20passed/0skipped/9.44s。第1000次写只标记due、锁外构造/原子发布确认、marker索引、真实线程并发及三处实际进程死亡恢复通过。小型单样本8MiB锁占用43.238→15.825ms但总耗时更高，非B1/RSS/WAL或硬时限验收。见CHECKPOINT_15.md/SNAPSHOT_MAINTENANCE.md/evidence；legacy热路径、M1 gate、M2–M5/闭环/长期验收继续保留。
+
 2026-10-08，基线 HEAD `d25cf02`，Python 3.12.3。本报告区别于原需求包的静态验证。
 
 | 命令 | 结果 | 能证明的范围 |

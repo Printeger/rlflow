@@ -26,3 +26,9 @@ NFR-10要求固定当前projection规模下历史events从10k→100k普通写p95
 独立High建议的最小快照方向：`_commit`同事务只记录small snapshot_due版本槽，不新增core event/version；单个maintenance从readonly BEGIN一致快照捕获V、immutable event tip与projection，锁外构造/validate/hash；短writer事务重新核对immutable tip后发布完整snapshot V，清理仅≤V的due。新core写允许继续；构造/崩溃未完整发布一概不用于recover，保留旧完整snapshot+完整事件tail，不改outbox/log/epoch或历史事件字节。
 
 这只是待验证设计：首次锁外full状态构造仍O(projection)/RSS，不等于流式bounded；必须有single-job、失败保留due和WAL read transaction期限/abort，后续chunk/manifest才可声称内存有界。显式Store.snapshot/原snapshot兼容、digest与version核验、恢复tail校验、idempotency/expected-version/事务rollback/单writer均不能删除或弱化。lazy map改造须单独测试membership、delete/clear/pop、original mutation检测、callback授权读取和consistent read snapshot，不能为省keys破坏authority语义。
+
+## Checkpoint15 实施后的更新
+
+上述 due/锁外构造/原子发布已实施并经定向、完整回归及独立 High 复核；marker 部分索引的实际 EXPLAIN 负例保证不再 SCAN 全 projection。旧审计描述保留为 checkpoint14 的基线，不表示当前 `_commit` 仍同步构造快照。
+
+独立小型单样本探针：8MiB ASCII historical payload 下手动 snapshot 总43.330ms/锁43.238ms，新 maintain 总63.158ms/锁15.825ms。只是兼容入口锁占用比较，不是吞吐提升、old commit 基准或 B1；发布完整 BLOB 仍随大小增加锁占用。详见 CHECKPOINT_15.md。固定投影10k→100k历史、真实10k任务/public events、RSS/WAL、B1及idle尚未测量；ObjectMap全keys、legacy transact/reconcile热路径与重复validator构造仍未优化。

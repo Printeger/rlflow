@@ -158,6 +158,9 @@ class Store:
                         db.execute("UPDATE projection SET object_status=? WHERE section=? AND object_key=?",(status,section,key))
                     db.commit()
                 db.execute("CREATE INDEX IF NOT EXISTS projection_status ON projection(section,object_status,object_key)")
+                db.execute("CREATE INDEX IF NOT EXISTS projection_markers ON projection(section) WHERE object_key=''")
+                maintenance_new=not db.execute("SELECT 1 FROM sqlite_master WHERE name='snapshot_due'").fetchone()
+                db.execute('CREATE TABLE IF NOT EXISTS snapshot_due (singleton INTEGER PRIMARY KEY CHECK(singleton=1),due_version INTEGER NOT NULL,last_complete INTEGER NOT NULL)')
                 from .observation import initialize_tables
                 initialize_tables(db)
                 if db.execute("SELECT version FROM projection_meta").fetchone() is None:
@@ -168,6 +171,13 @@ class Store:
                 projected=db.execute("SELECT version FROM projection_meta WHERE singleton=1").fetchone()[0]
                 latest=db.execute("SELECT COALESCE(MAX(seq),0) FROM events").fetchone()[0]
                 if projected!=latest and not allow_rebuild:raise Conflict("projection version mismatch; explicit offline rebuild required")
+                completed=db.execute('SELECT COALESCE(MAX(version),0) FROM snapshots').fetchone()[0]
+                due=projected//1000*1000
+                if maintenance_new:db.execute('INSERT INTO snapshot_due VALUES(1,?,?)',(due if due>completed else 0,completed))
+                maintenance=db.execute('SELECT due_version,last_complete FROM snapshot_due WHERE singleton=1').fetchone()
+                if (maintenance is None or any(type(v) is not int or not 0<=v<=projected for v in maintenance)
+                        or maintenance['last_complete'] and not db.execute('SELECT 1 FROM snapshots WHERE version=?',(maintenance['last_complete'],)).fetchone()):
+                    raise Conflict('snapshot maintenance metadata requires explicit recovery')
 
     def connect(self):
         db = sqlite3.connect(self.db, timeout=30)
@@ -357,8 +367,8 @@ class Store:
         from .observation import commit as observe
         observe(db,source_event_id,event_type,observation_payload,ver,timestamp)
         if ver % 1000 == 0:
-            raw = canonical(self.replay(db))
-            db.execute("INSERT INTO snapshots VALUES(?,?,?)", (ver,raw,hashlib.sha256(raw).hexdigest()))
+            if db.execute('UPDATE snapshot_due SET due_version=MAX(due_version,?) WHERE singleton=1',(ver,)).rowcount!=1:
+                raise Conflict('snapshot maintenance metadata missing')
         return ver
 
     @staticmethod
@@ -477,6 +487,7 @@ class Store:
             db.execute("BEGIN IMMEDIATE")
             state=self.replay(db);raw=canonical(state)
             db.execute("INSERT OR REPLACE INTO snapshots VALUES(?,?,?)",(state["version"],raw,hashlib.sha256(raw).hexdigest()))
+            db.execute('UPDATE snapshot_due SET due_version=CASE WHEN due_version<=? THEN 0 ELSE due_version END,last_complete=MAX(last_complete,?) WHERE singleton=1',(state['version'],state['version']))
             return {"version":state["version"],"sha256":hashlib.sha256(raw).hexdigest()}
 
     def export(self):
