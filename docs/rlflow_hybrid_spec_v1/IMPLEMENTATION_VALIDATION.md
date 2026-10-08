@@ -133,6 +133,8 @@ HOST/STATE_FILESYSTEM/SUPERVISOR_PROCESS明确分域、loop限频best-effort心�
 
 ## Checkpoint18：组合历史/归档任务的真实daemon idle
 
+Checkpoint22新的同档案终态父exit0、child TERM/reaped：baseline→last300.000624s、CPUΔ2.55s→单核0.849998%（CPU子指标<1%）、301采样RSS33.640625MiB，core/public/task/session/source不变；High只读精确复算/全部witness与SHA一致，无证据/安全MUST_FIX。源仍7be43b8，原614/32/1绑定回归未重跑；见IDLE_PERFORMANCE.md/evidence/checkpoint-22-final-tests.txt。旧checkpoint18失败保留、完整NFR06全仓库轮询/B1/M1及M2–M5仍未通过。
+
 Checkpoint21：root86/High86passed、冻结614passed/32skipped/1warning/251.12s，四种hint/formal状态变化无准备/无新session/预算不变、无候选view trap/generation实际调用。范围/source SHA见CHECKPOINT_21.md/evidence。原长测CPU失败保留，后续新测量不混为已完成NFR06/B1。
 
 Checkpoint20 closed early gate：root89+新模块10passed、High94passed/69.91s、冻结609passed/32skipped/1warning/251.96s；source/log SHA及范围见CHECKPOINT_20.md/evidence。无新的CPU/浏览器或M1通过声明，原长测失败不变。

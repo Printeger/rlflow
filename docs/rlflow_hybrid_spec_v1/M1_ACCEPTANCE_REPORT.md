@@ -25,6 +25,8 @@
 
 ## 当前结论及下一项
 
+Checkpoint22新的同100k/10k归档档案daemon-only300.000624s实测单核CPU0.849998%，相较旧单对1.7733%下降，CPU子指标<1%；301采样RSS33.641MiB、核心/公共/任务/会话/来源不变，完整原始baseline可复算。见IDLE_PERFORMANCE.md/evidence。仍全控制仓库逐秒轮询、无API合计与完整B1/长期，所以NFR06/M1 gate依旧未通过，不拿局部CPU结果解除其它门槛。
+
 M1 gate **未通过**，不是失败即停止整个Goal。真实历史固定单对象cardinality 10k→100k探针已终态exit0、ratio1.041488≤2与recover==audit==replay通过，见 HISTORY_PERFORMANCE.md；只证明该单轴，不代替完整B1。随后按证据测真实10k任务/活跃工作、B1读写与idle、维护RSS/WAL，并继续真实来源与长期场景。不能通过删除历史、放宽时限、编造counter或无说明跳过来通过。
 
 M2–M5 待执行：GoalContract/可信authority/命令/STOP/lease/runtime/结算/独立评审、实验与科研状态、资源可靠性、安装迁移、可信远程与历史纯回放。可按依赖开展设计/静态探索，但可写闭环上线必须满足可信批准与可靠STOP，不由只读Dashboard通过代替。

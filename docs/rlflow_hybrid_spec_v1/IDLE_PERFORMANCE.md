@@ -1,5 +1,19 @@
 # 组合历史/归档任务的有限 daemon idle 探针
 
+## Checkpoint22：视图优化后的新测量（已终态）
+
+生产7be43b8已通过冻结614/32/1与独立86回归；三项变化为daemon省reconcile尾view、outer closed control早门、inner无候选不构造full view。generation及全仓库watch原位保留。2026-10-09新独占audit/hybrid-v1/checkpoint-22-idle-r1，以同source100k严格只读backup及10k DONE/allfalse任务测300s（warmup5s），命令同前仅新output；新driver序列化显式baseline。此次只评价三项变化合计效果，不做逐项归因或统计显著性声明，不替代完整NFR06/B1。
+
+原工具session53811与daemon1197221/PGID1197221/starttime142347570/boot fa257cc3-1204-4e6f-88a5-a8a2ea7743aa live；日志audit/hybrid-v1/checkpoint-22-idle-r1.log。core100001/public100051、epoch store_351132e5203548729d858cdae0dd729a；source DB SHA仍bb148ad0b22bfbe27632915e3985b1a643bcf3fb1836f6fa84e045ad3756db4c。源码/tests/config冻结、无并行测试。恢复先查原handle，不因等待timeout另起。一次只读辅助query：read_monotonic1423577.145655354、telemetry seq100/monotonic1423576.679769619/epoch一致；仅辅助采样进展。终态CPU/RSS/不变式与独立重算待补，原checkpoint18失败不改。
+
+最新终态覆盖上述执行时记录：parent session53811 exit0、直接child正常TERM -15/已reap/owns=false、daemon.log空。实际区间300.00062407087535s，显式baseline CPU0.09s到末采样2.64s、差2.55s，单核 **0.8499982318028649%（CPU子指标<1%）**；301条原始采样RSS峰35274752B（33.640625MiB）。业务core/event100001、public100051、task10000/session0与原source不变，telemetry最终seq300/monotonic1423780.295567013，仅辅助进展。root从原始baseline与末行精确独立重算与summary一致，首baseline精度限制已在未来driver修复，不更改旧日志。
+
+portable evidence/checkpoint-22-idle.jsonl与raw log逐字节相同SHA `5abe002a7e055d1bc81b74a930beb4d2ba1200cd16d74ab1f83b85c9827490d9`；clone DB SHA `8762088ff56cd947443340bfed8be508731cf0fc4e67484c5ce37a4723949768`。原source SHA不变。与checkpoint18该单对区间1.7733%→0.8500%，仅合计观察，不做单项因果/重复性/统计显著性声明；sampled RSS38.016→33.641MiB亦非生命周期HWM。独立终态证据核验待补。
+
+**不是完整NFR06通过**：仍逐秒全控制仓库watch，且无API/3项目/活跃Goal/限定4CPU8GiB/双端/B1事件速率；也不是完整内存合计、8h/24h或M1退出证明。下一安全源码guard设计与全B1/read-write/来源/长期证据继续，不重启原终态probe或覆盖旧失败。
+
+High终态独立只读核验已完成：baseline原始CPU/elapsed逐float与summary相同、301样本单调、RSS精确、task DONE/allfalse、core/public/epoch/session、sourceDB/空WAL、两身份witness/currentgeneration/空log/child退出、telemetryseq300及归档SHA均一致，无剩余证据/安全MUST_FIX。未重新跑测试或benchmark。本checkpoint生产未改，沿用7be43b8冻结614/32/1和High86证据，不重新包装为本次重跑；evidence/checkpoint-22-final-tests.txt绑定source/log/DB。
+
 Checkpoint18，实测CPU未达目标，完整B1与M1 gate仍未通过。
 
 ## 方法与安全范围

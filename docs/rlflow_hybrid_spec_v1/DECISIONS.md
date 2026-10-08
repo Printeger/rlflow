@@ -93,6 +93,8 @@ append-only refs增加INSERT成员/severity guard；只读路径仍防御异常�
 工具feature公开起点与event retention floor分开。优先live-only，不隐式回填旧COLLECTED；public_tool_meta缺失/损坏却已有旧公共工具状态拒绝重新初始化。工具日志与CORE_STATUS分同事务观察batch，原模板/count状态解释逐字段保持不变，共享refs验证task/execution筛选。资源telemetry以后必须独立sample ID/时间，不占durable业务seq。
 # Checkpoint13：资源观测旁路与freshness
 
+Checkpoint22在新独占同档案保留旧失败，真实300s daemon CPU0.849998%且显式baseline精确独立复算。只评价三项view-elision合计观察，不个别归因/不主张显著性，不由CPU子阈值解除全仓库轮询/API+B1/长期及完整目标；源未改不重跑已绑定614回归。见IDLE_PERFORMANCE.md/evidence。
+
 Checkpoint21保留generation原首行，仅无候选closed hint否决时跳过inner完整view；实际候选必须重新正式读，不使用早门对象或改变权限/预算。四种实际状态变更拒绝验证，独立High关闭范围问题。三项视图优化只在新一次实际测量评估合计效果，不据614绿推断CPU。见CHECKPOINT_21.md。
 
 Checkpoint20选择closed标量/list早门，同BEGIN解blob+strict type与owned reader close；非授权、不增enabledgate，仅替换outer原view，pending/release/inner/generation全保留。独立审查发现inotify不能覆盖mmap/远程/挂载覆盖，所以未直接用事件缓存代替原监控；后续必须解决真实工作边界的完整验证。见CHECKPOINT_20.md。

@@ -1,0 +1,24 @@
+Checkpoint22: new actual-daemon idle observation after three view-elision changes.
+Measured production 7be43b8; no production/test changes in this checkpoint.
+Existing frozen 614 passed/32 established skips/1 existing warning in 251.12s and independent86/67.92s apply to identical source; not rerun or relabeled new results.
+
+.venv/bin/python -m tests.acceptance_idle_v1 audit/hybrid-v1/checkpoint-16-history-r1/state/runtime/research.db audit/hybrid-v1/checkpoint-22-idle-r1 --tasks 10000 --min-events 100000 --seconds 300 --warmup 5
+Parent original session53811 terminal exit0; daemon1197221/PGID1197221/starttime142347570/boot fa257cc3-1204-4e6f-88a5-a8a2ea7743aa intentionalTERM -15, reaped, owns=false.
+301 raw samples; baseline time1423480.834469262/CPU0.09s; final CPU2.64s; elapsed300.00062407087535s/CPUdelta2.55s -> single-core0.8499982318028649%.
+Peak sampled RSS35274752B=33.640625MiB, not lifecycle HWM/control+API sum.
+Core/event100001/public100051/tasks10000/session0/business+source unchanged, twoidentity witnesses match/currentgeneration matches/emptydiagnostic.
+Final telemetry_seq300/monotonic1423780.295567013 (auxiliary sampler progress only).
+Root raw exact recomputation agrees; independent High read-only review confirms exact floats, monotonic samples, RSS, all inactive task completions, core/public/epoch/session, source DB/WAL, two identity witnesses/current generation/empty log/dead child and byte-identical archive. No remaining evidence/safety MUST_FIX; no independent rerun.
+
+SHA256:
+e0457c07636dfc77c9a90454ce9a8e07c093576052eab5fdfea3229f112b2d34  tests/acceptance_idle_v1.py
+2bafba19e05f46114cf022669c4b1cb0f0bdaaf516397c364d2aa6c13bf090ca  rlflow/engine.py
+38f364ab1b43d1855cd7790519ff0b9dfaac6eb1c38306a7f89670a35bfea89a  rlflow/store.py
+5abe002a7e055d1bc81b74a930beb4d2ba1200cd16d74ab1f83b85c9827490d9  audit/hybrid-v1/checkpoint-22-idle-r1.log
+5abe002a7e055d1bc81b74a930beb4d2ba1200cd16d74ab1f83b85c9827490d9  docs/rlflow_hybrid_spec_v1/evidence/checkpoint-22-idle.jsonl
+8762088ff56cd947443340bfed8be508731cf0fc4e67484c5ce37a4723949768  audit/hybrid-v1/checkpoint-22-idle-r1/state/runtime/research.db
+bb148ad0b22bfbe27632915e3985b1a643bcf3fb1836f6fa84e045ad3756db4c  audit/hybrid-v1/checkpoint-16-history-r1/state/runtime/research.db
+
+Paired observations: prior daemon-only1.7733% -> new0.8500%, aggregate only; no individual causal attribution/statistical significance/repeatability claim.
+CPU-only subthreshold met; full NFR06 NOT met (full source polling remains), full B1 false (no API/projects/activeGoal/hardwarelimits/viewers/rates), M1/M2–M5/soak/actual closedloops/install not delivered.
+Prior checkpoint18 failed observation preserved. Do not restart terminal handles or overwrite old evidence.

@@ -1,5 +1,11 @@
 # Hybrid v1 开发进度
 
+Checkpoint22独立终态核验完成：High逐float精确重算baseline/CPU/elapsed、RSS/301单调样本/allfalse DONE任务与core/public/epoch/session/sourceDB+WAL/identity/generation/log/退出/归档SHA全部匹配，无剩余证据/安全MUST_FIX。生产仍7be43b8，未新增full/browser/test或benchmark重跑；见IDLE_PERFORMANCE.md/evidence/checkpoint-22-final-tests.txt。仅daemon-onlyCPU子指标0.849998%通过，无全仓库轮询/B1/M1/完整M0–M5仍待实现，Goal active。
+
+Checkpoint22终态exit0覆盖下述live记录：原53811已结束/child1197221 TERM-reap/ownsfalse，100k+10k同档案实际300.000624s单核CPU0.849998%（daemon-only CPU子指标<1%）、sampled RSS35274752B、301样本；baseline原始重算精确一致，core100001/public100051/task10000/session0/source保持不变，telemetryfinalseq300仅辅助。见IDLE_PERFORMANCE.md与evidence/checkpoint-22-idle.jsonl，独立终态核验待补。旧1.7733%失败保留；本对仅合计观察不做单项因果，仍全仓库watch/API+B1/长期/完整M1 gate及M2–M5未满足，Goal active。
+
+Checkpoint22长测live：checkpoint21已提交7be43b8，原full614/32/1与High86终态且新probe启动前安全无阻塞。当前新一次同100k/10k档案300s真实daemon测量，父原工具session53811、daemon PID1197221/PGID1197221/starttime142347570/boot fa257cc3-1204-4e6f-88a5-a8a2ea7743aa；audit/hybrid-v1/checkpoint-22-idle-r1.log，core100001/public100051、新epoch store_351132e5203548729d858cdae0dd729a。source SHA仍bb148ad0b22bfbe27632915e3985b1a643bcf3fb1836f6fa84e045ad3756db4c，仅只读backup，没有活跃Goal/model/API。源码/测试/配置冻结，无并行测试；恢复先查同handle、不能因观察timeout另起probe。仅测三项view-elision合计CPU收益，结果待终态；全仓库watch与generation未改，不能宣称完整NFR06/B1/M1通过。Goal active。
+
 Checkpoint21终态覆盖下述过程记录：inner无候选hint（非授权）+正式重新读取/generation原位完成；root86passed/40.99s、High86passed/67.92s无MUST_FIX、冻结614passed/32既有skips/1warning/251.12s，46989/91710均exit0，compileall/pip/diff通过。见CHECKPOINT_21.md/evidence。下一新独占fixture实际300s测三项视图优化合计效果（不单项归因）；代码watch未改，NFR06无全仓库轮询/B1/M1仍未通过，Goal active。
 
 Checkpoint21最新覆盖下述r2在跑记录：原9495已终态exit0，86passed/40.99s；compileall/diff通过。现在冻结全量原session46989/log audit/hybrid-v1/checkpoint-21-full-r1.log已确认live；High当前slice只读/独立复验待回，不能据root绿标完成。源码/测试冻结，恢复先查同handle（不因观察timeout重启），结果后建证据与commit，继续真正idle性能/监控安全与全M0–M5。没有新的CPU/B1/NFR06通过声明。
