@@ -2,6 +2,8 @@
 
 目前仍可推进开发，没有需要终止完整 Goal 的外部阻塞。
 
+Checkpoint16单对象真实100k历史终态/完整性/ratio1.041488已验证，无新外部阻塞；完整B1、任务cardinality、活跃reconcile/idle/维护并发/RSS/WAL和长期证据仍未完成。M1_ACCEPTANCE_REPORT.md明确列出范围，下一项继续实际10k任务测量，不把单轴通过当完成或阻塞。
+
 Checkpoint15 已移出周期快照全状态构造并通过586/32全回归、独立37项和browser20项，没有新增外部阻塞。full-state builder仍非chunk/硬RSS/硬时限；发布BLOB、WAL retention、大规模尾延迟/idle与B1未完成，已有metadata损坏仅fail closed非自动repair交付。继续性能分轴测量和热路径整改，再完成M1 gate进入M2–M5，不将单样本锁占用探针冒充完整验收。
 
 Checkpoint14：telemetry SSE/资源UI开发缺口已补，High两项迟到generation/排队续鲜finding已关闭，scope/source因果与optional发送错误隔离复验通过。B1/周期snapshot/首次历史性能与M1 gate及M2–M5仍是待开发/验收，不是需要停止Goal的外部阻塞。真实HOST浏览器数据不冒充真实vendor/工程科研闭环。

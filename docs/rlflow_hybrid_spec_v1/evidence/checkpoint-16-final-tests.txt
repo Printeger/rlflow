@@ -1,0 +1,31 @@
+Checkpoint16 evidence (2026-10-08; production baseline4623b42)
+Scope: warm sequential one-usage-object fixed cardinality real core/public history. NOT exact fixed bytes, NOT full B1/M1/Hybrid completion.
+Production code unchanged; did not rerun full586 or browser20 in this checkpoint. Baseline frozen results belong to checkpoint15.
+Commands:
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q tests/test_acceptance_history_v1.py tests/test_snapshot_maintenance.py tests/test_projection_v3.py
+.venv/bin/python -m tests.acceptance_history_v1 audit/hybrid-v1/checkpoint-16-history-r1 --checkpoints 10000 100000 --samples 200
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q tests/test_acceptance_history_v1.py tests/test_hybrid_observation.py (independent High)
+.venv/bin/python -m compileall -q tests/acceptance_history_v1.py tests/test_acceptance_history_v1.py
+.venv/bin/python -m pip check (No broken requirements found)
+git diff --check (passed)
+Root target:40 passed in3.20s. Initial r1:1failed/2passed; short unit profile no1000 boundary incorrectly demanded maintain=True; corrected assertion against actual pending, no fake due/no production relaxation; failure retained.
+High:28 passed in2.10s. Independent raw sample p95/ratio recomputation and source/schema SHA check passed; no remaining narrow-scope MUST_FIX. Documentation clarified Hybrid Web commands absent vs existing CLI/core STOP unchanged, lock body timing excludes flock release syscall.
+Actual process PID1145448 started2026-10-08 22:43:51 Asia/Shanghai; exec session82782 returned exit_code0, PID absent. Original run retained, not restarted.
+10k: core10000/public10001/projection14/usage1; ordinary199 samples p95=8.337045ms; holdp95=8.293555ms; boundarytotal7.018713ms; direct snapshot/page/eventpage p95=0.594425/0.239452/25.625400ms; maintain10.702666ms; pre-audit cumulative single-process RSS39556KiB.
+100k: core100000/public100001/projection14/usage1; ordinary199 samples p95=8.682933ms; holdp95=8.619053ms; boundarytotal5.888500ms; direct snapshot/page/eventpage p95=0.642655/0.179271/25.547475ms; maintain11.078074ms; pre-audit cumulative single-process RSS40384KiB.
+Ratio=1.0414880812086298; <=2 for this narrow probe only.100 total boundarysamples all retained; max11.077177ms.
+Final recover==audit==replay. Readonly postcheck: exact public=core+1; last source version/object version/fixture input_tokens100000; due_complete(0,100000); data_modefixture. Synthetic input_tokens not real supplier usage.
+Host x86_64/16 logical CPUs, Python3.12.3; unconstrained host, direct Reader not HTTP/auth/SSE/browser; no3projects/10ktasks/rate/burst/maintenance concurrency/soak. No model/scheduler/GPU/paid calls. No history export on hot writes.
+Raw samples and all boundaries captured in tracked checkpoint-16-history.jsonl (byte-identical raw log SHA). Raw local DB413MiB retained outside Git; source/schema/SQLite/perf_counter/argv/start/terminal provenance log retained; future evidence must not reuse this as completeB1.
+SHA:
+5afe79660a97a3f86fd163e134b67b0f21a8366bced6ba10196592e1373d01e1  tests/acceptance_history_v1.py
+d75cfbcd1f0afb627e879ff184a61ca60cde29ebdea64983a0363e0f190a62df  tests/test_acceptance_history_v1.py
+0afe6f6f92a31be579bfb2b067a9b64dcf044a969dc52006e0ca4e6be6df4659  audit/hybrid-v1/checkpoint-16-probe-unit-r1.log
+baf1afd93b423d89f3c293d9c2b52cdfb4faf2e4880be646004856d7570fee81  audit/hybrid-v1/checkpoint-16-probe-unit-r2.log
+196058455d9cbd16a417a337f0e8fbc83854a02dddb93391bfb76ad3105b703d  audit/hybrid-v1/checkpoint-16-high-r1.log
+4945a59dc5aa0612d2b55e6f37f8bdc0136c7d2fe4be1666828a73ff620e8724  audit/hybrid-v1/checkpoint-16-history-r1.log
+bd060f65c8e7005ddd9cdc15eaa33c7e1fa0d03d217a86fef07dc4cf4049f4c4  audit/hybrid-v1/checkpoint-16-public-facts-r1.log
+4fbd16e362543889bc3205f612ae0990011e58863c4023128853cd62be7ae85e  audit/hybrid-v1/checkpoint-16-provenance-r1.log
+bb148ad0b22bfbe27632915e3985b1a643bcf3fb1836f6fa84e045ad3756db4c  audit/hybrid-v1/checkpoint-16-history-r1/state/runtime/research.db
+4945a59dc5aa0612d2b55e6f37f8bdc0136c7d2fe4be1666828a73ff620e8724  docs/rlflow_hybrid_spec_v1/evidence/checkpoint-16-history.jsonl
+

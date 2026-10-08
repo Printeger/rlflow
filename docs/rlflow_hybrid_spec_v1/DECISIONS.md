@@ -1,5 +1,9 @@
 # 开发决策记录
 
+## Checkpoint16：历史轴与投影轴分开验收
+
+不把静态“普通写无全history replay”当性能通过。实际Store→observer逐次提交100k公共/控制事件，预定尾200窗口（普通199+一个千次边界）与全100边界分列，不挑快样本或造历史；锁body时长与总耗时分开，direct Reader和维护另测。结果ratio1.041488/完整性通过但限定warm单usage固定cardinality、宽宿主、无并发；原始JSONL随Git保存、DB本地保留、SHA绑定。生产未改，不重复声明新全量/browser执行；下一项依然真实10k任务和活跃工作轴及完整B1。M1_ACCEPTANCE_REPORT明确未过gate，不能用本probe缩减M0–M5。
+
 ## ADR-001：保持完整目标和用户授权
 
 附件明确批准 M0–M5，覆盖 CODEX_START 仅批准 M0/M1 的初始建议。遵循完整实施依赖和 PRD 安全条件，不改低验收标准。上级工作区的旧 instinctRL 双角色 Order 不用于本独立项目；用户本次明确授权为任务范围。
