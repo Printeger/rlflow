@@ -211,6 +211,12 @@ def collect(store,sid,*,limit=32):
                 if outcome is not None:
                     fact,verification,reason,validation = outcome
                     value.update(status='COLLECTED',fact=fact,verification=verification,reason=reason,validation_digest=validation)
+                    if verification=='VERIFIED':
+                        # Freeze lineage from the request validated against this
+                        # generation, not from a later mutable session at read time.
+                        # Old collected receipts without this field stay unknown;
+                        # never silently backfill historical task attribution.
+                        value['task_id'] = request['task_id']
             if pending:source['pending_after']=pending[-1][0]
             source.update(cursor=page['cursor'],incomplete_tail=page['incomplete_tail'],status='ACTIVE',reason=None)
             if session.get('status') not in ACTIVE and not page['has_more'] and not any(v['status']=='PENDING' for v in updates.values()):

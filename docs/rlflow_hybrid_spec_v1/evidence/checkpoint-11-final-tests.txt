@@ -1,0 +1,19 @@
+Checkpoint11 2026-10-08; frozen source; no model/GPU/public deployment.
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q tests/test_tool_collector.py tests/test_tool_journal.py tests/test_tool_return_facts.py tests/test_store_policy.py tests/test_engine.py tests/test_hybrid_observation.py tests/test_public_logs.py
+200 passed in 73.49s; audit/hybrid-v1/checkpoint-11-lineage-target-r2.log
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q -rs
+507 passed, 32 skipped, 1 warning in 188.76s; audit/hybrid-v1/checkpoint-11-full-pytest.log
+32 baseline skips: external dispatcher18/H1 implementation14. Warning: Starlette anyio alias deprecated.
+.venv/bin/python -m compileall -q rlflow tests/test_tool_collector.py: exit0
+.venv/bin/python -m pip check: No broken requirements found.
+git diff --check: exit0
+Independent High lineage subset: 4passed; read-only, no outstanding blocker in this private patch.
+Initial target: 28passed/1failed/28.67s; test mistakenly indexed audit()['state']; fixed assertion to actual audit() API, no product weakening.
+SHA256
+a533c1411dfa83cf303a189ad3207dfacc2c1565ce4448c5bf0d7113f6567b4e rlflow/tool_collector.py
+040f251497b6528d0912e55f88e3d29a560de6bd58a0b0600da59ce50f5eca6e schemas/ToolLedger.json
+91b92f0513d7cd5acc39ddeee8284ed9fab6ff5dc98fd04ad124824e3afa4cb4 tests/test_tool_collector.py
+c632dd517f69108bf2b9a127dfb2478955e7640c8fb618cee7df25cbee6b65de audit/hybrid-v1/checkpoint-11-lineage-target-r2.log
+5ca61d435dd1df93b9c64502b04b8f05668c6d036c8830a9ae2971668c6592c7 audit/hybrid-v1/checkpoint-11-full-pytest.log
+20652965f28cb7bf5112d6c38aa94f4423184b5942b46bf06530548f00a073b0 audit/hybrid-v1/checkpoint-11-lineage-target.log
+Public tool projection/API/UI are NOT enabled by this checkpoint. No browser rerun asserted.

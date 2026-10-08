@@ -46,3 +46,5 @@ Checkpoint08：worker新MCP config含closed request/generation指针，bound int
 Checkpoint09：执行前durable REGISTER与closed bounded fd reader已实现，杜绝只依赖返回通知的漏发现窗口；登记时缺launch witness不事后升级。High父目录fsync MUST_FIX关闭，target56passed，独立54passed/1deselected；冻结全回归 **478 passed/32 skipped/1 warning/146.63s**。见CHECKPOINT_09.md/TOOL_DISCOVERY_PROTOCOL.md及evidence。下一项core indexed pending/事务cursor与receipt语义digest、完整release/permission核验及公共工具事实接入，然后资源；M1–M5/完整Goal仍未完成。
 
 Checkpoint10：core private collector/ledger、同事务source cursor+receipt语义digest、indexed公平pending/global scan、完整request/release/startup/permissions/result绑定已接入engine。热view排除ledger、CLI audit/full replay完整保留；非法return隔离与Unicode byte-cap两项High finding关闭。最终target205passed，冻结全回归 **505passed/32skipped/1warning/172.21s**。见CHECKPOINT_10.md/evidence。下一项闭合公共tool projection/log模板/API/UI，再补资源与M1 gate；private VERIFIED不冒充供应商或启动事实，完整Goal仍活跃。
+
+Checkpoint11：VERIFIED返回固定request.task_id，旧COLLECTED缺字段不追认，后续session换task不重写历史。target200passed，High独立4passed，冻结全回归 **507passed/32skipped/1warning/188.76s**；见CHECKPOINT_11.md/evidence。下一公共集成的闭合转换、live-only coverage、旧日志兼容/独立模板与refs筛选门槛记录PUBLIC_TOOL_IMPLEMENTATION_NOTES.md。公共tool/API/UI尚未启用，下一切片继续实施，完整Goal活跃。

@@ -47,3 +47,5 @@ Checkpoint08工具private provenance：最终全回归455passed/32skipped/1warni
 Checkpoint09发现源：冻结478passed/32skipped/1warning/146.63s，target56passed，High父目录fsync finding关闭。见CHECKPOINT_09.md与TOOL_DISCOVERY_PROTOCOL.md。REGISTER不证明工具启动、fd reader不等于core事务collector；公开工具metadata/资源及完整M1–M5仍待交付。
 
 Checkpoint10 private core collector/ledger：target205passed/59.70s，冻结505passed/32skipped/1warning/172.21s，两项High MUST_FIX关闭。见CHECKPOINT_10.md/evidence。恢复/事务/公平扫描及完整绑定已证明，private VERIFIED仍非模型/vendor启动证明；公共工具projection/API/UI、资源、M1–M5及长期验收继续保留。
+
+Checkpoint11 private历史task关联：target200passed/73.49s，High独立4passed，冻结507passed/32skipped/1warning/188.76s，compileall/pip check/diff通过。见CHECKPOINT_11.md/evidence。缺失旧关联保持未知，公共metadata/UI尚未启用，后续安全集成门槛见PUBLIC_TOOL_IMPLEMENTATION_NOTES.md；完整Goal保持活跃。

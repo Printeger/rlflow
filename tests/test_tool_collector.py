@@ -44,6 +44,7 @@ def test_actual_return_ingested_once_without_budget_authority_or_public_raw_text
     assert receipt['status']=='COLLECTED' and receipt['verification']=='VERIFIED'
     assert receipt['fact']['state']=='RETURNED' and receipt['fact']['result_sha256']==sha(result)
     assert receipt['validation_digest'] is not None
+    assert receipt['task_id']==store.get('sessions',sid)['task_id']
     after = store.replay()
     for section in ('stages','tasks','sessions','approvals','authorizations','usage'):
         assert after.get(section)==before.get(section)
@@ -64,6 +65,7 @@ def test_null_registration_witness_never_upgrades_after_release(tools):
     value = next(iter(rows(store,'tool_receipts').values()))
     assert value['status']=='COLLECTED' and value['verification']=='UNVERIFIED'
     assert value['reason']=='REGISTER_UNVERIFIED' and value['validation_digest'] is None
+    assert 'task_id' not in value
 
 
 def test_pending_without_result_stays_discoverable_and_missing_fact_is_recovered(tools,monkeypatch):
@@ -85,6 +87,34 @@ def test_pending_without_result_stays_discoverable_and_missing_fact_is_recovered
     value = next(iter(rows(store,'tool_receipts').values()))
     assert value['status']=='COLLECTED' and value['verification']=='VERIFIED'
     assert not (path/'return-observation.json').exists() and value['fact']['result_sha256']==sha(result)
+    assert value['task_id']==store.get('sessions',sid)['task_id']
+
+
+def test_frozen_task_lineage_is_not_reassigned_from_later_session(tools):
+    store,sid,directory,config = tools
+    execute(config);assert collector.collect(store,sid)
+    receipt = next(iter(rows(store,'tool_receipts').values()))
+    original = receipt['task_id']
+    def reassign(state):state['sessions'][sid]['task_id']='later-private-task'
+    store.transact_objects('FIXTURE_TASK_REASSIGN','fixture_task_reassign',[('sessions',sid)],reassign)
+    assert collector.collect(store,sid)  # Binding mismatch quarantines, not historical reassignment.
+    after = store.get('tool_receipts',receipt['id'])
+    assert after==receipt and after['task_id']==original
+    assert store.get('tool_sources',receipt['source_id'])['status']=='QUARANTINED'
+
+
+def test_old_collected_receipt_without_task_lineage_stays_unknown(tools):
+    store,sid,directory,config = tools
+    execute(config);assert collector.collect(store,sid)
+    receipt = next(iter(rows(store,'tool_receipts').values()))
+    def old_schema(state):state['tool_receipts'][receipt['id']].pop('task_id')
+    store.transact_objects('FIXTURE_OLD_TOOL_RECEIPT','fixture_old_tool_receipt',
+                           [('tool_receipts',receipt['id'])],old_schema)
+    version = store.version()
+    assert not collector.collect(store,sid) and store.version()==version
+    restarted = Store(store.root)
+    assert 'task_id' not in restarted.get('tool_receipts',receipt['id'])
+    assert restarted.audit()==restarted.replay()
 
 
 @pytest.mark.parametrize('damage',['memory','permissions','cwd','argv','checkpoint','witness'])

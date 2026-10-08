@@ -112,3 +112,7 @@ REGISTER先于CPU副作用、固定有界hash-chain journal、登记当时launch
 ## Checkpoint10：core private工具collector/恢复ledger
 
 27新增cases与engine/store/obs/log目标205passed/59.70s，最终冻结 **505passed/32skipped/1warning/172.21s**。High非法return异常、producer/reader Unicode bytes不匹配finding均关闭，当前source与事务范围无MUST_FIX；compileall/pip check/diff通过。绑定真实model-free CPU返回、原预算/authority不变、outbox同回滚、并发一次性、restart/recover/audit、null不追认、终态历史、公平pending/global cursor与Unicode/容量已验证。具体命令/hash/过程失败见CHECKPOINT_10.md/evidence/checkpoint-10-final-tests.txt。未加入公共tool allowlist/body/UI、尚无资源、严格工具STOP、M1–M5或长期验收；周期snapshot全量maintenance例外保留。
+
+## Checkpoint11：历史任务关联前置
+
+private VERIFIED工具返回保存已核验request.task_id，旧缺失不补、后续session不重分配。target200passed/73.49s，High独立4passed；冻结 **507passed/32skipped/1warning/188.76s**，compileall/pip check/diff通过。首次target audit断言API错误已修复且原失败保留，见CHECKPOINT_11.md/evidence/checkpoint-11-final-tests.txt。公共集成方案见PUBLIC_TOOL_IMPLEMENTATION_NOTES.md，尚未启用工具projection/log/API/UI，static未改无browser重跑声明，完整Goal继续。

@@ -1,0 +1,13 @@
+# Checkpoint11：公共工具关联前置
+
+2026-10-08，继承ebca474。本切片只补private可信历史关联，不声明公共工具projection/log/API/UI已接入。
+
+工具receipt首次PENDING→COLLECTED且VERIFIED时，在原collector事务中保存已核验request.task_id。request必须与该generation的DB session匹配，提交时BINDINGS继续CAS检查task_id；关联不是从Web读取时的当前session推导。context.session已经记录执行关联。旧COLLECTED缺task_id允许schema兼容、重启/audit保留缺失，不重新采原文件或补当前任务；UNVERIFIED/PENDING不保存可信task关联。公开转换以后必须将缺失关联解释为未知。
+
+新增两项model-free测试：session后来换task只隔离源、不改旧receipt；旧schema receipt缺task_id在重复采集、重启和完整audit中保持未知。原实际CPU返回、无登记witness和延迟result测试追加可信关联断言。首次target28passed/1failed/28.67s：测试错误假设audit返回state wrapper；核对实际Store.audit直接返回state后修复断言，未改变产品或放宽验证。原失败日志checkpoint-11-lineage-target.log保留。
+
+High独立private补丁复核未见新增阻塞。公共集成不得直接把tool_receipts放入通用SECTIONS allowlist；专用闭合转换需要严格验证已提交receipt、冻结lineage与旧coverage，不能发布private全文或用VERIFIED表示模型启动/authority。
+
+High独立lineage子集4passed。下一切片实施门槛已记录PUBLIC_TOOL_IMPLEMENTATION_NOTES.md：live-only显式coverage、旧CORE_STATUS v1保持原解释、新工具模板、refs与筛选关系一致、后端与UI同步闭合升级。旧schema容许VERIFIED+null fact，promotion不能只看字符串状态。
+
+最终target200passed/73.49s；冻结全回归507passed/32skipped/1warning/188.76s。skip仍为原external dispatcher18/H1 14，warning仍为Starlette anyio alias deprecated，没有新增skip。compileall/pip check/diff通过，命令与SHA见evidence/checkpoint-11-final-tests.txt。static/Web未改，不声称浏览器重跑；Sites仅按local-only准备后续QA，不注册/同步/发布。完整M1–M5仍待交付，Goal活跃。

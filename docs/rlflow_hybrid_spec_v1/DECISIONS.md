@@ -73,3 +73,7 @@ append-only refs增加INSERT成员/severity guard；只读路径仍防御异常�
 ## 2026-10-08：工具ledger沿用core事务与恢复
 
 不建立第二个DB/控制writer：optional closed tool_sources/receipts/scan走Store对象事务、projection_status索引、append-only event与replay。热view必须排除ledger全keys，完整audit比较replay；legacy callback不改private集合。完成状态与证据验证分开，UNKNOWN pending不能因null witness提前移出索引；fair游标要有revision/round，防止位置循环复用旧幂等key。验证绑定被冻结request/当时release而非当前授权或PID活性；正常历史不因撤权失真。容量上界对齐producer Unicode字节，超限unsupported不是corruption。公开投影在下一切片显式闭合，不自动把私有事实塞进CORE_STATUS body。
+
+## 2026-10-08：冻结工具返回的任务关联
+
+公开工具筛选不能从当前session追认历史task。首次VERIFIED返回在原collector事务保存request.task_id，request对照DB且提交CAS覆盖task_id；旧COLLECTED缺字段保持未知、UNVERIFIED不添加。ToolLedger字段optional兼容旧事件/replay。公共转换必须独立闭合，不把private receipts直接加入通用观察allowlist。该前置不启用公共metadata或新authority。

@@ -2,6 +2,8 @@
 
 目前仍可推进开发，没有需要终止完整 Goal 的外部阻塞。
 
+Checkpoint11：private VERIFIED返回固定历史task关联，旧缺字段保持未知；公共projection/log/API/UI仍待实现，属于开发缺口而非外部阻塞。不得用当前session回填旧任务，或直接把private receipt放入公共allowlist。
+
 Checkpoint08：private工具返回事实基础与全回归455/32通过，独立High范围无MUST_FIX。公开collector尚待开发而非外部阻塞；需要bounded发现、可信release/权限核验、事务幂等写入，不能将现private context/hash当放行证明。其余环境证据缺口如下保留。
 
 Checkpoint09：执行前REGISTER/有界reader与全回归478/32通过，High父目录durability finding关闭。继续core pending/事务offset与公开collector，没有新的外部阻塞；partial尾修复、源恢复/历史coverage不能静默处理，仍属待实现恢复合同。
