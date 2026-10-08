@@ -147,6 +147,26 @@ def validate_transition(payload,lookup,*,event_type,key,object_id,producer,versi
         raise Conflict('controller current head changed')
 
 
+def validate_current_point(current,value,previous,*,registration,version,event_tip):
+    """Current head/fact/direct predecessor only; NOT whole-history auditing.
+
+    Service must prove each supplied fact against its original event first.
+    Older ancestor completeness belongs to validate_complete, not hot checks.
+    """
+    request=value['request'];fk=fact_key(request);hk=scope_key(request['project_id'],request['data_mode'])
+    validate_record(SECTIONS[0],fk,value);validate_record(SECTIONS[1],hk,current)
+    if (registration!=(request['project_id'],request['data_mode']) or current!=head(value) or
+            value['accepted_state_version']>version or event_tip!=(fk,value['accepted_state_version'])):
+        raise Conflict('controller current point or original tip differs')
+    if previous is not None:
+        validate_record(SECTIONS[0],fact_key(previous['request']),previous)
+    def lookup(section,key):
+        if previous is not None and section==SECTIONS[0] and key==fact_key(previous['request']):return previous
+        return None
+    actual_previous=_predecessor(value,lookup)
+    if actual_previous is not previous:raise Conflict('controller direct predecessor differs')
+
+
 def validate_complete(state,registration=None,event_lookup=None,*,event_tip=None):
     validate_persisted(state);lookup=lambda s,k:state.get(s,{}).get(k)
     latest={};revisions=set()

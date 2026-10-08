@@ -1,0 +1,104 @@
+Checkpoint36: actual owned-writer BLOCKED admission with historical source closure
+Base: b320daa (checkpoint35). Branch: hybrid-v1.
+All pytest commands use PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python.
+
+Actual terminal results (not inferred from log progress):
+- Controller r1 original19731 exit0: 99 passed/4.26s.
+- Controller r2 original98668 exit0: 111 passed/4.86s.
+- Controller r3 original51855 exit0: 114 passed/5.18s.
+- Witness r1 original4012 exit0: 167 passed/1 existing warning/42.20s.
+- Witness r2 original84305 exit0: 171 passed/1 warning/43.17s.
+- Admission domain r1 original18822 exit0: 205 passed/1 warning/60.17s.
+- Admission domain r2 original27544 exit1: 206 passed/1 fixture failure/62.84s.
+  Fixture returned without retaining the actual token; correct weak-cache GC
+  released it. Changed fixture to yield so caller frame retains the issued token.
+  No permanent cache, token reconstruction, or authorization weakening.
+- Admission domain r3 original93301 exit0: 150 passed/1 warning/22.87s.
+  Pure admission plus both controller modules; BEFORE Store/service integration.
+- Service r1 original69537 exit1: 8 passed/3 fixture failures/6.34s.
+  Fixture assumed dict instead of objects() list and nonexistent _clock fields.
+  Corrected fixture to actual APIs. No production changes for those failures.
+- Service r2 original98898 exit0: 11 passed/1 warning/6.56s.
+- Integration r1 original52014 exit1: 255 passed/1 fixture failure/77.72s.
+  Negative test used wrong transact_objects signature. Corrected objects/mutate
+  and expected argument; actual production gate unchanged.
+- Service r3 original23097 exit0: 29 passed/1 warning/18.27s.
+- Final integration r2 original50623 exit0: 263 passed/1 warning/81.63s.
+- Independent High original41876 exit0: exact same six modules ONCE,
+  263 passed/1 existing warning/82.57s. Fifteen SHA before/after equal.
+  Root ran no concurrent test/benchmark. Static and final review no MUST_FIX.
+- Central full original11991 exit0: 1393 passed, 32 existing external/H1 skips,
+  1 existing Starlette warning, 408.56s. Fifteen frozen SHA before/after equal.
+  Started only after independent terminal. No concurrent suite/benchmark/edits.
+- compileall -q rlflow tests: exit0.
+- pip check: exit0, no broken requirements.
+- git diff --check: exit0.
+No live test handles remain.
+
+Final root and independent exact module argv:
+.venv/bin/python -m pytest -q tests/test_hybrid_admission_service.py tests/test_hybrid_admission.py tests/test_hybrid_controller.py tests/test_hybrid_controller_service.py tests/test_hybrid_preparation_service.py tests/test_snapshot_maintenance.py
+Full argv: .venv/bin/python -m pytest -q
+Ignored audit logs retained locally, including failures; not overwritten.
+
+Log SHA256:
+109adec75c763a9ac74f228a673db94f0efc080500b0d55bccd8d5c964bfa0dc  audit/hybrid-v1/checkpoint-36-admission-domain-r1.log
+0d9a13e80ddf8ed589b3e9c5795ac31ec8c241125197a6c6fc7ddc1564ff1ca2  audit/hybrid-v1/checkpoint-36-admission-domain-r2.log
+51bfee58ee1e9333ecb72bdc7daec608789ee549ebd2c68498595db27a9f1f7d  audit/hybrid-v1/checkpoint-36-admission-domain-r3.log
+facab4225384fa4e12904fd49dd416604ab3ae031466674910c0f7993cebbe04  audit/hybrid-v1/checkpoint-36-admission-integration-r1.log
+a38b51348e20d370c952df7edc3e17a62ccfda9e89098f3e28dafb1699922a9c  audit/hybrid-v1/checkpoint-36-admission-integration-r2.log
+1bf7ad0c940e269a0c96cb51917ba8df666869f683355d4cd9f2a1e79990f470  audit/hybrid-v1/checkpoint-36-admission-service-r1.log
+7536f23a58cf2a7c67147a015514f06c4a4bd389558efc2f3c811f8b2f7fa2ea  audit/hybrid-v1/checkpoint-36-admission-service-r2.log
+dc71cfc47bcb43e00553c4a100c0137657e6f6ef5393a8035c0535a0ad92388f  audit/hybrid-v1/checkpoint-36-admission-service-r3.log
+129a5b84529fe482f2b17ea67bb308c4ab31d346d1765a960ace2933f028631c  audit/hybrid-v1/checkpoint-36-controller-r1.log
+6f14be237833fae1823fa983d57b22c9ee8c140a44d4fbff66fc303ae1a56ba1  audit/hybrid-v1/checkpoint-36-controller-r2.log
+c975d0e4a081b05c027907335ae8c59c24f87d75b3e255dc0a2191f8e2155e06  audit/hybrid-v1/checkpoint-36-controller-r3.log
+fb22ffcfa2353dca59fa5fd31cb79be80ae47dd0c517d3ba93e8e46b32fbe4c5  audit/hybrid-v1/checkpoint-36-full-r1.log
+2e4216b5f2ee8d61a32d640bbed52ac6b1e3f36e19257490c4a582ffb127dea1  audit/hybrid-v1/checkpoint-36-independent-r1.log
+2afc7392726b300c0f770a576bd1c777c0df8bbe30db6cafc2203ae437c7a1ee  audit/hybrid-v1/checkpoint-36-witness-r1.log
+0801b0edd7dfd098adbe1885bd4af4b69bc16c31bc19251229ef27a2f86955b0  audit/hybrid-v1/checkpoint-36-witness-r2.log
+
+Frozen source/test/schema SHA256 (root before/after and independent before/after):
+595c0e8c76544b0270b1435b987606d90704c19e411543ed02686b17c73ea6f7  rlflow/contracts.py
+f20a24d793e6a0d9add068d2bb94c9c1c9065abaf21c33213875157cb4126fed  rlflow/hybrid_controller.py
+499c0d2a2ebb9f7c4bdd8602b89ee0ec578a4d542a5c591c3ac36df44788b889  rlflow/hybrid_controller_service.py
+9d99b9ff5e73efaf6ab3d79ef24bdd354464df78a16bacded483c89c88c9c307  rlflow/hybrid_preparation.py
+6aac15b2427378edd02ffd46e042c31d2153494669c1511368a0e5484b244369  rlflow/hybrid_preparation_service.py
+84235bcbe30c083ef1cbf7a275251ee908b07c0adda1cb1cebf2acdbcfd1f00e  rlflow/snapshot_maintenance.py
+697573bd283559dc3157052201c339562fce40b9222e4722965456425a370b2a  rlflow/store.py
+db7f537ce8e19809576dadcd7310903bac91b8084bfc2d4afaa9a9d74e0943e7  schemas/RuntimeState.json
+1dffc4834ce938a424cf74c3d8ea473fdd24188a568c578cf640c3dd60c5e3d6  tests/test_hybrid_controller.py
+cb50af02fbb0c6525d4f34907955900e02c3c39342815e529bac49268150366c  tests/test_hybrid_controller_service.py
+90ec178292f3c25e7fc0b5ce6917fab0a824c8ca09fc5f8e7d3cd338cbea5972  tests/test_hybrid_preparation_service.py
+b5d1eeb79453fa49f2c8dc4695642ea69421d4608b51ca275d9edb9b3456c289  rlflow/hybrid_admission.py
+851c42a4ef665061e488b2b88325c876b549a346d99c325386749909cd0af36d  rlflow/hybrid_admission_service.py
+32c11733f1fcb775b9ac424858ce215264645ba30f2ed2ff5977cf4fbd223cfe  tests/test_hybrid_admission.py
+f703397c5eb5614f4b2a674aab872ee8e204179a41e7f3ec672999fbe79dafef  tests/test_hybrid_admission_service.py
+
+Independent safety findings closed:
+- Current controller proof fixed original fact/direct predecessor points,
+  with exact current head/indexed tip. Full history still audits all ancestors.
+- Owned BEGIN IMMEDIATE accepts no stale caller read DB or foreign connection;
+  writer->controller lock order, exact db/token/budget/thread context, nested
+  writer refusal and final token check before owned COMMIT.
+- Actual witness UTC plus boot-bound monotonic 30 seconds, atomic high-water
+  updates under an independent short clock lock; full file IO outside writer.
+- Actual Admission guard retains identity/source/witness checks through final
+  controller check, Admission callback and owned COMMIT; expiry rolls back fact.
+- Original closed single-fact event/first marker, immutable references, bounded
+  replay decode reuse, historical tip+COUNT detect whole/nonlatest omissions.
+- Actual admission-versus-renewal one-CAS-winner, nested refusal and no material
+  full IO inside writer; no deadlock in finite actual concurrency fixture.
+
+Scope:
+- BLOCKED only: all execution/release/candidate-write flags false.
+- Material VERIFIED_AS_OF is a sequential observation, not atomic joint freeze.
+- Historical duplicate is not current admission, renewal or material adoption.
+- Current point proof is not full remote-ancestor audit or NFR benchmark.
+- Fixed core controller is not workspace writer exclusivity or legacy exclusion.
+- No worker, model/API/GPU, HTTP/browser, public hosting, or protected-workspace
+  mutation. Disposable SQLite fault injection restores append-only trigger
+  BEFORE any product call; production triggers unchanged.
+- No new NFR/B1/24h fixture/8h UI proof or offline validator result.
+- Budget reservation/settlement, shared host pool, candidate writer/legacy
+  exclusion, reliable STOP/release and actual engineering/research remain.
+- USER package-lock.json preserved and excluded. Full M0-M5 Goal remains active.

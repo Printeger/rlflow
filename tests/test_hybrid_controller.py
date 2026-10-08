@@ -5,7 +5,7 @@ from datetime import datetime, timedelta, timezone
 import pytest
 
 from rlflow.hybrid_controller import (SECTIONS, EVENT, fact_key, scope_key, head,
-    validate_record, validate_transition, validate_complete)
+    validate_record, validate_transition, validate_complete, validate_current_point)
 from rlflow.hybrid_goals import digest
 from rlflow.store import Conflict
 
@@ -180,3 +180,19 @@ def test_boot_bound_monotonic_deadline_and_no_reset(damage):
         value=fact();state={SECTIONS[0]:{},SECTIONS[1]:{},'version':0}
     value['request_hash']=digest(value['request'])
     with pytest.raises(ValueError):transition(state,value)
+
+
+@pytest.mark.parametrize('damage',[None,'head','tip','missing_predecessor','predecessor_hash','scope','version'])
+def test_current_point_is_closed_and_requires_direct_predecessor(damage):
+    previous=fact();value=fact(previous,operation='renew',delay=10,version=2)
+    current=head(value);tip=(fact_key(value['request']),2);scope=SCOPE;version=2
+    if damage=='head':current['revision']=3
+    elif damage=='tip':tip=(fact_key(previous['request']),1)
+    elif damage=='missing_predecessor':previous=None
+    elif damage=='predecessor_hash':previous={**previous,'config_hash':digest('changed')}
+    elif damage=='scope':scope=('other','fixture')
+    elif damage=='version':version=1
+    def check():validate_current_point(current,value,previous,registration=scope,version=version,event_tip=tip)
+    if damage is None:check()
+    else:
+        with pytest.raises(Conflict):check()

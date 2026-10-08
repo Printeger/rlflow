@@ -1,5 +1,13 @@
 # 开发决策记录
 
+## Checkpoint36：实际 owned writer 中持久拒绝，不把观察升级为执行权限
+
+Controller 当前检查采用固定 head/tip/fact/direct predecessor 原 source 点证明；full audit/snapshot/recover 保留完整历史职责。统一锁序 writer→controller，owned token transaction 不接受 caller read connection；同线程 nested writer 提前拒绝。Preparation 真实文件核验只在 writer 外，内存原对象 MaterialWitness 用本 boot UTC+mono 30 秒与独立短时钟锁保持 freshness，不取得 Prep owner 大锁或重做文件 IO。
+
+AdmissionService 在同一 owned writer 核 current来源/实际token/实际witness，把 closed immutable BLOCKED fact 写入 Store；最终 Admission guard callback 保留到 Controller 最终检查之后、实际 COMMIT 之前。所有未知执行门仍 UNVERIFIED，三个执行/写入/release flag 固定 false，历史 duplicate 不重探测也不续期。历史原事件、精确首 marker、at/before V 的 tip+COUNT 能拒绝 rehashed snapshot 整域或非latest遗漏；没有新 worker/HTTP/模型权限。
+
+root 与独立 High exact 六modules各263passed（81.63s/82.57s），中央full原11991 terminalexit0 1393passed/32既有skip/1warning408.56s，15 SHA不变、范围无MUST、compileall/pipcheck/diff0，当前无live。边界见 HYBRID_BLOCKED_ADMISSION.md/evidence/checkpoint-36-final-tests.txt。下一 checkpoint37 依独立建议先做真实累计 BudgetLedger reserve/UNKNOWN settlement，绑定原 Goal/approval/prep、跨revision/epoch不归零；随后实际 candidate writer/legacy 排斥，再 protected host共享3session槽与runtime release/STOP。独立project Store各计3或单task cgroup不代表共享池；没有完整排斥时即使实际预留额度仍不发 worker/lease/release。
+
 ## Checkpoint35：core-fact fence 不冒充 workspace 独占或 STOP
 
 35冻结最终终态：中央full原12471 exit0 1296/32既有skip/1warning359.97s；独立High原68295 exact四modules一次exit0 166/1warning38.34s，11SHA一致、范围MUST关闭，当前无live。下段LIVE是原决策时过程，见evidence/checkpoint-35-final-tests.txt。下一统一writer→controller锁序和bounded当前点证明，再接实际BLOCKED准入；不得在writer内调用另开读连接的check_token或Preparation公有锁/全文件IO，避免ABBA。

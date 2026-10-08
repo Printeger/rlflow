@@ -1,5 +1,7 @@
 # 需求包离线校验报告
 
+Checkpoint36系统终态：中央full原11991 exit0 1393passed/32既有skip/1warning408.56s；root/High exact六modules各263passed，15 SHA不变、范围无MUST、compileall/pipcheck/diff0，无live。见HYBRID_BLOCKED_ADMISSION.md/evidence/checkpoint-36-final-tests.txt；不是本需求包旧18checks离线validator的新运行，没有重跑或重标browser/NFR/B1/soak。BLOCKED事实非执行、完整M0–M5 Goal active。
+
 Checkpoint35系统最终终态：中央full原12471 exit0 1296/32既有skip/1warning359.97s；独立High原68295 exact四modules ONCE exit0 166/1warning38.34s，11SHA一致、范围MUST关闭、compileall/pipcheck/diff0，无live测试。下段pending为旧过程，见evidence/checkpoint-35-final-tests.txt。这不是新的需求包18checks/browser/B1/NFR/soak运行；CORE_FACTS_ONLY不是完整Runtime/ARC/STOP验收，Goal active。
 
 Checkpoint35系统回归实际终态：原12471 exit0 **1296passed/32既有skip/1warning/359.97s**、11SHA一致、compileall/pipcheck/diff0，rootcontroller99/5.83s。High静态无范围MUST，独立四modules尚无终态，见HYBRID_CONTROLLER_FENCING.md/evidence/checkpoint-35-final-tests.txt。这不是本需求包离线18checks新运行，也没有重跑/重标browser、NFR/B1/soak。CORE_FACTS_ONLY不是完整T12/Runtime/STOP，Goal active。

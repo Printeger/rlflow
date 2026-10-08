@@ -51,6 +51,10 @@ REQUEST = obj({'idempotency_key': ID, 'project_id': ID, 'data_mode': enum('live'
                'goal_ref': ID, 'role': PACKET['properties']['role'], 'context': PACKET['properties']['context']})
 MATERIAL = obj({'preparation_id': ID, 'plan_hash': HASH, 'manifest_hash': HASH,
                 'execution_enabled': {'const': False}})
+MATERIAL_OBSERVATION = obj({'witness_id':ID,'intent_key':ID,'intent_hash':HASH,
+    'result_key':ID,'result_hash':HASH,'snapshot_id':ID,'snapshot_hash':HASH,
+    'plan_hash':HASH,'manifest_hash':HASH,'checked_at':TIME,'expires_at':TIME,
+    'state':{'const':'VERIFIED_AS_OF'},'execution_enabled':{'const':False}})
 RECORDS = {
     SECTIONS[0]: obj({'request': REQUEST, 'request_hash': HASH, 'sources': SOURCES, 'plan': PLAN,
         'snapshot': SNAPSHOT, 'snapshot_id': ID, 'bundle': BUNDLE, 'created_at': TIME,

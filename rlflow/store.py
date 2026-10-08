@@ -68,7 +68,7 @@ PRIVATE_HOT_SECTIONS = frozenset(('tool_sources','tool_receipts','tool_scan',
     'hybrid_goal_contracts','hybrid_goal_heads','hybrid_goal_commands',
     'hybrid_approval_facts','hybrid_approval_revocations','hybrid_approval_heads','hybrid_approval_commands',
     'hybrid_preparation_intents','hybrid_preparation_results',
-    'hybrid_controller_facts','hybrid_controller_heads'))
+    'hybrid_controller_facts','hybrid_controller_heads','hybrid_admission_facts'))
 
 
 class ObjectMap(dict):
@@ -133,6 +133,7 @@ class Store:
         self._hybrid_draft_service = None
         self._hybrid_preparation_service = None
         self._hybrid_controller_service = None
+        self._hybrid_admission_service = None
         self._existing_identity = None
         self.root = Path(root).resolve()
         (self.root / "runtime").mkdir(parents=True, exist_ok=True)
@@ -221,7 +222,7 @@ class Store:
         store._existing_identity = (info.st_dev, info.st_ino)
         for name in ('_hybrid_auth_owner', '_hybrid_registry', '_hybrid_authority_service',
                      '_hybrid_draft_auth_owner', '_hybrid_draft_service', '_hybrid_preparation_service',
-                     '_hybrid_controller_service'):
+                     '_hybrid_controller_service', '_hybrid_admission_service'):
             setattr(store, name, None)
         db = sqlite3.connect(store.db.as_uri() + '?mode=ro', uri=True, timeout=5)
         try:
@@ -395,6 +396,19 @@ class Store:
 
     def _apply(self, state, payload, db, event):
         preparation_decoded=False
+        from .hybrid_admission import SECTION as admission_section, EVENT as admission_event, validate_transition as admission_transition
+        if (event['event_type']==admission_event or any(s==admission_section for s,k,v in payload.get('put',[])) or
+                any(s==admission_section for s,k in payload.get('delete',[])) or admission_section in payload.get('set',{})):
+            from .hybrid_reads import ReadBudget
+            budget=ReadBudget(db,4*1024**2)
+            try:
+                decoded={**payload,'put':[[s,k,budget.decode(v)] for s,k,v in payload.get('put',[])]}
+            except (ValueError,TypeError,KeyError,RecursionError):
+                raise Conflict('admission replay decoding exceeds safe envelope') from None
+            admission_transition(decoded,lambda s,k:({} if s in state else None) if k=='' else state.get(s,{}).get(k),
+                event_type=event['event_type'],key=event['idempotency_key'],object_id=event['object_id'],producer=event['producer'],
+                version=event['new_state_version'],registration=self._goal_registration(db))
+            payload=decoded;preparation_decoded=True
         from .hybrid_controller import SECTIONS as controller_sections, EVENT as controller_event, validate_transition as controller_transition
         if (event['event_type']==controller_event or any(s in controller_sections for s,k,v in payload.get('put',[])) or
                 any(s in controller_sections for s,k in payload.get('delete',[])) or
@@ -593,6 +607,16 @@ class Store:
 
     def _commit(self, db, event_type, key, payload, previous, object_id, producer, inputs, *, _authorization=None):
         ver = previous + 1
+        from .hybrid_admission import SECTION as admission_section, EVENT as admission_event, validate_transition as admission_transition
+        if (event_type==admission_event or any(s==admission_section for s,k,v in payload['put']) or
+                any(s==admission_section for s,k in payload['delete'])):
+            service=self._check_admission_guard(db,_authorization)
+            def admission_lookup(section,objkey):
+                if objkey=='':return {} if db.execute('SELECT 1 FROM projection WHERE section=? LIMIT 1',(section,)).fetchone() else None
+                return _authorization.budget.object(section,objkey)
+            admission_transition(payload,admission_lookup,event_type=event_type,key=key,object_id=object_id,
+                producer=producer,version=ver,registration=self._goal_registration(db))
+            service.check_live_write(db,payload,_authorization)
         from .hybrid_controller import SECTIONS as controller_sections, EVENT as controller_event, validate_transition as controller_transition
         if (event_type==controller_event or any(s in controller_sections for s,k,v in payload['put']) or
                 any(s in controller_sections for s,k in payload['delete'])):
@@ -745,6 +769,68 @@ class Store:
         from .hybrid_controller import validate_complete as controller_complete
         controller_complete(state,self._goal_registration(db),lambda k:self._controller_event(db,k),
                             event_tip=self._controller_tip(db,state['version']))
+        from .hybrid_admission import validate_complete as admission_complete
+        admission_complete(state,self._goal_registration(db),lambda k:self._admission_event(db,k),
+                           event_summary=self._admission_summary(db,state['version']))
+
+    def bind_hybrid_admission(self, service):
+        from .hybrid_admission_service import AdmissionService
+        if type(service) is not AdmissionService or service.store is not self:
+            raise TypeError('invalid admission owner')
+        with self.lock():
+            if self._hybrid_admission_service not in (None,service):
+                raise Conflict('admission owner cannot be rebound in-place')
+            self._hybrid_admission_service=service
+
+    def _check_admission_guard(self, db, guard):
+        service=self._hybrid_admission_service
+        if service is None:raise PermissionError('protected admission owner required')
+        service.check_guard(db,guard)
+        return service
+
+    def _admission_tip(self, db, version):
+        from .hybrid_admission import EVENT
+        row=db.execute('SELECT idempotency_key,new_state_version FROM events WHERE event_type=? AND seq<=? ORDER BY seq DESC LIMIT 1',
+                       (EVENT,version)).fetchone()
+        return tuple(row) if row is not None else None
+
+    def _admission_summary(self, db, version):
+        from .hybrid_admission import EVENT
+        count=db.execute('SELECT COUNT(*) FROM events WHERE event_type=? AND seq<=?',(EVENT,version)).fetchone()[0]
+        return self._admission_tip(db,version),count
+
+    def _admission_event(self, db, key, *, max_bytes=256*1024, _parse=None, _decode=None):
+        """Closed original BLOCKED fact, including legal first-event marker."""
+        from .hybrid_admission import SECTION, EVENT, validate_record
+        from .hybrid_goals import check_bytes,digest
+        if _parse is None and _decode is None:
+            from .hybrid_reads import ReadBudget
+            budget=ReadBudget(db,4*1024**2);_parse,_decode=budget.parse,budget.decode
+        row=db.execute('SELECT event_type,producer,object_id,new_state_version,payload_sha256,CASE WHEN length(CAST(payload AS BLOB))<=? THEN payload END AS payload FROM events WHERE idempotency_key=?',(max_bytes,key)).fetchone()
+        if row is None:return None
+        if row['payload'] is None:raise Conflict('admission source exceeds bound')
+        payload=_parse(row['payload'].encode())
+        if sha(payload)!=row['payload_sha256']:raise Conflict('admission source integrity mismatch')
+        if (type(payload) is not dict or set(payload)!={'format','put','delete','details'} or
+                type(payload.get('format')) is not int or payload['format']!=2 or payload['details'] is not None or
+                type(payload['put']) is not list or type(payload['delete']) is not list or payload['delete']):
+            raise Conflict('admission original source shape mismatch')
+        decoded=[];seen=set();markers=[]
+        for item in payload['put']:
+            if type(item) is not list or len(item)!=3 or not all(type(v) is str for v in item[:2]):
+                raise Conflict('admission original descriptor invalid')
+            section,objkey,value=item
+            if section!=SECTION or objkey in seen:raise Conflict('admission original extra or duplicate object')
+            seen.add(objkey);value=_decode(value);check_bytes(value,128*1024)
+            if not objkey:
+                if value!={}:raise Conflict('admission original marker differs')
+                markers.append(value)
+            else:
+                validate_record(objkey,value);decoded.append((section,objkey,digest(value)))
+        previous=self._admission_tip(db,row['new_state_version']-1)
+        if len(decoded)!=1 or markers!=([{}] if previous is None else []):
+            raise Conflict('admission original single fact/initial marker differs')
+        return ((row['event_type'],row['producer'],row['object_id'],row['new_state_version']),decoded)
 
     def _controller_tip(self, db, version):
         from .hybrid_controller import EVENT
@@ -910,7 +996,8 @@ class Store:
             from .hybrid_authority import EVENTS as authority_events
             from .hybrid_preparation import EVENTS as preparation_events
             from .hybrid_controller import EVENT as controller_event
-            if event_type==controller_event or event_type in preparation_events or event_type in authority_events.values() or (event_type=='HYBRID_GOAL_DRAFTED' and self._hybrid_draft_auth_owner is not None):
+            from .hybrid_admission import EVENT as admission_event
+            if event_type in (controller_event,admission_event) or event_type in preparation_events or event_type in authority_events.values() or (event_type=='HYBRID_GOAL_DRAFTED' and self._hybrid_draft_auth_owner is not None):
                 raise PermissionError('Hybrid service events require guarded object transactions')
             if self._existing(db,key,event_type,object_id):
                 db.commit()
@@ -975,6 +1062,8 @@ class Store:
                 from .hybrid_authority import EVENTS as authority_events
                 from .hybrid_preparation import EVENTS as preparation_events
                 from .hybrid_controller import EVENT as controller_event
+                from .hybrid_admission import EVENT as admission_event
+                if event_type==admission_event:self._check_admission_guard(db,authorization)
                 if event_type==controller_event:self._check_controller_guard(db,authorization)
                 if event_type in preparation_events:self._check_preparation_guard(db,authorization)
                 if event_type in authority_events.values():self._check_hybrid_guard(db,authorization)

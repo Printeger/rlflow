@@ -1,5 +1,7 @@
 # 系统实施验收记录
 
+Checkpoint36完整终态：中央full原11991 exit0 1393passed/32既有skip/1warning408.56s；root/独立High同六modules各263passed/81.63s及82.57s，15 SHA不变、范围无MUST、compileall/pipcheck/diff0、无live。实际owned writer BLOCKED事实与原source/snapshot/recover闭合见HYBRID_BLOCKED_ADMISSION.md/evidence/checkpoint-36-final-tests.txt。不是executionlease、writer排斥或STOP；无新增browser/NFR/B1/24h/8h/离线validator证明，完整M0–M5仍未完成。
+
 Checkpoint35完整终态：中央full原12471 exit0 1296/32既有skip/1warning359.97s；独立High原68295 exact四modules ONCE exit0 166/1warning38.34s，11SHA一致、范围MUST关闭、compileall/pipcheck/diff0，无live测试。下段pending为旧过程，见HYBRID_CONTROLLER_FENCING.md/evidence/checkpoint-35-final-tests.txt。CORE_FACTS_ONLY不等于workspace writer、执行或STOP；无新UI/性能/长期/离线validator证明，完整M0–M5仍未完成。
 
 Checkpoint35系统full实际终态：原12471 exit0 **1296passed/32既有外部H1skip/1warning/359.97s**；11SHA一致、compileall/pipcheck/diff0，rootcontroller99/5.83s，High静态MUST关闭；独立四modules一次尚无终态。实际CORE_FACTS_ONLY controller/source/historicaltip恢复闭合见HYBRID_CONTROLLER_FENCING.md/evidence/checkpoint-35-final-tests.txt。执行/候选写开关false，非workspace单写或STOP完成；无新browser/性能/长期/离线validator证明，完整T12/M1/M0–M5仍未完成，Goal active。

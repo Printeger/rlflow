@@ -24,8 +24,8 @@ ControllerToken 是实际签发、由固定 service 的 weak-reference cache 识
 
 定向测试包含实际双 Store/双 owner 并发 acquire 一胜一拒、renew/expired takeover、两种 clock、PID reuse/boot/config/STOP、实际 token 身份、提交前 predecessor 过期、observation epoch、重启不 adopt、同键差异、原事件 corruption、rehashed snapshot、periodic due 保留及历史 tip seam。全部使用 disposable fixture database；原事件故障注入临时保存/移除 append-only trigger，注入后在调用产品前恢复原 trigger；生产 trigger 未放宽。没有启动 worker、供应商会话、模型、GPU、HTTP 或 browser。
 
-当前 current proof 仍遍历 controller predecessor lineage，单次 reader 有 4MiB/4096 facts 界，超界保守拒绝；它不是常数时间控制 loop 或 NFR06 证明。最多保留 128 个仍由调用方持有的 actual token，丢弃者自动释放；不承诺任意大控制历史长期可用。
+Checkpoint36 增量已把 current proof 改为固定 head/tip、原 fact 和直接 predecessor 点证明；初始读一份原 fact，后续读两份，不在每次当前 token 检查遍历全部远祖。完整 audit/snapshot/recover 仍核全历史；远祖损坏并不由局部 current check 发现。4MiB 单次默认 ReadBudget 保留，owned token transaction 可显式配置至 64MiB；点数测试不是整个控制 loop 常数时间、NFR06 或无限历史可用性证明。最多保留 128 个仍由调用方持有的 actual token，丢弃者自动释放。
 
-尚未接入其它自主核心写入者的统一 AdmissionService，也未排除 legacy dispatcher/experiment/job 路径。Controller 的 acquire/renew 不是工作区独占；不能据此关闭 ARC-01/04，不能把 SQL fencing 当 STOP、writer 清理或 execution release。candidate writer、跨项目资源池、预算 reservation/settlement、真实 OS/model/data capability、可靠 STOP、restart material adoption 和实际工程/科研闭环仍待交付。完整 M0–M5 Goal 保持 active。
+Checkpoint36 内部 BLOCKED AdmissionService 已接实际 owned token writer context，root/High263及full1393已终态，见 HYBRID_BLOCKED_ADMISSION.md。未排除 legacy dispatcher/experiment/job 路径。Controller 的 acquire/renew 不是工作区独占；不能据此关闭 ARC-01/04，不能把 SQL fencing 当 STOP、writer 清理或 execution release。candidate writer、跨项目资源池、预算 reservation/settlement、真实 OS/model/data capability、可靠 STOP、restart material adoption 和实际工程/科研闭环仍待交付。完整 M0–M5 Goal 保持 active。
 
 最终实际终态：root controller99/5.83s、中央full1296/32既有skip/1warning359.97s、独立High四modules ONCE166/1warning38.34s；11SHA不变、范围MUST闭合、compileall/pipcheck/diff0。source/log hashes 已归档在 `evidence/checkpoint-35-final-tests.txt`；早期失败与修复日志保留，不重标为最终冻结版本。无 live 测试。

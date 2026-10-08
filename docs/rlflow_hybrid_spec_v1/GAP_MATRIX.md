@@ -1,5 +1,7 @@
 # 当前实现到需求的差距矩阵
 
+Checkpoint36终态：中央full1393/32既有skip/1warning408.56s；root/High exact六modules各263/81.63s及82.57s，15 SHA一致、范围无MUST，无live。实际BLOCKED AdmissionService/同writer guard、fixed point proof、actual UTC/mono witness与原proof/tipCOUNT恢复已实现，见HYBRID_BLOCKED_ADMISSION.md/evidence/checkpoint-36-final-tests.txt；不再称统一BLOCKED准入“尚无”。仍无execution/lease/writer排斥/共享pool/预算/可靠STOP/真实工程科研/完整M0–M5验收；下一真实累计预算，Goal active。
+
 checkpoint35完整终态：中央full原12471 exit0 1296/32既有skip/1warning359.97s；独立High原68295 exact四modules ONCE exit0 166/1warning38.34s，11SHA一致、范围MUST关闭、无live测试。下段pending为旧过程，见evidence/checkpoint-35-final-tests.txt。controller仅CORE_FACTS_ONLY，不关闭ARC01/04/完整T12或其它执行验收；下一bounded当前点证明、锁序、实际BLOCKED准入，完整Goal active。
 
 checkpoint35最新系统full原12471 terminalexit0 **1296passed/32既有skip/1warning/359.97s**、11SHA一致，rootcontroller99/5.83s、High静态无范围MUST；独立四modules尚无终态。持久controllerfact/head/双deadline/actualtoken/原source及历史tip恢复已实现，但仅CORE_FACTS_ONLY，不关闭ARC01/04/T12，也未接其它自主写入者准入。候选writer/legacy exclusion/预算/STOP/实际执行及完整M0–M5仍缺，见HYBRID_CONTROLLER_FENCING.md。下一bounded current proof与锁序→实际BLOCKED准入；无新增UI/性能/长期验收。

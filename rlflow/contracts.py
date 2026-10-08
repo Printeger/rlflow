@@ -170,6 +170,8 @@ def validate_runtime_state(state: dict) -> None:
         validate_preparation(state)
         from .hybrid_controller import validate_persisted as validate_controller
         validate_controller(state)
+        from .hybrid_admission import validate_persisted as validate_admission
+        validate_admission(state)
     except (jsonschema.ValidationError, ValueError) as exc:
         raise ContractError('Invalid persisted runtime state: ' + str(exc)) from exc
 

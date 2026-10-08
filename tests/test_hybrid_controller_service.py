@@ -11,6 +11,7 @@ import pytest
 from rlflow.hybrid_controller import SECTIONS, EVENT, head, fact_key, scope_key
 from rlflow.hybrid_controller_service import ControllerService, ControllerToken
 from rlflow.hybrid_goals import digest
+from rlflow.hybrid_reads import ReadBudget
 from rlflow.jobs import identity
 from rlflow.observation import enable, rotate_epoch
 from rlflow.snapshot_maintenance import maintain
@@ -323,3 +324,123 @@ def test_released_old_revisions_do_not_accumulate_in_owner_cache(owned):
         result=service.renew(result['token'],f'renew_{index}',expected_version=service.store.version())
     gc.collect()
     assert len(service._tokens)==1 and service.check_token(result['token'])['head_revision']==17
+
+
+def test_live_point_proof_count_does_not_grow_with_ancestry(owned,monkeypatch):
+    service,_,_=owned;result=acquire(service);original=service._original;reads=[]
+    def observed(db,key,budget):
+        reads.append(key);return original(db,key,budget)
+    monkeypatch.setattr(service,'_original',observed)
+    service.check_token(result['token']);assert len(reads)==1
+    result=service.renew(result['token'],'second',expected_version=1)
+    reads.clear();service.check_token(result['token']);assert len(reads)==2
+    for index in range(16):result=service.renew(result['token'],f'later_{index}',expected_version=service.store.version())
+    reads.clear();service.check_token(result['token']);assert len(reads)==2
+    assert reads==[result['token'].key,result['fact']['request']['previous_fact_key']]
+    assert service.store.audit()==service.store.replay()
+
+
+def test_current_point_does_not_pretend_to_audit_distant_ancestors(owned):
+    service,_,_=owned;initial=acquire(service);result=initial
+    for index in range(3):result=service.renew(result['token'],f'later_{index}',expected_version=service.store.version())
+    with service.store.connect() as db:
+        key=initial['token'].key
+        trigger=db.execute("SELECT sql FROM sqlite_master WHERE type='trigger' AND name='no_update'").fetchone()[0]
+        payload=json.loads(db.execute('SELECT payload FROM events WHERE idempotency_key=?',(key,)).fetchone()[0])
+        payload['put'].append(['sessions','illegal',{}])
+        db.execute('DROP TRIGGER no_update')
+        db.execute('UPDATE events SET payload=?,payload_sha256=? WHERE idempotency_key=?',(canonical(payload).decode(),sha(payload),key))
+        db.execute(trigger);db.commit()
+    # Latest/direct predecessor still prove the actual token's current owner.
+    # Full historical closure, not a hot check, detects old source corruption.
+    assert service.check_token(result['token'])['head_revision']==4
+    with pytest.raises(Conflict):service.store.audit()
+    with pytest.raises(Conflict):service.store.snapshot()
+
+
+def test_shared_token_transaction_requires_actual_active_context(owned):
+    service,_,_=owned;result=acquire(service)
+    with service.store.read_connection() as foreign:
+        foreign.execute('BEGIN');foreign_budget=ReadBudget(foreign)
+        with pytest.raises(PermissionError):service.check_token_in_transaction(foreign,result['token'],foreign_budget)
+    with service.token_transaction(result['token']) as (db,budget,value):
+        assert service.check_token_in_transaction(db,result['token'],budget)==value
+        with pytest.raises(PermissionError):service.check_token_in_transaction(db,result['token'],ReadBudget(db))
+        with pytest.raises(Conflict):
+            with service.token_transaction(result['token']):pass
+        with pytest.raises(Conflict):service.renew(result['token'],'nested',expected_version=1)
+        with pytest.raises(Conflict):service.acquire('nested-acquire',expected_version=1)
+    assert not db.in_transaction
+    with pytest.raises(PermissionError):service.check_token_in_transaction(db,result['token'],budget)
+
+
+def test_writer_then_controller_order_allows_concurrent_renew_without_abba(owned):
+    service,_,_=owned;initial=acquire(service);held=threading.Event();renewing=threading.Event();outcomes=[]
+    def admission_like():
+        try:
+            with service.token_transaction(initial['token']) as (db,budget,_):
+                held.set();assert renewing.wait(timeout=5)
+                service.check_token_in_transaction(db,initial['token'],budget)
+            outcomes.append('checked')
+        except Exception as exc:outcomes.append(exc)
+    def renew():
+        try:
+            assert held.wait(timeout=5);renewing.set()
+            outcomes.append(service.renew(initial['token'],'concurrent',expected_version=1))
+        except Exception as exc:outcomes.append(exc)
+    threads=[threading.Thread(target=admission_like),threading.Thread(target=renew)]
+    for thread in threads:thread.start()
+    for thread in threads:thread.join(timeout=10);assert not thread.is_alive()
+    assert len(outcomes)==2 and 'checked' in outcomes and any(type(v) is dict for v in outcomes)
+    assert service.store.version()==2
+
+
+def test_token_expiry_while_waiting_for_writer_refuses_transaction(owned):
+    service,_,_=owned;initial=acquire(service);started=threading.Event();outcomes=[]
+    def waiting():
+        started.set()
+        try:
+            with service.token_transaction(initial['token']):
+                pytest.fail('expired token entered active writer context')
+        except Exception as exc:outcomes.append(exc)
+    with service.store.lock():
+        thread=threading.Thread(target=waiting);thread.start();assert started.wait(timeout=5)
+        advance(owned,30)
+    thread.join(timeout=10);assert not thread.is_alive()
+    assert len(outcomes)==1 and isinstance(outcomes[0],Conflict) and service.store.version()==1
+
+
+def test_stale_read_snapshot_and_foreign_db_cannot_enter_token_writer_context(owned,tmp_path):
+    service,_,_=owned;initial=acquire(service)
+    with service.store.read_connection() as stale:
+        stale.execute('BEGIN');budget=ReadBudget(stale)
+        assert service._current(stale,budget)==initial['fact']
+        renewed=service.renew(initial['token'],'renew',expected_version=1)
+        assert service._current(stale,ReadBudget(stale))==initial['fact']
+        with pytest.raises(PermissionError):service.check_token_in_transaction(stale,initial['token'],ReadBudget(stale))
+        with pytest.raises(Conflict):
+            with service.token_transaction(initial['token']):pass
+    with Store(tmp_path/'foreign').read_connection() as foreign:
+        foreign.execute('BEGIN')
+        with pytest.raises(PermissionError):service.check_token_in_transaction(foreign,renewed['token'],ReadBudget(foreign))
+        with pytest.raises(PermissionError):
+            with service.token_transaction(foreign):pass
+    with service.token_transaction(renewed['token']) as (db,budget,_):
+        assert service.check_token_in_transaction(db,renewed['token'],budget)==renewed['fact']
+
+
+def test_token_context_cross_thread_is_refused(owned):
+    service,_,_=owned;result=acquire(service);outcomes=[]
+    with service.token_transaction(result['token']) as (db,budget,_):
+        def foreign_thread():
+            try:service.check_token_in_transaction(db,result['token'],budget)
+            except PermissionError as exc:outcomes.append(exc)
+        thread=threading.Thread(target=foreign_thread);thread.start();thread.join(timeout=5)
+        assert not thread.is_alive() and len(outcomes)==1
+
+
+def test_token_context_rechecks_expiry_before_its_owned_commit(owned):
+    service,_,_=owned;result=acquire(service)
+    with pytest.raises(Conflict):
+        with service.token_transaction(result['token']):advance(owned,30)
+    assert service.store.version()==1

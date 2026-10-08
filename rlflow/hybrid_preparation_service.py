@@ -6,26 +6,43 @@ records UNKNOWN rather than trusting a disk manifest or automatically regenerati
 material. PREPARED remains a historical observation, never execution authority.
 """
 from contextlib import contextmanager
-from datetime import datetime, timezone
+from dataclasses import dataclass
+from datetime import datetime, timedelta, timezone
 import json
+import os
 import threading
+import time
+import uuid
+import weakref
 
 from .execution_adapter import CodexExecAdapter
 from .files import relative_name
 from .hybrid_goals import check_bytes, digest
 from .hybrid_preparation import (REQUEST, SECTIONS, EVENTS, intent_key, result_key,
-    source_binding, validate_record, validate_complete)
+    source_binding, validate_record, validate_complete, MATERIAL_OBSERVATION)
 from .hybrid_preparation_sources import load_sources, historical_sources
 from .hybrid_reads import ReadBudget
-from .hybrid_protocol import validate_schema
+from .hybrid_protocol import validate_schema, ID
 from .hybrid_registry import Registry
 from .hybrid_snapshot import SnapshotBuilder
 from .hybrid_authority import timestamp
+from .jobs import identity
 from .store import Store, Conflict, canonical, PREPARATION_READ_BYTES
 
 # Includes repeated projection/source expansion of two <=4MiB prep records,
 # original Goal/Authority point proofs, and both live-source validations.
 TRANSACTION_BYTES=PREPARATION_READ_BYTES
+
+
+@dataclass(frozen=True,eq=False)
+class MaterialWitness:
+    """Actual as-of observation, not an immutable filesystem or execution lease."""
+    id: str
+    raw: bytes
+    materials: tuple
+    boot_id: str
+    issued_monotonic_ns: int
+    expires_monotonic_ns: int
 
 
 class _Guard:
@@ -40,7 +57,7 @@ class _Guard:
 
 class PreparationService:
     def __init__(self, store, registry, builder, adapter, *, project_id, data_mode,
-                 store_epoch, clock=lambda: datetime.now(timezone.utc)):
+                 store_epoch, clock=lambda: datetime.now(timezone.utc),monotonic_ns=time.monotonic_ns):
         if (type(store) is not Store or type(registry) is not Registry or
                 type(builder) is not SnapshotBuilder or type(adapter) is not CodexExecAdapter or
                 adapter.registry is not registry):
@@ -51,7 +68,89 @@ class PreparationService:
         self.store, self.registry, self.builder, self.adapter = store, registry, builder, adapter
         self.project_id, self.data_mode, self.store_epoch = project_id, data_mode, store_epoch
         self.clock=clock; self._active=None; self._materials={}; self._lock=threading.RLock()
+        self._witnesses=weakref.WeakValueDictionary()
+        self._witness_monotonic_ns=monotonic_ns;self._witness_last_sample=None
+        process=identity(os.getpid())
+        if process is None:raise Conflict('actual material observation process unavailable')
+        self._witness_boot_id=process['boot_id'];self._witness_sample_lock=threading.Lock()
         store.bind_hybrid_preparation(self)
+
+    def _observation(self,witness_id,key,intent,outcome,now):
+        if outcome['status']!='PREPARED' or outcome['material'] is None:
+            raise Conflict('material witness requires original PREPARED fact')
+        return {'witness_id':witness_id,'intent_key':key,'intent_hash':digest(intent),
+            'result_key':result_key(key),'result_hash':digest(outcome),'snapshot_id':intent['snapshot_id'],
+            'snapshot_hash':intent['snapshot']['tree_hash'],'plan_hash':intent['bundle']['plan_hash'],
+            'manifest_hash':intent['bundle']['seal']['manifest_hash'],
+            'checked_at':now.isoformat().replace('+00:00','Z'),
+            'expires_at':(now+timedelta(seconds=30)).isoformat().replace('+00:00','Z'),
+            'state':'VERIFIED_AS_OF','execution_enabled':False}
+
+    def _witness_sample(self):
+        # Independent short clock mutex: never acquires Prep owner/writer locks
+        # and never verifies files while held; serialize high-water updates.
+        with self._witness_sample_lock:
+            now=self._now();mono=self._witness_monotonic_ns()
+            if type(mono) is not int or not 0<=mono<=2**63-1-30*10**9:
+                raise Conflict('material observation requires actual monotonic clock')
+            old=self._witness_last_sample
+            if old is not None and (now<old[0] or mono<old[1]):
+                raise Conflict('material observation clock regressed')
+            self._witness_last_sample=(now,mono)
+            return now,mono
+
+    def issue_material_witness(self,key):
+        """Actual finite file verification OUTSIDE the business writer.
+
+        Never call while holding Store writer: prepare uses owner->writer order.
+        Result is an as-of observation only; no filesystem freeze is claimed.
+        """
+        validate_schema(ID,key)
+        with self._lock:
+            if len(self._witnesses)>=128:raise Conflict('material witness capacity reached')
+            with self.store.read_connection() as db:
+                db.execute('BEGIN');budget=ReadBudget(db,TRANSACTION_BYTES);self._metadata(db)
+                intent=self._original(db,SECTIONS[0],key,budget)
+                outcome=self._original(db,SECTIONS[1],result_key(key),budget)
+                self._historical(db,key,intent,outcome,budget)
+            material=self._materials.get(key)
+            if material is None:raise PermissionError('actual original issued preparation materials required')
+            snapshot,plan,bundle=material
+            if (intent['snapshot_id']!=snapshot.id or intent['snapshot']!=json.loads(snapshot.raw) or
+                    intent['plan']!=json.loads(plan.raw) or intent['bundle']!=json.loads(bundle.raw)):
+                raise Conflict('material witness original issued bytes differ')
+            self.builder.verify(snapshot);self.adapter.verify_bundle(bundle)
+            wid='material_witness_'+uuid.uuid4().hex
+            # Completion timestamp after sequential checks, NOT a claim that
+            # both file trees were atomically frozen at this instant.
+            now,mono=self._witness_sample()
+            record=self._observation(wid,key,intent,outcome,now)
+            check_bytes(record,4096);validate_schema(MATERIAL_OBSERVATION,record)
+            witness=MaterialWitness(wid,canonical(record),material,self._witness_boot_id,mono,mono+30*10**9);self._witnesses[wid]=witness
+            return witness
+
+    def check_material_witness(self,witness,intent,outcome):
+        """No IO/owner lock acquisition: use original same-DB facts in writer.
+
+        Issued material slots are append-only; this check never calls prepare,
+        source readers or full-file verification under a business writer.
+        """
+        if (type(witness) is not MaterialWitness or self._witnesses.get(witness.id) is not witness or
+                self.store._hybrid_preparation_service is not self or witness.boot_id!=self._witness_boot_id):
+            raise PermissionError('actual issued material witness required')
+        record=json.loads(witness.raw);validate_schema(MATERIAL_OBSERVATION,record)
+        now,mono=self._witness_sample();checked=timestamp(record['checked_at'])
+        if (not checked<=now<timestamp(record['expires_at']) or
+                not witness.issued_monotonic_ns<=mono<witness.expires_monotonic_ns):
+            raise Conflict('material observation expired or clock regressed')
+        expected=self._observation(witness.id,record['intent_key'],intent,outcome,checked)
+        if record!=expected or self._materials.get(record['intent_key']) is not witness.materials:
+            raise Conflict('material observation differs from original issued facts')
+        snapshot,plan,bundle=witness.materials
+        if (intent['snapshot_id']!=snapshot.id or intent['snapshot']!=json.loads(snapshot.raw) or
+                intent['plan']!=json.loads(plan.raw) or intent['bundle']!=json.loads(bundle.raw)):
+            raise Conflict('material observation original bytes changed')
+        return record
 
     def _now(self):
         now=self.clock()

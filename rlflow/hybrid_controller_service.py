@@ -15,7 +15,7 @@ import uuid
 import weakref
 
 from .hybrid_controller import (SECTIONS, EVENT, REQUEST, fact_key, scope_key, head,
-    validate_record, validate_complete)
+    validate_record, validate_current_point)
 from .hybrid_goals import digest
 from .hybrid_protocol import validate_schema
 from .hybrid_reads import ReadBudget
@@ -62,6 +62,7 @@ class ControllerService:
         # Do not retain discarded obsolete revisions forever. Callers must hold
         # their actual token; losing it never authorizes reconstruction from disk.
         self._last_sample=None;self._active=None;self._tokens=weakref.WeakValueDictionary();self._lock=threading.RLock()
+        self._token_active=None
         store.bind_hybrid_controller(self)
 
     def _sample(self):
@@ -111,20 +112,12 @@ class ControllerService:
         validate_record(SECTIONS[1],hk,current)
         if tip is None or tip['idempotency_key']!=current['fact_key']:
             raise Conflict('controller current head differs from original event tip')
-        facts={};key=current['fact_key']
-        while key is not None:
-            if key in facts or len(facts)>=4096:raise Conflict('controller lineage exceeds safe bound')
-            value=self._original(db,key,budget);facts[key]=value
-            key=value['request']['previous_fact_key']
-        state={'version':self._metadata(db),SECTIONS[0]:facts,SECTIONS[1]:{hk:current}}
-        # Reuse already source-verified facts; each original head is derived from
-        # its immutable fact, not the current mutable head.
-        validate_complete(state,(self.project_id,self.data_mode),lambda k:(
-            (EVENT,'hybrid-core',digest(facts[k]),facts[k]['accepted_state_version']),
-            sorted([(SECTIONS[0],k,digest(facts[k])),(SECTIONS[1],hk,digest(head(facts[k])))])),event_tip=tuple(tip))
-        if facts[current['fact_key']]['accepted_state_version']!=tip['new_state_version']:
-            raise Conflict('controller original event tip version differs')
-        return facts[current['fact_key']]
+        value=self._original(db,current['fact_key'],budget)
+        pk=value['request']['previous_fact_key']
+        previous=None if pk is None else self._original(db,pk,budget)
+        validate_current_point(current,value,previous,registration=(self.project_id,self.data_mode),
+                               version=self._metadata(db),event_tip=tuple(tip))
+        return value
 
     def _issued(self,token):
         if type(token) is not ControllerToken or self._tokens.get(token.key) is not token:
@@ -148,6 +141,50 @@ class ControllerService:
             value=self._token_live(db,token,ReadBudget(db,READ_BYTES))
             return {'controller_epoch':value['controller_epoch'],'head_revision':value['head_revision'],
                     'authority_domain':'HYBRID_CORE_FACTS_ONLY','execution_enabled':False}
+
+    @contextmanager
+    def token_transaction(self,token,*,read_bytes=READ_BYTES,_before_commit=None):
+        """Mint a fresh fixed-Store writer, hold owner lock, recheck and commit.
+
+        Never accepts a caller's connection/read snapshot. Internal owner API;
+        do not expose DB/budget/token as JSON or manually commit inside context.
+        """
+        self._refuse_nested_writer();self._issued(token)
+        if type(read_bytes) is not int or not 1<=read_bytes<=64*1024**2:
+            raise Conflict('invalid controller transaction read envelope')
+        if _before_commit is not None and not callable(_before_commit):
+            raise TypeError('internal final-check callback required')
+        with self.store.lock(),self._lock,self.store.connect() as db:
+            db.execute('BEGIN IMMEDIATE');budget=ReadBudget(db,read_bytes)
+            if self.store._hybrid_controller_service is not self:
+                raise PermissionError('actual bound controller owner required')
+            if self._token_active is not None:raise Conflict('nested controller token transaction refused')
+            self._token_active=(db,token,budget,threading.get_ident())
+            try:
+                self._metadata(db);value=self._token_live(db,token,budget)
+                yield db,budget,value
+                self.check_token_in_transaction(db,token,budget)
+                if _before_commit is not None:_before_commit()
+                db.commit()
+            finally:self._token_active=None
+
+    def _refuse_nested_writer(self):
+        if self._token_active is not None and self._token_active[3]==threading.get_ident():
+            raise Conflict('nested controller authoritative writer refused')
+        if self._active is not None and getattr(self._active,'thread',None)==threading.get_ident():
+            raise Conflict('nested controller authoritative writer refused')
+
+    def check_token_in_transaction(self,db,token,budget):
+        """Check within token_transaction while the actual owner lock is held."""
+        active=self._token_active
+        if (active is None or active[0] is not db or active[1] is not token or active[2] is not budget or
+                active[3]!=threading.get_ident() or not db.in_transaction or
+                type(budget) is not ReadBudget or budget.db is not db):
+            raise PermissionError('actual held controller transaction required')
+        if self.store._hybrid_controller_service is not self:
+            raise PermissionError('actual bound controller owner required')
+        self._metadata(db)
+        return self._token_live(db,token,budget)
 
     def _check_active(self,guard):
         if type(guard) is not _Guard or guard.owner is not self or self._active is not guard:
@@ -194,7 +231,7 @@ class ControllerService:
     @contextmanager
     def _authorization(self,value,previous):
         if self._active is not None:raise Conflict('nested controller transaction refused')
-        guard=_Guard(self,value,previous);self._active=guard
+        guard=_Guard(self,value,previous);guard.thread=threading.get_ident();self._active=guard
         try:guard.check();yield guard
         finally:self._active=None
 
@@ -206,7 +243,10 @@ class ControllerService:
         return self._write('renew',idempotency_key,expected_version,ttl_seconds,token)
 
     def _write(self,operation,idem,expected,ttl,token):
-        with self._lock,self.store.lock(),self.store.connect() as db:
+        # Shared authority lock order: writer -> controller owner. Admission
+        # holds this same order through final token check and DB commit.
+        self._refuse_nested_writer()
+        with self.store.lock(),self._lock,self.store.connect() as db:
             db.execute('BEGIN IMMEDIATE');version=self._metadata(db);self._owner_live()
             budget=ReadBudget(db,READ_BYTES);previous=self._current(db,budget)
             request={'authority_domain':'HYBRID_CORE_FACTS_ONLY','project_id':self.project_id,

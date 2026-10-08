@@ -6,7 +6,7 @@ import hashlib
 import pytest
 
 from rlflow.hybrid_preparation import SECTIONS, EVENTS, intent_key, result_key
-from rlflow.hybrid_preparation_service import PreparationService
+from rlflow.hybrid_preparation_service import PreparationService, MaterialWitness
 from rlflow.hybrid_snapshot import SnapshotBuilder
 from rlflow.hybrid_reads import ReadBudget
 from rlflow.hybrid_authority import timestamp
@@ -50,6 +50,60 @@ def test_actual_service_intent_precedes_publish_and_complete_is_nonexecuting(own
     with pytest.raises(PermissionError):service.adapter.start(value['result'])
     store.snapshot();assert Store(store.root).recover()==state
     assert SECTIONS[0] not in store.view() and SECTIONS[1] not in store.view()
+
+
+def test_actual_material_witness_checks_issued_files_but_is_only_as_of(owned,monkeypatch):
+    service,request,_,_=owned;prepared=service.prepare(request);before=service.store.audit()
+    witness=service.issue_material_witness(intent_key(request))
+    record=service.check_material_witness(witness,prepared['intent'],prepared['result'])
+    assert record['state']=='VERIFIED_AS_OF' and record['execution_enabled'] is False
+    assert record['intent_hash']==digest(prepared['intent']) and record['result_hash']==digest(prepared['result'])
+    monkeypatch.setattr(service.builder,'verify',lambda s:pytest.fail('writer check reopened files'))
+    monkeypatch.setattr(service.adapter,'verify_bundle',lambda b:pytest.fail('writer check reopened bundle'))
+    assert service.check_material_witness(witness,prepared['intent'],prepared['result'])==record
+    assert service.store.audit()==before and not service.store.objects('sessions')
+
+
+@pytest.mark.parametrize('damage',['copy','json','foreign_owner','expired','wrong_intent','wrong_result','material_slot'])
+def test_material_witness_cannot_be_copied_rebound_or_extended(owned,damage):
+    service,request,clock,_=owned;prepared=service.prepare(request)
+    witness=service.issue_material_witness(intent_key(request));intent=prepared['intent'];outcome=prepared['result']
+    if damage=='copy':witness=MaterialWitness(witness.id,witness.raw,witness.materials,
+        witness.boot_id,witness.issued_monotonic_ns,witness.expires_monotonic_ns)
+    elif damage=='json':witness=json.loads(witness.raw)
+    elif damage=='foreign_owner':service._witnesses.clear()
+    elif damage=='expired':clock[0]+=timedelta(seconds=30)
+    elif damage=='wrong_intent':intent={**intent,'created_at':'2026-10-09T00:00:00Z'}
+    elif damage=='wrong_result':outcome={**outcome,'accepted_state_version':5}
+    else:service._materials[intent_key(request)]=tuple(list(witness.materials))
+    with pytest.raises((Conflict,PermissionError)):service.check_material_witness(witness,intent,outcome)
+
+
+def test_material_witness_rejects_actual_snapshot_tamper_before_issue(owned):
+    service,request,_,_=owned;service.prepare(request)
+    snapshot,_,_=service._materials[intent_key(request)]
+    (snapshot.path/'module/source.py').write_text('tampered\n')
+    with pytest.raises(Conflict):service.issue_material_witness(intent_key(request))
+    assert not service._witnesses
+
+
+def test_material_witness_never_adopts_disk_after_owner_restart(owned):
+    service,request,_,_=owned;service.prepare(request);service._materials.clear()
+    with pytest.raises(PermissionError):service.issue_material_witness(intent_key(request))
+
+
+@pytest.mark.parametrize('damage',['utc_stalled','utc_backward','mono_backward','boolean'])
+def test_material_witness_real_elapsed_deadline_cannot_be_extended_by_clock(owned,damage):
+    service,request,clock,_=owned;mono=[100*10**9];service._witness_monotonic_ns=lambda:mono[0]
+    prepared=service.prepare(request);witness=service.issue_material_witness(intent_key(request))
+    if damage=='utc_stalled':mono[0]+=30*10**9
+    elif damage=='utc_backward':
+        clock[0]+=timedelta(seconds=10);mono[0]+=10*10**9
+        service.check_material_witness(witness,prepared['intent'],prepared['result'])
+        clock[0]-=timedelta(seconds=1);mono[0]+=1*10**9
+    elif damage=='mono_backward':mono[0]-=1
+    else:mono[0]=True
+    with pytest.raises(Conflict):service.check_material_witness(witness,prepared['intent'],prepared['result'])
 
 
 def test_original_retry_is_no_regeneration_even_after_expiry(owned,monkeypatch):
