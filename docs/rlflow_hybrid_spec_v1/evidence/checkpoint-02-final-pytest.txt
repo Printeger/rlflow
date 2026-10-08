@@ -1,0 +1,32 @@
+2026-10-08; Python 3.12.3; final candidate r3; branch hybrid-v1; parent 757129d.
+Command: PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q -rs
+Output: audit/hybrid-v1/checkpoint-02-final-r3-pytest.log
+Result: 368 passed, 32 skipped, 1 warning in 115.80s (0:01:55)
+Skips: 18 external reviewed dispatcher tests; 14 external H1 tests.
+Warning: installed Starlette TestClient uses deprecated anyio.abc.BlockingPortal alias.
+No source or test edits while r3 was running.
+
+Earlier frozen candidate: 1 failed, 365 passed, 32 skipped in 116.57s.
+Failure: test_supervisor_cleans_descendants_when_owner_dies teardown ENOTEMPTY,
+trusted recovery writers still active; see checkpoint-02-final-pytest.log.
+Failure diagnosed and fixed, not skipped or ignored. An additional writable
+control-directory defect and invalid-identity cleanup defect were fixed.
+Intermediate r2: 368 passed, 32 skipped, 1 warning in 117.74s.
+
+Final targeted authentication/API/SSE/local HTTP/isolation/CPU approval suite:
+31 passed, 1 warning in 11.73s.
+Independent High review: four recovery/security tests passed; findings closed.
+compileall, git diff --check, pip check passed.
+
+Frozen source SHA256:
+6c3800fe428f317c4650bef393ebd61908d62b6312c3fd4fb406fbb2b790fa0f  rlflow/web_auth.py
+a140109c18389537526aaaab593ff71167c126bd60d81bd7ca26aed901bacc93  rlflow/web_api.py
+c1638a45a2ade333d8b8ff6790d04e6fec14a74ac91b0fa023c093c0576d8934  rlflow/web.py
+82042fb69a7e31b934b23d5a574381d6c4207ac910d898d5b781bd9b88ce1621  rlflow/live_stream.py
+1c7cdbce843ae540f6f51ecb30ac562c9a26c635cbe02974788d0c085590f434  rlflow/observation.py
+1c7f997a203337f75d206f1a98968dd5a3ff155fab9ec6f63a2f9c7f9d3561bb  rlflow/isolation.py
+c75dd55cf0cd9a7d4b20b17788fbcaa7935b3733499ecae7bc3797f13b5a5e41  tests/test_web_auth.py
+dcaf186dfd40f60269c148a8793a4dbf8ae6c5fcdca99b85d02895b75578d59d  tests/test_web_api.py
+2e6e06ecebfed5ebffe99ab45a17e0ed16077b3bc9b69ce5d0d49d6d3d207daa  tests/test_live_stream.py
+fcccec4b74e674080fc15f38880dd3dc8d3633b4bae026f9b2c6478f89f4db81  tests/test_web_local.py
+3685fa6ebd142e02f0b63f80127ac21bc5df6c7640f8838d76a3d6ba9165584e  tests/test_isolation.py

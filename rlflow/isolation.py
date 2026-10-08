@@ -12,6 +12,7 @@ import json
 import os
 from pathlib import Path
 import platform
+import re
 import resource
 import signal
 import subprocess
@@ -121,6 +122,31 @@ def _restrict(read_roots: list[str], write_roots: list[str], execute_paths: list
     finally: sec.seccomp_release(ctx)
 
 
+def _command_writers_quiescent(directory, timeout=3):
+    """Never remove control files while the independent guardian can write."""
+    from .jobs import owns
+    def valid_identity(record):
+        return (isinstance(record,dict) and set(record)=={'pid','pgid','starttime','boot_id'}
+                and all(type(record[k]) is int and 0<record[k]<2**31 for k in ('pid','pgid'))
+                and isinstance(record['starttime'],str) and record['starttime'].isascii()
+                and record['starttime'].isdigit() and 0<len(record['starttime'])<=20
+                and isinstance(record['boot_id'],str)
+                and re.fullmatch(r'[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}',record['boot_id']) is not None)
+    ready=directory/'lifeguard-ready.json';request=directory/'lifeguard-request.json'
+    if not request.exists():return True
+    deadline=time.monotonic()+timeout
+    while time.monotonic()<deadline:
+        try:
+            guardian=json.loads(ready.read_text())['identity']
+            supervisor=json.loads(request.read_text())['owner']
+            if not valid_identity(guardian) or not valid_identity(supervisor):return False
+            if not owns(guardian) and not owns(supervisor):return True
+        except (OSError,ValueError,KeyError,TypeError):
+            pass  # Missing or ambiguous identity is not permission to delete.
+        time.sleep(.01)
+    return False
+
+
 def cpu_exec(command: str, candidate: str | Path, scratch: str | Path,
              role: str, *, timeout: float = 60, read_extra: list[str] | None = None,
              write_roots: list[str] | None = None,
@@ -139,6 +165,22 @@ def cpu_exec(command: str, candidate: str | Path, scratch: str | Path,
     scratch = Path(scratch).resolve(strict=True)
     if candidate == scratch or candidate in scratch.parents or scratch in candidate.parents:
         raise IsolationError('Candidate and scratch must be separate directory trees')
+    if artifact_dir is None:
+        # Create trusted control artifacts in the CALLER, before giving the
+        # sandbox TMPDIR=scratch. The independent guardian must never accept
+        # role-writable identity/done/release files. A killed caller leaves its
+        # private diagnostic directory for recovery rather than deleting it
+        # underneath the still-running guardian.
+        private=Path(tempfile.mkdtemp(prefix='rlflow-command-private-'))
+        try:
+            return cpu_exec(command,candidate,scratch,role,timeout=timeout,
+                            read_extra=read_extra,write_roots=write_roots,execute_extra=execute_extra,
+                            memory_bytes=memory_bytes,command_seconds=command_seconds,
+                            artifact_dir=private)
+        finally:
+            if _command_writers_quiescent(private/'process'):
+                import shutil
+                shutil.rmtree(private)
     writes = [str(scratch)]
     if role == 'Engineer':
         writes += write_roots if write_roots is not None else [str(candidate)]
@@ -163,6 +205,10 @@ def cpu_exec(command: str, candidate: str | Path, scratch: str | Path,
         artifact_dir=Path(artifact_dir).resolve()
         if artifact_dir.is_relative_to(candidate) or artifact_dir.is_relative_to(scratch):
             raise IsolationError('Command artifacts must be outside role writable storage')
+        for allowed in (read_extra or []) + (execute_extra or []):
+            path=Path(allowed).resolve(strict=True)
+            if path==artifact_dir or path in artifact_dir.parents or path.is_relative_to(artifact_dir):
+                raise IsolationError('Extra access cannot include trusted command artifacts')
     with (open(artifact_dir/'stdout.log','x+b') if artifact_dir else tempfile.TemporaryFile()) as out, (open(artifact_dir/'stderr.log','x+b') if artifact_dir else tempfile.TemporaryFile()) as err:
         p = subprocess.Popen(argv, cwd=scratch, env=env, stdin=subprocess.DEVNULL,
                              stdout=out, stderr=err, start_new_session=True)
@@ -521,7 +567,9 @@ if __name__ == '__main__':
         from rlflow.lifeguard import start as start_guard,group_identity,kill_group
         from rlflow.store import atomic,canonical
         owner=os.getppid()
-        directory=Path(cfg.get('guard_directory') or tempfile.mkdtemp(prefix='rlflow-command-guard-'))
+        if not cfg.get('guard_directory'):
+            raise IsolationError('Trusted command guard directory required')
+        directory=Path(cfg['guard_directory'])
         directory.mkdir(parents=True,exist_ok=True)
         cfg['guard_directory']=str(directory);cfg['supervisor_identity']=group_identity(os.getpid())
         import uuid

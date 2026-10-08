@@ -2,6 +2,8 @@
 
 目前仍可推进开发，没有需要终止完整 Goal 的外部阻塞。
 
+本切片故障不是外部阻塞：冻结全回归暴露 guardian teardown race 与角色可写 default guard 控制目录，已经按完整真实身份和控制文件隔离修复，最终 r3 368 passed / 32 skipped，High 范围内阻塞 finding 全部关闭。没有删除测试、延长业务终止门槛或忽略 cleanup 错误。
+
 1. 原 Codex 版本不匹配已修复：0.161.0 的工具注册、隔离测试通过；使用独立空 HOME 的固定 census catalog 与本机 localhost 拒绝端点，零模型调用。真实 runtime 的供应商 usage/interrupt/恢复仍未验证，不能把 doctor 通过当作真实业务闭环通过。
 2. cgroup v2 存在，但未证明本项目拥有可委派 subtree；严格任务拒绝执行。后续资源测试先验证能力，不能修改宿主安全配置绕过。
 3. 真实模型、GPU、付费资源未获单独精确运行授权。可完成普通本地代码、模型无关测试、实验与故障验证；真实供应商闭环属于独立证据缺口。

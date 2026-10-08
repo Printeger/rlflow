@@ -47,3 +47,24 @@ ec46e1f68eb5181dde7eb140a28a956620c4dadfe172bc090ac2415d3b98015c  tests/test_hyb
 ```
 
 发布门槛缺口仍包括：完整生产 API/SSE/UI、工程/科研闭环、真实供应商接入、共享资源、B1、24h/8h soak、新安装与迁移、可信远程、回放、最终独立审查。不能宣布 Goal 完成。
+
+## Checkpoint 02：认证只读 API/SSE 与 command guardian 修复
+
+最终冻结候选 **368 passed / 32 skipped / 1 warning / 115.80s**。命令 `PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q -rs`；实际原始日志 `audit/hybrid-v1/checkpoint-02-final-r3-pytest.log`，版本化结果与源码 SHA256 见 [evidence/checkpoint-02-final-pytest.txt](evidence/checkpoint-02-final-pytest.txt)。r3 期间未编辑源码或测试。
+
+| 验证 | 实际结果与边界 |
+|---|---|
+| 最终认证/API/SSE/loopback/isolation/CPU approval 子集 | 31 passed / 1 warning / 11.73s |
+| 真实 loopback TCP HTTP | 提交后 domain 与真实公共 usage 字段到达；Last-Event-ID 重连无重复，heartbeat 不带 id；线程/server/socket 正常结束 |
+| 纯 ASGI socket-facing send | 实际 send stall 超时、连接槽回收；100 条健康积压完整发送；真实慢 send resync+close；撤销阻止后续 buffered domain |
+| 项目身份替换故障 | head 后更换 reader.db 时 snapshot 拒绝；head/snapshot/page/events 均在事务内绑定 project/data_mode |
+| 登录/授权边界 | 匿名/跨项目/Host/Origin/CSRF/方法混用、body 过量、额外字段、surrogate、Bearer query token、Agent approver 全部拒绝 |
+| command guardian 隔离与恢复 | 默认外部私有目录、真实角色写入控制标记被拒绝；旧 child 死亡断言保留并新增 supervisor/guardian quiescence；unknown/invalid identities 不允许删除 |
+| 独立 High 安全/恢复复核 | 四项针对恢复测试通过；本范围 MUST_FIX 均关闭；详见 SECURITY_REVIEW_WEB_FOUNDATION.md |
+| Python 编译 / 补丁 / 依赖 | compileall、git diff --check、pip check 全通过 |
+
+保留失败证据：首轮 366/32 通过后，增加 heartbeat closed-schema 校验的冻结回归出现 **1 failed / 365 passed / 32 skipped / 116.57s**。原日志 `audit/hybrid-v1/checkpoint-02-final-pytest.log`；错误是原隔离死亡测试的 rmtree 与仍活跃 trusted recovery writer 竞争。不是跳过/忽略：独立诊断后修复角色可写控制目录与清理证明；中间 r2 368/32 通过，随后闭合 null/empty identity 防御并重新执行最终 r3。未降低业务终止期限或删除测试。
+
+32 skipped 与 checkpoint 01 相同：外部 reviewed dispatcher 18、外部 H1 14。唯一 warning 为安装版 Starlette TestClient 的 anyio alias deprecation；没有项目测试报错。测试默认仍隔离宿主 ROS 插件。
+
+该切片不是 M1 完成证明。T05 完整启动观测、T07/T08 前端、日志/遥测、完整 Error envelope、性能/soak、M2–M5 与最终 Goal 门槛仍未验收。新增仅 local read-only API；未调用真实模型、GPU、公开监听或生产状态。

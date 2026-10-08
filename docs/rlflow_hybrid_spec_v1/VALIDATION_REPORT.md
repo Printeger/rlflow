@@ -28,3 +28,6 @@
 ## 2026-10-08 实施验收入口
 
 上文保留为原需求包校验记录。当前系统实现的基线、测试命令、进程故障注入和独立审查见 [IMPLEMENTATION_VALIDATION.md](IMPLEMENTATION_VALIDATION.md)，任务状态见 [PROGRESS.md](PROGRESS.md)。当前尚未完成 M1–M5；需求包通过不代表完整系统验收通过。
+# 系统 Checkpoint 02 补充
+
+2026-10-08：认证只读 API/SSE 基础和 command guardian 控制隔离修复的最终回归 **368 passed / 32 skipped / 115.80s**。真实 loopback HTTP/SSE 重连与 High 只读复核已通过。详细失败过程、修复、冻结 SHA256、证据路径见 IMPLEMENTATION_VALIDATION.md 与 CHECKPOINT_02.md；这不是 M1 或完整 Goal 完成结论。

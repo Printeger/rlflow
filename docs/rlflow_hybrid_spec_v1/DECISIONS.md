@@ -29,3 +29,12 @@
 ## ADR-006：有界读模型与断裂拒绝
 
 公共对象采用索引 tuple keyset 分页，snapshot 仅返回 30 个对象和增量 counters，其余分页查询。旧日志不嵌入事件。观察事件按不超过 200 个对象拆批、不丢已提交变化；同事务 counters 包括本次归零记录。计数状态正规化成有限集合以避免无界增长。只读 reader 校验源投影版本、outbox MAX(seq)、序号连续与 envelope 序号；不一致要求 resync，不用静默空状态冒充 LIVE。
+# 2026-10-08：T06 本地只读服务基础
+
+冻结回归揭示既有 command guard 默认使用子进程 TMPDIR=scratch，角色可伪造控制标记。修正为 trusted caller 的外部私有 artifact 目录；不削弱 Landlock/seccomp，禁止额外 scope 覆盖控制目录。自动临时清理必须等待 supervisor+guardian 两种绑定身份 quiescence；未知状态保留诊断目录，不能以临时文件整洁为由删除活动恢复证据。owner-death 测试强化等待可信 writer，而非固定 sleep 或忽略 rmtree 错误。
+
+沿用 Python 控制核心，新增 FastAPI/uvicorn，仅通过 ObservationReader 查询已经显式启用的同库观测投影。Web 请求不能实例化 Store/迁移/启动 scheduler；provision 是独立 trusted CLI 的显式动作。M1 暂不提供写命令或 artifact API。
+
+使用纯 ASGI 同源 middleware，避免 BaseHTTPMiddleware 内部流队列截断真实 socket-send deadline。默认 session 15 分钟、viewer Bearer 至多 5 分钟；cookie 和 Bearer 不可互换；Agent 不能收到 approver role。每个 BEGIN 内校验项目身份与模式，而不是仅在路由入口先读 head。
+
+SSE 单事件预取、32 帧/4MiB queue、8 流；heartbeat 不写 durable id。健康历史补齐不因批次大于 queue 被错误断开。slow client resync+close；socket 已阻塞时直接 timeout close，由 Last-Event-ID 恢复。没有为得到“实时运行”而将 ROLE_IDENTITY 或 heartbeat 当作业务 RUNNING 证据。

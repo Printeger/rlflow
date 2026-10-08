@@ -78,9 +78,10 @@ class IsolationTests(unittest.TestCase):
         with self.assertRaises(IsolationError):require_doctor(self.root/'state')
     def test_supervisor_cleans_descendants_when_owner_dies(self):
         marker=self.s/'pids'
+        artifacts=self.root/'trusted-command';artifacts.mkdir()
         inner="import subprocess,os,time; p=subprocess.Popen(['/usr/bin/python3','-c','import time; time.sleep(30)']); open("+repr(str(marker))+",'w').write(str(os.getpid())+' '+str(p.pid)); time.sleep(30)"
         cmd='/usr/bin/python3 -c '+shlex.quote(inner)
-        caller="from rlflow.isolation import cpu_exec; cpu_exec("+repr(cmd)+','+repr(str(self.c))+','+repr(str(self.s))+",'Engineer',timeout=60)"
+        caller="from rlflow.isolation import cpu_exec; cpu_exec("+repr(cmd)+','+repr(str(self.c))+','+repr(str(self.s))+",'Engineer',timeout=60,artifact_dir=__import__('pathlib').Path("+repr(str(artifacts))+"))"
         parent=subprocess.Popen([sys.executable,'-c',caller],stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
         try:
             deadline=time.monotonic()+4
@@ -94,8 +95,50 @@ class IsolationTests(unittest.TestCase):
             deadline=time.monotonic()+3
             while any(running(p) for p in pids) and time.monotonic()<deadline:time.sleep(.02)
             self.assertFalse(any(running(p) for p in pids),'Owned descendants survived supervisor owner death')
+            # Dead role PIDs alone do not imply trusted recovery writers have
+            # finished. Preserve the original cleanup deadline, and additionally
+            # require both bound supervisor and independent guardian quiescence.
+            from rlflow.jobs import owns
+            guardian=json.loads((artifacts/'process/lifeguard-ready.json').read_text())['identity']
+            supervisor=json.loads((artifacts/'process/lifeguard-request.json').read_text())['owner']
+            while (owns(guardian) or owns(supervisor)) and time.monotonic()<deadline:time.sleep(.01)
+            self.assertFalse(owns(supervisor),'CPU supervisor still writing control artifacts')
+            self.assertFalse(owns(guardian),'Guardian still writing recovery artifacts')
         finally:
             if parent.poll() is None:parent.kill();parent.wait()
+
+    def test_private_command_control_artifacts_are_not_role_writable(self):
+        artifacts=self.root/'trusted-command';artifacts.mkdir()
+        script="from pathlib import Path; Path("+repr(str(artifacts/'process/lifeguard-done'))+").write_text('forged')"
+        result=cpu_exec('/usr/bin/python3 -c '+shlex.quote(script),self.c,self.s,'Engineer',timeout=3,artifact_dir=artifacts)
+        self.assertNotEqual(result['exit_code'],0,result)
+        self.assertNotIn('forged',(artifacts/'process/lifeguard-done').read_text())
+        result=self.run_cpu("from pathlib import Path; print(list(Path('.').glob('rlflow-command-guard-*')))")
+        self.assertEqual(result['exit_code'],0,result)
+        self.assertEqual(result['stdout'].strip(),'[]')
+        with self.assertRaises(IsolationError):
+            cpu_exec('true',self.c,self.s,'Engineer',timeout=3,artifact_dir=artifacts,read_extra=[str(self.root)])
+
+    def test_private_control_cleanup_requires_trusted_writer_quiescence(self):
+        from rlflow.isolation import _command_writers_quiescent
+        from rlflow.jobs import identity
+        control=self.root/'trusted-control';control.mkdir()
+        current=identity(os.getpid())
+        (control/'lifeguard-request.json').write_text(json.dumps({'owner':current}))
+        # No ready identity is an unknown guardian, not evidence of no writer.
+        self.assertFalse(_command_writers_quiescent(control,timeout=.03))
+        (control/'lifeguard-ready.json').write_text(json.dumps({'identity':current}))
+        self.assertFalse(_command_writers_quiescent(control,timeout=.03))
+        dead=dict(current,starttime=str(int(current['starttime'])+99999999))
+        (control/'lifeguard-request.json').write_text(json.dumps({'owner':dead}))
+        (control/'lifeguard-ready.json').write_text(json.dumps({'identity':dead}))
+        self.assertTrue(_command_writers_quiescent(control,timeout=.03))
+        self.assertTrue(control.exists())
+        for ambiguous in (None,{},dict(current,pid=True),{'pid':current['pid']},dict(current,boot_id='invalid'),dict(current,starttime='invalid')):
+            for side in ('owner','identity'):
+                (control/'lifeguard-request.json').write_text(json.dumps({'owner':ambiguous if side=='owner' else dead}))
+                (control/'lifeguard-ready.json').write_text(json.dumps({'identity':ambiguous if side=='identity' else dead}))
+                self.assertFalse(_command_writers_quiescent(control,timeout=.03))
     def test_doctor_real_kernel(self):
         r=doctor();self.assertTrue(r['ok'],r)
 

@@ -65,6 +65,16 @@ def test_missing_usage_stays_unknown_and_role_identity_is_not_start_proof():
     assert summary("usage", "s", {"complete": True,"input_tokens":1,"output_tokens":1,"cached_tokens":2}, 1)["usage_status"] == "PARTIAL"
 
 
+def test_each_read_transaction_checks_bound_project_and_mode(observed):
+    store, base = observed
+    cursor = base.head()["cursor"]
+    for expected in ({"expected_project_id": "project_other"}, {"expected_data_mode": "live"}):
+        reader = ObservationReader(store.root, **expected)
+        for call in (reader.head, reader.snapshot, reader.page, lambda: reader.events(cursor)):
+            with pytest.raises(ProtocolError, match="identity mismatch"):
+                call()
+
+
 def test_same_entity_version_is_not_source_global_version(observed):
     store, reader = observed
     change_usage(store, "one", input_tokens=1)

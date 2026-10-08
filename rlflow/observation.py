@@ -218,8 +218,9 @@ def enable(store, project_id, *, data_mode="live"):
 
 class ObservationReader:
     """Read-only queries; construction never creates or migrates a state store."""
-    def __init__(self, root):
+    def __init__(self, root, *, expected_project_id=None, expected_data_mode=None):
         self.db = Path(root).resolve() / "runtime" / "research.db"
+        self.expected_project_id, self.expected_data_mode = expected_project_id, expected_data_mode
 
     def connect(self):
         db = sqlite3.connect(self.db.as_uri() + "?mode=ro", uri=True, timeout=5)
@@ -237,6 +238,13 @@ class ObservationReader:
         last = db.execute("SELECT COALESCE(MAX(seq),0) FROM observation_events").fetchone()[0]
         if last != row["seq"]: raise ProtocolError("outbox/meta sequence mismatch", "RESYNC_REQUIRED")
         return row
+
+    def _checked_meta(self, db):
+        meta = self._meta(db)
+        if ((self.expected_project_id is not None and meta["project_id"] != self.expected_project_id)
+                or (self.expected_data_mode is not None and meta["data_mode"] != self.expected_data_mode)):
+            raise ProtocolError("observation identity mismatch", "RESYNC_REQUIRED")
+        return meta
 
     @staticmethod
     def _page(db, *, limit, kind=None, after=""):
@@ -263,7 +271,7 @@ class ObservationReader:
     def snapshot(self, *, limit=30):
         with self.connect() as db:
             db.execute("BEGIN")
-            meta = self._meta(db)
+            meta = self._checked_meta(db)
             counters = [dict(row) for row in db.execute("SELECT kind,status,count FROM observation_counters WHERE count>0 ORDER BY kind,status LIMIT 1000")]
             value = {"schema_version": "1.0", "project_id": meta["project_id"], "store_epoch": meta["store_epoch"],
                      "cursor": f'{meta["store_epoch"]}:{meta["seq"]}', "server_time": utc(), "data_mode": meta["data_mode"],
@@ -276,13 +284,22 @@ class ObservationReader:
     def page(self, *, kind=None, after="", limit=50):
         with self.connect() as db:
             db.execute("BEGIN")
+            self._checked_meta(db)
             return self._page(db,kind=kind,after=after,limit=limit)
+
+    def head(self):
+        """Small consistent metadata read; no projection scan or process probes."""
+        with self.connect() as db:
+            db.execute("BEGIN")
+            meta = self._checked_meta(db)
+            return {"project_id": meta["project_id"], "data_mode": meta["data_mode"],
+                    "cursor": f'{meta["store_epoch"]}:{meta["seq"]}', "server_time": utc()}
 
     def events(self, cursor, *, limit=200):
         if type(limit) is not int or not 1 <= limit <= MAX_PAGE: raise ProtocolError("invalid event limit")
         with self.connect() as db:
             db.execute("BEGIN")
-            meta = self._meta(db)
+            meta = self._checked_meta(db)
             seq = parse_cursor(cursor,meta["store_epoch"])
             if seq < meta["floor"] or seq > meta["seq"]: raise ProtocolError("cursor outside retained range", "RESYNC_REQUIRED")
             result = []
