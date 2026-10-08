@@ -380,7 +380,7 @@ class Store:
             state["version"] = row["new_state_version"]
         validate_runtime_state(state)
         from .hybrid_goals import validate_complete
-        validate_complete(state,self._goal_registration(db),lambda k:self._goal_event(db,k))
+        validate_complete(state,self._goal_registration(db),lambda k:self._goal_event(db,k),lambda k:self._goal_source(db,k))
         from .hybrid_authority import validate_complete as authority_complete
         authority_complete(state,self._goal_registration(db),lambda k:self._authority_event(db,k))
         return state
@@ -688,6 +688,31 @@ class Store:
         row=db.execute('SELECT event_type,producer,object_id,new_state_version FROM events WHERE idempotency_key=?',(key,)).fetchone()
         return tuple(row) if row else None
 
+    def _goal_source(self, db, key, *, max_bytes=16*1024*1024, _parse=None, _decode=None):
+        """PK source proof for original full draft records, not row versions."""
+        from .hybrid_goals import SECTIONS, check_bytes, digest
+        row=db.execute('SELECT event_type,producer,object_id,new_state_version,payload_sha256,CASE WHEN length(CAST(payload AS BLOB))<=? THEN payload END AS payload FROM events WHERE idempotency_key=?',(max_bytes,key)).fetchone()
+        if row is None:return None
+        if row['payload'] is None:raise Conflict('draft source exceeds bounded witness')
+        payload=(_parse or json.loads)(row['payload'].encode())
+        if sha(payload)!=row['payload_sha256']:raise Conflict('draft source payload integrity mismatch')
+        if payload.get('format')!=2 or payload.get('delete'):
+            raise Conflict('draft original source shape mismatch')
+        decoded=[];seen=set();markers=set()
+        for section,objkey,value in payload.get('put',[]):
+            if section not in SECTIONS or (section,objkey) in seen:
+                raise Conflict('draft original source duplicate or extra object')
+            seen.add((section,objkey))
+            value=_decode(value) if _decode else self._decode_value(db,value)
+            check_bytes(value,1024*1024)
+            if not objkey:
+                if value!={}:raise Conflict('draft original collection marker mismatch')
+                markers.add(section)
+            else:decoded.append((section,objkey,digest(value)))
+        if len(decoded)!=3 or {s for s,k,h in decoded}!=set(SECTIONS):
+            raise Conflict('draft original source requires three objects')
+        return ((row['event_type'],row['producer'],row['object_id'],row['new_state_version']),sorted(decoded))
+
     def transact(self, event_type, key, mutate, *, expected=None, object_id="control", producer="orchestrator", inputs=None):
         """Legacy whole-state callback; new hot paths should use transact_objects."""
         with self.lock(), self.connect() as db:
@@ -804,7 +829,7 @@ class Store:
                 if state["version"]!=row["version"]: raise Conflict("snapshot version mismatch")
                 validate_runtime_state(state)
                 from .hybrid_goals import validate_complete
-                validate_complete(state,self._goal_registration(db),lambda k:self._goal_event(db,k))
+                validate_complete(state,self._goal_registration(db),lambda k:self._goal_event(db,k),lambda k:self._goal_source(db,k))
                 from .hybrid_authority import validate_complete as authority_complete
                 authority_complete(state,self._goal_registration(db),lambda k:self._authority_event(db,k))
             else: state=initial()
@@ -815,7 +840,7 @@ class Store:
                 state["version"]=event["new_state_version"]
             validate_runtime_state(state)
             from .hybrid_goals import validate_complete
-            validate_complete(state,self._goal_registration(db),lambda k:self._goal_event(db,k))
+            validate_complete(state,self._goal_registration(db),lambda k:self._goal_event(db,k),lambda k:self._goal_source(db,k))
             from .hybrid_authority import validate_complete as authority_complete
             authority_complete(state,self._goal_registration(db),lambda k:self._authority_event(db,k))
             self._replace_projection(db,state)
@@ -826,7 +851,7 @@ class Store:
             db.execute("BEGIN IMMEDIATE")
             state=self.replay(db);raw=canonical(state)
             from .hybrid_goals import validate_complete
-            validate_complete(state,self._goal_registration(db),lambda k:self._goal_event(db,k))
+            validate_complete(state,self._goal_registration(db),lambda k:self._goal_event(db,k),lambda k:self._goal_source(db,k))
             from .hybrid_authority import validate_complete as authority_complete
             authority_complete(state,self._goal_registration(db),lambda k:self._authority_event(db,k))
             db.execute("INSERT OR REPLACE INTO snapshots VALUES(?,?,?)",(state["version"],raw,hashlib.sha256(raw).hexdigest()))

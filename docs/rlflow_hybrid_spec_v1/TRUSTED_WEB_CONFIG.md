@@ -1,6 +1,6 @@
 # 可信 Web 控制配置（checkpoint30）
 
-本切片把 checkpoint29 的不可执行 HTTP 控制桥接到实际 `rlflow.web serve`。不是执行授权、完整安装迁移或 M1/M2–M5 通过声明。Dashboard 确认 UI 和 goal/head 读桥仍未接入；命令语义见 [HYBRID_CONTROL_API.md](HYBRID_CONTROL_API.md)。
+本切片把 checkpoint29 的不可执行 HTTP 控制桥接到实际 `rlflow.web serve`。不是执行授权、完整安装迁移或 M1/M2–M5 通过声明。checkpoint31 已新增 head 列表及 human private review 读桥，见 [HYBRID_GOAL_READS.md](HYBRID_GOAL_READS.md)；Dashboard 确认 UI 仍未接入。命令语义见 [HYBRID_CONTROL_API.md](HYBRID_CONTROL_API.md)。
 
 ## 默认与显式启用
 

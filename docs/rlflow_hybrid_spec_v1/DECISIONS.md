@@ -1,5 +1,11 @@
 # 开发决策记录
 
+## Checkpoint31：有界原记录证明与部分覆盖不可混淆
+
+新 GoalRecord 的私有 source_command_key 绑定完整原 record/receipt/原 revision head；不改 proposal/request/hash，不回填旧记录。完整 snapshot/recover 对旧新记录都核原对象摘要，避免删除可选指针降级安全闭合。网页旧无指针记录明确 PARTIAL_NO_SOURCE_POINTER，列表明确 HEAD_ONLY；不扫描所有历史获取假“完整来源”。
+
+共享 blob 缓存只减少原始 I/O，不免除展开逻辑字节/节点收费；prepare 与 private review 共用预算。实际 head 必须匹配 proposal，stored ProtocolError 归源503。human operator 或 approver 才可完整 review；viewer/Bearer 仅 head summary。记录批准、期限、新合同适用性分别显示且 execution_enabled=false；逐次读取不宣称完整链审计或 lease 资格。见 HYBRID_GOAL_READS.md。
+
 ## Checkpoint30：配置启用不能隐式初始化或升级权限
 
 旧 `load_config` 三元组与prepare viewer-only保持；单独 `load_server_config` 识别closed1.1/明确controls，角色不自动继承写入或批准。全局2MiB读取、旧64KiB接受、每catalog256KiB及项目/credential数上界各自说明，不把新的读取cap说成完全不变。NONBLOCK在fstat前防FIFO阻塞，严格JSON duplicate/nonfinite/depth门同样适用。

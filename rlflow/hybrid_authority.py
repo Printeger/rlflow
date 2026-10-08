@@ -13,7 +13,7 @@ import threading
 from urllib.parse import urlsplit
 
 from .hybrid_goals import (bounded_copy, check_bytes, digest, head_key, control_command_key, SECTIONS as GOALS,
-                           validate_record as validate_goal_record)
+                           validate_record as validate_goal_record, validate_source as validate_goal_source, draft_head)
 from .hybrid_protocol import ID, HASH, COUNT, TIME, TEXT, obj, enum, nullable, validate_schema, ProtocolError
 from .hybrid_registry import Registry, CATALOG
 from .store import Conflict, sha
@@ -293,12 +293,22 @@ class ApprovalService:
             db.execute('BEGIN')
             meta = db.execute('SELECT project_id,data_mode,store_epoch FROM observation_meta WHERE singleton=1').fetchone()
             if meta is None or tuple(meta[:2]) != (self.project_id,self.data_mode):raise Conflict('approval project registration mismatch')
-            def read(s,k):
-                row=db.execute('SELECT value FROM projection WHERE section=? AND object_key=?',(s,k)).fetchone()
-                return self.store._decode_value(db,json.loads(row[0])) if row else None
-            head=read(GOALS[1],hk)
-            if head is None:raise Conflict('draft not found')
-            record=read(GOALS[0],head['contract_key']);validate_goal_record(GOALS[0],head['contract_key'],record)
+            from .hybrid_reads import ReadBudget
+            budget=ReadBudget(db)
+            read=budget.object
+            try:
+                head=read(GOALS[1],hk)
+                if head is None:raise Conflict('draft not found')
+                validate_goal_record(GOALS[1],hk,head)
+                record=read(GOALS[0],head['contract_key']);validate_goal_record(GOALS[0],head['contract_key'],record)
+                if head!=draft_head(record['contract']['proposal']):raise Conflict('draft current head mismatch')
+                if 'source_command_key' in record:
+                    ck=record['source_command_key'];receipt=read(GOALS[2],ck)
+                    if receipt is None:raise Conflict('draft original receipt missing')
+                    validate_goal_source(head['contract_key'],record,ck,receipt,self.store._goal_source(
+                        db,ck,max_bytes=budget.remaining,_parse=budget.parse,_decode=budget.decode))
+            except ProtocolError:
+                raise Conflict('draft source invalid') from None
             authority=read(SECTIONS[2],hk)
             binding=self.registry.resolve(record['contract']['proposal'])
             confirm={'id':'confirmation_'+secrets.token_hex(32),'goal_id':goal_id,'store_epoch':meta['store_epoch'],

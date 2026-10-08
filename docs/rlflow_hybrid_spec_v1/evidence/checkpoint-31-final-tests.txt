@@ -1,0 +1,64 @@
+Checkpoint31 bounded Goal reads / original complete record proof
+2026-10-09. Final frozen implementation evidence. Goal remains active.
+
+Root final target original87433 TERMINAL exit0:
+347 passed /1 existing Starlette warning /41.81s
+audit/hybrid-v1/checkpoint-31-reads-r4.log
+SHA 6b00788f8034df1a6aa11c501bb558d89c0c2a2939ea032f411fcdb23ee575d8
+
+Independent native High original56356 TERMINAL exit0:
+347 passed /1 existing Starlette warning /41.97s
+audit/hybrid-v1/checkpoint-31-reads-high-r1.log
+SHA f80ad50616ceae344fa5f0f27e6ad304b4b4275bf5a87328c11f0bd934438ef8
+Source/test SHA start/end identical. No remaining slice MUST_FIX.
+
+Exact modules for both runs:
+tests/test_hybrid_reads.py tests/test_hybrid_goals.py
+tests/test_hybrid_control_api.py tests/test_hybrid_draft_service.py
+tests/test_hybrid_draft_global_cas.py tests/test_hybrid_authority.py
+tests/test_hybrid_registry.py tests/test_store_policy.py tests/test_contracts.py
+tests/test_web_control_config.py tests/test_web_auth.py tests/test_web_api.py
+tests/test_snapshot_maintenance.py
+Root prefix PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q
+High prefix env -u PYTHONPATH PYTEST_DISABLE_PLUGIN_AUTOLOAD=1
+PYTHONDONTWRITEBYTECODE=1 .venv/bin/python -m pytest -q -p no:cacheprovider
+
+Central full original10588 TERMINAL exit0:
+949 passed /32 existing external H1 skipped /1 existing Starlette warning /282.61s
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q
+audit/hybrid-v1/checkpoint-31-full-r1.log
+SHA aa6ccd95524c2446b12cf231e62a4c7eee743ef3d87ddac3db6391448ca3abbb
+Each original handle observed terminal before next; no parallel tests/benchmark.
+Source/test SHA unchanged after full. No live run now.
+compileall rlflow tests, pip check, git diff --check all exit0.
+No protocol/schema-file changes; offline validator not rerun or old18 relabelled.
+
+Retained intermediate runs:
+r1 original2733 exit1: 1 failed /341passed /1warning /40.65s;
+new legacy fixture wrapper missing db argument, fixed fixture only.
+r2 original6592 exit0: 344passed /1warning /41.04s;
+r3 original49772 exit0: 345passed /1warning /41.67s.
+These preceding source versions do not replace final r4.
+
+Closed findings: cached alias logical expansion now charged per use;
+prepare shares ReadBudget for all source/blob reads; stored ProtocolError
+maps to source503; actual head schema and proposal/hash equality checked.
+No relaxed acceptance, removed tests, backfill or fake goal literal fields.
+
+Frozen source/test SHA256:
+b219f5673934343432dff835bd2450dc86d634949880f51a76b50c4ab93b6dcf rlflow/hybrid_goals.py
+8a63a1ce646660adcc43ea82f6934a6e0f0c1c7fbb54d7035b69b9dc8c1fa5e1 rlflow/store.py
+a038f295b98741ad7cf86121b3597563bd5d4623c7f6013818780187f218acb4 rlflow/hybrid_reads.py
+76531521f0bee038e4c90a7fa7927979b86b2550c73ee73dda31b7efe93ab970 rlflow/hybrid_control.py
+2dcbd441c6fa599dfecb02b54273e4ce0d42fda742a95f12e2ba89c18e8bfbe6 rlflow/hybrid_authority.py
+50f358f1fa8c3b0fc6413d255b7b0f19a775f9d3fe0a78568699e21435bd7327 rlflow/snapshot_maintenance.py
+5446691a02cd9fa725d5e3fed550c4a730ee90c8a7421ecb756c91f291b0a84c tests/test_hybrid_reads.py
+0e0fa64d5554de5962f97d496f4f239237cfe8cffb55f62479aa0c80a16329d1 tests/test_hybrid_goals.py
+
+Actual protected configuration loader -> owned loopback TCP -> session login,
+DRAFT submit/head list/private review/original proof -> normal thread/pool
+shutdown. Not CLI main subprocess or blocked writer shutdown evidence.
+No new browser/performance/lease/model/engineering/research/B1/24h/8h result.
+No public full proposal/witness exposure, execution, user Goal approval,
+paid/GPU/vendor workload, external push or USER package-lock modification.
+Details/remaining gates: HYBRID_GOAL_READS.md, M1_ACCEPTANCE_REPORT.md.

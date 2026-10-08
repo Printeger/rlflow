@@ -1,5 +1,7 @@
 # 需求包离线校验报告
 
+Checkpoint31 完整终态：root 原87433与独立High原56356均 terminal exit0，同13modules各347passed/1既有warning，41.81s/41.97s；范围MUST_FIX关闭。中央full原10588 terminal exit0：949passed/32既有外部H1 skips/1既有Starlette warning/282.61s；compileall、pip check、diff0，源SHA不变，当前无live测试。新增有界head/private review桥、完整原GoalRecord事件证明、安全snapshot/recover闭合，见 HYBRID_GOAL_READS.md 与 evidence/checkpoint-31-final-tests.txt。实际保护配置加载→owned TCP读写/正常关闭不是CLI main、UI/性能或执行证明；M1/B1/NFR06/24h/8h、确认UI、lease/STOP/runtime、工程科研闭环与M0–M5完整Goal仍未通过且保持active。下一直接接真实合同审阅/nonce确认UI；USER package-lock不动。
+
 Checkpoint30系统最新终态：root/High各301定向passed，中央full原11956terminalexit0，913passed/32既有skips/1既有warning274.16s，compileall/pip/diff0，范围无MUST_FIX。见TRUSTED_WEB_CONFIG.md/evidence/checkpoint-30-final-tests.txt；无live测试。此次无protocol/schema变更，未重跑离线validator，不把旧18checks重标为新30系统证据。CLI实际保护配置入口已接通，但确认UI/lease/STOP执行/真实工程科研/B1/长期及M0–M5全验收未完成，Goal active。本文件保留旧离线与历史实施记录。
 
 Checkpoint29系统最新终态：root/High各289定向passed、全量原10082terminal exit0，867passed/32既有skips/1既有warning267.24s，compileall/pip/diff0，范围无MUST_FIX。见HYBRID_CONTROL_API.md/evidence/checkpoint-29-final-tests.txt；当前无live测试，下段pending为历史过程。未完成CLI安装开关/确认UI/lease/STOP执行、M1–M5全验收，Goal active。本文件仍保留原离线校验与历史实施，不以18项静态检查代替系统验收。

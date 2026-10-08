@@ -37,6 +37,9 @@ RECORDS = {
     SECTIONS[2]: obj({'request': REQUEST, 'request_hash': HASH, 'contract_key': ID,
                      'contract_hash': HASH, 'accepted_state_version': {'type': 'integer', 'minimum': 1}}),
 }
+# Private source locator only. Original records and proposal/request hashes are
+# never backfilled; the core event commits the whole record including this key.
+RECORDS[SECTIONS[0]]['properties']['source_command_key'] = ID
 
 
 def digest(value):
@@ -59,6 +62,25 @@ def command_key(request):
 def control_command_key(actor, project_id, data_mode, idempotency_key):
     """Shared HTTP namespace across actions; old internal keys stay immutable."""
     return 'control_' + sha([actor,project_id,data_mode,idempotency_key])
+
+
+def draft_head(proposal):
+    return {'project_id':proposal['project_id'],'data_mode':proposal['data_mode'],'goal_id':proposal['goal_id'],
+            'revision':proposal['contract_version'],'contract_key':revision_key(proposal),'contract_hash':digest(proposal)}
+
+
+def validate_source(record_key, record, command_id, receipt, source):
+    """Exact original record/receipt/revision-head proof, not snapshot hashes."""
+    validate_record(SECTIONS[0],record_key,record)
+    validate_record(SECTIONS[2],command_id,receipt)
+    proposal=record['contract']['proposal']
+    if (record.get('source_command_key',command_id)!=command_id or receipt['contract_key']!=record_key
+            or receipt['request']['proposal']!=proposal or receipt['request']['actor']!=record['submitted_by']):
+        raise Conflict('draft original record/receipt mismatch')
+    expected=(('HYBRID_GOAL_DRAFTED','hybrid-core',receipt['request_hash'],receipt['accepted_state_version']),
+              sorted([(SECTIONS[0],record_key,digest(record)),(SECTIONS[2],command_id,digest(receipt)),
+                      (SECTIONS[1],head_key(proposal['project_id'],proposal['data_mode'],proposal['goal_id']),digest(draft_head(proposal)))]))
+    if source!=expected:raise Conflict('draft original payload mismatch')
 
 
 def bounded_copy(value):
@@ -173,6 +195,7 @@ def validate_transition(payload, lookup, *, event_type, key, object_id, producer
         raise Conflict('draft event/receipt mismatch')
     if c['proposal'] != p or record['submitted_by'] != request['actor'] or receipt['contract_key'] != rk or receipt['contract_hash'] != c['hash']:
         raise Conflict('draft contract/receipt mismatch')
+    if record.get('source_command_key',ck)!=ck:raise Conflict('draft source pointer differs from transaction')
     if hk != head_key(p['project_id'], p['data_mode'], p['goal_id']) or head['contract_key'] != rk or head['contract_hash'] != c['hash']:
         raise Conflict('draft contract/head mismatch')
     if lookup(SECTIONS[0], rk) is not None or lookup(SECTIONS[2], ck) is not None:
@@ -187,7 +210,7 @@ def validate_transition(payload, lookup, *, event_type, key, object_id, producer
     if record['previous_hash'] != previous_hash or record['changes'] != changes:raise Conflict('draft predecessor/diff mismatch')
 
 
-def validate_complete(state, registration=None, event_lookup=None):
+def validate_complete(state, registration=None, event_lookup=None, source_lookup=None):
     """Cross-object closure for full snapshots/recovery, never a partial write."""
     validate_persisted(state)
     contracts = state.get(SECTIONS[0], {});heads = state.get(SECTIONS[1], {});commands = state.get(SECTIONS[2], {})
@@ -211,6 +234,13 @@ def validate_complete(state, registration=None, event_lookup=None):
         if rk in covered:raise Conflict('draft revision has duplicate receipts')
         expected=('HYBRID_GOAL_DRAFTED','hybrid-core',receipt['request_hash'],receipt['accepted_state_version'])
         if event_lookup is None or event_lookup(ck)!=expected:raise Conflict('draft receipt does not match original core event')
+        if source_lookup is not None:
+            # All core closure paths provide this, including legacy records.
+            # Removing an optional pointer from a new snapshot cannot downgrade
+            # the original record digest requirement to a four-tuple check.
+            validate_source(rk,record,ck,receipt,source_lookup(ck))
+        elif 'source_command_key' in record:
+            raise Conflict('draft source pointer requires original payload proof')
         covered.add(rk)
     if covered != set(contracts):raise Conflict('draft revision lacks receipt')
 
@@ -268,9 +298,8 @@ def propose(store, proposal, *, principal, project_id, data_mode, idempotency_ke
                     'state': 'DRAFT', 'approval_id': None, 'outcome': None}
         contracts[rk] = {'contract': contract, 'previous_hash': old['contract']['hash'] if old else None,
             'changes': differences(old['contract']['proposal'], p) if old else [], 'submitted_by': request['actor'],
-            'submitted_at': datetime.now(timezone.utc).isoformat().replace('+00:00', 'Z')}
-        state[SECTIONS[1]][hk] = {'project_id': project_id, 'data_mode': data_mode, 'goal_id': p['goal_id'],
-            'revision': p['contract_version'], 'contract_key': rk, 'contract_hash': contract['hash']}
+            'submitted_at': datetime.now(timezone.utc).isoformat().replace('+00:00', 'Z'),'source_command_key':ck}
+        state[SECTIONS[1]][hk] = draft_head(p)
         state.setdefault(SECTIONS[2], {})[ck] = {'request': request, 'request_hash': request_hash,
             'contract_key': rk, 'contract_hash': contract['hash'], 'accepted_state_version': state['version'] + 1}
         return {'contract_key': rk, 'request_hash': request_hash}
@@ -290,4 +319,5 @@ def propose(store, proposal, *, principal, project_id, data_mode, idempotency_ke
         validate_record(SECTIONS[2], ck, receipt);validate_record(SECTIONS[0], rk, record)
         if (store._goal_registration(db)!=(project_id,data_mode) or event!=('HYBRID_GOAL_DRAFTED','hybrid-core',request_hash,receipt['accepted_state_version']) or receipt['request_hash']!=request_hash or receipt['contract_hash']!=record['contract']['hash']):
             raise Conflict('draft command receipt mismatch')
+        if 'source_command_key' in record:validate_source(rk,record,ck,receipt,store._goal_source(db,ck))
     return {'contract': record['contract'], 'accepted_state_version': receipt['accepted_state_version'], 'duplicate': result['duplicate']}

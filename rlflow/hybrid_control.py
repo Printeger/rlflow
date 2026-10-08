@@ -153,6 +153,7 @@ def read_receipt(store,command_id):
 
 
 def install(app,services,projects,auth,*,origin,max_jobs):
+    from .hybrid_reads import HybridReader
     services=dict(services)
     if len(services)>128:raise ValueError('too many control services')
     for project_id,pair in services.items():
@@ -170,6 +171,8 @@ def install(app,services,projects,auth,*,origin,max_jobs):
                 or draft.store._hybrid_registry is not approval.registry):
             raise ValueError('control service binding mismatch')
     pool=ControlPool(max_jobs);app.state.hybrid_control_pool=pool
+    readers={key:HybridReader(pair.drafts.store,project_id=key,data_mode=pair.drafts.data_mode,
+                             store_epoch=pair.drafts.store_epoch,clock=pair.approvals.clock) for key,pair in services.items()}
     original_lifespan=app.router.lifespan_context
     @asynccontextmanager
     async def lifespan(current):
@@ -188,7 +191,8 @@ def install(app,services,projects,auth,*,origin,max_jobs):
             token=request.cookies.get(COOKIE);access=auth.resolve(token,'session')
         if access is None:raise ControlError(401,'AUTH_REQUIRED','authentication required')
         if project_id not in services or not access.principal.allows(project_id):raise ControlError(404,'NOT_FOUND','project not found')
-        if role and (access.principal.kind!='human' or not access.principal.allows(project_id,role)):
+        allowed=any(access.principal.allows(project_id,r) for r in ('operator','approver')) if role=='review' else access.principal.allows(project_id,role) if role else True
+        if role and (access.principal.kind!='human' or not allowed):
             raise ControlError(403,'PERMISSION_DENIED','scoped role required')
         return token,access,services[project_id]
 
@@ -273,4 +277,39 @@ def install(app,services,projects,auth,*,origin,max_jobs):
             _,_,pair=authorize(request,project_id)
             validate_schema(ID,command_id)
             return command_dto(command_id,read_receipt(pair.drafts.store,command_id))
+        return await response(lookup,request=request,project_id=project_id)
+
+    @app.get('/api/v1/projects/{project_id}/goals')
+    async def goals(request:Request,project_id:str):
+        try:
+            if (set(request.query_params)-{'after','limit'} or any(len(request.query_params.getlist(k))!=1 for k in request.query_params)):
+                raise ValueError('ambiguous Hybrid page query')
+            raw=request.query_params.get('limit','30')
+            if not raw.isascii() or not raw.isdecimal() or len(raw)>2:raise ValueError('invalid Hybrid page size')
+            limit=int(raw)
+            if not 1<=limit<=50:raise ValueError('invalid Hybrid page size')
+            after=request.query_params.get('after','')
+            if after:validate_schema(ID,after)
+        except (ValueError,ProtocolError):return error_response(ControlError(400,'VALIDATION_ERROR','bounded Hybrid page query required'))
+        def lookup():
+            authorize(request,project_id)
+            result=readers[project_id].goals(after=after,limit=limit)
+            authorize(request,project_id)
+            readers[project_id].check_current(result['as_of_state_version'])
+            authorize(request,project_id)
+            return result
+        return await response(lookup,request=request,project_id=project_id)
+
+    @app.get('/api/v1/projects/{project_id}/goals/{goal_ref}/review')
+    async def review(request:Request,project_id:str,goal_ref:str):
+        def lookup():
+            authorize(request,project_id,'review')
+            validate_schema(ID,goal_ref)
+            if request.query_params:raise ControlError(400,'VALIDATION_ERROR','closed review query required')
+            result=readers[project_id].review(goal_ref)
+            authorize(request,project_id,'review')
+            if result is None:raise ControlError(404,'NOT_FOUND','goal not found')
+            readers[project_id].check_current(result['as_of_state_version'])
+            authorize(request,project_id,'review')
+            return result
         return await response(lookup,request=request,project_id=project_id)

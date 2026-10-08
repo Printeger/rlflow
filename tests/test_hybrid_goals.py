@@ -145,11 +145,11 @@ def test_bounded_input_failures_do_not_echo_secrets(setup,kind):
 
 def test_complete_snapshot_rejects_corrupt_links(setup):
     store,p,actor=setup;submit(setup);state=store.replay()
-    with store.connect() as db:validate_complete(state,('project_fixture','fixture'),lambda k:store._goal_event(db,k))
+    with store.connect() as db:validate_complete(state,('project_fixture','fixture'),lambda k:store._goal_event(db,k),lambda k:store._goal_source(db,k))
     for section in SECTIONS:
         bad=deepcopy(state);bad[section].clear()
         with store.connect() as db:
-            with pytest.raises(Conflict):validate_complete(bad,('project_fixture','fixture'),lambda k:store._goal_event(db,k))
+            with pytest.raises(Conflict):validate_complete(bad,('project_fixture','fixture'),lambda k:store._goal_event(db,k),lambda k:store._goal_source(db,k))
 
 
 def test_generic_record_validation_enforces_request_byte_cap(setup):

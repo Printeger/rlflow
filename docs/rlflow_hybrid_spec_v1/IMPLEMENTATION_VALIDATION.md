@@ -1,5 +1,7 @@
 # 系统实施验收记录
 
+Checkpoint31 完整终态：root 原87433与独立High原56356均 terminal exit0，同13modules各347passed/1既有warning，41.81s/41.97s；范围MUST_FIX关闭。中央full原10588 terminal exit0：949passed/32既有外部H1 skips/1既有Starlette warning/282.61s；compileall、pip check、diff0，源SHA不变，当前无live测试。新增有界head/private review桥、完整原GoalRecord事件证明、安全snapshot/recover闭合，见 HYBRID_GOAL_READS.md 与 evidence/checkpoint-31-final-tests.txt。实际保护配置加载→owned TCP读写/正常关闭不是CLI main、UI/性能或执行证明；M1/B1/NFR06/24h/8h、确认UI、lease/STOP/runtime、工程科研闭环与M0–M5完整Goal仍未通过且保持active。下一直接接真实合同审阅/nonce确认UI；USER package-lock不动。
+
 Checkpoint30最新终态覆盖下述旧过程：root/High14modules各301passed、原84286/81244exit0；中央full原11956terminalexit0，913passed/32既有外部/H1skips/1既有warning274.16s，compileall/pip/diff0，范围无MUST_FIX。可信CLI配置1.1与existing-only attach不迁移/恢复/写业务、不自动加roles；默认1.0仍RO。见TRUSTED_WEB_CONFIG.md/evidence/checkpoint-30-final-tests.txt。配置ASGI集成与CLI mock不冒充新TCP/UI/性能验收；无live测试，无lease或实际工程科研闭环，M1–M5完整Goal active。
 
 Checkpoint29完整终态：root/High13modules289passed/1既有warning，中央full原10082terminal exit0，867passed/32既有外部/H1skips/1既有warning267.24s。compileall/pip/diff0，offline18checks，范围finding关闭；见HYBRID_CONTROL_API.md与evidence/checkpoint-29-final-tests.txt。新增持续operator会话/DRAFT全局CAS/显式opt-inHTTP事实控制及actualsocket断连原receipt；下方live记录为历史过程，当前没有运行测试。仍无CLI安装配置/确认UI/STOP执行/lease/真实数据OSprobe或工程科研闭环，M1–M5完整目标保持active，无新browser/性能证据。

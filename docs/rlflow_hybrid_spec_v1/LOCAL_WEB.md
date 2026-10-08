@@ -1,5 +1,7 @@
 # 本地只读 Web 服务（T06 基础切片）
 
+显式启用的控制项目在 checkpoint31 新增真实 Goal head 列表与 human private review；权限、来源覆盖和非执行范围见 [HYBRID_GOAL_READS.md](HYBRID_GOAL_READS.md)。尚未连接 Dashboard 确认交互。
+
 当前提供真实 SQLite 观测 API、SSE 和 `/` 下的只读 Dashboard；不能据此判定 M1 完成。默认 `1.0` 配置不开放命令或修改批准。checkpoint30 新增受保护本地 `1.1` 配置，可显式启用不可执行的 DRAFT/条件批准/撤销 HTTP 服务，见 [TRUSTED_WEB_CONFIG.md](TRUSTED_WEB_CONFIG.md)。两者均不启动 scheduler、模型、lease，不提供 artifact 路径；启动不创建/迁移业务 Store。
 
 安装项目运行依赖，并对一个已存在的 rlflow state 显式启用观测：
