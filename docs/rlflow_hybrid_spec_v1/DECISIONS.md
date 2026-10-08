@@ -93,6 +93,14 @@ append-only refs增加INSERT成员/severity guard；只读路径仍防御异常�
 工具feature公开起点与event retention floor分开。优先live-only，不隐式回填旧COLLECTED；public_tool_meta缺失/损坏却已有旧公共工具状态拒绝重新初始化。工具日志与CORE_STATUS分同事务观察batch，原模板/count状态解释逐字段保持不变，共享refs验证task/execution筛选。资源telemetry以后必须独立sample ID/时间，不占durable业务seq。
 # Checkpoint13：资源观测旁路与freshness
 
+## 后续28：批准事实的live信任与历史真实性分开
+
+最终28：root/独立各207定向及冻结full795passed/32既有skips/1warning/255.47s已终态，四项范围MUST_FIX关闭；见HYBRID_APPROVAL_FACTS.md及证据。以下候选/最初设计状态保留为过程，不是当前仍待实现事实服务或仍live声明；下一HTTP/UI桥与lease/执行尚未实现。
+
+候选实现补充：live 已接 Store 固定 owner、实际 issuedguard 与服务本次 staged request/fact 摘要，不能单凭真正 AuthGuard 编造 future consent；nonce 容量/读写共锁，绑定 token/session 而非 human ID。历史 witness 必须核原核心 payload 中 fact/receipt/原 head 三摘要，单核 request hash 不能防日期平移和重算快照自 hash。周期来源读取复用既有预算。root r5 原93936终态207passed12.82s；独立复验/新全量尚待，不把旧762重新归于新源。详见 HYBRID_APPROVAL_FACTS.md；下段保留最初设计时状态，不覆盖候选最新事实。
+
+live必须由Store启动绑定的AuthStore核实际签发guard identity及主体，generic human JSON/producer/check不能伪造；当前已实现issuer membership helper，尚未接入事实写入。ApprovalService固定Store/Auth/Origin/Registry/project，由server确认精确revision/hash/diff、完整scope/config、Store epoch、全局expectedversion和有限期限；私有nonce绑定真实session，仅成功commit后记消费，持久confirmation_id防同nonce换idem再批准。合法retry查原receipt/原事实且新鲜认证，不依赖重启前noncecache，不续期。批准不改DRAFT或自动READY，撤销另追加；历史恢复核原registry witness和coreevent，不能因当前expiry/session/config变化否定过去事实，也不自动恢复执行许可。已知不能保证hard_required按RES-04拒绝；UNKNOWN仅允许清楚标条件性同意且不可执行，lease前实际preflight不能跳过。该设计不是已经完成批准事实/路由/执行。
+
 ## Checkpoint27：Store→Auth顺序解决等待期间撤销，不复用先行Access
 
 可信服务guard factory只在writer+BEGIN后进入，Auth锁覆盖实际commit，紧邻提交再次验clock；等待writer期间不持Auth锁，避免阻塞撤销。实际token/session锁内查human/approver/project/CSRF，不接caller Principal/Access为凭据；duplicate仍fresh check并关闭只读txn后退出，不重写或续期旧fact。异常rollback包含core/public表；同进程单Auth owner明确，不冒充多进程一致性。Origin/精确确认与批准事实另由下一固定服务完成，此primitive不授予执行。root+High112相关回归通过，中央Store full62752已终态762passed/32既有skips/1warning/247.08s。后续guard内不得调用非重入Auth方法或反向获取Store锁。

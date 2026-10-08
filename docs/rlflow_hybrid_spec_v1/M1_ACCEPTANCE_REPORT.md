@@ -1,12 +1,12 @@
 # M1 退出门槛审计（尚未通过）
 
-2026-10-09，最新源码 checkpoint27（新增真实session事务认证守卫，仍无批准事实/写路由/执行）；checkpoint26新增纯Registry。此前性能绑定 checkpoint21/旧源码，不自动推广到新代码。此文件补齐 IMPLEMENTATION_PLAN §5 要求的 M1 报告；**不是 M1 完成声明**。M0–M5 的完整目标不变，剩余开发没有外部阻塞。
+2026-10-09，最新 checkpoint28（新增内部条件性批准/撤销事实与原事件恢复核验，仍无HTTP/UI写路由、lease或执行）；root及独立定向各207passed，全量原38620终态795passed/32既有skips/1warning/255.47s，范围无剩余MUST_FIX。此前性能绑定 checkpoint21/旧源码，不自动推广到新代码。此文件补齐 IMPLEMENTATION_PLAN §5 要求的 M1 报告；**不是 M1 完成声明**。M0–M5 的完整目标不变，剩余开发没有外部阻塞。
 
 ## 当前可运行范围
 
 既有 Store 的真实事务经同事务 observation/outbox、closed public projection/counters、snapshot/keyset page、认证只读 HTTP/SSE 接入 Dashboard。当前 UI 支持真实业务事件的拓扑/状态/原因/预算未知、有限对象与虚拟事件窗口、公共日志、绑定 CPU 工具返回、HOST/磁盘与 worker loop/supervisor telemetry；未知不转0或模型 RUNNING。HTTP 不启动 scheduler 或调用模型，没有写命令或 artifact 路径。运行方式见 LOCAL_WEB.md。
 
-最新生产源码冻结全回归：checkpoint27 **762 passed / 32既有外部/H1 skipped / 1既有警告 / 247.08s**，其中包括 Web/观测/telemetry/Store、private draft与1.1声明、Registry与认证事务guard。source/log SHA 见 evidence/checkpoint-27-final-tests.txt。现有 UI checkpoint15 sandbox Chrome+Node **20 passed / 0 skipped / 9.44s**，用 owned loopback 与明确标记的业务 Fixture；HOST 资源来自实际 OS，本轮未新增 browser 结果。没有重新把这些测试跑成真实供应商闭环，也没有把节点心跳当作模型活动。
+最新生产源码冻结全回归：checkpoint28 **795 passed / 32既有外部/H1 skipped / 1既有警告 / 255.47s**，其中包括 Web/观测/telemetry/Store、private draft与1.1声明、Registry、认证事务guard与内部批准/撤销事实及恢复。source/log SHA 见 evidence/checkpoint-28-final-tests.txt。现有 UI checkpoint15 sandbox Chrome+Node **20 passed / 0 skipped / 9.44s**，用 owned loopback 与明确标记的业务 Fixture；HOST 资源来自实际 OS，本轮未新增 browser 结果。没有重新把这些测试跑成真实供应商闭环，也没有把节点心跳当作模型活动。
 
 ## 场景到证据
 

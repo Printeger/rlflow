@@ -72,7 +72,7 @@ class Access:
     method: str
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, eq=False)
 class _ApprovalSessionGuard:
     _check: object
 
@@ -92,6 +92,7 @@ class AuthStore:
             raise ValueError("too many principals")
         self.ttl, self.max_sessions, self.clock = ttl, max_sessions, clock
         self._sessions = {}
+        self._approval_guards = {}
         self._lock = threading.Lock()
         # Rate-limit globally, not by untrusted forwarded addresses or user ID.
         self._login_times = []
@@ -157,7 +158,7 @@ class AuthStore:
             self._sessions.pop(self._key(token), None)
 
     @contextmanager
-    def approval_guard(self, token, *, project_id, csrf):
+    def approval_guard(self, token, *, project_id, csrf, _validator=None):
         """Authenticate a human session while a trusted writer transaction owns us.
 
         Acquire Store writer/BEGIN before this context, never Auth then Store.
@@ -179,10 +180,30 @@ class AuthStore:
                         or not isinstance(csrf, str) or not csrf.isascii() or not 20 <= len(csrf) <= 128
                         or access.csrf is None or not hmac.compare_digest(csrf, access.csrf)):
                     raise PermissionError('live scoped human approval session required')
+                if _validator is not None:_validator()
                 return access
             try:
                 guard = _ApprovalSessionGuard(check)
+                self._approval_guards[guard] = (owner, project_id, self._key(token) if isinstance(token,str) and token.isascii() and 20<=len(token)<=128 else None)
                 guard.check()
                 yield guard
             finally:
                 active[0] = False
+                if 'guard' in locals():self._approval_guards.pop(guard, None)
+
+    def check_approval_guard(self, guard, *, project_id):
+        """Only our actual issued active context can authenticate a live fact.
+
+        Called while that context already holds our non-reentrant lock; never
+        acquire it again. A lookalike check() or caller-constructed Access does
+        not prove membership, owner thread, or authenticated project. Protected
+        control startup must bind the same AuthStore owner to its writer.
+        """
+        if (type(guard) is not _ApprovalSessionGuard
+                or self._approval_guards.get(guard,())[:2] != (threading.get_ident(), project_id)):
+            raise PermissionError('active issued approval guard required')
+        return guard.check()
+
+    def approval_guard_session_key(self, guard, *, project_id):
+        self.check_approval_guard(guard,project_id=project_id)
+        return self._approval_guards[guard][2]

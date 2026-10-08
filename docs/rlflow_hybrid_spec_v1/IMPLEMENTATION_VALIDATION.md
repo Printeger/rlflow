@@ -1,5 +1,9 @@
 # 系统实施验收记录
 
+Checkpoint28完整终态：固定服务真实human session/Origin/CSRF/nonce明确确认、immutable批准撤销事实与原receipt、服务stagedfact核心gate、原事件三摘要历史恢复验证完成。root/High各207目标passed；全量原38620 terminal exit0，795passed/32既有skips/1既有Starlette warning/255.47s，compileall/pip/diff0，无剩余范围MUST_FIX；见HYBRID_APPROVAL_FACTS.md/evidence/checkpoint-28-final-tests.txt。下方过程保留，不再live。仍仅LEASE_VALIDATION_PENDING或REVOKED/execution_enabled=false，未接HTTP/UI、lease/实际能力probe/工程科研执行，无新增browser/性能或完整M1–M5验收，Goal active。
+
+Checkpoint28候选：不可变条件性批准/撤销及原receipt、服务明确确认/issuedguard/stagedfact、原事件三对象摘要历史核验已经接入；root9modules207passed12.82s、独立207passed12.75s，无剩余范围MUST_FIX。当前冻结全量原38620 live，audit/hybrid-v1/checkpoint-28-full-r1.log；未取得新全量结果，不将27的762转记。详见HYBRID_APPROVAL_FACTS.md；未接HTTP/UI写桥或lease/执行，完整T09/M1–M5/Goal保持未完成。
+
 Checkpoint27完整终态覆盖下述live过程：真实session认证与Store→Auth事务守卫、撤销/过期/幂等/rollback闭合，root112passed9.28s/独立112passed9.31s、范围无MUST_FIX，冻结全回归762passed/32既有外部/H1skips/1既有Starlette warning/247.08s，原62752terminal exit0，不再live。compileall/pip/diff通过，见HYBRID_APPROVAL_AUTH.md/evidence/checkpoint-27-final-tests.txt。仍无ApprovalService/批准事实/Origin桥/写路由或执行权限；无新browser/性能证据。下一不可变批准/撤销和receipt/snapshot/recovery，完整T09/M1/B1/长期与M2–M5继续开发，Goal active，用户package-lock保留。
 
 Checkpoint26：可信启动immutable Registry纯核验实现，整proposal+整catalog（含policy/rules）scope绑定，工具/命令依赖、网络三层subset、数据version/purpose/access与冻结rule逐项拒绝。root130passed3.45s、独立High130passed3.43s，原96925/3366皆terminal exit0，范围无MUST_FIX。见HYBRID_REGISTRY.md/evidence/checkpoint-26-final-tests.txt。结果NOT_EXECUTABLE，无auth/approve/routes/Store写入/执行/数据文件或资源能力探测；既有源码入口未变，此次针对性回归，全量689仅绑定25。下一自持Registry/AuthStore的真实session批准事实与单写恢复闭合，不能信caller attestation。完整T09/M1/B1/长期/M2–M5仍待开发，Goal active，无新增外部阻塞，USER package-lock保留。

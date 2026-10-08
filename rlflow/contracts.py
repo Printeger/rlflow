@@ -164,6 +164,8 @@ def validate_runtime_state(state: dict) -> None:
         canonical_bytes(state)
         from .hybrid_goals import validate_persisted
         validate_persisted(state)
+        from .hybrid_authority import validate_persisted as validate_authority
+        validate_authority(state)
     except (jsonschema.ValidationError, ValueError) as exc:
         raise ContractError('Invalid persisted runtime state: ' + str(exc)) from exc
 

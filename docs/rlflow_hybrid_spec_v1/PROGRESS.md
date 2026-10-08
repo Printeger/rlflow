@@ -1,5 +1,19 @@
 # Hybrid v1 开发进度
 
+Checkpoint28完整终态覆盖下述live过程：不可变条件性批准/撤销、实际human session确认、固定服务与核心事务gate、原receipt/fact/head三对象source核验及手动/周期snapshot+recover闭合完成；root/High9modules分别207passed12.82s/12.75s，无剩余范围MUST_FIX。冻结全量原38620 terminal exit0：795passed/32既有外部/H1skips/1既有Starlette warning/255.47s；compileall/pip/diff0。见HYBRID_APPROVAL_FACTS.md/evidence/checkpoint-28-final-tests.txt。目前没有live测试或负载。仍无HTTP/UI写桥、实际数据/OSpreflight、lease/STOP新执行闭环或真实用户批准；无新browser/性能证据。下一版本化DRAFT提交/查询与精确human确认HTTP桥，然后STOP/fencing/lease/runtime；完整T09/M1/B1/24h/8h及M0–M5 Goal active，用户package-lock不动不stage。
+
+Checkpoint28全量原handle登记：session38620，audit/hybrid-v1/checkpoint-28-full-r1.log，当前live；源码/测试冻结，勿重复或并行测试/负载。后续终态记录覆盖此过程，旧762只绑定27。
+
+Checkpoint28独立目标终态：High同9modules207passed12.75s，原4180exit0，四项MUST_FIX与新增负例闭合、无新MUST_FIX；独立log c073ab0b5ed524b84098802bf0a5a23defdb5ad3b2a707b3ae0185da6ad87985。root现在启动冻结全量 checkpoint-28-full-r1.log（见后续原handle登记），源码/测试冻结、不并行测试/benchmark；查原终态、不因观察timeout重起。仅私有条件性consent/revocation，不是完整T09或执行许可，Goal active。
+
+Checkpoint28最新定向终态：root9modules207passed12.82s，原93936exit0，audit/hybrid-v1/checkpoint-28-authority-r5.log；compileall/diff0。r4未collect：shell环境自动加载ROS pytest插件缺lark，原命令exit1/log保留，r5使用既有PYTEST_DISABLE_PLUGIN_AUTOLOAD=1，未更改标准/跳过项目测试。High现在获准一次独立同9模块复验，root不并行launch full或benchmark；源码/测试冻结。HYBRID_APPROVAL_FACTS.md记录候选真实边界，仍无执行准入或HTTP写接口，完整Goal active。
+
+Checkpoint28批准事实候选已接入（未提交）：固定Store/AuthStore/Registry/service owner、真实session+Origin/CSRF、session-bound nonce、有界互斥缓存、服务实际签发的request/fact上下文；私有immutable approval/revocation/head/originalreceipt及同事务CAS、rollback、历史恢复/周期snapshot原事件三对象摘要核验已实现。没有HTTP写路由/lease/执行权限，状态仅LEASE_VALIDATION_PENDING或REVOKED，DRAFT不改写。root r1兼容/fixture失败已修复，r2原65462终态107passed10.16s；安全review指出缓存并发、仅guard不足以证明明确确认、历史时间可平移及超长token先hash四项，候选修复均已落盘。r3原53750终态2failed/112passed11.00s，两处失败来自新增测试末尾误置断言（NameError），已修正；补纯nonce到期而session有效、四public表rollback、同human不同session拒绝、撤销后再批准及历史revoked_at篡改负例。尚无最终独立执行或新全量结果，旧762仅绑定27；接下来冻结目标回归、High独立复验与中央Store全量。用户package-lock保留，完整T09/M0–M5 Goal active。
+
+Checkpoint28身份前置独立终态：root33passed2.97s（48685exit0），High33passed2.95s（70424exit0），范围无MUST_FIX，compileall/diff0；目前没有live测试/负载。web_auth SHA9bcb477595fcd599a48b5aa796f283f933577dbc686253a95f279de16f6b4803；newtest9cad4f9d955ff29d49f736f8c22499e03732633dafe60698c806af0cd8da90f7；rootlog52ec799528749373db88c6a84360013f863c96508f1a8b5dc5610c192395fa9c；Highlog7a6e9bee6d170ee008313243e57196669268e134f413023d14b19be7aa28f8e7。仍是未提交28前置（latest commitf6373f1），不是ApprovalService/通用live批准gate已经实现；762全量仅绑定27。下一直接实现批准事实服务与核心hooks，不需继续审查相同已通过identity helper或重复33测试：固定Store/Auth owner核实际guard，4 optional私有集合+有界private registry witness、nonce confirmation/CAS/currentepoch与有限期限、live拒绝伪JSON、历史只验closure/source、不因现在过期拒绝snapshot。完整Goal active，无外部阻塞；USER package-lock保留。
+
+Checkpoint28批准事实服务开始（未提交）：27已提交f6373f1/完整762终态。High设计明确live通用写入也必须验证启动绑定AuthStore实际签发的guard，不能仅信human JSON/producer或任意check对象；replay/snapshot只验证历史事实/合同/有界private registry witness/原核心receipt，不使用当前session/clock/catalog。先实现AuthStore issuedguard identity（eq=False；实际issuer+ownerthread+project+active membership；copy/伪Access/foreignissuer拒绝、finally清理），root相关3modules33passed2.97s、原48685terminalexit0，compileall/diff通过；High此delta只读/独立复验待回，源码冻结，无新full结果。尚未Store绑定owner/批准四集合/nonce确认/ApprovalService，不能据identity函数声称通用批准门完成。下一实现固定服务+私有immutable approval/revocation/head/originalreceipt，同txn CAS当前revision/epoch/fullscope/globalversion、finiteexpiry/retry不续期、提交前nonce不永久consume、durable confirmation_id唯一与恢复闭合。无write route/lease/实际Goal批准或执行；完整T09/M1–M5继续，USER package-lock保留，Goal active。
+
 Checkpoint27完整终态覆盖下述live过程：真实session认证与Store→Auth事务守卫、撤销/过期/幂等/rollback闭合，root112passed9.28s/独立112passed9.31s、范围无MUST_FIX，冻结全回归762passed/32既有外部/H1skips/1既有Starlette warning/247.08s，原62752terminal exit0，不再live。compileall/pip/diff通过，见HYBRID_APPROVAL_AUTH.md/evidence/checkpoint-27-final-tests.txt。仍无ApprovalService/批准事实/Origin桥/写路由或执行权限；无新browser/性能证据。下一不可变批准/撤销和receipt/snapshot/recovery，完整T09/M1/B1/长期与M2–M5继续开发，Goal active，用户package-lock保留。
 
 Checkpoint27独立目标终态覆盖下述过程：root最终112passed9.28s（80475exit0），High112passed9.31s（62069exit0），范围无剩余MUST_FIX，compileall/diff通过。guarded duplicate commit顺序与四public表rollback直接核验闭合。当前中央Store变更冻结全回归原session62752 live，audit/hybrid-v1/checkpoint-27-full-r1.log；源码/测试冻结，无parallel tests/benchmark，恢复先查同handle，不因观察timeout另起。最新commit仍03891a9，守卫27未提交，见HYBRID_APPROVAL_AUTH.md。下一确认全量终态→SHA/证据/最终独立文档复核→commit，然后实现固定AuthStore/Origin/Registry/Store的不可变批准/撤销与原receipt、snapshot/recovery闭合。认证primitive不等于批准事实/路由/执行，完整T09/M1/B1/长期及M2–M5未完成，Goal active，USER package-lock保留。
@@ -78,7 +92,7 @@ Checkpoint17：归档任务100/1k/10k真实Store/公共桥探针r2终态exit0、
 | T05 | 启动释放、CORE_STATUS、绑定工具公共返回与资源纵向切片已验证，完整观测未完成 | private ledger→closed projection/TOOL_METADATA；真实OS/loop HB/独立telemetry SSE/API/UI、age与因果barrier；不授予authority或证明vendor/STARTED；完整来源闭环与M1 gate待验证 |
 | T06 | 只读基础切片实现，未完整验收 | 同源登录/project scope/短期 Bearer、snapshot/page、bounded durable SSE、loopback CLI；无写命令/任意 artifact；见 LOCAL_WEB.md |
 | T07–T08 | 只读 UI、虚拟事件/公共日志/工具返回与资源面板已实现，未完整验收 | 真实 snapshot/SSE reducer、预算/分页/详情、虚拟窗口/锚点/键盘、日志、离线/身份隔离、closed工具metadata、真实HOST与worker来源/陈旧/版本屏障；Chrome QA通过；B1/真实完整闭环与M1 gate待完成 |
-| T09 | 未批准合同/1.1声明/可信注册内容核验已实现，完整任务未完成 | 私有immutable revision/原receipt、CAS head、恢复闭合；显式工具/评价数据及整config scope绑定；真实human批准/实际数据来源与能力核验、lease仍待实现 |
+| T09 | DRAFT/1.1/Registry与内部条件性批准事实已实现，完整任务未完成 | 私有immutable revision/批准撤销事实/原receipt、CAS head、恢复原事件核验；fixture真实human session认证确认但无HTTP/UI桥或执行；实际数据来源与能力核验、lease仍待实现 |
 | T10–T17 | 未开始 | 策略、受控 Runtime、单写、独立评审、预算、skill、控制与恢复 |
 | T18–T20 | 未开始 | 本地与 fixture 实验 adapter、科研状态、证据页面 |
 | T21–T22 | 未开始 | 资源隔离、故障/性能/24h 与 8h soak |

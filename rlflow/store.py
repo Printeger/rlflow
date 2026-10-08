@@ -63,7 +63,8 @@ def initial():
 
 _UNLOADED = object()
 PRIVATE_HOT_SECTIONS = frozenset(('tool_sources','tool_receipts','tool_scan',
-    'hybrid_goal_contracts','hybrid_goal_heads','hybrid_goal_commands'))
+    'hybrid_goal_contracts','hybrid_goal_heads','hybrid_goal_commands',
+    'hybrid_approval_facts','hybrid_approval_revocations','hybrid_approval_heads','hybrid_approval_commands'))
 
 
 class ObjectMap(dict):
@@ -121,6 +122,9 @@ class ObjectMap(dict):
 
 class Store:
     def __init__(self, root, *, allow_rebuild=False):
+        self._hybrid_auth_owner = None
+        self._hybrid_registry = None
+        self._hybrid_authority_service = None
         self.root = Path(root).resolve()
         (self.root / "runtime").mkdir(parents=True, exist_ok=True)
         self.db = self.root / "runtime/research.db"
@@ -212,9 +216,17 @@ class Store:
         validate_runtime_state(state)
         from .hybrid_goals import validate_complete
         validate_complete(state,self._goal_registration(db),lambda k:self._goal_event(db,k))
+        from .hybrid_authority import validate_complete as authority_complete
+        authority_complete(state,self._goal_registration(db),lambda k:self._authority_event(db,k))
         return state
 
     def _apply(self, state, payload, db, event):
+        from .hybrid_authority import SECTIONS as authority_sections, validate_transition as authority_transition
+        if (any(s in authority_sections for s,k,v in payload.get('put',[])) or any(s in authority_sections for s,k in payload.get('delete',[])) or set(payload.get('set',{})) & set(authority_sections)):
+            decoded={**payload,'put':[[s,k,self._decode_value(db,v)] for s,k,v in payload.get('put',[])]}
+            authority_transition(decoded,lambda s,k:({} if s in state else None) if k=='' else state.get(s,{}).get(k),
+                event_type=event['event_type'],key=event['idempotency_key'],object_id=event['object_id'],producer=event['producer'],
+                version=event['new_state_version'],registration=self._goal_registration(db))
         goal_sections = ('hybrid_goal_contracts','hybrid_goal_heads','hybrid_goal_commands')
         if (any(s in goal_sections for s,k,v in payload.get('put', [])) or any(s in goal_sections for s,k in payload.get('delete', [])) or set(payload.get('set', {})) & set(goal_sections)):
             from .hybrid_goals import validate_transition
@@ -376,8 +388,29 @@ class Store:
         if isinstance(value,list):return [self._decode_value(db,v) for v in value]
         return value
 
-    def _commit(self, db, event_type, key, payload, previous, object_id, producer, inputs):
+    def _commit(self, db, event_type, key, payload, previous, object_id, producer, inputs, *, _authorization=None):
         ver = previous + 1
+        from .hybrid_authority import SECTIONS as authority_sections, validate_transition as authority_transition
+        if any(s in authority_sections for s,k,v in payload['put']) or any(s in authority_sections for s,k in payload['delete']):
+            access=self._check_hybrid_guard(db,_authorization)
+            def authority_lookup(section,objkey):
+                if objkey=='':return {} if db.execute('SELECT 1 FROM projection WHERE section=? LIMIT 1',(section,)).fetchone() else None
+                row=db.execute('SELECT value FROM projection WHERE section=? AND object_key=?',(section,objkey)).fetchone()
+                return self._decode_value(db,json.loads(row[0])) if row else None
+            authority_transition(payload,authority_lookup,event_type=event_type,key=key,object_id=object_id,
+                producer=producer,version=ver,registration=self._goal_registration(db))
+            receipt=next(v for s,k,v in payload['put'] if s==authority_sections[3] and k)
+            request=receipt['request']
+            if request['actor']!={'id':access.principal.id,'kind':'human'}:raise Conflict('authority actor differs from actual session')
+            live_fact=next(v for s,k,v in payload['put'] if s==receipt['fact_section'] and k==receipt['fact_key'])
+            self._hybrid_authority_service.check_live_write(request,live_fact,_authorization)
+            if request['action']=='approve':
+                confirm=request['confirmation']
+                epoch=db.execute('SELECT store_epoch FROM observation_meta WHERE singleton=1').fetchone()[0]
+                fact=next(v for s,k,v in payload['put'] if s==authority_sections[0] and k)
+                if confirm['store_epoch']!=epoch or self._hybrid_registry.config_hash!=confirm['config_hash']:
+                    raise Conflict('confirmation epoch or registry changed')
+                if json.loads(self._hybrid_registry._raw)!=fact['registry_witness']:raise Conflict('registry witness differs from protected owner')
         from .hybrid_goals import validate_transition, SECTIONS as goal_sections
         if any(s in goal_sections for s,k,v in payload['put']) or any(s in goal_sections for s,k in payload['delete']):
             def lookup(section,objkey):
@@ -419,6 +452,40 @@ class Store:
         if not db.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='observation_meta'").fetchone():return None
         row=db.execute('SELECT project_id,data_mode FROM observation_meta WHERE singleton=1').fetchone()
         return tuple(row) if row else None
+
+    def bind_hybrid_authority(self, auth, registry, service):
+        """Protected startup binding, never an HTTP/agent operation."""
+        from .web_auth import AuthStore
+        from .hybrid_registry import Registry
+        from .hybrid_authority import ApprovalService
+        if type(auth) is not AuthStore or type(registry) is not Registry or type(service) is not ApprovalService:raise TypeError('invalid authority owner')
+        with self.lock():
+            if self._hybrid_auth_owner is not None and (self._hybrid_auth_owner is not auth or self._hybrid_registry is not registry or self._hybrid_authority_service is not service):
+                raise Conflict('authority owner cannot be rebound in-place')
+            self._hybrid_auth_owner,self._hybrid_registry=auth,registry
+            self._hybrid_authority_service=service
+
+    def _check_hybrid_guard(self, db, guard):
+        registration=self._goal_registration(db)
+        if self._hybrid_auth_owner is None or registration is None:raise PermissionError('protected authority owner required')
+        return self._hybrid_auth_owner.check_approval_guard(guard,project_id=registration[0])
+
+    def _authority_event(self, db, key, *, max_bytes=3*1024*1024, _parse=None, _decode=None):
+        """Indexed original fact/receipt/head witness, not snapshot self-hashes."""
+        from .hybrid_authority import SECTIONS, digest
+        row=db.execute('SELECT event_type,producer,object_id,new_state_version,payload_sha256,CASE WHEN length(CAST(payload AS BLOB))<=? THEN payload END AS payload FROM events WHERE idempotency_key=?',(max_bytes,key)).fetchone()
+        if row is None:return None
+        if row['payload'] is None:raise Conflict('authority source exceeds bounded witness')
+        payload=(_parse or json.loads)(row['payload'].encode())
+        if sha(payload)!=row['payload_sha256']:raise Conflict('authority source payload integrity mismatch')
+        decoded=[]
+        for section,objkey,value in payload.get('put',[]):
+            if section in SECTIONS and objkey:
+                value=_decode(value) if _decode else self._decode_value(db,value)
+                from .hybrid_goals import check_bytes
+                check_bytes(value,1024*1024)
+                decoded.append((section,objkey,digest(value)))
+        return ((row['event_type'],row['producer'],row['object_id'],row['new_state_version']),sorted(decoded))
 
     @staticmethod
     def _goal_event(db,key):
@@ -489,6 +556,8 @@ class Store:
                 if _authorization is not None and (authorization is None or not callable(getattr(authorization, 'check', None))):
                     raise Conflict('authorization guard unavailable')
                 if authorization is not None:authorization.check()
+                from .hybrid_authority import EVENTS as authority_events
+                if event_type in authority_events.values():self._check_hybrid_guard(db,authorization)
                 previous = db.execute("SELECT version FROM projection_meta WHERE singleton=1").fetchone()[0]
                 if self._existing(db,key,event_type,object_id):
                     if authorization is not None:
@@ -516,7 +585,8 @@ class Store:
                     if not db.execute("SELECT 1 FROM projection WHERE section=? AND object_key=''",(section,)).fetchone():
                         puts.append([section,"",{}])
                 payload={"format":2,"put":puts,"delete":[[s,k] for s,k in before if (s,k) not in current],"details":details}
-                ver=self._commit(db,event_type,key,payload,previous,object_id,producer,inputs)
+                if authorization is None:ver=self._commit(db,event_type,key,payload,previous,object_id,producer,inputs)
+                else:ver=self._commit(db,event_type,key,payload,previous,object_id,producer,inputs,_authorization=authorization)
                 if authorization is not None:authorization.check()
                 db.commit()
                 return {"version":ver,"duplicate":False}
@@ -534,6 +604,8 @@ class Store:
                 validate_runtime_state(state)
                 from .hybrid_goals import validate_complete
                 validate_complete(state,self._goal_registration(db),lambda k:self._goal_event(db,k))
+                from .hybrid_authority import validate_complete as authority_complete
+                authority_complete(state,self._goal_registration(db),lambda k:self._authority_event(db,k))
             else: state=initial()
             for event in db.execute("SELECT * FROM events WHERE seq>? ORDER BY seq",(state["version"],)):
                 validate_runtime_event(dict(event))
@@ -543,6 +615,8 @@ class Store:
             validate_runtime_state(state)
             from .hybrid_goals import validate_complete
             validate_complete(state,self._goal_registration(db),lambda k:self._goal_event(db,k))
+            from .hybrid_authority import validate_complete as authority_complete
+            authority_complete(state,self._goal_registration(db),lambda k:self._authority_event(db,k))
             self._replace_projection(db,state)
             return state
 
@@ -552,6 +626,8 @@ class Store:
             state=self.replay(db);raw=canonical(state)
             from .hybrid_goals import validate_complete
             validate_complete(state,self._goal_registration(db),lambda k:self._goal_event(db,k))
+            from .hybrid_authority import validate_complete as authority_complete
+            authority_complete(state,self._goal_registration(db),lambda k:self._authority_event(db,k))
             db.execute("INSERT OR REPLACE INTO snapshots VALUES(?,?,?)",(state["version"],raw,hashlib.sha256(raw).hexdigest()))
             db.execute('UPDATE snapshot_due SET due_version=CASE WHEN due_version<=? THEN 0 ELSE due_version END,last_complete=MAX(last_complete,?) WHERE singleton=1',(state['version'],state['version']))
             return {"version":state["version"],"sha256":hashlib.sha256(raw).hexdigest()}
