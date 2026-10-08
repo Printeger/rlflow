@@ -38,3 +38,6 @@
 使用纯 ASGI 同源 middleware，避免 BaseHTTPMiddleware 内部流队列截断真实 socket-send deadline。默认 session 15 分钟、viewer Bearer 至多 5 分钟；cookie 和 Bearer 不可互换；Agent 不能收到 approver role。每个 BEGIN 内校验项目身份与模式，而不是仅在路由入口先读 head。
 
 SSE 单事件预取、32 帧/4MiB queue、8 流；heartbeat 不写 durable id。健康历史补齐不因批次大于 queue 被错误断开。slow client resync+close；socket 已阻塞时直接 timeout close，由 Last-Event-ID 恢复。没有为得到“实时运行”而将 ROLE_IDENTITY 或 heartbeat 当作业务 RUNNING 证据。
+# 2026-10-08：启动观测的证据语义
+
+START_ACK 写于 exec 前，故仅公开 CLI_RELEASE_ACK/startup_released_at，不能填实际 execution.started/started_at 或升 RUNNING。observer 在 trusted core 中采集，不在 Web GET 中读取私有启动文件或写 Store；短命事实在 receipt acceptance 前再次采集。完整绑定与事务再检查，不因当前 PID 已终止、批准已变化或 STOP 已发生而抹掉合法历史事实。无效 optional proof 仅显示观察不足，不阻断核心事务。

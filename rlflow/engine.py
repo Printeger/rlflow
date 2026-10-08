@@ -475,6 +475,10 @@ def _classification(task, engineer, evaluation, stage):
 
 
 def accept_result(store, sid):
+    # Capture short-lived wrapper ACKs before this session becomes terminal.
+    # A prior reconcile pass may have observed no ACK just before the receipt.
+    from .startup_observation import observe as observe_startup
+    observe_startup(store, sid)
     state = store.view()
     session = state["sessions"][sid]
     if session["status"] not in ACTIVE:
@@ -933,6 +937,8 @@ def reconcile(store):
     for sid, session in store.objects("sessions",ACTIVE):
         if session["status"] not in ACTIVE:
             continue
+        from .startup_observation import observe as observe_startup
+        observe_startup(store, sid)
         d = Path(session["directory"])
         if not owns(session.get('identity')) and not (d/'receipt.json').exists() and (d/'lifeguard-request.json').exists():
             from .lifeguard import reclaim

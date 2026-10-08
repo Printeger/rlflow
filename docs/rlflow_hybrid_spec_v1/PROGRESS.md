@@ -13,7 +13,7 @@
 | T02 | 无生成探测与隔离兼容完成 | 315 schema；version+protocol SHA pin；initialize-only 独立握手成功；真实 usage/interrupt/子代理未证实，禁用不支持能力 |
 | T03 | 初始闭合合同已实现，后续扩展中 | GoalContract/Task/Lease/Attempt/Approval/Evidence/Experiment/Usage/Budget/CommandReceipt、公共快照与已注册 payload；完整 API 实际接口尚待 T06/T16 |
 | T04 | 初始事务观测桥已验证，性能验收未完成 | 只读 bounded snapshot/page、增量 counters、同事务 outbox、epoch、真实进程故障测试；B1 100k 与备份恢复集成待验证 |
-| T05 | 未完成 | actual worker START_ACK 需逐事实绑定核验；当前仍保守显示 STARTING，不能推定模型启动 |
+| T05 | 启动释放事实切片已验证，完整观测未完成 | trusted core 校验完整绑定链并持久化一次 CLI_RELEASE_ACK；短命/换代/文件安全覆盖；仍 STARTING，vendor 活动/日志/资源另待验证 |
 | T06 | 只读基础切片实现，未完整验收 | 同源登录/project scope/短期 Bearer、snapshot/page、bounded durable SSE、loopback CLI；无写命令/任意 artifact；见 LOCAL_WEB.md |
 | T07–T08 | 未完成 | 前端、日志/资源真实观测、浏览器与完整 M1 验收尚待完成 |
 | T09–T17 | 未开始 | 合同、策略、受控 Runtime、单写、独立评审、预算、skill、控制与恢复 |
@@ -29,4 +29,6 @@
 
 High 独立 Web 复核的项目读源 TOCTOU、健康 backlog 误判/过量预取均已关闭；见 SECURITY_REVIEW_WEB_FOUNDATION.md。真实 loopback HTTP 事件提交与重连测试已通过。源码没有 scheduler/model/GPU 启动副作用。
 
-下一项：提交本验证 checkpoint 后实现 T05 trusted core 启动观测绑定，随后 T07 Dashboard 与 T08 M1 验收。T06 的并行基础切片不替代 T05 前置验收；M1–M5 和完整 Goal 仍未完成。
+最新 checkpoint 03：68 项 startup/protocol/observation 回归及独立 High 审查通过；冻结全回归 **399 passed / 32 skipped / 135.90s**。新启动观测不改 source status/phase/预算/批准，明确 CLI_RELEASE_ACK 不是模型 RUNNING。证据见 CHECKPOINT_03.md。
+
+下一项：实现 T07 只读 Dashboard 与纯 reducer、真实浏览器 QA，补齐 T05 日志/资源，再进行 T08/M1 验收。web_checks 独立 npm 环境可用，实际 Chrome sandbox 启动通过；尚无 UI 验收。M1–M5 和完整 Goal 仍未完成。

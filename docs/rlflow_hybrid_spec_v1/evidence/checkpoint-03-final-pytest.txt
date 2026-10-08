@@ -1,0 +1,21 @@
+2026-10-08; Python 3.12.3; hybrid-v1; parent 3fa157a.
+Command: PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q -rs
+Actual log: audit/hybrid-v1/checkpoint-03-final-pytest.log
+399 passed, 32 skipped, 1 warning in 135.90s (0:02:15)
+No runtime Python or pytest source edits during this final run.
+Targeted startup/protocol/observation regression: 68 passed in 21.62s.
+Independent High review: 68 passed; scoped findings closed.
+32 skips unchanged: 18 external reviewed dispatcher, 14 external H1.
+Warning unchanged: Starlette TestClient deprecated anyio BlockingPortal alias.
+
+Frozen source SHA256:
+021a856beacbd32fc463533a7120e73cc1d60ccad41908758b88b2d807d06997  rlflow/startup_observation.py
+788e4ed1a623123cd46586616e7f4e626694323f51451c3610a557e8ece95e5b  rlflow/engine.py
+c1113c7a50c1883b72f21cffe79d2c69d877c5e3c06ed758e438b72daca869f0  rlflow/observation.py
+39597f19b8343406f622b6d004fd1b4b0c277b7159e27049ef73d95dfe5b3511  rlflow/hybrid_protocol.py
+6a74223f7f249b0cef2606433e46b325f2ac29ce56b03ecee61ac331de82ac3a  tests/test_startup_observation.py
+93998dd794ef2a2c419c8f9b19d21a34739d29ad85ca4902976130f5297b2ca5  tests/test_hybrid_observation.py
+
+Local browser QA capability: playwright-core 1.55.1 / Google Chrome 151.0.7922.108,
+chromiumSandbox=true, disable-gpu, credential-free child env, about:blank only.
+This is browser capability evidence, NOT Dashboard verification or a provider run.

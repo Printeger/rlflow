@@ -82,6 +82,20 @@ def summary(section, key, value, version):
     if kind == "execution":
         result["state"] = "STARTING" if raw.get("status") == "RUNNING" else result["source_status"]
         result["usage_status"] = "UNKNOWN"
+        proof = raw.get("startup_observation")
+        valid_proof = False
+        if isinstance(proof, dict):
+            try:
+                validate("StartupObservation", proof)
+                valid_proof = (isinstance(raw.get("generation"), str) and proof["generation"] == raw["generation"]
+                               and proof["observed_at"].endswith("Z") and proof["released_at"].endswith("Z"))
+            except ProtocolError:
+                pass  # Malformed optional observations cannot block core writes.
+        if valid_proof:
+            result["startup_observation"] = "CLI_RELEASE_ACK"
+            result["startup_observed_at"] = proof["observed_at"]
+            result["startup_released_at"] = proof["released_at"]
+            result["launch_phase"] = "START_ACK"
     else:
         result["state"] = result["source_status"]
     if kind == "usage":

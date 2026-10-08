@@ -68,3 +68,13 @@ ec46e1f68eb5181dde7eb140a28a956620c4dadfe172bc090ac2415d3b98015c  tests/test_hyb
 32 skipped 与 checkpoint 01 相同：外部 reviewed dispatcher 18、外部 H1 14。唯一 warning 为安装版 Starlette TestClient 的 anyio alias deprecation；没有项目测试报错。测试默认仍隔离宿主 ROS 插件。
 
 该切片不是 M1 完成证明。T05 完整启动观测、T07/T08 前端、日志/遥测、完整 Error envelope、性能/soak、M2–M5 与最终 Goal 门槛仍未验收。新增仅 local read-only API；未调用真实模型、GPU、公开监听或生产状态。
+
+## Checkpoint 03：绑定启动释放事实
+
+最终冻结全回归 **399 passed / 32 skipped / 1 warning / 135.90s**；命令 `PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q -rs`，原日志 `audit/hybrid-v1/checkpoint-03-final-pytest.log`，版本化输出和 SHA256 见 evidence/checkpoint-03-final-pytest.txt。目标子集与 High 独立复核均为 68 passed。runtime Python/pytest 源码在最终执行中未改变。
+
+新增真实 model-free held-wrapper 子进程短命启动与退出，再以历史身份验证 ACK。只证明本地 CLI_RELEASE_ACK，不证明供应商模型执行。负例覆盖 request/release/phase/hash/identity/command/candidate/reservation/resource 绑定、换代与并发、FIFO/链接/读取上限、receipt 前补采集与 optional proof 破损。stage/task/approval/authority/usage 不因此观察事实改变；legacy source RUNNING 仍公开 STARTING/PARTIAL。
+
+High 发现的两类问题已修：持久化前 candidate/limit/resources 必须再绑定；malformed optional proof 不能通过 None generation 或缺失/无效时间/hashes 伪造公共 ACK、不能阻止核心写入。时间字段命名 startup_released_at，避免伪称实际 execution.started。
+
+独立 npm 检查环境（不动根用户 package-lock）已安装并锁定 playwright-core 1.55.1。实际 Chrome 151.0.7922.108 在 sandbox=true、disable-gpu、无账号 env 下 about:blank 启动并退出，证明后续浏览器 QA 工具可用；不属于 T07 UI 或 8h soak 验收。

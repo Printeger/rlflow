@@ -1,0 +1,8 @@
+{
+  "name": "rlflow-browser-checks",
+  "private": true,
+  "type": "module",
+  "devDependencies": {
+    "playwright-core": "1.55.1"
+  }
+}

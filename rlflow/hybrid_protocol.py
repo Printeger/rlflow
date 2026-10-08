@@ -62,6 +62,7 @@ PUBLIC_PROPERTIES = {
     "description": TEXT, "reason": TEXT, "candidate_hash": nullable(HASH),
     "task_id": nullable(ID), "parent_id": nullable(ID), "started_at": nullable(TIME),
     "launch_phase": nullable(TEXT), "usage_status": enum("KNOWN", "PARTIAL", "UNKNOWN"),
+    "startup_observation": enum("CLI_RELEASE_ACK"), "startup_observed_at": nullable(TIME), "startup_released_at": nullable(TIME),
     "input_tokens": nullable(COUNT), "output_tokens": nullable(COUNT), "cached_tokens": nullable(COUNT),
     "actual_cost_status": enum("KNOWN", "UNKNOWN"), "actual_cost": nullable({"type": "string", "pattern": r"^[0-9]+(\.[0-9]+)?$"}),
     "used_calls": nullable(COUNT), "reserved_calls": nullable(COUNT), "limit_calls": nullable(COUNT),
@@ -111,6 +112,10 @@ OBJECTS = {
                                         "objects": PAGE, "observability": enum("PARTIAL", "OBSERVED")})}),
     "Heartbeat": obj({"server_time": TIME, "cursor": TEXT}),
     "Resync": obj({"code": {"const": "RESYNC_REQUIRED"}, "reason": TEXT}),
+    "StartupObservation": obj({"kind": {"const": "CLI_RELEASE_ACK"}, "generation": ID,
+                               "request_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+                               "ack_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+                               "released_at": TIME, "observed_at": TIME}),
 }
 OBJECTS.update({
     "Project": obj({"id": ID, "name": TEXT, "workspace_root": TEXT, "state_root": TEXT,

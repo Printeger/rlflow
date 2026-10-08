@@ -75,6 +75,16 @@ def test_each_read_transaction_checks_bound_project_and_mode(observed):
                 call()
 
 
+@pytest.mark.parametrize("proof", [{}, {"kind":"CLI_RELEASE_ACK"}, {"kind":"CLI_RELEASE_ACK","generation":None},
+    {"kind":"CLI_RELEASE_ACK","generation":"g","observed_at":"broken"},
+    {"kind":"CLI_RELEASE_ACK","generation":"g","observed_at":"2026-10-08T00:00:00Z", "released_at":"2026-10-08T00:00:00Z",
+     "request_sha256":"invalid","ack_sha256":"invalid"}])
+def test_malformed_optional_startup_proof_cannot_claim_ack_or_block_public_bridge(proof):
+    row = summary("sessions", "s", {"status":"RUNNING", "generation":"g", "startup_observation":proof}, 1)
+    assert row["state"] == "STARTING" and row["usage_status"] == "UNKNOWN"
+    assert "startup_observation" not in row
+
+
 def test_same_entity_version_is_not_source_global_version(observed):
     store, reader = observed
     change_usage(store, "one", input_tokens=1)
