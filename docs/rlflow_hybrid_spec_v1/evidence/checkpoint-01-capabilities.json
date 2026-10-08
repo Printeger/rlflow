@@ -1,0 +1,40 @@
+{
+  "runtime": {
+    "adapter": "codex-exec",
+    "version": "codex-cli 0.161.0",
+    "protocol_sha256": "e18d9d29dd6ca3826af3a2b0fead0813160ceb099e80b9c1a4102313d0acb9e5",
+    "compatible": true,
+    "model_access": "UNVERIFIED",
+    "structured_output": "DECLARED",
+    "usage": "DECLARED_JSONL",
+    "interrupt": "UNVERIFIED",
+    "resume": "DECLARED",
+    "native_subagents": false,
+    "delegation_observability": "UNVERIFIED",
+    "enforced_readonly": "UNVERIFIED",
+    "hard_token_limit": false,
+    "hard_cost_limit": false,
+    "app_server": "SCHEMA_GENERATED",
+    "observations": [
+      "315 local protocol schema files generated without model calls",
+      "execution, account access, interrupt and isolation remain unverified"
+    ]
+  },
+  "resources": {
+    "cgroup_version": 2,
+    "controllers": [
+      "cpu",
+      "cpuset",
+      "dmem",
+      "hugetlb",
+      "io",
+      "memory",
+      "misc",
+      "pids",
+      "rdma"
+    ],
+    "resource_enforcement": "partial",
+    "strict_execution_admissible": false,
+    "delegation_verified": false
+  }
+}

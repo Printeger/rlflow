@@ -14,5 +14,8 @@ rlflow = "rlflow.cli:main"
 [tool.setuptools.packages.find]
 include = ["rlflow*"]
 
+[tool.setuptools.package-data]
+rlflow = ["hybrid_schemas/*.json"]
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]

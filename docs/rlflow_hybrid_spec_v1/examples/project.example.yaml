@@ -1,0 +1,62 @@
+# 安全模板：非现有配置格式；开发时实现解析器。默认禁用执行。
+schema_version: '1.0'
+execution_enabled: false
+data_mode: fixture
+project:
+  id: project_fixture
+  root: SET_ME_ABSOLUTE_PROJECT_ROOT
+  state_dir: SET_ME_PROTECTED_STATE_DIR
+  source_roots:
+  - src
+  - tests
+  data_roots:
+  - SET_ME_READONLY_DATA_ROOT
+  artifact_root: SET_ME_ARTIFACT_ROOT
+  protected_paths:
+  - .rlflow
+  - fixtures/acceptance
+runtime:
+  adapter: fixture
+  approved_real_adapter: null
+  pinned_version: SET_ME_AFTER_CAPABILITY_PROBE
+  native_subagents: false
+  max_delegation_depth: 1
+  require_enforced_readonly: true
+models:
+  fast_reader: null
+  standard_worker: null
+  deep_reviewer: null
+limits:
+  host_model_sessions_including_children: 3
+  writers_per_workspace: 1
+  gpu_experiments_concurrent: 1
+  automatic_expensive_retries: 0
+  control_rss_target_mib: 512
+  require_cgroup_for_strict_tasks: true
+policy:
+  repeated_failure_trigger_count: 2
+  same_task_same_cause_escalations: 1
+  finalization_reserve_fraction: 0.2
+  independent_review_before_delivery: true
+  allow_lightweight_decision_service: false
+commands:
+  fixture_test:
+    adapter: fixture
+    template_id: test_success
+    parameters: {}
+    network: none
+dashboard:
+  bind: 127.0.0.1
+  port: 8765
+  auth_required: true
+  timezone: Asia/Taipei
+  sse_heartbeat_seconds: 5
+  stale_after_seconds: 15
+  max_animation_fps: 30
+  max_visible_graph_nodes: 30
+  max_active_pulses: 200
+retention:
+  raw_log_days: 14
+  telemetry_days: 7
+  downsampled_metric_days: 90
+  protect_referenced_evidence: true

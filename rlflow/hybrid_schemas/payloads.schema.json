@@ -1,0 +1,347 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:rlflow:spec:payloads:1.0",
+  "title": "Initial typed event payload registry",
+  "description": "Initial event types for fixtures; implementers must add remaining domain event types with semantic tests. No generic fallback may drive a privileged transition.",
+  "$defs": {
+    "goal.state_changed": {
+      "type": "object",
+      "properties": {
+        "previous_state": {
+          "anyOf": [
+            {
+              "type": "string",
+              "enum": [
+                "DRAFT",
+                "AWAITING_APPROVAL",
+                "READY",
+                "RUNNING",
+                "WAITING_EXTERNAL",
+                "BLOCKED",
+                "PAUSE_REQUESTED",
+                "PAUSED",
+                "STOP_REQUESTED",
+                "STOPPED",
+                "COMPLETED",
+                "BUDGET_EXHAUSTED",
+                "FAILED"
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "state": {
+          "type": "string",
+          "enum": [
+            "DRAFT",
+            "AWAITING_APPROVAL",
+            "READY",
+            "RUNNING",
+            "WAITING_EXTERNAL",
+            "BLOCKED",
+            "PAUSE_REQUESTED",
+            "PAUSED",
+            "STOP_REQUESTED",
+            "STOPPED",
+            "COMPLETED",
+            "BUDGET_EXHAUSTED",
+            "FAILED"
+          ]
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        },
+        "contract_hash": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        }
+      },
+      "required": [
+        "previous_state",
+        "state",
+        "reason",
+        "contract_hash"
+      ],
+      "additionalProperties": false
+    },
+    "task.state_changed": {
+      "type": "object",
+      "properties": {
+        "previous_state": {
+          "anyOf": [
+            {
+              "type": "string",
+              "enum": [
+                "PROPOSED",
+                "READY",
+                "RUNNING",
+                "AWAITING_REVIEW",
+                "SUCCEEDED",
+                "FAILED",
+                "BLOCKED",
+                "CANCELLED"
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "state": {
+          "type": "string",
+          "enum": [
+            "PROPOSED",
+            "READY",
+            "RUNNING",
+            "AWAITING_REVIEW",
+            "SUCCEEDED",
+            "FAILED",
+            "BLOCKED",
+            "CANCELLED"
+          ]
+        },
+        "goal_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "previous_state",
+        "state",
+        "goal_id",
+        "reason"
+      ],
+      "additionalProperties": false
+    },
+    "execution.started": {
+      "type": "object",
+      "properties": {
+        "task_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+        },
+        "runtime_ref": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+        },
+        "session_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+        },
+        "capability": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+        },
+        "model_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "base_snapshot_hash": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        },
+        "lease_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+        },
+        "controller_epoch": {
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "required": [
+        "task_id",
+        "runtime_ref",
+        "session_id",
+        "capability",
+        "model_id",
+        "base_snapshot_hash",
+        "lease_id",
+        "controller_epoch"
+      ],
+      "additionalProperties": false
+    },
+    "execution.completed": {
+      "type": "object",
+      "properties": {
+        "task_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+        },
+        "state": {
+          "type": "string",
+          "enum": [
+            "SUCCEEDED",
+            "FAILED",
+            "CANCELLED"
+          ]
+        },
+        "output_snapshot_hash": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        },
+        "result_artifact_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+        },
+        "usage_status": {
+          "type": "string",
+          "enum": [
+            "KNOWN",
+            "PARTIAL",
+            "UNKNOWN"
+          ]
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "task_id",
+        "state",
+        "output_snapshot_hash",
+        "result_artifact_id",
+        "usage_status",
+        "reason"
+      ],
+      "additionalProperties": false
+    },
+    "evidence.accepted": {
+      "type": "object",
+      "properties": {
+        "goal_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+        },
+        "condition_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+        },
+        "artifact_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 160,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+          },
+          "minItems": 1
+        },
+        "candidate_hash": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$"
+        },
+        "verdict": {
+          "type": "string",
+          "enum": [
+            "PASS",
+            "FAIL",
+            "INCONCLUSIVE"
+          ]
+        },
+        "reviewer_session_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "goal_id",
+        "condition_id",
+        "artifact_ids",
+        "candidate_hash",
+        "verdict",
+        "reviewer_session_id",
+        "reason"
+      ],
+      "additionalProperties": false
+    },
+    "budget.updated": {
+      "type": "object",
+      "properties": {
+        "dimension": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+        },
+        "limit": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "consumed": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "reserved": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "unknown_exposure": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "available": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "unit": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+        },
+        "source_ref": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160,
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+        }
+      },
+      "required": [
+        "dimension",
+        "limit",
+        "consumed",
+        "reserved",
+        "unknown_exposure",
+        "available",
+        "unit",
+        "source_ref"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

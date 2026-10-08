@@ -1,0 +1,67 @@
+{
+  "schema_version": "1.0",
+  "data_mode": "fixture",
+  "project_id": "project_fixture",
+  "goal_id": "goal_fixture_01",
+  "contract_version": 1,
+  "objective": "在隔离 fixture 项目中实现一个确定性加法模块，并通过固定测试和独立评审。不得运行真实模型或 GPU。",
+  "goal_kind": "engineering",
+  "global_conditions": [
+    {
+      "id": "C1",
+      "description": "固定测试全部通过",
+      "required": true,
+      "verification": {
+        "method": "deterministic",
+        "rule": "预置测试退出码为 0 且结果数匹配",
+        "evidence_required": [
+          "test_result"
+        ]
+      }
+    },
+    {
+      "id": "C2",
+      "description": "独立只读评审通过",
+      "required": true,
+      "verification": {
+        "method": "independent_review",
+        "rule": "reviewer_session_id 与实现会话不同，证据绑定同一候选",
+        "evidence_required": [
+          "review_result"
+        ]
+      }
+    }
+  ],
+  "scope": {
+    "writable_paths": [
+      "src/",
+      "tests/"
+    ],
+    "protected_paths": [
+      ".rlflow/",
+      "fixtures/acceptance/"
+    ],
+    "allowed_command_templates": [
+      "fixture_test"
+    ],
+    "network_access": "none",
+    "allowed_hosts": []
+  },
+  "budget": {
+    "model_sessions": 0,
+    "model_input_tokens": 0,
+    "model_output_tokens": 0,
+    "model_token_enforcement": "hard_required",
+    "gpu_device_seconds": 0,
+    "experiment_starts": 0,
+    "experiment_retries": 0,
+    "wall_seconds": 300,
+    "finalization_reserve_fraction": 0.2
+  },
+  "stop_rules": [
+    "任何真实模型调用或 GPU 启动请求立即拒绝",
+    "fixture 只用于协议/界面测试，不能进入 live 运行队列"
+  ],
+  "risk": "low",
+  "approval_status": "UNAPPROVED"
+}

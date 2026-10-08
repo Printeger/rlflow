@@ -1,0 +1,450 @@
+openapi: 3.1.0
+info:
+  title: rlflow Hybrid control and observability API
+  version: 1.0.0
+  description: Proposed starter contract; not a running service. Snapshot/list view
+    models and all domain payload schemas must be finalized during T03.
+servers:
+- url: /
+security:
+- cookieAuth: []
+- bearerAuth: []
+paths:
+  /api/v1/projects:
+    get:
+      operationId: listProjects
+      responses:
+        '200':
+          description: 可见项目摘要
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+  /api/v1/projects/{project_id}/snapshot:
+    parameters:
+    - &id001
+      name: project_id
+      in: path
+      required: true
+      schema: &id004
+        type: string
+        minLength: 1
+        maxLength: 160
+        pattern: ^[A-Za-z0-9][A-Za-z0-9_.:-]*$
+    get:
+      operationId: getSnapshot
+      responses:
+        '200':
+          description: 一致快照与对应游标
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Snapshot'
+        '403': &id002
+          description: 权限不足
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/v1/projects/{project_id}/events:
+    parameters:
+    - *id001
+    get:
+      operationId: streamEvents
+      description: SSE domain frames carry durable cursor; telemetry/heartbeat do
+        not advance it. resync_required closes the stream. Authenticate before opening.
+      parameters:
+      - name: after
+        in: query
+        schema:
+          type: string
+        description: Initial cursor, not a credential
+      - name: Last-Event-ID
+        in: header
+        schema:
+          type: string
+        description: Reconnect cursor; valid header takes precedence
+      responses:
+        '200':
+          description: domain / telemetry / heartbeat / resync_required frames
+          content:
+            text/event-stream:
+              schema:
+                type: string
+        '401': &id003
+          description: 未认证
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403': *id002
+  /api/v1/projects/{project_id}/commands:
+    parameters:
+    - *id001
+    post:
+      operationId: submitCommand
+      description: Actor is derived from authentication. Approve requires human approver
+        role and exact proposal hash. 202 is durable receipt, not execution completion.
+      security:
+      - cookieAuth: []
+        csrfToken: []
+      - bearerAuth: []
+      parameters:
+      - name: Idempotency-Key
+        in: header
+        required: true
+        schema:
+          type: string
+          minLength: 8
+          maxLength: 160
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: schemas/command.schema.json
+      responses:
+        '202':
+          description: 命令已持久接收
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommandReceipt'
+        '401': *id003
+        '403': *id002
+        '409':
+          description: 版本或幂等冲突
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '422':
+          description: 输入无效
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '429':
+          description: 限流
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '503':
+          description: 服务或执行能力不可用
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/v1/projects/{project_id}/commands/{command_id}:
+    parameters:
+    - *id001
+    - name: command_id
+      in: path
+      required: true
+      schema: *id004
+    get:
+      operationId: getCommand
+      responses:
+        '200':
+          description: 真实命令状态
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommandReceipt'
+        '403': *id002
+  /api/v1/health:
+    get:
+      operationId: getHealth
+      description: Unauthenticated health, if exposed, returns only readiness without
+        paths, credentials or model account details.
+      responses:
+        '200':
+          description: 授权健康摘要
+          content:
+            application/json:
+              schema:
+                type: object
+  /api/v1/projects/{project_id}/tasks:
+    parameters:
+    - *id001
+    get:
+      operationId: listTasks
+      parameters:
+      - name: cursor
+        in: query
+        schema:
+          type: string
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 200
+          default: 50
+      responses:
+        '200':
+          description: 分页只读投影；实体合同由 T03 固化
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      type: object
+                    minItems: 0
+                  next_cursor:
+                    type:
+                    - string
+                    - 'null'
+                required:
+                - items
+                - next_cursor
+                additionalProperties: false
+        '403': *id002
+  /api/v1/projects/{project_id}/executions:
+    parameters:
+    - *id001
+    get:
+      operationId: listExecutions
+      parameters:
+      - name: cursor
+        in: query
+        schema:
+          type: string
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 200
+          default: 50
+      responses:
+        '200':
+          description: 分页只读投影；实体合同由 T03 固化
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      type: object
+                    minItems: 0
+                  next_cursor:
+                    type:
+                    - string
+                    - 'null'
+                required:
+                - items
+                - next_cursor
+                additionalProperties: false
+        '403': *id002
+  /api/v1/projects/{project_id}/experiments:
+    parameters:
+    - *id001
+    get:
+      operationId: listExperiments
+      parameters:
+      - name: cursor
+        in: query
+        schema:
+          type: string
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 200
+          default: 50
+      responses:
+        '200':
+          description: 分页只读投影；实体合同由 T03 固化
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      type: object
+                    minItems: 0
+                  next_cursor:
+                    type:
+                    - string
+                    - 'null'
+                required:
+                - items
+                - next_cursor
+                additionalProperties: false
+        '403': *id002
+  /api/v1/projects/{project_id}/approvals:
+    parameters:
+    - *id001
+    get:
+      operationId: listApprovals
+      parameters:
+      - name: cursor
+        in: query
+        schema:
+          type: string
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 200
+          default: 50
+      responses:
+        '200':
+          description: 分页只读投影；实体合同由 T03 固化
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      type: object
+                    minItems: 0
+                  next_cursor:
+                    type:
+                    - string
+                    - 'null'
+                required:
+                - items
+                - next_cursor
+                additionalProperties: false
+        '403': *id002
+  /api/v1/projects/{project_id}/budget:
+    parameters:
+    - *id001
+    get:
+      operationId: getBudget
+      responses:
+        '200':
+          description: 含预留、未知和来源范围的预算投影
+          content:
+            application/json:
+              schema:
+                type: object
+        '403': *id002
+  /api/v1/projects/{project_id}/artifacts/{artifact_id}:
+    parameters:
+    - *id001
+    - name: artifact_id
+      in: path
+      required: true
+      schema: *id004
+    get:
+      operationId: getArtifact
+      description: Resolve server-side authorized artifact ID; no arbitrary path input.
+        Metadata may include a separately authorized download mechanism.
+      responses:
+        '200':
+          description: 授权产物元数据
+          content:
+            application/json:
+              schema:
+                type: object
+        '403': *id002
+components:
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: rlflow_session
+    csrfToken:
+      type: apiKey
+      in: header
+      name: X-CSRF-Token
+    bearerAuth:
+      type: http
+      scheme: bearer
+  schemas:
+    Error:
+      type: object
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+        retryable:
+          type: boolean
+        correlation_id:
+          type: string
+        details:
+          type: object
+      required:
+      - code
+      - message
+      - retryable
+      - correlation_id
+      additionalProperties: false
+    Snapshot:
+      type: object
+      properties:
+        schema_version:
+          const: '1.0'
+        project_id: *id004
+        store_epoch: *id004
+        cursor:
+          type: string
+        server_time:
+          type: string
+          format: date-time
+        data_mode:
+          type: string
+          enum:
+          - live
+          - fixture
+        projection:
+          type: object
+          description: Typed read models must be generated by implementation T03;
+            do not interpret this generic projection as permission to drive privileged
+            transitions.
+      required:
+      - schema_version
+      - project_id
+      - store_epoch
+      - cursor
+      - server_time
+      - data_mode
+      - projection
+      additionalProperties: false
+    CommandReceipt:
+      type: object
+      properties:
+        command_id: *id004
+        project_id: *id004
+        status:
+          type: string
+          enum:
+          - ACCEPTED
+          - EXECUTING
+          - SUCCEEDED
+          - REJECTED
+          - FAILED
+        accepted_at:
+          type: string
+          format: date-time
+        result:
+          type:
+          - object
+          - 'null'
+      required:
+      - command_id
+      - project_id
+      - status
+      - accepted_at
+      - result
+      additionalProperties: false
+    EventEnvelope:
+      $ref: schemas/event.schema.json

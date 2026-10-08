@@ -1,0 +1,76 @@
+{
+  "spec_version": "1.0",
+  "date": "2026-10-07",
+  "rlflow_reference_commit": "90fd977f0ebcd3d00a5ce50c64f7ecb9a5009dae",
+  "kind": "requirements-and-contract-starters",
+  "files": {
+    "CODEX_START.md": {
+      "bytes": 3595,
+      "sha256": "4587c2291a0e33ec5fb58db9fe529c5a196cfcde206dcd03458c2d95035fa01d"
+    },
+    "IMPLEMENTATION_PLAN.md": {
+      "bytes": 6998,
+      "sha256": "a6d2fe0c5d750edf4a73b2280cc2a020921d3939397a6e92eec0c70e1db1e1d5"
+    },
+    "PRD.html": {
+      "bytes": 108948,
+      "sha256": "c6325d86ca3cb00fabda4bc9b0c78d795cfbc59269aa30cf457b201114ef7544"
+    },
+    "PRD.md": {
+      "bytes": 67263,
+      "sha256": "d24db654e6b97733e5507421e722065005daab9bafe1c80c107898e6a0e722ff"
+    },
+    "README.md": {
+      "bytes": 2683,
+      "sha256": "852bfb33caff81bd175fd08033ce7ec08285a2da1a2cd35b2670eadc2eeb9679"
+    },
+    "SOURCES.md": {
+      "bytes": 4691,
+      "sha256": "d2ef3af1d7a669d49b58e95dc48271404704e66e93de19f4105659e89ed4ad3d"
+    },
+    "VALIDATION_REPORT.md": {
+      "bytes": 1413,
+      "sha256": "881733b66b5ef63dc8c7eb72ded437b2d1048647bb7f09d51f726bc6e0ae6d9b"
+    },
+    "examples/command.fixture.json": {
+      "bytes": 226,
+      "sha256": "7239a9efc14391a5e5d161043d12f9ed53bc674fdabb1b705c84187bfc983afd"
+    },
+    "examples/events.fixture.ndjson": {
+      "bytes": 4285,
+      "sha256": "281b8b03fabd5b15938965fb89c74f8f99b0fe66f2cb44e0f6e26669a4cad10a"
+    },
+    "examples/goal.fixture.json": {
+      "bytes": 1786,
+      "sha256": "c78c14b9534277e785b32de8362dd1f868aff6c287fa0290796abdbe567d272e"
+    },
+    "examples/project.example.yaml": {
+      "bytes": 1571,
+      "sha256": "a9ccc2b4dc879da2de5cb91cb597504692ee200156e89bc97cc96be21587309d"
+    },
+    "openapi.yaml": {
+      "bytes": 11661,
+      "sha256": "1fc5ed2cea5a1cf13106d3913e505aa27789d460de33d4e0ba3e5bb8ea1b1f4e"
+    },
+    "schemas/command.schema.json": {
+      "bytes": 8133,
+      "sha256": "c8e8b4cf37815895b36e34a19cf48e67a872e6fc44843a2f136f48038c4daef8"
+    },
+    "schemas/event.schema.json": {
+      "bytes": 3333,
+      "sha256": "3e23c293862e1d635d464c73f59169106b796d403ba95f64711023e98bd45d48"
+    },
+    "schemas/goal.schema.json": {
+      "bytes": 5819,
+      "sha256": "44e607d02ee63594255578506bafb013b992df9161ee1121bd327ef22fa730a1"
+    },
+    "schemas/payloads.schema.json": {
+      "bytes": 8397,
+      "sha256": "cd38f6171a425a913bf3da64061a11236a41075620b8f4902e274c09f3f1eee4"
+    },
+    "validate_spec.py": {
+      "bytes": 6848,
+      "sha256": "7c8cc2dbe85bc400b7e1f3bf6cb5beb7fb22a417a3cf91950a5d97e42d3ff448"
+    }
+  }
+}

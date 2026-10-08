@@ -20,7 +20,7 @@ import tempfile
 import time
 
 CODEX = '/usr/local/bin/codex'
-PINNED_VERSION = '0.153.4'
+PINNED_VERSION = '0.161.0'
 ROLES = ('PI', 'Critic', 'Designer', 'Engineer', 'Evaluator', 'Scout')
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -279,7 +279,8 @@ def codex_command(role: str, candidate: str | Path, scratch: str | Path,
                   read_extra: list[str] | None = None, write_roots: list[str] | None = None,
                   execute_extra: list[str] | None = None,
                   memory_bytes: int = 2 * 1024**3,
-                  model: str = 'gpt-5.6-sol', effort: str = 'medium', command_seconds: int = 120) -> tuple[list[str], dict[str,str]]:
+                  model: str = 'gpt-5.6-sol', effort: str = 'medium', command_seconds: int = 120,
+                  _census_catalog: dict | None = None) -> tuple[list[str], dict[str,str]]:
     """Return argv/env; caller writes prompt to stdin and captures JSONL stdout.
 
     Output's parent is trusted control storage; it MUST be disjoint from role
@@ -295,8 +296,13 @@ def codex_command(role: str, candidate: str | Path, scratch: str | Path,
     version = subprocess.run([CODEX,'--version'],capture_output=True,text=True,timeout=10)
     if version.returncode or PINNED_VERSION not in version.stdout.split():
         raise IsolationError('Codex version does not match '+PINNED_VERSION)
-    cache = Path(os.environ.get('CODEX_HOME',str(Path.home()/'.codex')))/'models_cache.json'
-    catalog = json.loads(cache.read_text())
+    if _census_catalog is None:
+        cache = Path(os.environ.get('CODEX_HOME',str(Path.home()/'.codex')))/'models_cache.json'
+        catalog = json.loads(cache.read_text())
+    else:
+        # Only the local rejecting census uses a synthetic catalog. It must never
+        # be a fallback for a real account/model missing from the operator cache.
+        catalog = json.loads(json.dumps(_census_catalog))
     models = [m for m in catalog['models'] if m['slug']==model]
     if not models: raise IsolationError('Requested model absent from local Codex model catalog')
     if effort not in {x['effort'] for x in models[0].get('supported_reasoning_levels', [])}:
@@ -363,6 +369,11 @@ def tool_census() -> dict:
     import http.server
     import threading
     seen=[]
+    catalog = {'models':[{'slug':'gpt-5.6-sol','display_name':'Fixture census',
+        'supported_reasoning_levels':[{'effort':'medium','description':'Fixture'}],
+        'visibility':'list','supported_in_api':True,'priority':5,'support_verbosity':True,
+        'truncation_policy':{'mode':'tokens','limit':10000},
+        'base_instructions':'Non-generating local tool census only.','use_responses_lite':True}]}
     class Receiver(http.server.BaseHTTPRequestHandler):
         def do_POST(self):
             request=json.loads(self.rfile.read(int(self.headers.get('Content-Length','0'))))
@@ -377,8 +388,11 @@ def tool_census() -> dict:
         for name in ('candidate','scratch','control','auth-empty'):(root/name).mkdir()
         schema=root/'control/schema.json'
         schema.write_text('{"type":"object","properties":{},"required":[],"additionalProperties":false}')
-        argv,env=codex_command('Engineer',root/'candidate',root/'scratch',schema,root/'control/result.json')
-        env['CODEX_HOME']=str(root/'auth-empty')
+        argv,env=codex_command('Engineer',root/'candidate',root/'scratch',schema,root/'control/result.json',
+                               _census_catalog=catalog)
+        env = {'HOME':str(root/'auth-empty'),'CODEX_HOME':str(root/'auth-empty'),
+               'PATH':'/usr/local/bin:/usr/bin:/bin','LANG':'C.UTF-8',
+               'CUDA_VISIBLE_DEVICES':'','NVIDIA_VISIBLE_DEVICES':'none'}
         # The trusted MCP server needs no inherited secrets either.
         server=http.server.HTTPServer(('127.0.0.1',0),Receiver)
         thread=threading.Thread(target=server.serve_forever,daemon=True)
@@ -407,7 +421,9 @@ def tool_census() -> dict:
                 'registered_tools':sorted(actual),'expected_tools':sorted(expected),
                 'source':'installed CLI turn_metadata_includes_tool_info, local rejecting HTTP stub',
                 'real_model_calls':0,'exit_code':result.returncode,
-                'requests_observed':len(seen)}
+                'requests_observed':len(seen),
+                'catalog_sha256':hashlib.sha256(json.dumps(catalog,sort_keys=True,separators=(',',':')).encode()).hexdigest(),
+                'registry_sha256':hashlib.sha256(json.dumps(sorted(actual),separators=(',',':')).encode()).hexdigest()}
 
 
 def doctor(state_root: str | Path | None = None, *, workspace: str | Path = Path.home()/'.local/share/rlflow-standalone') -> dict:

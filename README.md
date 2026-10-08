@@ -32,3 +32,18 @@ rlflow_standalone/
 
 2026-09-16 已同步可靠性更新，详见 [可靠性与兼容边界](docs/RELIABILITY.md)。
 独立路径与未配置项目 Runner 的默认值保持不变。
+
+## Hybrid v1 开发中
+
+完整需求见 [PRD](docs/hybrid-v1/PRD.md)，实施状态见 [PROGRESS](docs/hybrid-v1/PROGRESS.md)，验收证据见 [系统验证记录](docs/hybrid-v1/IMPLEMENTATION_VALIDATION.md)。当前已增加严格 v1 协议、同事务只读观测桥和有界快照/增量事件读接口；Web Dashboard、Hybrid 工程/科研闭环及发布验收尚未完成。
+
+无模型调用的本机能力检查：
+
+```bash
+.venv/bin/python -m rlflow.capabilities
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q
+```
+
+能力探测不会读取账号凭据或启动模型。未配置精确版本和协议 SHA256 时 `compatible` 为 false；即使匹配，仍不代表真实模型访问、硬 token 上限或原生子代理隔离已经通过验收。执行隔离目前固定 Codex `0.161.0`，升级必须重新验证工具注册与内核边界。
+
+程序读模型使用 `rlflow.observation.ObservationReader`，仅打开已存在数据库的只读连接。观测初始化必须通过受信控制代码显式调用 `enable(store, project_id, data_mode=...)`；API 不得自行创建、迁移或调度状态。不要将演示状态连接到真实项目的 live endpoint。

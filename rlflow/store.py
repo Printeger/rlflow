@@ -157,6 +157,8 @@ class Store:
                         db.execute("UPDATE projection SET object_status=? WHERE section=? AND object_key=?",(status,section,key))
                     db.commit()
                 db.execute("CREATE INDEX IF NOT EXISTS projection_status ON projection(section,object_status,object_key)")
+                from .observation import initialize_tables
+                initialize_tables(db)
                 if db.execute("SELECT version FROM projection_meta").fetchone() is None:
                     db.execute("BEGIN IMMEDIATE")
                     state = self.audit(db)
@@ -335,10 +337,14 @@ class Store:
 
     def _commit(self, db, event_type, key, payload, previous, object_id, producer, inputs):
         ver = previous + 1
+        source_event_id = uuid.uuid4().hex
+        timestamp = time.time()
+        # Preserve the unencoded patch for the small allowlisted public bridge.
+        observation_payload = payload
         statuses={(s,k):v.get("status") if isinstance(v,dict) else None for s,k,v in payload["put"]}
         payload = {**payload, "put": [[s,k,self._encode_value(db,v)] for s,k,v in payload["put"]]}
         db.execute("INSERT INTO events(event_id,idempotency_key,event_type,object_id,object_version,previous_state_version,new_state_version,producer,time,input_versions,payload,payload_sha256) VALUES(?,?,?,?,?,?,?,?,?,?,?,?)",
-                   (uuid.uuid4().hex,key,event_type,object_id,ver,previous,ver,producer,time.time(),
+                   (source_event_id,key,event_type,object_id,ver,previous,ver,producer,timestamp,
                     canonical(inputs or {}).decode(),canonical(payload).decode(),sha(payload)))
         for section, objkey in payload["delete"]:
             db.execute("DELETE FROM projection WHERE section=? AND object_key=?", (section,objkey))
@@ -346,6 +352,8 @@ class Store:
             db.execute("INSERT INTO projection(section,object_key,value,version,object_status) VALUES(?,?,?,?,?) ON CONFLICT(section,object_key) DO UPDATE SET value=excluded.value,version=excluded.version,object_status=excluded.object_status",
                        (section,objkey,canonical(value).decode(),ver,statuses[(section,objkey)]))
         db.execute("UPDATE projection_meta SET version=? WHERE singleton=1", (ver,))
+        from .observation import commit as observe
+        observe(db,source_event_id,event_type,observation_payload,ver,timestamp)
         if ver % 1000 == 0:
             raw = canonical(self.replay(db))
             db.execute("INSERT INTO snapshots VALUES(?,?,?)", (ver,raw,hashlib.sha256(raw).hexdigest()))

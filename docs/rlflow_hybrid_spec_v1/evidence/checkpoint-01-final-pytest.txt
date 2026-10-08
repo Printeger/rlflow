@@ -1,0 +1,17 @@
+........................................................................ [ 18%]
+........................................ssssssss........................ [ 37%]
+..ssssssssssssss........................................................ [ 56%]
+...................s.....................................s.............. [ 75%]
+...........s........................sssssss............................. [ 94%]
+.....................                                                    [100%]
+=========================== short test summary info ============================
+SKIPPED [18] tests/test_experiments_v2.py:13: External reviewed dispatcher excluded from standalone distribution
+SKIPPED [1] tests/test_h1_adapter.py:53: External H1 implementation excluded
+SKIPPED [7] tests/test_h1_adapter.py:59: External H1 implementation excluded
+SKIPPED [1] tests/test_h1_adapter.py:69: External H1 implementation excluded
+SKIPPED [1] tests/test_h1_adapter.py:83: External H1 implementation excluded
+SKIPPED [1] tests/test_h1_adapter.py:90: External H1 implementation excluded
+SKIPPED [1] tests/test_h1_adapter.py:96: External H1 implementation excluded
+SKIPPED [1] tests/test_h1_adapter.py:112: External H1 implementation excluded
+SKIPPED [1] tests/test_h1_adapter.py:129: External H1 implementation excluded
+349 passed, 32 skipped in 109.97s (0:01:49)

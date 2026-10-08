@@ -1,0 +1,253 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:rlflow:spec:goal-proposal:1.0",
+  "title": "Unapproved goal proposal",
+  "description": "Only a proposal. No input object can grant approval. Paths, references, resource enforceability and trusted approval must be validated by core.",
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "data_mode": {
+      "type": "string",
+      "enum": [
+        "live",
+        "fixture"
+      ]
+    },
+    "project_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 160,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+    },
+    "goal_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 160,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+    },
+    "contract_version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "objective": {
+      "type": "string",
+      "minLength": 10,
+      "maxLength": 16000
+    },
+    "goal_kind": {
+      "type": "string",
+      "enum": [
+        "engineering",
+        "research"
+      ]
+    },
+    "global_conditions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 160,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+          },
+          "description": {
+            "type": "string",
+            "minLength": 1
+          },
+          "required": {
+            "type": "boolean"
+          },
+          "verification": {
+            "type": "object",
+            "properties": {
+              "method": {
+                "type": "string",
+                "enum": [
+                  "deterministic",
+                  "independent_review",
+                  "experiment"
+                ]
+              },
+              "rule": {
+                "type": "string",
+                "minLength": 1
+              },
+              "evidence_required": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "minItems": 1
+              }
+            },
+            "required": [
+              "method",
+              "rule",
+              "evidence_required"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "id",
+          "description",
+          "required",
+          "verification"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 1
+    },
+    "scope": {
+      "type": "object",
+      "properties": {
+        "writable_paths": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1
+        },
+        "protected_paths": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1
+        },
+        "allowed_command_templates": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 160,
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$"
+          },
+          "minItems": 0
+        },
+        "network_access": {
+          "type": "string",
+          "enum": [
+            "none",
+            "allowlist"
+          ]
+        },
+        "allowed_hosts": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
+        }
+      },
+      "required": [
+        "writable_paths",
+        "protected_paths",
+        "allowed_command_templates",
+        "network_access",
+        "allowed_hosts"
+      ],
+      "additionalProperties": false
+    },
+    "budget": {
+      "type": "object",
+      "properties": {
+        "model_sessions": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "model_input_tokens": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "model_output_tokens": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "model_token_enforcement": {
+          "type": "string",
+          "enum": [
+            "hard_required",
+            "soft_approved"
+          ]
+        },
+        "gpu_device_seconds": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "experiment_starts": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "experiment_retries": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "wall_seconds": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "finalization_reserve_fraction": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 0.8
+        }
+      },
+      "required": [
+        "model_sessions",
+        "model_input_tokens",
+        "model_output_tokens",
+        "model_token_enforcement",
+        "gpu_device_seconds",
+        "experiment_starts",
+        "experiment_retries",
+        "wall_seconds",
+        "finalization_reserve_fraction"
+      ],
+      "additionalProperties": false
+    },
+    "stop_rules": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "minItems": 1
+    },
+    "risk": {
+      "type": "string",
+      "enum": [
+        "low",
+        "medium",
+        "high"
+      ]
+    },
+    "approval_status": {
+      "const": "UNAPPROVED"
+    }
+  },
+  "required": [
+    "schema_version",
+    "data_mode",
+    "project_id",
+    "goal_id",
+    "contract_version",
+    "objective",
+    "goal_kind",
+    "global_conditions",
+    "scope",
+    "budget",
+    "stop_rules",
+    "risk",
+    "approval_status"
+  ],
+  "additionalProperties": false
+}
