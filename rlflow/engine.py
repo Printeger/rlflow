@@ -231,7 +231,7 @@ def packet(store, state, task, session):
 
 def dispatch_one(store, *, allow_paused=False):
     with store.lock('scheduler'):
-        snapshot=store.view()
+        snapshot=store.control_view()
         if stopped(store.root) or bool(store.objects('sessions',ACTIVE)):return None
         if snapshot['paused'] and not allow_paused and not snapshot.get('autonomous_tasks'):return None
         pointer=store.root/'runtime/current-release.json'

@@ -31,4 +31,6 @@ Checkpoint10：private core collector与冻结505/32通过，High异常隔离/Un
 
 pytest 默认加载宿主 ROS 插件时缺少 lark。已通过 `PYTEST_DISABLE_PLUGIN_AUTOLOAD=1` 使用项目隔离测试入口，不修改宿主包，也不删除项目测试。
 
+Checkpoint20 outer早门已验证（冻结609/32/1），性能尚未复测；原NFR06失败待修复。事件guard设计发现inotify缺mmap/network/mount覆盖，不能直接削弱现安全门；本项是可继续设计和实现的开发缺口，非外部权限阻塞。
+
 Checkpoint18真实组合idle未达标：300s daemon-only单核CPU1.773328%≥1%，逐秒全控制文件watch也不满足NFR06无全仓库轮询。本项为可继续诊断/修复的开发与验收缺口，不是权限阻塞。下一优化无工作view/key枚举与事件失效代码guard，保留安全门；完整API/B1/长期与M2–M5仍未验证。见IDLE_PERFORMANCE.md，原证据保留。

@@ -1,5 +1,11 @@
 # Hybrid v1 开发进度
 
+Checkpoint20终态覆盖下述过程：closed control early gate与blob/并发snapshot/成功失败close拒绝验证完成；target89+r3新模块10passed，独立High94passed/69.91s无MUST_FIX、冻结全量609passed/32既有skips/1warning/251.96s，原63583/91575均exit0，compileall/pip/diff通过。见CHECKPOINT_20.md/evidence；inner full/generation门未改、CPU未复测。下一无候选inner视图优化与有安全边界的事件guard（不能忽略inotify mmap/mount/network限制）。Goal active，完整M1–M5仍未交付。
+
+Checkpoint20最终冻结回归进展覆盖下述过程：r2 session67982已exit0、89passed/40.39s；补5个错型/缺blob负例与失败关闭并收紧异常，r3新模块10passed/0.83s、compileall/diff通过。当前全量pytest原session63583/log audit/hybrid-v1/checkpoint-20-full-r1.log已确认live，High独立最终目标在跑（checkpoint-20-high-r1.log），源/测试冻结。下一恢复先核对原handle与日志，不因观察超时重启；结果后更新证据/提交，再推进事件失效源码guard/inner优化与实际复测。现无CPU修好/B1/M1完成声明；Goal active。
+
+Checkpoint20进行中：checkpoint19已提交277a13a，全量600/32/1终态。新增Store.control_view仅读closed version/paused/enabled/autonomous且同BEGIN/blob解码/严格类型，自有连接close；dispatch outer用早门不枚举archive，inner完整view/generation/授权/STOP/active/schedule_pending与release夹层原封不动。r1目标87passed/40.34s；补blob与并发snapshot/close测试后r2原session67982/log audit/hybrid-v1/checkpoint-20-target-r2.log运行，源冻结，恢复先查同handle；High只读复核进行中。未提交/未验收/未测CPU改善，下一独立复验/全回归及真正事件失效guard/inner优化，完整Goal active。用户package-lock.json保留不stage。
+
 Checkpoint19终态覆盖下述过程记录：目标r2 107passed/1warning/36.03s、High独立78passed/1warning/48.43s无MUST_FIX、冻结全量600passed/32既有external skips/1warning/241.02s，全部原handle终态exit0，compileall/pip/diff通过。reconcile默认API不变/daemon省尾view、未来测量显式baseline已验证，见CHECKPOINT_19.md/evidence。未复测CPU、未改变checkpoint18失败，下一consistent indexed dispatch早门与事件失效watch，完整Goal active。
 
 Checkpoint19进行中（未提交/未验收）：checkpoint18已提交0405b8d，保留CPU未达标证据。第一最小生产优化reconcile新增默认True的return_view，仅daemon传False省掉丢弃的尾view，所有实际reconcile/采样/安全门未变；driver新显式baseline修复未来精确复算。r1目标107passed/1既有warning/36.11s、High静态无MUST_FIX；按review建议追加真实telemetry发布/core+cursor不变断言，r2原工具session34190/log audit/hybrid-v1/checkpoint-19-target-r2.log运行中，源码/测试冻结，恢复先检查此handle而非重跑。剩余全回归、独立测试/复核、更多indexed空闲dispatch及事件失效watch待做；未复测CPU、无性能通过声明。用户package-lock.json仍不改不stage；Goal保持active。

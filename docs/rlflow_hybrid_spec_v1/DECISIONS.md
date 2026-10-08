@@ -93,6 +93,8 @@ append-only refs增加INSERT成员/severity guard；只读路径仍防御异常�
 工具feature公开起点与event retention floor分开。优先live-only，不隐式回填旧COLLECTED；public_tool_meta缺失/损坏却已有旧公共工具状态拒绝重新初始化。工具日志与CORE_STATUS分同事务观察batch，原模板/count状态解释逐字段保持不变，共享refs验证task/execution筛选。资源telemetry以后必须独立sample ID/时间，不占durable业务seq。
 # Checkpoint13：资源观测旁路与freshness
 
+Checkpoint20选择closed标量/list早门，同BEGIN解blob+strict type与owned reader close；非授权、不增enabledgate，仅替换outer原view，pending/release/inner/generation全保留。独立审查发现inotify不能覆盖mmap/远程/挂载覆盖，所以未直接用事件缓存代替原监控；后续必须解决真实工作边界的完整验证。见CHECKPOINT_20.md。
+
 Checkpoint19采用显式兼容return_view选项，仅daemon丢弃尾view；不重构ObjectMap/legacy交易语义、不删任何reconcile步骤。实际observer验证采样推进但业务不变，baseline修复仅未来日志。见CHECKPOINT_19.md；剩余dispatch/control watcher独立实施，不能由600全量绿替代CPU/B1验收。
 
 保留唯一控制权威：资源采样采用独立latest-only SQLite slot、不入业务events/outbox；同writer lock非阻塞+SQLite timeout=0，竞争丢样，不等待业务30秒锁。indexed active keyset每批32、公平轮转；per-session heartbeat witness独立索引持久化且有界GC，不用易淘汰的单批RAM/map冒充完整高水位。首次/丢witness须实际counter+clock前进才confirm；latest读取累加age并核验当前session binding，修正采样停止或generation变化后的错误freshness。HOST、STATE_FILESYSTEM、SUPERVISOR_PROCESS明确分域，GPU来源未实现为UNKNOWN/null；FRESH不是model STARTED。SSE/UI随后集成，后端切片不作为M1完成门槛。接口、边界及High修复见RESOURCE_TELEMETRY.md/CHECKPOINT_13.md。

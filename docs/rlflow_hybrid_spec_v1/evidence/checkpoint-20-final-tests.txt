@@ -1,0 +1,23 @@
+Checkpoint20: closed consistent control early gate; no performance pass claimed.
+Root r2:
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q tests/test_idle_reconcile.py tests/test_engine.py tests/test_projection_v3.py tests/test_packages.py tests/test_releases.py
+89 passed in 40.39s (before five negative cases).
+Root r3: tests/test_idle_reconcile.py, 10 passed in 0.83s, final source.
+Independent High same five files: 94 passed in 69.91s, no remaining slice MUST_FIX.
+Frozen full:
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q
+609 passed, 32 skipped, 1 warning in 251.96s, exit0/session63583 terminal.
+Established external dispatcher+H1 skips and existing Starlette warning unchanged.
+compileall, pip check, diff check passed. UI unchanged/no browser rerun. No CPU rerun.
+
+SHA256:
+d742d64bb6272306d3e1995af850ce8a291195cc17693434ff04bbd2389a0d09  rlflow/engine.py
+38f364ab1b43d1855cd7790519ff0b9dfaac6eb1c38306a7f89670a35bfea89a  rlflow/store.py
+61612ce0db4ecb2d769d9aed0d1752c0ae84b6e7cdf5b409f4fd019acc725808  tests/test_idle_reconcile.py
+e46275524ba491cf2aec296f0254506b4caa4806407154a1529f7561d3a69800  audit/hybrid-v1/checkpoint-20-target-r2.log
+41c28e99393acd30dab16abfca7518c9e16bc997b91a9baf3283896ccfa06376  audit/hybrid-v1/checkpoint-20-target-r3.log
+b44b225ccab76dad8e4d02ece013d2952928d5e713a6dd5a969553733af58d8e  audit/hybrid-v1/checkpoint-20-high-r1.log
+b54cf4f4b3626878bd88b539688f050b5b2dc3a00da96363808fc2bb0a809a75  audit/hybrid-v1/checkpoint-20-full-r1.log
+
+control_view never authorizes dispatch. Inner full validation/STOP/ACTIVE/pending/release/generation preserved.
+Prior measured CPU1.773328% failure still authoritative; full B1/M1/M2–M5/soak/install not complete.

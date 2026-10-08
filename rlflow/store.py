@@ -269,6 +269,26 @@ class Store:
             state[section]=ObjectMap(self,db,section) if isinstance(value,dict) else value
         return state
 
+    def control_view(self):
+        """Closed consistent scalar early gate; never a dispatch authorization.
+
+        No collection keys/bodies are discovered. The owned read transaction is
+        closed before returning plain values; real work still uses full view.
+        """
+        with contextlib.closing(self.connect()) as db:
+            db.execute('BEGIN')
+            row=db.execute('SELECT version FROM projection_meta WHERE singleton=1').fetchone()
+            if row is None or type(row[0]) is not int or row[0]<0:raise Conflict('invalid control version')
+            state={'version':row[0]}
+            for section,raw in db.execute("SELECT section,value FROM projection WHERE object_key='' AND section IN ('paused','enabled','autonomous_tasks')"):
+                state[section]=self._decode_value(db,json.loads(raw))
+            for field in ('paused','enabled'):
+                if type(state.get(field)) is not bool:raise Conflict('invalid control '+field)
+            autonomous=state.setdefault('autonomous_tasks',[])
+            if type(autonomous) is not list or any(type(key) is not str for key in autonomous):
+                raise Conflict('invalid control autonomous_tasks')
+            return state
+
     def get(self, section, key="", default=None):
         """Indexed object query, with no unrelated objects or event payloads."""
         with self.connect() as db:
