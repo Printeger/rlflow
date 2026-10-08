@@ -47,3 +47,7 @@ START_ACK 写于 exec 前，故仅公开 CLI_RELEASE_ACK/startup_released_at，�
 沿用 Python 服务和无构建 ESM，不增加外部部署、云存储或第二个写入服务。Sites 技能用于 local-only 预览与 browser QA；本机 portable Chrome 在 sandbox=true/disable-gpu 下运行，Fixture 明确标识。纯 reducer 不读取时钟或权限，业务变化仅来自已提交 domain，heartbeat 只更新连接/同步时间。公共分页增加事务内 cursor/project/mode，拒绝迟到页复活已删除对象。
 
 静态 shell 匿名可读但无业务内容；认证 identity 重新确认时清空全部旧 DOM/缓存/details，而非只设置 state=null。认证 ticket+AbortController 与项目 generation 分开，注销时先失效迟到响应。口令原生 fallback POST，CSP form-action self；全部业务文本 textContent。每个详情读取同事务绑定 project/epoch/seq/eventID/digest。对象总缓存 200，保留最近至多 30 execution/10 stage 防止无关任务洪流隐藏执行，紧凑事件摘要 200，不缓存 200 份最大 envelope。未接入的费用、授权条件、日志、资源明确 UNKNOWN/未提供，不能以 Fixture UI 通过宣称 M1 完成。
+
+## 2026-10-08：虚拟化与日志公开边界
+
+事件DOM采用固定64px虚拟窗口，阅读ID/偏移与真实事实分开，geometry不能推进cursor/计数。后台/静止不运行空闲动画；scroll/resize仅按需显示。原始模型JSONL含reasoning/MCP args/results，不能用正则脱敏后整体公开；公共日志下一步先接入明确CORE_STATUS模板并同事务绑定domain lineage，之后工具metadata需单独trusted request/release绑定，私有stdout/stderr不绕过公开策略。具体尚未实现边界见PUBLIC_LOG_IMPLEMENTATION_NOTES.md；不是缩减完整日志验收。
