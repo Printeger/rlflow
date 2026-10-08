@@ -93,6 +93,10 @@ append-only refs增加INSERT成员/severity guard；只读路径仍防御异常�
 工具feature公开起点与event retention floor分开。优先live-only，不隐式回填旧COLLECTED；public_tool_meta缺失/损坏却已有旧公共工具状态拒绝重新初始化。工具日志与CORE_STATUS分同事务观察batch，原模板/count状态解释逐字段保持不变，共享refs验证task/execution筛选。资源telemetry以后必须独立sample ID/时间，不占durable业务seq。
 # Checkpoint13：资源观测旁路与freshness
 
+## Checkpoint27：Store→Auth顺序解决等待期间撤销，不复用先行Access
+
+可信服务guard factory只在writer+BEGIN后进入，Auth锁覆盖实际commit，紧邻提交再次验clock；等待writer期间不持Auth锁，避免阻塞撤销。实际token/session锁内查human/approver/project/CSRF，不接caller Principal/Access为凭据；duplicate仍fresh check并关闭只读txn后退出，不重写或续期旧fact。异常rollback包含core/public表；同进程单Auth owner明确，不冒充多进程一致性。Origin/精确确认与批准事实另由下一固定服务完成，此primitive不授予执行。root+High112相关回归通过，中央Store full62752已终态762passed/32既有skips/1warning/247.08s。后续guard内不得调用非重入Auth方法或反向获取Store锁。
+
 ## Checkpoint26：先冻结可信注册内容，不将内容匹配解释为执行准入
 
 新增独立纯Registry，不接写路由/执行器，protected-startup配置canonical bounded copy至immutable bytes。五binding域隔离含project/mode，dataset域含评价rules；scope_hash绑定整proposal+整config及policy，使只变policy也使旧确认失效。参数schema仅check_schema，不加载远程ref/运行argv；network三层subset、dataset access精确匹配，protected不可降为READ_ONLY。OPAQUE profile/policy configuration只绑定内容，不将未知能力当允许；数据版本仍须后续adapter核验实际来源。下一ApprovalService须服务自持catalogfresh resolve+真实human session，不接caller attestation或Principal当批准。root/High130回归，无剩余MUST_FIX，旧全量/性能不重标；完整T09与M1–M5保留。

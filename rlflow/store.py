@@ -474,40 +474,52 @@ class Store:
             db.commit()
             return self.view()
 
-    def transact_objects(self, event_type, key, objects, mutate, *, expected=None, object_id="control", producer="orchestrator", inputs=None):
+    def transact_objects(self, event_type, key, objects, mutate, *, expected=None, object_id="control", producer="orchestrator", inputs=None, _authorization=None):
         """Mutate an explicit object set atomically; omitted objects remain inaccessible.
 
         Callback receives a partial valid state with only the selected objects.
         Callers must list every object required for authorization and mutation.
+        Optional protected-service guard factory is entered AFTER writer/BEGIN,
+        checked at entry and directly before commit, and held through commit.
+        Never accept this factory or an Access/Principal proof from request JSON.
         """
         with self.lock(), self.connect() as db:
             db.execute("BEGIN IMMEDIATE")
-            previous = db.execute("SELECT version FROM projection_meta WHERE singleton=1").fetchone()[0]
-            if self._existing(db,key,event_type,object_id): return {"version":previous,"duplicate":True}
-            if expected is not None and previous != expected: raise Conflict("stale state version")
-            state=initial();state["version"]=previous
-            selected=set(map(tuple,objects));before={}
-            for section,objkey in selected:
-                if not objkey: raise Conflict("object transaction requires an object key")
-                row=db.execute("SELECT value FROM projection WHERE section=? AND object_key=?",(section,objkey)).fetchone()
-                if row:
-                    value=self._decode_value(db,json.loads(row[0]));state.setdefault(section,{})[objkey]=value;before[(section,objkey)]=canonical(value)
-            details=mutate(state)
-            if state.get("version")!=previous:raise Conflict("state version is controller-owned")
-            from .contracts import validate_runtime_state
-            validate_runtime_state(state)
-            current={(s,k):v for s,k,v in self._rows(state) if k}
-            if set(current)-selected: raise Conflict("mutation outside selected objects")
-            if any(state.get(k)!=v for k,v in initial().items() if not isinstance(v,dict) and k!="version"):
-                raise Conflict("control mutation outside selected objects")
-            puts=[[s,k,v] for (s,k),v in current.items() if before.get((s,k))!=canonical(v)]
-            for section in {s for s,k,v in puts}:
-                if not db.execute("SELECT 1 FROM projection WHERE section=? AND object_key=''",(section,)).fetchone():
-                    puts.append([section,"",{}])
-            payload={"format":2,"put":puts,"delete":[[s,k] for s,k in before if (s,k) not in current],"details":details}
-            ver=self._commit(db,event_type,key,payload,previous,object_id,producer,inputs)
-            db.commit()
-            return {"version":ver,"duplicate":False}
+            with _authorization() if _authorization is not None else contextlib.nullcontext() as authorization:
+                if _authorization is not None and (authorization is None or not callable(getattr(authorization, 'check', None))):
+                    raise Conflict('authorization guard unavailable')
+                if authorization is not None:authorization.check()
+                previous = db.execute("SELECT version FROM projection_meta WHERE singleton=1").fetchone()[0]
+                if self._existing(db,key,event_type,object_id):
+                    if authorization is not None:
+                        authorization.check()
+                        db.commit()  # Close even the read-only retry while the guard is held.
+                    return {"version":previous,"duplicate":True}
+                if expected is not None and previous != expected: raise Conflict("stale state version")
+                state=initial();state["version"]=previous
+                selected=set(map(tuple,objects));before={}
+                for section,objkey in selected:
+                    if not objkey: raise Conflict("object transaction requires an object key")
+                    row=db.execute("SELECT value FROM projection WHERE section=? AND object_key=?",(section,objkey)).fetchone()
+                    if row:
+                        value=self._decode_value(db,json.loads(row[0]));state.setdefault(section,{})[objkey]=value;before[(section,objkey)]=canonical(value)
+                details=mutate(state)
+                if state.get("version")!=previous:raise Conflict("state version is controller-owned")
+                from .contracts import validate_runtime_state
+                validate_runtime_state(state)
+                current={(s,k):v for s,k,v in self._rows(state) if k}
+                if set(current)-selected: raise Conflict("mutation outside selected objects")
+                if any(state.get(k)!=v for k,v in initial().items() if not isinstance(v,dict) and k!="version"):
+                    raise Conflict("control mutation outside selected objects")
+                puts=[[s,k,v] for (s,k),v in current.items() if before.get((s,k))!=canonical(v)]
+                for section in {s for s,k,v in puts}:
+                    if not db.execute("SELECT 1 FROM projection WHERE section=? AND object_key=''",(section,)).fetchone():
+                        puts.append([section,"",{}])
+                payload={"format":2,"put":puts,"delete":[[s,k] for s,k in before if (s,k) not in current],"details":details}
+                ver=self._commit(db,event_type,key,payload,previous,object_id,producer,inputs)
+                if authorization is not None:authorization.check()
+                db.commit()
+                return {"version":ver,"duplicate":False}
 
     def recover(self):
         """Validate the newest snapshot and replay only its tail into projections."""

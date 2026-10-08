@@ -11,6 +11,7 @@ import re
 import secrets
 import threading
 import time
+from contextlib import contextmanager
 from dataclasses import dataclass
 
 ROLES = frozenset({"viewer", "operator", "approver"})
@@ -69,6 +70,14 @@ class Access:
     expires_at: float
     csrf: str | None
     method: str
+
+
+@dataclass(frozen=True)
+class _ApprovalSessionGuard:
+    _check: object
+
+    def check(self):
+        return self._check()
 
 
 class AuthStore:
@@ -146,3 +155,34 @@ class AuthStore:
     def revoke(self, token):
         with self._lock:
             self._sessions.pop(self._key(token), None)
+
+    @contextmanager
+    def approval_guard(self, token, *, project_id, csrf):
+        """Authenticate a human session while a trusted writer transaction owns us.
+
+        Acquire Store writer/BEGIN before this context, never Auth then Store.
+        One protected service owns this in-memory AuthStore: the lock serializes
+        local revoke, not revocation across independent processes. Origin and
+        exact confirmation/contract checks remain the fixed service's duties.
+        This is authentication, NOT an approval fact or execution permission.
+        """
+        with self._lock:
+            owner = threading.get_ident()
+            active = [True]
+            def check():
+                if not active[0] or threading.get_ident() != owner:
+                    raise PermissionError('approval session guard is no longer active')
+                self._expire()
+                access = self._sessions.get(self._key(token)) if isinstance(token, str) and token.isascii() and 20 <= len(token) <= 128 else None
+                if (access is None or access.method != 'session' or access.principal.kind != 'human'
+                        or not access.principal.allows(project_id, 'approver')
+                        or not isinstance(csrf, str) or not csrf.isascii() or not 20 <= len(csrf) <= 128
+                        or access.csrf is None or not hmac.compare_digest(csrf, access.csrf)):
+                    raise PermissionError('live scoped human approval session required')
+                return access
+            try:
+                guard = _ApprovalSessionGuard(check)
+                guard.check()
+                yield guard
+            finally:
+                active[0] = False

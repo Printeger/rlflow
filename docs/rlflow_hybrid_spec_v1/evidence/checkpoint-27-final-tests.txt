@@ -1,0 +1,30 @@
+Checkpoint27: actual-session authentication transaction guard, NOT approval facts
+Parent HEAD: 03891a9
+Root final five modules: 112 passed in 9.28s; session80475 terminal exit0
+Independent High same five: 112 passed in 9.31s; session62069 terminal exit0
+Root frozen full: 762 passed, 32 existing external/H1 skipped, 1 existing
+Starlette warning in 247.08s; original session62752 terminal exit0
+Five modules: tests/test_approval_session_guard.py tests/test_web_auth.py tests/test_store_policy.py tests/test_hybrid_goals.py tests/test_snapshot_maintenance.py
+Root runner: PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q
+Independent runner: env -u PYTHONPATH PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 PYTHONDONTWRITEBYTECODE=1 .venv/bin/python -m pytest -q -p no:cacheprovider
+Full argv: PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q
+Compileall/pip check/git diff --check: exit0
+Independent final code/security scope: no remaining MUST_FIX.
+Final independent source/log/docs check: all six hashes, Parent HEAD and three
+terminal tails matched; no safety/evidence MUST_FIX. No tests rerun.
+Two nonblocking deltas closed: guarded duplicate explicit commit ordering,
+direct rollback equality on all four public meta/events/projection/counter tables.
+First r1 two fixture errors retained: bearer defaultTTL>fixture10 and objects
+returns list. Fixed without changing security requirements; r2/r3 intermediate.
+Store writer+BEGIN beforeAuth, entry/precommit fresh checks, revoke serialized.
+Single protected process/AuthStore owner; no multiprocess revocation guarantee.
+Fixtures write USAGE only, no fabricated real-human approval/Goal execution.
+No ApprovalService/facts/Origin bridge/new route/lease/model/GPU.
+No browser or performance rerun; old results remain bound to old sources.
+SHA256:
+4c4539ba77521127d2a063905d4ceabdc0ff7e6e7f5e81c73fe4a44c5c3892c2  rlflow/store.py
+6fb7bc88ce36a4852f3b4f25a6a4de30bc49f4571ec1e6e078630d31ac0227d0  rlflow/web_auth.py
+62a8d4e9fc2632770f8784470bc27026742436d26d79ce004770efb3525aaf68  tests/test_approval_session_guard.py
+7750b7e6dba037718c2bae573a5adebb6c3deb55101b1585ae55d4d807b09435  audit/hybrid-v1/checkpoint-27-guard-r4.log
+8bf2ff494f1e393989ed3b99ef96887b750778df6883ca1eb9b9ecded7d4a67f  audit/hybrid-v1/checkpoint-27-high-guard-r1.log
+34f6288cf48da080a659c43b188a9fbb417f65e65656946f1edc7dcaf4a74f87  audit/hybrid-v1/checkpoint-27-full-r1.log
