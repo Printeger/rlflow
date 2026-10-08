@@ -1,5 +1,9 @@
 # 当前实现到需求的差距矩阵
 
+checkpoint35完整终态：中央full原12471 exit0 1296/32既有skip/1warning359.97s；独立High原68295 exact四modules ONCE exit0 166/1warning38.34s，11SHA一致、范围MUST关闭、无live测试。下段pending为旧过程，见evidence/checkpoint-35-final-tests.txt。controller仅CORE_FACTS_ONLY，不关闭ARC01/04/完整T12或其它执行验收；下一bounded当前点证明、锁序、实际BLOCKED准入，完整Goal active。
+
+checkpoint35最新系统full原12471 terminalexit0 **1296passed/32既有skip/1warning/359.97s**、11SHA一致，rootcontroller99/5.83s、High静态无范围MUST；独立四modules尚无终态。持久controllerfact/head/双deadline/actualtoken/原source及历史tip恢复已实现，但仅CORE_FACTS_ONLY，不关闭ARC01/04/T12，也未接其它自主写入者准入。候选writer/legacy exclusion/预算/STOP/实际执行及完整M0–M5仍缺，见HYBRID_CONTROLLER_FENCING.md。下一bounded current proof与锁序→实际BLOCKED准入；无新增UI/性能/长期验收。
+
 checkpoint34完整终态：root最终service增量43/31.78s、High43/31.94s；中央full原71114 terminalexit0 1197passed/32既有skip/1warning/350.10s，15SHA一致，范围MUST闭合。下段34WIP为过程历史；持久准备及恢复闭合已交付，但全执行门UNVERIFIED/start拒绝，不证明restartadoption、lease/预算/STOP、工程科研、M1/B1/长期或M0–M5通过。见HYBRID_PERSISTENT_PREPARATION.md/evidence/checkpoint-34-final-tests.txt；下一持久controller fencing与release-denied统一准入。
 
 checkpoint34增量WIP：实际有界candidate copy、source-bound immutable intent/original expectedseal→publish→completion、固定actualowner guard、samewriter来源CAS及历史pointproof、audit/manual+periodic snapshot/recover闭合已实现；root旧九modules366+最终service43、High旧九modules366+增量43终态，中央full原71114尚运行。见HYBRID_PERSISTENT_PREPARATION.md。不再把这些持久准备组件标成“尚无”；但所有执行门UNVERIFIED，restartadoption、完整prepare/start/inspect/collect、controller/writer lease、预算/STOP/实际闭环及完整M0–M5仍缺；无新UI/性能/长期证明。

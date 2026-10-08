@@ -67,7 +67,8 @@ PREPARATION_READ_BYTES = 64*1024**2
 PRIVATE_HOT_SECTIONS = frozenset(('tool_sources','tool_receipts','tool_scan',
     'hybrid_goal_contracts','hybrid_goal_heads','hybrid_goal_commands',
     'hybrid_approval_facts','hybrid_approval_revocations','hybrid_approval_heads','hybrid_approval_commands',
-    'hybrid_preparation_intents','hybrid_preparation_results'))
+    'hybrid_preparation_intents','hybrid_preparation_results',
+    'hybrid_controller_facts','hybrid_controller_heads'))
 
 
 class ObjectMap(dict):
@@ -131,6 +132,7 @@ class Store:
         self._hybrid_draft_auth_owner = None
         self._hybrid_draft_service = None
         self._hybrid_preparation_service = None
+        self._hybrid_controller_service = None
         self._existing_identity = None
         self.root = Path(root).resolve()
         (self.root / "runtime").mkdir(parents=True, exist_ok=True)
@@ -171,6 +173,7 @@ class Store:
                     db.commit()
                 db.execute("CREATE INDEX IF NOT EXISTS projection_status ON projection(section,object_status,object_key)")
                 db.execute("CREATE INDEX IF NOT EXISTS projection_markers ON projection(section) WHERE object_key=''")
+                db.execute('CREATE INDEX IF NOT EXISTS events_type_tip ON events(event_type,seq DESC)')
                 maintenance_new=not db.execute("SELECT 1 FROM sqlite_master WHERE name='snapshot_due'").fetchone()
                 db.execute('CREATE TABLE IF NOT EXISTS snapshot_due (singleton INTEGER PRIMARY KEY CHECK(singleton=1),due_version INTEGER NOT NULL,last_complete INTEGER NOT NULL)')
                 from .observation import initialize_tables
@@ -217,7 +220,8 @@ class Store:
             raise ValueError('existing store requires a regular database')
         store._existing_identity = (info.st_dev, info.st_ino)
         for name in ('_hybrid_auth_owner', '_hybrid_registry', '_hybrid_authority_service',
-                     '_hybrid_draft_auth_owner', '_hybrid_draft_service', '_hybrid_preparation_service'):
+                     '_hybrid_draft_auth_owner', '_hybrid_draft_service', '_hybrid_preparation_service',
+                     '_hybrid_controller_service'):
             setattr(store, name, None)
         db = sqlite3.connect(store.db.as_uri() + '?mode=ro', uri=True, timeout=5)
         try:
@@ -391,6 +395,20 @@ class Store:
 
     def _apply(self, state, payload, db, event):
         preparation_decoded=False
+        from .hybrid_controller import SECTIONS as controller_sections, EVENT as controller_event, validate_transition as controller_transition
+        if (event['event_type']==controller_event or any(s in controller_sections for s,k,v in payload.get('put',[])) or
+                any(s in controller_sections for s,k in payload.get('delete',[])) or
+                set(payload.get('set',{})) & set(controller_sections)):
+            from .hybrid_reads import ReadBudget
+            budget=ReadBudget(db,1024**2)
+            try:
+                decoded={**payload,'put':[[s,k,budget.decode(v)] for s,k,v in payload.get('put',[])]}
+            except (ValueError,TypeError,KeyError,RecursionError):
+                raise Conflict('controller replay decoding exceeds safe envelope') from None
+            controller_transition(decoded,lambda s,k:({} if s in state else None) if k=='' else state.get(s,{}).get(k),
+                event_type=event['event_type'],key=event['idempotency_key'],object_id=event['object_id'],producer=event['producer'],
+                version=event['new_state_version'],registration=self._goal_registration(db))
+            payload=decoded;preparation_decoded=True
         from .hybrid_preparation import SECTIONS as preparation_sections, EVENTS as preparation_events, validate_transition as preparation_transition
         if (event['event_type'] in preparation_events or
                 any(s in preparation_sections for s,k,v in payload.get('put',[])) or
@@ -575,6 +593,16 @@ class Store:
 
     def _commit(self, db, event_type, key, payload, previous, object_id, producer, inputs, *, _authorization=None):
         ver = previous + 1
+        from .hybrid_controller import SECTIONS as controller_sections, EVENT as controller_event, validate_transition as controller_transition
+        if (event_type==controller_event or any(s in controller_sections for s,k,v in payload['put']) or
+                any(s in controller_sections for s,k in payload['delete'])):
+            service=self._check_controller_guard(db,_authorization)
+            def controller_lookup(section,objkey):
+                if objkey=='':return {} if db.execute('SELECT 1 FROM projection WHERE section=? LIMIT 1',(section,)).fetchone() else None
+                return _authorization.budget.object(section,objkey)
+            controller_transition(payload,controller_lookup,event_type=event_type,key=key,object_id=object_id,
+                producer=producer,version=ver,registration=self._goal_registration(db))
+            service.check_live_write(db,payload,_authorization)
         from .hybrid_preparation import SECTIONS as preparation_sections, EVENTS as preparation_events, validate_transition as preparation_transition
         if (event_type in preparation_events or any(s in preparation_sections for s,k,v in payload['put']) or
                 any(s in preparation_sections for s,k in payload['delete'])):
@@ -714,6 +742,67 @@ class Store:
     def _preparation_complete(self, db, state):
         from .hybrid_preparation import validate_complete
         validate_complete(state,self._goal_registration(db),lambda k:self._preparation_event(db,k))
+        from .hybrid_controller import validate_complete as controller_complete
+        controller_complete(state,self._goal_registration(db),lambda k:self._controller_event(db,k),
+                            event_tip=self._controller_tip(db,state['version']))
+
+    def _controller_tip(self, db, version):
+        from .hybrid_controller import EVENT
+        row=db.execute('SELECT idempotency_key,new_state_version FROM events WHERE event_type=? AND seq<=? ORDER BY seq DESC LIMIT 1',
+                       (EVENT,version)).fetchone()
+        return tuple(row) if row is not None else None
+
+    def bind_hybrid_controller(self, service):
+        from .hybrid_controller_service import ControllerService
+        if type(service) is not ControllerService or service.store is not self:
+            raise TypeError('invalid controller owner')
+        with self.lock():
+            if self._hybrid_controller_service not in (None,service):
+                raise Conflict('controller owner cannot be rebound in-place')
+            self._hybrid_controller_service=service
+
+    def _check_controller_guard(self, db, guard):
+        service=self._hybrid_controller_service
+        if service is None:raise PermissionError('protected controller owner required')
+        service.check_guard(db,guard)
+        return service
+
+    def _controller_event(self, db, key, *, max_bytes=256*1024, _parse=None, _decode=None):
+        """Bounded original controller fact/head pair, not a projection self-hash."""
+        from .hybrid_controller import SECTIONS, validate_record, head
+        from .hybrid_goals import check_bytes,digest
+        if _parse is None and _decode is None:
+            from .hybrid_reads import ReadBudget
+            budget=ReadBudget(db,1024**2);_parse,_decode=budget.parse,budget.decode
+        row=db.execute('SELECT event_type,producer,object_id,new_state_version,payload_sha256,CASE WHEN length(CAST(payload AS BLOB))<=? THEN payload END AS payload FROM events WHERE idempotency_key=?',(max_bytes,key)).fetchone()
+        if row is None:return None
+        if row['payload'] is None:raise Conflict('controller source exceeds bound')
+        payload=_parse(row['payload'].encode())
+        if sha(payload)!=row['payload_sha256']:raise Conflict('controller source integrity mismatch')
+        if (type(payload) is not dict or set(payload)!={'format','put','delete','details'} or
+                type(payload.get('format')) is not int or payload['format']!=2 or payload['details'] is not None or type(payload['put']) is not list or
+                type(payload['delete']) is not list or payload['delete']):
+            raise Conflict('controller original source shape mismatch')
+        decoded=[];seen=set();markers=set();values={}
+        for item in payload['put']:
+            if type(item) is not list or len(item)!=3 or not all(type(v) is str for v in item[:2]):
+                raise Conflict('controller original descriptor invalid')
+            section,objkey,value=item
+            if section not in SECTIONS or (section,objkey) in seen:
+                raise Conflict('controller original extra or duplicate object')
+            seen.add((section,objkey));value=_decode(value);check_bytes(value,64*1024)
+            if not objkey:
+                if value!={}:raise Conflict('controller original marker differs')
+                markers.add(section)
+            else:
+                validate_record(section,objkey,value);values[section]=value
+                decoded.append((section,objkey,digest(value)))
+        if len(decoded)!=2 or {s for s,k,h in decoded}!=set(SECTIONS):
+            raise Conflict('controller original fact/head pair required')
+        initial=values[SECTIONS[0]]['request']['previous_fact_key'] is None
+        if markers!=(set(SECTIONS) if initial else set()) or values[SECTIONS[1]]!=head(values[SECTIONS[0]]):
+            raise Conflict('controller original markers or derived head differ')
+        return ((row['event_type'],row['producer'],row['object_id'],row['new_state_version']),sorted(decoded))
 
     def _preparation_event(self, db, key, *, max_bytes=5*1024**2, _parse=None, _decode=None):
         """Indexed closed original single-object preparation event proof."""
@@ -820,7 +909,8 @@ class Store:
             db.execute("BEGIN IMMEDIATE")
             from .hybrid_authority import EVENTS as authority_events
             from .hybrid_preparation import EVENTS as preparation_events
-            if event_type in preparation_events or event_type in authority_events.values() or (event_type=='HYBRID_GOAL_DRAFTED' and self._hybrid_draft_auth_owner is not None):
+            from .hybrid_controller import EVENT as controller_event
+            if event_type==controller_event or event_type in preparation_events or event_type in authority_events.values() or (event_type=='HYBRID_GOAL_DRAFTED' and self._hybrid_draft_auth_owner is not None):
                 raise PermissionError('Hybrid service events require guarded object transactions')
             if self._existing(db,key,event_type,object_id):
                 db.commit()
@@ -884,6 +974,8 @@ class Store:
                 if authorization is not None:authorization.check()
                 from .hybrid_authority import EVENTS as authority_events
                 from .hybrid_preparation import EVENTS as preparation_events
+                from .hybrid_controller import EVENT as controller_event
+                if event_type==controller_event:self._check_controller_guard(db,authorization)
                 if event_type in preparation_events:self._check_preparation_guard(db,authorization)
                 if event_type in authority_events.values():self._check_hybrid_guard(db,authorization)
                 if event_type=='HYBRID_GOAL_DRAFTED' and self._hybrid_draft_auth_owner is not None:

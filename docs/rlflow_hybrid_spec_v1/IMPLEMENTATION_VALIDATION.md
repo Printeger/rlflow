@@ -1,5 +1,9 @@
 # 系统实施验收记录
 
+Checkpoint35完整终态：中央full原12471 exit0 1296/32既有skip/1warning359.97s；独立High原68295 exact四modules ONCE exit0 166/1warning38.34s，11SHA一致、范围MUST关闭、compileall/pipcheck/diff0，无live测试。下段pending为旧过程，见HYBRID_CONTROLLER_FENCING.md/evidence/checkpoint-35-final-tests.txt。CORE_FACTS_ONLY不等于workspace writer、执行或STOP；无新UI/性能/长期/离线validator证明，完整M0–M5仍未完成。
+
+Checkpoint35系统full实际终态：原12471 exit0 **1296passed/32既有外部H1skip/1warning/359.97s**；11SHA一致、compileall/pipcheck/diff0，rootcontroller99/5.83s，High静态MUST关闭；独立四modules一次尚无终态。实际CORE_FACTS_ONLY controller/source/historicaltip恢复闭合见HYBRID_CONTROLLER_FENCING.md/evidence/checkpoint-35-final-tests.txt。执行/候选写开关false，非workspace单写或STOP完成；无新browser/性能/长期/离线validator证明，完整T12/M1/M0–M5仍未完成，Goal active。
+
 Checkpoint34完整终态：中央full原71114 terminalexit0，1197passed/32既有外部H1skip/1既有Starlettewarning/350.10s；15source/test/schema SHA一致，compileall/pipcheck/diff0，root/High最终service增量各43passed31.78/31.94s，范围MUST关闭。持久准备/source原proof/actualowner/originalseal-before-publish及audit/snapshot/recovery/bounded replay已交付，非执行许可；见HYBRID_PERSISTENT_PREPARATION.md/evidence/checkpoint-34-final-tests.txt。当前无live测试，无新UI/性能/长期/离线validator证据，完整T11/M1/M0–M5仍未完成，Goal active。
 
 Checkpoint34持久准备WIP：fixed actualowner/source两次同writer CAS/original expectedseal-before-publish/immutable completion、历史原Goal+approval+prep pointproof、recover bounded decode复用与全部snapshot closure接线。root pre-replayfix九modules366passed75.86s，High pre-fix366passed76.31s；修复后service root43passed31.78s、High43passed31.94s/15SHA一致/无剩余范围MUST，中央full原71114 LIVE，尚不能宣布34完整终态。范围/容量/保留失败日志见HYBRID_PERSISTENT_PREPARATION.md。start仍拒绝，无runtime release/账户或OS证明/restartadoption，不称完整T11/M1/M0–M5通过，Goal active。

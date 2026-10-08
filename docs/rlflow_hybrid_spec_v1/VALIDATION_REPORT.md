@@ -1,5 +1,9 @@
 # 需求包离线校验报告
 
+Checkpoint35系统最终终态：中央full原12471 exit0 1296/32既有skip/1warning359.97s；独立High原68295 exact四modules ONCE exit0 166/1warning38.34s，11SHA一致、范围MUST关闭、compileall/pipcheck/diff0，无live测试。下段pending为旧过程，见evidence/checkpoint-35-final-tests.txt。这不是新的需求包18checks/browser/B1/NFR/soak运行；CORE_FACTS_ONLY不是完整Runtime/ARC/STOP验收，Goal active。
+
+Checkpoint35系统回归实际终态：原12471 exit0 **1296passed/32既有skip/1warning/359.97s**、11SHA一致、compileall/pipcheck/diff0，rootcontroller99/5.83s。High静态无范围MUST，独立四modules尚无终态，见HYBRID_CONTROLLER_FENCING.md/evidence/checkpoint-35-final-tests.txt。这不是本需求包离线18checks新运行，也没有重跑/重标browser、NFR/B1/soak。CORE_FACTS_ONLY不是完整T12/Runtime/STOP，Goal active。
+
 Checkpoint34系统完整终态：中央full原71114 exit0，1197passed/32既有skip/1warning/350.10s，15SHA一致、compileall/pip/diff0；最终service root/High各43passed，范围MUST关闭。见HYBRID_PERSISTENT_PREPARATION.md/evidence/checkpoint-34-final-tests.txt。旧34LIVE/33/32为历史；旧离线18checks/Browser/性能未重跑、不重标。准备非release，start仍拒绝，完整T11–17/M1/M0–M5验收仍未完成，Goal active。
 
 Checkpoint34系统WIP：持久准备与原source/seal、actualowner、CAS、audit/snapshot/recover闭合及bounded prep replay已接线，最终service root/High各43passed、范围MUST闭合；中央full原71114 LIVE尚无终态。pre-fix九modules366结果不能改称修复后完整定向结果；旧离线18checks/Browser/性能未重跑，不归此source。执行门全UNVERIFIED/start拒绝，T11/M1/M0–M5完整验收仍未通过；见HYBRID_PERSISTENT_PREPARATION.md，Goal active。

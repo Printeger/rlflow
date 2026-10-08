@@ -1,5 +1,11 @@
 # 开发决策记录
 
+## Checkpoint35：core-fact fence 不冒充 workspace 独占或 STOP
+
+35冻结最终终态：中央full原12471 exit0 1296/32既有skip/1warning359.97s；独立High原68295 exact四modules一次exit0 166/1warning38.34s，11SHA一致、范围MUST关闭，当前无live。下段LIVE是原决策时过程，见evidence/checkpoint-35-final-tests.txt。下一统一writer→controller锁序和bounded当前点证明，再接实际BLOCKED准入；不得在writer内调用另开读连接的check_token或Preparation公有锁/全文件IO，避免ABBA。
+
+controller SQL fence 明确限 HYBRID_CORE_FACTS_ONLY。持久不可变fact+派生head，双 UTC/boot-monotonic deadline，同epoch expiry takeover加controller epoch；actual process/service UUID与对象身份token由保护端产生。source closure严格原两对象+合法marker、state.version历史tip，阻止被rehashed快照整体遗漏。丢弃token用weakref释放，磁盘fact永不自动adopt。bounded4MiB/4096lineage尚非长期常数热路径；legacy exclusion/执行/预算/STOP/Admission后续开发，见HYBRID_CONTROLLER_FENCING.md。当前full原12471 LIVE，尚无35终态/commit/完整验收。
+
 ## Checkpoint34：先持久化原seal，再发布；准备事实不继承执行权限
 
 实际固定owner服务与实际issued snapshot/plan/bundle分离于caller JSON；有限copy/hash/native metadata在业务writer外，两次事实提交均在writer+同DB事务重验完整原来源、当前head、Registry/epoch/TTL和global CAS。intent保存原expectedseal后才能publish；PREPARED completion还必须索引核验原intent事件。失败/重启物料不由本地manifest自证，原键只返原fact；显式reconcile当前仅UNKNOWN，无自动重建/adoption/model调用。

@@ -77,6 +77,9 @@ def maintain(store,*,seconds=5,max_bytes=32*1024*1024,max_rows=100000,max_nodes=
                 preparation_events={key:store._preparation_event(db,key,max_bytes=max(0,min(budget[0],4*1024**2)),_parse=source_parse,_decode=decode)
                                     for section in ('hybrid_preparation_intents','hybrid_preparation_results')
                                     for key in state.get(section,{})}
+                controller_events={key:store._controller_event(db,key,max_bytes=max(0,min(budget[0],256*1024)),_parse=source_parse,_decode=decode)
+                                   for key in state.get('hybrid_controller_facts',{})}
+                controller_tip=store._controller_tip(db,version)
             check()
             from .contracts import validate_runtime_state
             validate_runtime_state(state);check()
@@ -86,6 +89,8 @@ def maintain(store,*,seconds=5,max_bytes=32*1024*1024,max_rows=100000,max_nodes=
             authority_complete(state,registration,authority_events.get);check()
             from .hybrid_preparation import validate_complete as preparation_complete
             preparation_complete(state,registration,preparation_events.get);check()
+            from .hybrid_controller import validate_complete as controller_complete
+            controller_complete(state,registration,controller_events.get,event_tip=controller_tip);check()
             raw=canonical(state);check()
             if len(raw)>max_bytes:return False
             digest=hashlib.sha256(raw).hexdigest();check()

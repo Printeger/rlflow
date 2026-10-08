@@ -839,6 +839,8 @@
     "hybrid_approval_commands": {"type": "object"},
     "hybrid_preparation_intents": {"type": "object"},
     "hybrid_preparation_results": {"type": "object"},
+    "hybrid_controller_facts": {"type": "object"},
+    "hybrid_controller_heads": {"type": "object"},
     "tool_sources": {
       "type":"object","additionalProperties":{"$ref":"ToolLedger.json#/$defs/source"}
     },

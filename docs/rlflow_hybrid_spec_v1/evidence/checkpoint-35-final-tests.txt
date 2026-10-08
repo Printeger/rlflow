@@ -1,0 +1,93 @@
+Checkpoint35: actual persistent Hybrid CORE_FACTS_ONLY controller fencing
+Base: de06848 (checkpoint34). Branch: hybrid-v1.
+All pytest commands use PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python.
+
+Actual terminal results (not inferred from log progress):
+- Pure domain initial tool stdout: 43pass, then 48pass after persisted mono/no-reset.
+- Core r1 original64719 exit0: 115 passed/1 existing warning/34.10s.
+  Modules: controller domain, preparation service, snapshot maintenance.
+- Controller r1 original31275 exit1: 78 passed/1 fixture failure/2.82s.
+  The wrong-event fixture wrote an identical selected controller value, so no
+  controller mutation occurred. Fixed fixture to change config_hash and exercise
+  actual mutation gate; product authorization was not weakened. Log retained.
+- Controller r2 original58229 exit0: 146 passed/1 warning/35.83s.
+  Modules: both controller modules, preparation service, snapshot maintenance.
+- Controller r3 original65823 exit0: 82 passed/2.60s, both controller modules.
+- Controller r4 original5513 exit1: 91 passed/1 fixture failure/3.54s.
+  SHA corruption was rejected by the pre-existing runtime-event ContractError
+  (ValueError) before the later Conflict path. Audit assertion corrected to its
+  common ValueError rejection contract. Product source checks/bounds unchanged.
+- Controller r5 original12965 exit0: 121 passed/5.38s.
+  Modules: both controller modules plus snapshot maintenance.
+- Final controller r6 original21562 exit0: 99 passed/5.83s, both controller modules.
+- Central full original12471 exit0: 1296 passed, 32 existing external/H1 skips,
+  1 existing Starlette warning, 359.97s. Eleven frozen SHA before/after equal.
+- compileall -q rlflow tests: exit0. pip check: exit0, no broken requirements.
+- git diff --check: exit0.
+- Independent High original68295 exit0: exact four modules ONCE,
+  166 passed/1 existing warning/38.34s. Same eleven SHA before/after equal.
+  Started only AFTER central full terminal; no concurrent suite/benchmark/edits.
+  Final independent review: all finite-scope MUST_FIX closed, no remaining MUST.
+  No live test handles remain.
+
+Independent argv (root is not running this concurrently):
+.venv/bin/python -m pytest -q tests/test_hybrid_controller.py tests/test_hybrid_controller_service.py tests/test_hybrid_preparation_service.py tests/test_snapshot_maintenance.py
+Full argv: .venv/bin/python -m pytest -q
+Ignored audit logs retained locally under audit/hybrid-v1, not overwritten.
+
+Log SHA256:
+4c7a77ffe237778d426d2abcfba8dc532363f12c4c5295b8cd90566920447090 checkpoint-35-core-r1.log
+cd7366e7d8139049e512c566c5e5089c46d4f29e13c0c2a4e80f292908afe23f checkpoint-35-controller-r1.log
+38ea043cceeee993e3694335e745654172654e86120749573a5af0e1cfe43a67 checkpoint-35-controller-r2.log
+d08f4e536a8b99c1d29a40c3a0a6dcc5578a2e765b60f0393250842d38a29808 checkpoint-35-controller-r3.log
+102de09bd63a795a5082000d9e692169ba8bc67d0b428ccc5216f85f2dc20a85 checkpoint-35-controller-r4.log
+7b275c5db9bd06d54be6fdff382aee2ee3db14b094ccd12221f25b040e1d4377 checkpoint-35-controller-r5.log
+b614f6796aff8b4c77b528663434c49b74870d5ddc242fa9ea382ae53b68848f checkpoint-35-controller-r6.log
+a6a99d2e95e0d1f0c44a4ca6182350e19aa992158bedfbfc75a141bba5ae2c7f checkpoint-35-full-r1.log
+75d9e8e934f2fe30e1f4323430b3e07470d788432bef831d91ba26608efc7c9e checkpoint-35-high-final-r1.log
+
+Full before/after exact source/test/schema SHA256:
+85012a07426bd5506b4277420fff01c5fdd3374358fde869389e6766ddb9001b rlflow/hybrid_controller.py
+fbe80bfebc9a8fbe2a854b2c6c3365f80eac64789e6c07aa6ff626e83e0a52b1 rlflow/hybrid_controller_service.py
+749b6486191091cd223a6296337ba92cf282e4b66d48f1ab07584419a43f4968 rlflow/store.py
+7288ae91a007cada668c10116fcc0058939962af7a6fa42e8653fb7516c667fd rlflow/contracts.py
+e94485b5b4c55463b1e0dfc891296181ac0f20ca738b525e687fcaa30415e2d8 rlflow/snapshot_maintenance.py
+84df0fcc6e5a9cb864165a5b217bb1f139deb4967ad931bf1993a98c48f76aef schemas/RuntimeState.json
+2d1cbe91854039951570391b7b808bb854ae37af5ec957717ca7331d42a28095 tests/test_hybrid_controller.py
+3766e8ccdd8676712e73c44a6ad6f9a3dffcd420f2ea40a091ff03dcdd36f2ae tests/test_hybrid_controller_service.py
+d1976ae5545f47ada4f3f29764ba875535b04f817cc841b0897e550e94b1b708 rlflow/hybrid_preparation_service.py
+2f4ad7f06b960c43d901d92f79e0b52a736b3eafdae932dc0511b79e938c8ec4 rlflow/hybrid_preparation.py
+b80fc330333ea68c1ce59868dc514c22e9d419d129b7303158cfd47790a41d57 tests/test_hybrid_preparation_service.py
+
+Independent static review findings and fixes:
+- Persist boot-bound monotonic deadlines; sameepoch takeover requires both UTC
+  and mono elapsed, renewal both unexpired. Kernel identity and clock regressions
+  are live checks, not historical closure requirements.
+- Existing/missing/stale projected head cannot reset INITIAL or fork renewal:
+  actual samewriter indexed original tip and closed lineage/source proof.
+- Original source marker proof must preserve illegality, not discard markers:
+  only INITIAL carries both initial markers; all other original markers rejected.
+- Rehashed snapshot cannot drop whole controller domain: capture indexed tip
+  at/before state.version, reject missing domain, preserve valid old snapshot tail.
+- Issued cache weakrefs release discarded old actual token objects; no disk adoption.
+Latest static High review found no remaining MUST_FIX within this finite slice.
+
+Scope and remaining work:
+- Actual SQLite append fact/update uniquehead, CAS, fixedactualservice/process,
+  token object identity, dual deadlines, originalevent fact/head proof, historical
+  tip, audit/manual+periodic snapshot/recover; no source/schema changes during runs.
+- Fault injections affect only disposable temporary DBs; exact append-only update
+  trigger is restored BEFORE product readers execute. Production trigger unchanged.
+- CORE_FACTS_ONLY does not fence legacy dispatch/experiments/jobs or authorize
+  other autonomous core writers yet. It is not workspace/ARC01/ARC04 exclusivity.
+- candidate_write_enabled and execution_enabled always false;
+  prior_runtime_recovery always UNVERIFIED. No worker/model/session/release starts.
+- Current proof still traverses ancestry, bounded4MiB/4096facts; retained actual
+  tokenobjects bound128. No constanttime/24h-controller/performance claim.
+- No new HTTP/browser/B1/NFR06/soak/offline-validator/engineering/research proof.
+  Existing checkpoints remain bound to their actual source and limited scope.
+- Unified AdmissionService, reservation/settlement, real OS/model/data capability,
+  candidate writer, legacy exclusion, reliable STOP and actual runtime still pending.
+- USER package-lock.json untouched and unstaged; no remote push/deployment.
+Goal remains active. Next: bounded current point proof + lock order + protected
+non-executing durable admission, then actual budget/STOP/execution and full M0-M5.
