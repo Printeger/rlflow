@@ -174,6 +174,19 @@ def create_app(projects, auth, *, origin="http://127.0.0.1:8765", max_streams=8,
         reader = await reader_for(request, project_id)
         return await read(reader.event, event_id=event_id)
 
+    @app.get("/api/v1/projects/{project_id}/logs")
+    async def logs(request: Request, project_id: str, severity: str | None = None, kind: str | None = None,
+                   object_id: str | None = None, after: str = "", limit: int = 50):
+        from .public_logs import page
+        reader = await reader_for(request, project_id)
+        return await read(page,reader=reader,severity=severity,kind=kind,object_id=object_id,after=after,limit=limit)
+
+    @app.get("/api/v1/projects/{project_id}/logs/{log_id}")
+    async def log_body(request: Request, project_id: str, log_id: str):
+        from .public_logs import body
+        reader = await reader_for(request, project_id)
+        return await read(body,reader=reader,log_id=log_id)
+
     @app.get("/api/v1/projects/{project_id}/events")
     async def events(request: Request, project_id: str, after: str = ""):
         nonlocal active_streams

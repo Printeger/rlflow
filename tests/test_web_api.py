@@ -63,6 +63,29 @@ def test_public_event_detail_and_page_cursor_are_scoped_consistent_reads(web):
     assert client.get(url.rsplit("/", 1)[0] + "/not_found").status_code == 404
 
 
+def test_public_logs_scoped_lazy_and_no_path_parameters(web):
+    store, auth, app, client = web
+    route = "/api/v1/projects/project_one/logs"
+    assert client.get(route).status_code == 401
+    login(client)
+    index = client.get(route)
+    assert index.status_code == 200
+    validate("LogPage", index.json())
+    entry = index.json()["items"][0]
+    assert "text" not in entry
+    detail = client.get(route + "/" + entry["id"])
+    assert detail.status_code == 200
+    validate("LogBody", detail.json())
+    assert detail.json()["summary"] == entry and detail.json()["raw_logs"] == "PRIVATE_ONLY"
+    assert client.get(route.replace("project_one", "project_two")).status_code == 404
+    assert client.get(route.replace("project_one", "project_two") + "/" + entry["id"]).status_code == 404
+    assert client.get(route + "/not_found").status_code == 404
+    assert client.get(route + "?limit=201").status_code == 400
+    assert client.get(route + "?kind=task").status_code == 400
+    assert client.get(route + "?object_id=../private").status_code == 400
+    assert str(store.root) not in detail.text
+
+
 def test_anonymous_routes_and_same_origin_dns_boundary(web):
     store, auth, app, client = web
     assert client.get("/health").json() == {"ready": True}

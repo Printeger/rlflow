@@ -37,3 +37,5 @@
 启动释放事实切片冻结 **399 passed / 32 skipped / 135.90s**；初始只读 UI 冻结 **402 passed / 32 skipped / 139.90s**，sandbox Chrome Fixture browser+reducer **9 passed**。High UI 初始范围 MUST_FIX 关闭；详细输出/哈希/失败记录见 CHECKPOINT_03.md、CHECKPOINT_04.md 与 IMPLEMENTATION_VALIDATION.md。Fixture、CLI_RELEASE_ACK 和连接 LIVE 都不能证明供应商模型 RUNNING；日志/资源、完整 M1、M2–M5 与长期验收仍未完成。
 
 Checkpoint05虚拟事件窗口：geometry/reducer/browser11通过，Web/CLI回归11通过；命令和源码hash见CHECKPOINT_05.md。该前端变化不是完整M1或后端100k性能验收。
+
+Checkpoint06公共CORE_STATUS日志后端/API：冻结430passed/32skipped/143.61s，浏览器回归11passed，High本范围MUST_FIX关闭。见CHECKPOINT_06.md/evidence/checkpoint-06-final-tests.txt；状态日志不证明工具/模型实际运行，日志UI、工具metadata、资源、完整M1–M5仍待交付。

@@ -88,3 +88,11 @@ High 发现的两类问题已修：持久化前 candidate/limit/resources 必须
 ## Checkpoint05：虚拟事件列表
 
 geometry/reducer/真实Chrome Fixture浏览器 **11 passed/0 skipped/3.92s**，Web/CLI Python回归 **11 passed/1 warning/7.95s**。本轮只改前端，未重跑全量后端；测试命令/日志/哈希与实际阅读锚点、keyboard、viewport可见性见CHECKPOINT_05.md。虚拟DOM替代200条全挂载，不改变事件事实和权威总数。完整日志/资源、真实来源验收与M1–M5仍未完成。
+
+## Checkpoint06：公共日志后端
+
+CORE_STATUS同事务append-only投影、closed schema、scoped summary/lazy-body API已实现。最终目标子集80 passed/1 warning/5.31s，独立High27日志测试通过且三项integrity/partial-schema finding关闭；Chrome/reducer/geometry回归11passed/0skipped/4.50s，日志checkpoint-06-browser-regression.log。本次Chrome只验证现有UI/SSE不回归，尚无日志UI验证。
+
+初始实验test错误使用未支持的experiments集合，被RuntimeState拒绝；已改实际usage relation fixture，不放宽产品schema。两次全回归在审查修复期间主动SIGINT停止、保留原日志，不列为成功。独立复验后r3最终冻结运行，后端日志的实际边界/失败/恢复与证据见CHECKPOINT_06.md。资源与工具动作metadata、真实供应商、完整M1–M5仍待交付。
+
+r3冻结最终 **430 passed/32 skipped/1 warning/143.61s**，编译/diff check通过；命令/源码hash/实际结果见evidence/checkpoint-06-final-tests.txt。本轮仍无日志UI与真实工具日志验收证明，下一项继续实现。

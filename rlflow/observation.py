@@ -204,6 +204,8 @@ def commit(db, source_event_id, event_type, payload, source_version, timestamp):
         encoded = json.dumps(event,ensure_ascii=False,sort_keys=True,separators=(",",":"),allow_nan=False)
         if len(encoded.encode()) > 2*1024*1024: raise ProtocolError("observation exceeds bounded event size")
         db.execute("INSERT INTO observation_events VALUES(?,?,?,?,?,?)", (seq,event["event_id"],source_event_id,index,encoded,hashlib.sha256(encoded.encode()).hexdigest()))
+        from .public_logs import commit as log_commit
+        log_commit(db,event,hashlib.sha256(encoded.encode()).hexdigest())
     db.execute("UPDATE observation_meta SET seq=?,source_version=?,paused=?,enabled=? WHERE singleton=1", (seq,source_version,flags["paused"],flags["enabled"]))
 
 
@@ -217,10 +219,14 @@ def enable(store, project_id, *, data_mode="live"):
         if existing:
             if existing["project_id"] != project_id or existing["data_mode"] != data_mode:
                 raise ProtocolError("observer identity is immutable")
+            from .public_logs import initialize as initialize_logs
+            initialize_logs(db,existing["seq"])
             return existing["store_epoch"]
         version = db.execute("SELECT version FROM projection_meta WHERE singleton=1").fetchone()[0]
         epoch = "store_" + uuid.uuid4().hex
         db.execute("INSERT INTO observation_meta VALUES(1,?,?,?,0,0,?,1,0)", (project_id,epoch,data_mode,version))
+        from .public_logs import initialize as initialize_logs
+        initialize_logs(db,0)
         # One-time, explicit observation migration. Subsequent writes are incremental.
         rows = []
         for row in db.execute("SELECT section,object_key,value FROM projection"):

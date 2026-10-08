@@ -1,6 +1,6 @@
-# 公共日志后续实现边界（未实现，不能作为验收）
+# 公共日志后续实现边界
 
-2026-10-08，checkpoint05之后的T05/T06/T07接入工作。当前仅事件详情可读，没有公共日志API；完整日志要求仍待完成。
+2026-10-08，checkpoint06已实现CORE_STATUS同事务存储、闭合LogSummary/Body/Page与scoped API，实际证据见CHECKPOINT_06.md。以下方案保留设计来源，不本身作为验收；UI/工具metadata/资源与完整日志仍待完成。
 
 ## 已核实的源风险
 

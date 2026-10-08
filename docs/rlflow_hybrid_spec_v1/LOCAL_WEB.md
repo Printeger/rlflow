@@ -30,6 +30,8 @@
 | `GET /api/v1/projects/{id}/objects?kind=execution&after=...&limit=50` | keyset 公共对象页，最多 200，不读取私有日志/文件 |
 | `GET /api/v1/projects/{id}/events?after={cursor}` | 单项目完整 durable SSE；重连 Last-Event-ID 优先 |
 | `GET /api/v1/projects/{id}/domain-events/{event_id}` | 懒加载单个有界公共事件，project/epoch/seq/digest 校验，不读取私有日志 |
+| `GET /api/v1/projects/{id}/logs?severity=ERROR&kind=task&object_id=ref_...&limit=50&after=...` | CORE_STATUS公共日志summary，索引keyset/high-water；不带正文 |
+| `GET /api/v1/projects/{id}/logs/{log_id}` | lazy固定模板正文与公开来源证明；raw logs PRIVATE_ONLY/tool metadata UNAVAILABLE |
 
 每个读事务都重新校验 project/data_mode，避免数据源替换时越项目泄漏。无权限项目返回 404；源不可用或身份不一致不返回内部 SQLite 错误和路径。原公共字段 allowlist/脱敏仍适用。ROLE_IDENTITY 不是实际运行证据：T05 尚未完成，旧 RUNNING 仍映射 STARTING，usage/cost 缺证据仍 UNKNOWN。
 
@@ -41,8 +43,11 @@ SSE：`domain` 有 durable id；5 秒 `heartbeat` 无 id；`resync_required` 携
 
 ## 验证
 
+公共日志仅证明核心已提交状态观测，不是模型原始stdout/stderr/思维过程。新prepare自动启用；已有观察者不在Web GET升级。若只缺全部三日志表，可在可信终端显式调用原有 `enable(Store(existing_root), existing_project_id, data_mode=existing_mode)`，不重写已有登录config；从启用seq开始记录，coverage_after_seq说明历史缺口。部分缺表拒绝，需后续明确离线恢复，不能新建空refs伪称覆盖完整。日志列表cursor不是SSE cursor，改变kind/id/severity需重新从首页读取。前端日志入口下一项接入，当前仅HTTP API可查询。
+
 ```bash
 PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q tests/test_web_auth.py tests/test_web_api.py tests/test_live_stream.py tests/test_web_local.py tests/test_hybrid_observation.py
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q tests/test_public_logs.py
 ```
 
 包括真实 loopback socket 上提交后的 SSE 事件与 Last-Event-ID 重连；不是模拟业务模型成功。独立 High 审查关闭了读源 TOCTOU 和健康积压误判；最终系统审查仍未完成。

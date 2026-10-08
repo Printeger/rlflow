@@ -51,3 +51,9 @@ START_ACK 写于 exec 前，故仅公开 CLI_RELEASE_ACK/startup_released_at，�
 ## 2026-10-08：虚拟化与日志公开边界
 
 事件DOM采用固定64px虚拟窗口，阅读ID/偏移与真实事实分开，geometry不能推进cursor/计数。后台/静止不运行空闲动画；scroll/resize仅按需显示。原始模型JSONL含reasoning/MCP args/results，不能用正则脱敏后整体公开；公共日志下一步先接入明确CORE_STATUS模板并同事务绑定domain lineage，之后工具metadata需单独trusted request/release绑定，私有stdout/stderr不绕过公开策略。具体尚未实现边界见PUBLIC_LOG_IMPLEMENTATION_NOTES.md；不是缩减完整日志验收。
+
+## 2026-10-08：公共日志实现与恢复拒绝
+
+CORE_STATUS日志同原public event事务提交，不新增调度器或模型调用；正文仅opaque ID/对象版本/有限状态/固定模板，不复制任何自由文本。不从core数据库状态推出generation/request/执行活动，工具日志以后独立绑定。日志游标固定high-water与filter hash，独立于SSE消费位置。普通列表信任同事务compact witness并验证其hash/元数据/source digest；lazy正文再验证实际source bytes和重构模板。过滤命中逐个public envelope核验membership/severity，避免不受限批量最大事件加载。
+
+append-only refs增加INSERT成员/severity guard；只读路径仍防御异常索引与缺log/source。初始化和reader检查三日志表闭合，all absent才允许显式旧库启用；部分缺表拒绝，不自动创造空refs使历史覆盖假完整。未过滤keyset仅对本次窗口验证连续性与floor，不扫描全部历史。真实资源/工具metadata/日志UI与M1长期gate继续保留，不以该status log切片取代。

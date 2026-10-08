@@ -1,0 +1,35 @@
+2026-10-08 CORE_STATUS public log backend, not complete T05/M1.
+Frozen Python source/tests during final r3 execution.
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q -rs
+Exit 0: 430 passed, 32 skipped, 1 warning in 143.61s (0:02:23)
+Raw log: audit/hybrid-v1/checkpoint-06-final-r3-pytest.log
+32 skips: external reviewed dispatcher 18, external H1 14.
+Warning: Starlette TestClient deprecated anyio alias, retained.
+
+Target logs/API/protocol/observation: 80 passed, 1 warning, 5.31s.
+Raw log: audit/hybrid-v1/checkpoint-06-targeted-r5-final.log
+Independent High: 27 public log tests passed, no remaining MUST_FIX.
+Partial-schema prepare/page/filter/body rejection additionally independently checked; state/schema unchanged.
+
+node --test web_checks/reducer.test.mjs web_checks/virtual-list.test.mjs web_checks/browser.test.mjs
+Exit 0: 11 passed, 0 skipped, 4504.846325 ms.
+Raw log: audit/hybrid-v1/checkpoint-06-browser-regression.log
+Local sandbox Chrome + loopback-owned Fixture, existing UI regression only.
+No log UI acceptance claim, no model/GPU/provider execution.
+
+.venv/bin/python -m compileall -q rlflow
+git diff --check
+Both exit 0.
+
+Interrupted pre-final runs retained, not acceptance:
+checkpoint-06-final-pytest.log: SIGINT exit2,219passed/22skipped/64.29s.
+checkpoint-06-final-r2-pytest.log: SIGINT exit2,137passed/8skipped/46.86s.
+Reason: stop pre-freeze regression while independent partial-schema fix was being applied.
+
+SHA256 final sources/tests:
+93b36e0e0f0507c89f91f00d6726108f93d96943676bb1c7d0482f494f7cef5a  rlflow/public_logs.py
+733edffaee47922d1d76d20b7089d0a2d32b427642a0f819bfcccc6f0219bc72  rlflow/observation.py
+e73b9a7d9d897624987294940aac47af23a1cb87b05757e608fca02d0fd92937  rlflow/hybrid_protocol.py
+e789f29575862f7e63e9ce87bd2fdac2c686c10f257b18c2a14de0e8b0e67542  rlflow/web_api.py
+a61ef6bf3f552d9f764f313fae40b59c805ed275cac069177bc14acaa69e39a8  tests/test_public_logs.py
+32ce76c68d10bf4eacf5525293238fbd7844c76316697ebadd480a95433d9c6a  tests/test_web_api.py
