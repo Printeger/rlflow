@@ -13,7 +13,7 @@
 | T02 | 无生成探测与隔离兼容完成 | 315 schema；version+protocol SHA pin；initialize-only 独立握手成功；真实 usage/interrupt/子代理未证实，禁用不支持能力 |
 | T03 | 初始闭合合同已实现，后续扩展中 | GoalContract/Task/Lease/Attempt/Approval/Evidence/Experiment/Usage/Budget/CommandReceipt、公共快照与已注册 payload；完整 API 实际接口尚待 T06/T16 |
 | T04 | 初始事务观测桥已验证，性能验收未完成 | 只读 bounded snapshot/page、增量 counters、同事务 outbox、epoch、真实进程故障测试；B1 100k 与备份恢复集成待验证 |
-| T05 | 启动释放、CORE_STATUS与绑定工具公共返回已验证，完整观测未完成 | REGISTER+private ledger/完整核验→closed公共projection/TOOL_METADATA同事务；v2冻结task/显式覆盖；不授予authority或证明vendor/STARTED；资源telemetry/worker freshness待接入 |
+| T05 | 启动释放、CORE_STATUS、绑定工具公共返回与资源来源后端已验证，完整观测未完成 | REGISTER+private ledger/完整核验→closed公共projection/TOOL_METADATA同事务；真实OS latest slot/loop HB/身份与高水位核验/只读API；不授予authority或证明vendor/STARTED；telemetry SSE/UI待接入 |
 | T06 | 只读基础切片实现，未完整验收 | 同源登录/project scope/短期 Bearer、snapshot/page、bounded durable SSE、loopback CLI；无写命令/任意 artifact；见 LOCAL_WEB.md |
 | T07–T08 | 只读 UI、事件虚拟化/公共日志与绑定工具返回已实现，未完整验收 | 真实 snapshot/SSE reducer、预算/分页/详情、虚拟窗口/锚点/键盘、日志筛选/lazy正文、离线/身份隔离、closed工具metadata/覆盖边界；Fixture Chrome QA 通过；资源、真实运行与完整 M1 验收待完成 |
 | T09–T17 | 未开始 | 合同、策略、受控 Runtime、单写、独立评审、预算、skill、控制与恢复 |
@@ -50,3 +50,5 @@ Checkpoint10：core private collector/ledger、同事务source cursor+receipt语
 Checkpoint11：VERIFIED返回固定request.task_id，旧COLLECTED缺字段不追认，后续session换task不重写历史。target200passed，High独立4passed，冻结全回归 **507passed/32skipped/1warning/188.76s**；见CHECKPOINT_11.md/evidence。下一公共集成的闭合转换、live-only coverage、旧日志兼容/独立模板与refs筛选门槛记录PUBLIC_TOOL_IMPLEMENTATION_NOTES.md。公共tool/API/UI尚未启用，下一切片继续实施，完整Goal活跃。
 
 Checkpoint12：closed工具公共projection/API/UI+独立TOOL_METADATA已接入，v2 task digest与显式live-only覆盖；旧CORE_STATUS原解释、任务/执行refs筛选、同事务rollback与旧ledger缺关联UNKNOWN。High三类finding关闭，独立23passed/31deselected；target166passed，最终protocol/tools43passed；Chrome+Node15passed/0skipped；冻结全回归 **532passed/32skipped/1warning/200.39s**。见CHECKPOINT_12.md/evidence和LOCAL_WEB.md。下一项真实资源telemetry/worker freshness与M1 gate（含性能证据），然后M2–M5；CPU backend与序列化browser Fixture各自证据不混为vendor/完整闭环，完整Goal活跃。
+
+Checkpoint13：真实OS资源/loop heartbeat/独立latest slot及认证只读API已接入，非阻塞bounded fair sampling、持久counter witness与读时age/generation核验；定向98passed，High24passed/当前范围无MUST_FIX，Chrome+Node15passed；最终冻结 **556passed/32skipped/1warning/208.02s**。见CHECKPOINT_13.md/evidence。下一项telemetry独立SSE/资源UI与M1 gate，不把后端来源冒充完整实时资源Dashboard；M1–M5完整Goal保持active。

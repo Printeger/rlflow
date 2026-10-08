@@ -963,6 +963,8 @@ def reconcile(store):
                            lambda s, sid=sid: s["sessions"][sid].update(status="RECONCILE"), object_id=sid)
     from .tool_collector import scan as scan_tools
     scan_tools(store)
+    from .telemetry import sample as sample_telemetry
+    sample_telemetry(store)
     return store.view()
 
 

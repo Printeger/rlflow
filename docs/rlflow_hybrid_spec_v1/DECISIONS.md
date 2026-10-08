@@ -83,3 +83,6 @@ append-only refs增加INSERT成员/severity guard；只读路径仍防御异常�
 专用closed promotion只取已提交可信receipt；PublicObject通用/工具变体互斥闭合，SHA是trusted core内部一致校验而非抵抗同权限恶意DB writer的签名。新validation_version=2绑定task，旧v1不追认。只读API/UI同步新kind与TOOL_METADATA模板，工具返回不表示模型启动/成功/authority。
 
 工具feature公开起点与event retention floor分开。优先live-only，不隐式回填旧COLLECTED；public_tool_meta缺失/损坏却已有旧公共工具状态拒绝重新初始化。工具日志与CORE_STATUS分同事务观察batch，原模板/count状态解释逐字段保持不变，共享refs验证task/execution筛选。资源telemetry以后必须独立sample ID/时间，不占durable业务seq。
+# Checkpoint13：资源观测旁路与freshness
+
+保留唯一控制权威：资源采样采用独立latest-only SQLite slot、不入业务events/outbox；同writer lock非阻塞+SQLite timeout=0，竞争丢样，不等待业务30秒锁。indexed active keyset每批32、公平轮转；per-session heartbeat witness独立索引持久化且有界GC，不用易淘汰的单批RAM/map冒充完整高水位。首次/丢witness须实际counter+clock前进才confirm；latest读取累加age并核验当前session binding，修正采样停止或generation变化后的错误freshness。HOST、STATE_FILESYSTEM、SUPERVISOR_PROCESS明确分域，GPU来源未实现为UNKNOWN/null；FRESH不是model STARTED。SSE/UI随后集成，后端切片不作为M1完成门槛。接口、边界及High修复见RESOURCE_TELEMETRY.md/CHECKPOINT_13.md。

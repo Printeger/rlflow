@@ -238,6 +238,8 @@ def enable(store, project_id, *, data_mode="live"):
             initialize_logs(db,existing["seq"])
             from .public_tools import initialize as initialize_tools
             initialize_tools(db,existing['seq'],existing['source_version'])
+            from .telemetry import initialize as initialize_telemetry
+            initialize_telemetry(db)
             return existing["store_epoch"]
         version = db.execute("SELECT version FROM projection_meta WHERE singleton=1").fetchone()[0]
         epoch = "store_" + uuid.uuid4().hex
@@ -246,6 +248,8 @@ def enable(store, project_id, *, data_mode="live"):
         initialize_logs(db,0)
         from .public_tools import initialize as initialize_tools
         initialize_tools(db,0,version)
+        from .telemetry import initialize as initialize_telemetry
+        initialize_telemetry(db)
         # One-time, explicit observation migration. Subsequent writes are incremental.
         rows = []
         for row in db.execute("SELECT section,object_key,value FROM projection"):
@@ -257,6 +261,10 @@ def enable(store, project_id, *, data_mode="live"):
 
 class ObservationReader:
     """Read-only queries; construction never creates or migrates a state store."""
+    def telemetry(self):
+        from .telemetry import latest
+        return latest(self)
+
     def __init__(self, root, *, expected_project_id=None, expected_data_mode=None):
         self.db = Path(root).resolve() / "runtime" / "research.db"
         self.expected_project_id, self.expected_data_mode = expected_project_id, expected_data_mode

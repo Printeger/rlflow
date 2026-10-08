@@ -2,6 +2,8 @@
 
 目前仍可推进开发，没有需要终止完整 Goal 的外部阻塞。
 
+Checkpoint13：真实资源来源、loop heartbeat、非阻塞latest slot与项目scope只读API已实现。独立复核发现的陈旧FRESH、轮转丢witness、防御性JSON异常边界和同sid新generation误关联已修复；telemetry SSE/资源UI/B1/M1 gate仍属开发缺口，不是外部阻塞。只有监督循环心跳，不宣称模型活动或完整进程树资源；不会启动付费模型/GPU来填证据。
+
 Checkpoint11：private VERIFIED返回固定历史task关联，旧缺字段保持未知；公共projection/log/API/UI仍待实现，属于开发缺口而非外部阻塞。不得用当前session回填旧任务，或直接把private receipt放入公共allowlist。
 
 Checkpoint12：公共工具返回projection/log/API/UI代码已接入；High task digest与损坏/恢复覆盖边界finding关闭。仍可自主推进资源telemetry/worker freshness/M1 gate与M2–M5，无新的外部阻塞。旧ledger历史不隐式回填，损坏tool coverage保留RESYNC_REQUIRED等待显式离线恢复，而非重置未知历史。

@@ -1,0 +1,82 @@
+Checkpoint13 frozen evidence (2026-10-08; baseline192a2f2)
+Scope: backend OS sources / worker freshness / readonly API, NOT SSE resources UI or complete M1.
+Commands:
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q tests/test_telemetry.py tests/test_hybrid_protocol.py tests/test_web_api.py tests/test_engine.py
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q tests/test_telemetry.py (independent High)
+node --test web_checks/*.test.mjs
+.venv/bin/python -m compileall -q rlflow
+.venv/bin/python -m pip check (No broken requirements found)
+git diff --check (passed)
+Read-only independent review: no remaining MUST_FIX within backend scope; four findings fixed; no source writes.
+Exception injection: isolated temporary Store + unittest.mock, actual parser calls2/host calls1; not real4KiB parser attack.
+Failure history retained: console sys.path collection3; fixture14 fail; realworker fixture overlap1 fail; not accepted runs.
+Initial full550/32 predates fixes, final556/32 below. 32 established external dispatcher/H1 skips; one established Starlette warning.
+Browser uses isolated loopback fixtures / sandbox Chrome; existing UI regression only; no new resource UI claims.
+Source and raw log SHA256 (raw audit logs available in working environment, summaries tracked here):
+8a25cdee3b251594e70d7ea28830bcab0e781f442cbd34997aa5f3ae5c8407ef  rlflow/telemetry.py
+990ebbd5358749987aca24e892b543f55ba814bbfdaaa8571b9df14fed182d3b  rlflow/telemetry_sources.py
+29d5da572ae0a30f2e5b1b49f23964ec2690f7475ba8ee64bb1ff80e3604fdf1  rlflow/worker_heartbeat.py
+9a0ae97e33d23f9aa4079b7d9ad5c2940a58eb94279dadec97ab669ba2626f18  rlflow/worker.py
+dfb8080456a0083b0807112f309006a95530cd54b5346804a5d785d7df3a066d  rlflow/engine.py
+3019b2b3fee910b033c669c9b1f52604f4f35eefc218c677d37d6b7f06a26086  rlflow/observation.py
+32e6a08de2238d613f803ec857990d8930c524efe39b17c1bebc50a2bd5799ae  rlflow/hybrid_protocol.py
+c8d353d1a78bee22466a0c38147569dc2e062c3063e6c7829077d9bd1bc1de74  rlflow/web_api.py
+13d60e776c297efb50b65f03154f03ea9e8877d4d634dd10a6967f508599e9f7  tests/test_telemetry.py
+33904b10473281b7dd2d399967e6048e368cf8ee2ef039f0aa283465dd219930  audit/hybrid-v1/checkpoint-13-target-r1.log
+441480c2b6f4475b78a6e12d3c9900acf5739c67c0746d748c9028812e01f751  audit/hybrid-v1/checkpoint-13-target-r2.log
+4073dd2fa8e30af8bdafb3ff3058f3c7bdd203741b5d6b7941f72138a069cf6b  audit/hybrid-v1/checkpoint-13-target-r3.log
+2760eb11718f70e325623a1468716180f030ac5072ccba1f43c89d9de490398f  audit/hybrid-v1/checkpoint-13-target-r4.log
+19b71757a37ead414f290e3073c89e0903bb4f63a0ed09b04a4ba9952b23d3a1  audit/hybrid-v1/checkpoint-13-target-r5.log
+06fb6dcf9c83b35ca4552756e1fb9c9279b5097f51c4c7802b64aff2edec55d5  audit/hybrid-v1/checkpoint-13-target-r6.log
+6280b62436fcf2b85069ccb1d3a502a4b143619d523c155e45cb966b9e22998a  audit/hybrid-v1/checkpoint-13-full-r1.log
+db0c47d438a169b6c1f3062a8fc3b9e4066a0f82b9da09584f793f7f01914eec  audit/hybrid-v1/checkpoint-13-full-r2.log
+60fe8e059ec3d5e34606a0e6229a3f8fc6a013f27f07c0c6ae0f513143e4b40f  audit/hybrid-v1/checkpoint-13-high-r1.log
+bfccd5cc563830e1aea46f43ad09eb0e170ff7880c65c263f6640fc24a75f712  audit/hybrid-v1/checkpoint-13-browser-r1.log
+b8eee7994d044803a0005469b6ddfe117a24585ca0d781b7dd4b6c28447ccd67  audit/hybrid-v1/checkpoint-13-exception-injection.log
+
+Final captured summaries:
+........................................................................ [ 61%]
+...s........................sssssss..................................... [ 73%]
+........................................................................ [ 85%]
+........................................................................ [ 97%]
+............                                                             [100%]
+=============================== warnings summary ===============================
+.venv/lib/python3.12/site-packages/starlette/testclient.py:37
+  /home/mint/rl_dev/rlflow_standalone/.venv/lib/python3.12/site-packages/starlette/testclient.py:37: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = typing.Callable[[], typing.ContextManager[anyio.abc.BlockingPortal]]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+556 passed, 32 skipped, 1 warning in 208.02s (0:03:28)
+........................................................................ [ 73%]
+..........................                                               [100%]
+=============================== warnings summary ===============================
+.venv/lib/python3.12/site-packages/starlette/testclient.py:37
+  /home/mint/rl_dev/rlflow_standalone/.venv/lib/python3.12/site-packages/starlette/testclient.py:37: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = typing.Callable[[], typing.ContextManager[anyio.abc.BlockingPortal]]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+98 passed, 1 warning in 28.74s
+........................                                                 [100%]
+=============================== warnings summary ===============================
+.venv/lib/python3.12/site-packages/starlette/testclient.py:37
+  /home/mint/rl_dev/rlflow_standalone/.venv/lib/python3.12/site-packages/starlette/testclient.py:37: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = typing.Callable[[], typing.ContextManager[anyio.abc.BlockingPortal]]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+24 passed, 1 warning in 3.25s
+  ...
+1..15
+# tests 15
+# suites 0
+# pass 15
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 6501.230988
+PASS: injected heartbeat parser RecursionError -> UNKNOWN; calls=2
+PASS: injected host RecursionError -> dropped sample; calls=1
+PASS: domain replay/version/cursor unchanged; isolated fixture cleaned
+Scope: defensive exception injection, NOT an actual 4KiB JSON parser attack
+

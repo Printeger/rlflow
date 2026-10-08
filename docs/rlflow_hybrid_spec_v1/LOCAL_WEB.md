@@ -72,3 +72,9 @@ node --test web_checks/reducer.test.mjs web_checks/virtual-list.test.mjs web_che
 ```
 
 测试启动 stdin 控制、loopback 临时 fixture，检查实际持久化提交到 SSE/DOM、离线追平、208 项总数与有界窗口、XSS 文本、键盘详情、手机无横向溢出、日志high-water/过滤/lazy正文/乱序和刷新失败保留、身份更换和迟到响应、无 JS 原生 POST。新增工具浏览器case使用序列化可信core Fixture，证明API/SSE/UI路由，不证明实际CPU/vendor执行；真实model-free CPU→core→公共查询另由test_public_tools验证。结束关闭 Chrome、服务并清理其唯一临时目录。截图保存在忽略的 web_checks/artifacts；不触碰真实 state、模型、GPU或根目录用户 package-lock。
+
+Checkpoint13新增认证只读 `GET /api/v1/projects/{project_id}/telemetry`，返回独立latest-only真实OS样本或null，完整合同见RESOURCE_TELEMETRY.md。新prepare显式初始化空slot；旧observer必须可信终端显式enable，GET不会升级。core reconcile做nonblocking采样，单独Web服务不启动scheduler/模型或后台sampler，因此无core采样时不会假造资源。sample_age与worker freshness不同于server heartbeat；来源陈旧、generation变化和未知GPU不显示0。Dashboard telemetry SSE/资源面板下一项接入，现有browser通过不证明它们已交付。
+
+```bash
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q tests/test_telemetry.py
+```

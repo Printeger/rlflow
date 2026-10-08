@@ -169,6 +169,11 @@ def create_app(projects, auth, *, origin="http://127.0.0.1:8765", max_streams=8,
         reader = await reader_for(request, project_id)
         return await read(reader.page, kind=kind, after=after, limit=limit, include_cursor=True)
 
+    @app.get("/api/v1/projects/{project_id}/telemetry")
+    async def telemetry(request: Request, project_id: str):
+        reader = await reader_for(request, project_id)
+        return await read(reader.telemetry)
+
     @app.get("/api/v1/projects/{project_id}/domain-events/{event_id}")
     async def domain_event(request: Request, project_id: str, event_id: str):
         reader = await reader_for(request, project_id)

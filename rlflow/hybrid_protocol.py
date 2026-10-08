@@ -204,6 +204,27 @@ OBJECTS['LogBody']['allOf'] = [{
 }]
 
 
+MEASURE = nullable({'type':'number','minimum':0})
+RESOURCE_PROCESS = obj({'scope':{'const':'SUPERVISOR_PROCESS'},'status':enum('KNOWN','UNKNOWN'),
+                        'cpu_seconds':MEASURE,'rss_bytes':nullable(COUNT)})
+RESOURCE_HEARTBEAT = obj({'status':enum('FRESH','STALE','UNKNOWN'),'counter':nullable(COUNT),'age_seconds':MEASURE})
+OBJECTS['Telemetry'] = obj({
+    'schema_version':{'const':VERSION},'sample_id':ID,'sampler_epoch':ID,'sample_seq':{'type':'integer','minimum':1},
+    'observed_at':{**TIME,'pattern':'Z$'},'project_id':ID,'store_epoch':ID,'data_mode':enum('live','fixture'),
+    'source':{'const':'CORE_OS_SAMPLE'},'observability':{'const':'PARTIAL'},'sample_age_seconds':MEASURE,
+    'host':obj({
+        'cpu':obj({'scope':{'const':'HOST'},'status':enum('KNOWN','UNKNOWN'),
+                   'utilization_percent':nullable({'type':'number','minimum':0,'maximum':100})}),
+        'memory':obj({'scope':{'const':'HOST'},'status':enum('KNOWN','UNKNOWN'),
+                      'total_bytes':nullable(COUNT),'available_bytes':nullable(COUNT)}),
+        'disk':obj({'scope':{'const':'STATE_FILESYSTEM'},'status':enum('KNOWN','UNKNOWN'),
+                    'total_bytes':nullable(COUNT),'available_bytes':nullable(COUNT)})}),
+    'gpu':obj({'scope':{'const':'GPU'},'status':{'const':'UNKNOWN'},
+               'utilization_percent':{'type':'null'},'memory_used_bytes':{'type':'null'}}),
+    'workers':{'type':'array','maxItems':32,'items':obj({'execution_id':OPAQUE_ID,
+               'process':RESOURCE_PROCESS,'heartbeat':RESOURCE_HEARTBEAT})},'workers_truncated':{'type':'boolean'}})
+
+
 @lru_cache(maxsize=1)
 def schemas():
     root = Path(__file__).with_name("hybrid_schemas")
@@ -234,6 +255,23 @@ def validate(name, value):
     if schema is None:
         raise ProtocolError("unknown contract", "UNSUPPORTED_CAPABILITY")
     validate_schema(schema, value)
+    if name == 'Telemetry':
+        if value['sample_id'] != value['sampler_epoch']+':'+str(value['sample_seq']):
+            raise ProtocolError('invalid telemetry sample identity')
+        measures = [(value['host']['cpu'],('utilization_percent',)),
+                    (value['host']['memory'],('total_bytes','available_bytes')),
+                    (value['host']['disk'],('total_bytes','available_bytes'))]
+        measures += [(w['process'],('cpu_seconds','rss_bytes')) for w in value['workers']]
+        measures += [(w['heartbeat'],('counter','age_seconds')) for w in value['workers']]
+        for metric,keys in measures:
+            if any((metric['status']=='UNKNOWN') != (metric[key] is None) for key in keys):
+                raise ProtocolError('inconsistent telemetry availability')
+            if 'total_bytes' in keys and metric['status']=='KNOWN' and metric['available_bytes']>metric['total_bytes']:
+                raise ProtocolError('invalid telemetry availability')
+        for worker in value['workers']:
+            h = worker['heartbeat']
+            if h['status']!='UNKNOWN' and (h['counter']<1 or (h['status']=='FRESH') != (h['age_seconds']<=15)):
+                raise ProtocolError('invalid heartbeat freshness')
     if name == "Budget":
         if value["unknown_exposure"] > value["reserved"] or value["available"] != max(0, value["limit"] - value["consumed"] - value["reserved"]):
             raise ProtocolError("invalid budget conservation")

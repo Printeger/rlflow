@@ -49,6 +49,9 @@ def run(path):
     deadline = min(start + request['limit'],request.get('overall_deadline_monotonic',float('inf')))
     phase_policy=request.get('startup_policy',{'preparing_seconds':60,'release_seconds':60,'ack_seconds':60})
     try:
+        from .worker_heartbeat import Heartbeat
+        heartbeat = Heartbeat(request)
+        heartbeat.tick()
         def prepare():
             from .isolation import codex_command
             compute = request.get('compute', {})
@@ -91,6 +94,7 @@ def run(path):
             record(d,'READY',{'session':request['id'],'generation':request['generation'],'identity':identity(os.getpid())})
         release_started=time.monotonic()
         while not (d / 'release').exists():
+            heartbeat.tick()
             release_deadline = min(release_started + request.get('release_wait_seconds', phase_policy['release_seconds']), deadline)
             if time.monotonic() >= release_deadline or (d / 'cancel').exists() or stopped(request['root']):
                 raise RuntimeError('bounded release cancelled/timed out')
@@ -127,6 +131,7 @@ def run(path):
             owned=_group_identity(proc.pid)
             wait_deadline=min(deadline,time.monotonic()+phase_policy['ack_seconds'])
             while not (d/'codex-identity.json').exists():
+                heartbeat.tick()
                 if proc.poll() is not None or time.monotonic()>wait_deadline:raise RuntimeError('held CLI identity unavailable')
                 time.sleep(.01)
             owned=json.loads((d/'codex-identity.json').read_text())
@@ -149,6 +154,7 @@ def run(path):
             os.set_blocking(fd, False)
             pending = memoryview(request['prompt'].encode())
             while pending:
+                heartbeat.tick()
                 if time.monotonic() >= deadline or stopped(request['root']) or (d/'cancel').exists():
                     raise RuntimeError('wall budget or STOP during prompt delivery')
                 _, writable, _ = select.select([], [fd], [], min(.02, max(0, deadline - time.monotonic())))
@@ -160,6 +166,7 @@ def run(path):
             proc.stdin.close()
             # WNOWAIT retains the group leader until owned descendant cleanup is done.
             while os.waitid(os.P_PID, proc.pid, os.WEXITED | os.WNOHANG | os.WNOWAIT) is None:
+                heartbeat.tick()
                 if request.get('resources'):
                     from .resources import verify_group,stats
                     group=verify_group(request['resources']);observed=stats(group)

@@ -120,3 +120,7 @@ private VERIFIED工具返回保存已核验request.task_id，旧缺失不补、�
 ## Checkpoint12：绑定工具返回公共纵向切片
 
 实际model-free CPU→private collector→closed public projection/query、独立TOOL_METADATA与task/execution筛选、v2绑定冻结task、live-only覆盖/旧v1 UNKNOWN、epoch/损坏覆盖拒绝、工具日志故障整体回滚已验证。目标166passed/1warning/93.28s；最终冻结protocol/tools43passed/25.72s，全回归 **532passed/32skipped/1warning/200.39s**。High23passed/31deselected/23.93s，三类MUST_FIX关闭。Chrome+Node **15passed/0skipped/6.46s**，截图已查看；工具browsercase序列化Fixture证明DB/API/SSE/UI而非CPU/vendor，与真实CPU后台证据分开。compileall/pip check/diff通过；入口不存在、旧单event断言、top-level闭合声明失败及主动停止的首轮full均保留，见CHECKPOINT_12.md/evidence/checkpoint-12-final-tests.txt。资源telemetry/freshness、完整M1–M5和长期gate仍未完成。
+
+## Checkpoint13：真实资源与 worker freshness 后端
+
+HOST/STATE_FILESYSTEM/SUPERVISOR_PROCESS明确分域、loop限频best-effort心跳、非阻塞bounded公平采样、independent latest slot/持久indexed witness、CAS与读时age/当前generation绑定核验、项目scope只读API已验证。定向98passed/28.74s；High24passed/3.25s与防御性异常注入通过，当前后端范围MUST_FIX关闭；冻结全回归 **556passed/32skipped/1warning/208.02s**，Chrome+Node15passed/0skipped/6.50s。原32外部依赖skip与1个Starlette warning不增加。过程失败、deep JSON证据边界、命令/hash见CHECKPOINT_13.md/evidence。无telemetry SSE/资源UI或历史曲线；不是完整M1/M0–M5验收，下一项继续实时消费及B1。
