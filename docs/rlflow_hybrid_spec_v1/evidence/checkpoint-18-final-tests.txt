@@ -1,0 +1,31 @@
+Checkpoint18 — finite actual-daemon idle; CPU target NOT met, full B1 false
+Production source remains checkpoint15 4623b42; this checkpoint adds probe/tests/docs only.
+
+Root regression:
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q tests/test_acceptance_idle_v1.py tests/test_acceptance_history_v1.py tests/test_acceptance_tasks_v1.py
+13 passed in 2.54s (audit/hybrid-v1/checkpoint-18-unit-r4.log)
+Independent High: same 13 cases, 13 passed in 2.53s (audit/hybrid-v1/checkpoint-18-high-r1.log)
+Startup/final read-only review: no remaining safety MUST_FIX.
+compileall, pip check (No broken requirements found), git diff --check passed.
+No new full-suite/browser rerun claimed; no vendor/model/GPU/API or active Goal.
+
+300s command and scope: IDLE_PERFORMANCE.md
+Parent tool session90403 terminal exit0; owned child1146995 terminal intentional SIGTERM -15, owns=false.
+Actual 300.0008994229138s reported CPU1.7733280167604935% (single core) >=1%.
+301 stored-row recomputation: 300.00082542188466s, CPU delta5.32s, CPU1.7733284541862842%, peak RSS39862272B.
+First baseline not serialized: 74.001us before first stored row. Cannot independently exactly reconstruct reported baseline; stored rows independently confirm failure.
+Core/event100001/public100051/tasks10000 (DONE, completion all false)/sessions0, unchanged business/source, empty daemon.log.
+Final telemetry sample_seq297, auxiliary sampler progress only.
+NFR06 no-full-repository-polling condition still unmet; no NFR06/B1/M1/soak/M2–M5 pass.
+
+SHA256 at frozen test/measurement version:
+df362b621fe24b9c8bbce87cfadc89405ac1f9123ea4a68862fce63df1bf1c25  tests/acceptance_idle_v1.py
+ec416775600741d7fb979ee8b8933fb5e8fd2240be319b61409b55d4e392a774  tests/test_acceptance_idle_v1.py
+3f3fb5df53dafb35b0c3b845fc98d808eb473c910c50afba0dc34c5e463891c7  audit/hybrid-v1/checkpoint-18-idle-r1.log
+3f3fb5df53dafb35b0c3b845fc98d808eb473c910c50afba0dc34c5e463891c7  docs/rlflow_hybrid_spec_v1/evidence/checkpoint-18-idle.jsonl
+3ecde35ff2460fb5407af39de5e3a5007c5f94c52a6e99b133f6aade8c32602e  audit/hybrid-v1/checkpoint-18-unit-r4.log
+ef03d59b241da7197021330965969a54d44c87cb86fbfca68af26025699f201f  audit/hybrid-v1/checkpoint-18-high-r1.log
+6481c5f03d08ef80651d5f2a2d5e3bda0ada6b0362b50b04e24d37fcc28259e9  audit/hybrid-v1/checkpoint-18-idle-r1/state/runtime/research.db
+bb148ad0b22bfbe27632915e3985b1a643bcf3fb1836f6fa84e045ad3756db4c  audit/hybrid-v1/checkpoint-16-history-r1/state/runtime/research.db
+
+Next: serialize raw first baseline in future driver; optimize idle indexed-read path and event-invalidated code guard without weakening consistent reads, STOP/authority or prepare/post-prepare code generation. Preserve this unsuccessful baseline; do not rerun unchanged probe to replace it.

@@ -1,5 +1,7 @@
 # Hybrid v1 开发进度
 
+Checkpoint18 组合idle终态exit0：100k真实历史只读backup+10k DONE/all-false归档任务，真实daemon测300.000899s，CPU单核1.773328% **未达<1%**，采样RSS39862272bytes；core100001/public100051、sessions0、业务/来源不变、子进程已回收。telemetry最终seq297只证明采样进展。短回归13passed/2.54s，High启动安全无剩余MUST_FIX；终态独立复核进行中。session90403已终态不重启；见IDLE_PERFORMANCE.md/evidence/checkpoint-18-idle.jsonl。原始结果保留，不调阈值；逐秒全控制仓库watch也不满足NFR06无全仓库轮询条款。下一项优化空闲view/key枚举及事件失效式代码guard，保留STOP/授权/代码generation门，再以新版本复测。完整B1、M1 gate及M2–M5未完成，Goal保持active。
+
 Checkpoint17：归档任务100/1k/10k真实Store/公共桥探针r2终态exit0、每档audit==replay/core61/session0；10k scoped/legacy write p95=7.061/14.747ms、viewkeys2.677ms、无工作CPU p50=10.257ms/次，不能等同5min idle或活跃闭环。High发现assert可删除调用的测量保真缺陷已修：实际调用移出assert、两driver拒绝-O、实际负例验证；root20passed、独立7passed。见TASK_PERFORMANCE.md/evidence。生产未改；下一项组合100k/10k、有限idle/活跃工作与完整B1，M1 gate及M2–M5仍未完成，Goal active。
 
 2026-10-08。完整目标保持 M0–M5 / T00–T25，不以首个切片作为完成。

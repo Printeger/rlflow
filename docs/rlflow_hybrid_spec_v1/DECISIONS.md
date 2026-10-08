@@ -99,6 +99,10 @@ append-only refs增加INSERT成员/severity guard；只读路径仍防御异常�
 
 critical domain/control保持原FIFO；optional source独立task和单latest payload槽，共享byte cap，不让可丢弃来源失败/序列化失败中断durable追平。增龄基准在query前，选送时补偿query/queue elapsed；网络时间不能精确观测不承诺零延迟。原采样source_state_version是因果下界，不是领域seq，也不能事后读取新head贴版本；旧槽缺witness时null/workerUNKNOWN，保留原body/digest。UI使用snapshot/domain全局O(1) execution barrier，宁可短暂全批UNKNOWN，不维护无界ID版本表、也不让较新sample_seq解除旧generation屏障。资源更新只渲染独立面板，不产生业务动画/计数/历史曲线。见CHECKPOINT_14.md。
 
+## Checkpoint18：有限daemon测量保留未达标证据
+
+Checkpoint18补充：严格allowlist只读备份100k fixture历史，再事务增加10k归档task，不由label暗授调度权限。使用独立Python wrapper的PDEATHSIG与完整父身份前后检查，不用多线程父中的preexec_fn；所有启动后打印/测量均在直接child cleanup finally。源码冻结单次300s真实daemon结果1.773328%单核CPU，未达目标，不改阈值或混用API/B1证据。全仓库watch仍违反NFR06独立条件；下一优化保留同read事务/授权/STOP/prepare前后generation。first基线未序列化明确披露，raw rows独立计算亦未达标，下一driver修复不篡改本次证据。见IDLE_PERFORMANCE.md。
+
 ## Checkpoint15：移出周期性全状态构造
 
 选择兼容完整快照的两阶段维护：core 第1000次写同事务只标记 due；单个可选线程从一致只读事务构造/validate/hash，非阻塞 writer 事务核对 immutable tip 后原子发布快照与 acknowledgement。新版 due 不被旧构造清除，不新增业务事件或第二个控制 writer。增加 marker 部分索引，不据此声称 ObjectMap 全 key 枚举已经解决。首次缺表迁移与已有槽损坏严格区分，实际 BLOB 正文核验，不信摘要列独自证明完整。保留显式手动 snapshot 与原恢复格式。暂不直接引入 chunk 格式，减少对既有恢复合同的同时改动；full-state RSS/WAL/协作 deadline 非硬时限的限制明确保留，B1 必须另测。见 SNAPSHOT_MAINTENANCE.md。

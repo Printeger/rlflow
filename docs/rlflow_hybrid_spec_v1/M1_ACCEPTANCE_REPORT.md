@@ -28,3 +28,5 @@
 M1 gate **未通过**，不是失败即停止整个Goal。真实历史固定单对象cardinality 10k→100k探针已终态exit0、ratio1.041488≤2与recover==audit==replay通过，见 HISTORY_PERFORMANCE.md；只证明该单轴，不代替完整B1。随后按证据测真实10k任务/活跃工作、B1读写与idle、维护RSS/WAL，并继续真实来源与长期场景。不能通过删除历史、放宽时限、编造counter或无说明跳过来通过。
 
 M2–M5 待执行：GoalContract/可信authority/命令/STOP/lease/runtime/结算/独立评审、实验与科研状态、资源可靠性、安装迁移、可信远程与历史纯回放。可按依赖开展设计/静态探索，但可写闭环上线必须满足可信批准与可靠STOP，不由只读Dashboard通过代替。
+
+Checkpoint18补测两轴组合：真实100k历史backup+10k归档任务，daemon-only 300.000899s单核CPU1.773328%，未达<1%；业务与来源不变、sessions0、采样RSS38.016MiB。原始证据见IDLE_PERFORMANCE.md；没有API/活跃工作/限定B1硬件，不宣称NFR06通过，且当前逐秒全控制仓库watch本身违反无全仓库轮询条件。下一项是保留安全不变量的空闲热路径优化，不降低验收门槛。

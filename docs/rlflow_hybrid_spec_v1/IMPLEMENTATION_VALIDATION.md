@@ -131,6 +131,10 @@ private VERIFIED工具返回保存已核验request.task_id，旧缺失不补、�
 
 HOST/STATE_FILESYSTEM/SUPERVISOR_PROCESS明确分域、loop限频best-effort心跳、非阻塞bounded公平采样、independent latest slot/持久indexed witness、CAS与读时age/当前generation绑定核验、项目scope只读API已验证。定向98passed/28.74s；High24passed/3.25s与防御性异常注入通过，当前后端范围MUST_FIX关闭；冻结全回归 **556passed/32skipped/1warning/208.02s**，Chrome+Node15passed/0skipped/6.50s。原32外部依赖skip与1个Starlette warning不增加。过程失败、deep JSON证据边界、命令/hash见CHECKPOINT_13.md/evidence。无telemetry SSE/资源UI或历史曲线；不是完整M1/M0–M5验收，下一项继续实时消费及B1。
 
+## Checkpoint18：组合历史/归档任务的真实daemon idle
+
+有限真实300.000899s区间，100k实际历史backup+10k实际归档task，CPU单核1.773328% **未达<1%**；采样RSS39862272bytes、sessions0、core100001/public100051保持不变、来源SHA不变、daemon诊断空、直接child已TERM/reap，父exit0。原始301采样见evidence/checkpoint-18-idle.jsonl，精确基线未单独存储限制及raw区间独立重算同样未达标见IDLE_PERFORMANCE.md。root短回归13passed/2.54s，独立High13passed/2.53s且raw重算/DB不变式/身份/SHA核验一致、无剩余MUST_FIX；pip check/diff通过。生产未改，不新增全量/浏览器通过声明；NFR06全仓库轮询条件亦未满足，完整Goal保持active，下一安全热路径优化而非调阈值。
+
 ## Checkpoint14：独立 telemetry SSE 与资源 UI
 
 latest-only可丢弃帧/无durable id/optional独立task/关键FIFO优先，query/queue实际选送增龄、原sample source版本+客户端snapshot/domain O(1) barrier、旧槽null/workerUNKNOWN只读、重复/迟到不续鲜、项目/身份隔离及真实资源DOM已验证。target63passed/5.78s，High33Python/5JSpassed，两类MUST_FIX关闭；sandbox Chrome+Node20passed/0skipped/9.19s（真实HOST OS、业务明确Fixture），desktop/mobile已查看。冻结全回归 **562passed/32skipped/1warning/209.07s**，静态/依赖/diff通过。作用域误放assert的r4/high r1失败保留并修正，不放宽age精确断言。见CHECKPOINT_14.md/evidence/RESOURCE_TELEMETRY.md。仍需M1 gate/B1历史与snapshot维护性能、M2–M5/闭环/长期验收，未发布或调用paid模型/GPU。
