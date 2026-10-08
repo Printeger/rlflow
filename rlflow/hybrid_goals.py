@@ -22,6 +22,10 @@ PROPOSAL = deepcopy(OBJECTS['GoalContract']['properties']['proposal'])
 REQUEST = obj({'action': {'const': 'propose_goal_draft'}, 'project_id': ID,
                'data_mode': enum('live', 'fixture'), 'actor': ACTOR,
                'idempotency_key': ID, 'expected_revision': COUNT, 'proposal': PROPOSAL})
+# Optional only for compatibility with original immutable draft receipts.
+# The future HTTP command version must require this field, never precheck only.
+REQUEST['properties']['expected_state_version'] = {**COUNT, 'maximum': 2**63-1}
+REQUEST['properties']['control_command_id'] = ID
 DRAFT_CONTRACT = deepcopy(OBJECTS['GoalContract'])
 DRAFT_CONTRACT['properties'].update(state={'const': 'DRAFT'}, approval_id={'type': 'null'}, outcome={'type': 'null'})
 RECORDS = {
@@ -48,7 +52,13 @@ def revision_key(proposal):
 
 
 def command_key(request):
+    if 'control_command_id' in request:return request['control_command_id']
     return 'goal_command_' + sha([request['action'], request['actor'], request['project_id'], request['data_mode'], request['idempotency_key']])
+
+
+def control_command_key(actor, project_id, data_mode, idempotency_key):
+    """Shared HTTP namespace across actions; old internal keys stay immutable."""
+    return 'control_' + sha([actor,project_id,data_mode,idempotency_key])
 
 
 def bounded_copy(value):
@@ -72,6 +82,11 @@ def check_bytes(value, limit=MAX_BYTES):
 def validate_request(request):
     check_bytes(request)
     validate_schema(REQUEST, request)
+    if 'expected_state_version' in request and type(request['expected_state_version']) is not int:
+        raise ProtocolError('invalid expected state version')
+    if ('control_command_id' in request and request['control_command_id']!=control_command_key(
+            request['actor'],request['project_id'],request['data_mode'],request['idempotency_key'])):
+        raise ProtocolError('control command identity mismatch')
     p = request['proposal']
     if type(request['expected_revision']) is not int or type(p['contract_version']) is not int or p['contract_version'] != request['expected_revision'] + 1:
         raise ProtocolError('contract revision must advance by one')
@@ -121,6 +136,8 @@ def validate_record(section, key, record):
         request = record['request'];validate_request(request)
         if key != command_key(request) or record['request_hash'] != digest(request) or record['contract_key'] != revision_key(request['proposal']) or record['contract_hash'] != digest(request['proposal']):
             raise ProtocolError('draft receipt identity mismatch')
+        if 'expected_state_version' in request and record['accepted_state_version'] != request['expected_state_version']+1:
+            raise ProtocolError('draft receipt global version mismatch')
 
 
 def validate_persisted(state):
@@ -210,7 +227,8 @@ def differences(before, after, path=''):
     return rows
 
 
-def propose(store, proposal, *, principal, project_id, data_mode, idempotency_key, expected_revision):
+def propose(store, proposal, *, principal, project_id, data_mode, idempotency_key, expected_revision,
+            expected_state_version=None, _authorization=None, _control_command_id=None):
     """Create an immutable draft revision + CAS head + original receipt atomically.
 
     project_id/data_mode come from trusted core registration. No missing tools
@@ -220,12 +238,18 @@ def propose(store, proposal, *, principal, project_id, data_mode, idempotency_ke
     if not isinstance(principal, Principal) or not principal.allows(project_id, 'operator'):
         raise ProtocolError('goal proposal requires scoped operator', 'PERMISSION_DENIED')
     from .observation import ObservationReader
-    head = ObservationReader(store.root).head()
+    try:head = ObservationReader(store.root).head()
+    except ProtocolError as error:
+        if _authorization is not None:raise Conflict('draft observation source unavailable') from error
+        raise
     if (head['project_id'], head['data_mode']) != (project_id, data_mode):
         raise ProtocolError('store differs from registered project', 'PERMISSION_DENIED')
-    request = bounded_copy({'action': 'propose_goal_draft', 'project_id': project_id, 'data_mode': data_mode,
+    request = {'action': 'propose_goal_draft', 'project_id': project_id, 'data_mode': data_mode,
         'actor': {'id': principal.id, 'kind': principal.kind}, 'idempotency_key': idempotency_key,
-        'expected_revision': expected_revision, 'proposal': proposal})
+        'expected_revision': expected_revision, 'proposal': proposal}
+    if expected_state_version is not None:request['expected_state_version']=expected_state_version
+    if _control_command_id is not None:request['control_command_id']=_control_command_id
+    request = bounded_copy(request)
     validate_request(request)
     p = request['proposal'];request_hash = digest(request);ck = command_key(request);rk = revision_key(p)
     hk = head_key(project_id, data_mode, p['goal_id'])
@@ -250,7 +274,9 @@ def propose(store, proposal, *, principal, project_id, data_mode, idempotency_ke
         state.setdefault(SECTIONS[2], {})[ck] = {'request': request, 'request_hash': request_hash,
             'contract_key': rk, 'contract_hash': contract['hash'], 'accepted_state_version': state['version'] + 1}
         return {'contract_key': rk, 'request_hash': request_hash}
-    result = store.transact_objects('HYBRID_GOAL_DRAFTED', ck, selected, change, object_id=request_hash, producer='hybrid-core')
+    kwargs={'expected':expected_state_version,'object_id':request_hash,'producer':'hybrid-core'}
+    if _authorization is not None:kwargs['_authorization']=_authorization
+    result = store.transact_objects('HYBRID_GOAL_DRAFTED', ck, selected, change, **kwargs)
     # Store's duplicate branch returns the *current* state version. Only the
     # immutable original receipt determines the response of a retried command.
     with store.connect() as db:

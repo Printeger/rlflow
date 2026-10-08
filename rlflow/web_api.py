@@ -21,8 +21,9 @@ COOKIE = "rlflow_session"
 class SameOriginBoundary:
     """Pure ASGI: preserve SSE deadlines all the way to the socket send."""
 
-    def __init__(self, app, *, origin, host):
+    def __init__(self, app, *, origin, host, control_enabled=False):
         self.app, self.origin, self.host = app, origin, host
+        self.control_enabled=control_enabled
 
     async def __call__(self, scope, receive, send):
         if scope["type"] != "http":
@@ -44,6 +45,10 @@ class SameOriginBoundary:
             await send(message)
 
         if repeated_boundary_header or headers.get(b"host") != self.host.encode() or (b"origin" in headers and headers[b"origin"] != self.origin.encode()):
+            path=scope['path']
+            if self.control_enabled and path.startswith('/api/v1/projects/') and ('/commands' in path or path.endswith('/approval-confirmations')):
+                from .hybrid_control import ControlError, error_response
+                return await error_response(ControlError(403,'PERMISSION_DENIED','same-origin request required'))(scope,receive,safe_send)
             return await JSONResponse({"detail": "same-origin request required"}, status_code=403)(scope, receive, safe_send)
         return await self.app(scope, receive, safe_send)
 
@@ -55,7 +60,8 @@ class Project:
     data_mode: str = "live"
 
 
-def create_app(projects, auth, *, origin="http://127.0.0.1:8765", max_streams=8, stream_options=None):
+def create_app(projects, auth, *, origin="http://127.0.0.1:8765", max_streams=8, stream_options=None,
+               control_services=None, max_control_jobs=4):
     parsed = urlsplit(origin)
     if parsed.scheme not in {"http", "https"} or not parsed.netloc or parsed.path or parsed.query or parsed.fragment or parsed.username:
         raise ValueError("origin must be a canonical HTTP origin")
@@ -68,7 +74,7 @@ def create_app(projects, auth, *, origin="http://127.0.0.1:8765", max_streams=8,
     app = FastAPI(docs_url=None, redoc_url=None, openapi_url=None)
     active_streams = 0
 
-    app.add_middleware(SameOriginBoundary, origin=origin, host=parsed.netloc)
+    app.add_middleware(SameOriginBoundary, origin=origin, host=parsed.netloc,control_enabled=control_services is not None)
 
     def access(request):
         authorization = request.headers.get("authorization")
@@ -211,6 +217,10 @@ def create_app(projects, auth, *, origin="http://127.0.0.1:8765", max_streams=8,
                               **(stream_options or {}))
         active_streams += 1
         return response
+
+    if control_services is not None:
+        from .hybrid_control import install
+        install(app,control_services,registry,auth,origin=origin,max_jobs=max_control_jobs)
 
     static = Path(__file__).with_name("static")
     @app.get("/", include_in_schema=False)

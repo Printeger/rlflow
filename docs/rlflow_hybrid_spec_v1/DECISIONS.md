@@ -142,3 +142,15 @@ T09的前置是T01/T03，不是完整M1退出门槛；IMPLEMENTATION_PLAN§3亦�
 ## Checkpoint15：移出周期性全状态构造
 
 选择兼容完整快照的两阶段维护：core 第1000次写同事务只标记 due；单个可选线程从一致只读事务构造/validate/hash，非阻塞 writer 事务核对 immutable tip 后原子发布快照与 acknowledgement。新版 due 不被旧构造清除，不新增业务事件或第二个控制 writer。增加 marker 部分索引，不据此声称 ObjectMap 全 key 枚举已经解决。首次缺表迁移与已有槽损坏严格区分，实际 BLOB 正文核验，不信摘要列独自证明完整。保留显式手动 snapshot 与原恢复格式。暂不直接引入 chunk 格式，减少对既有恢复合同的同时改动；full-state RSS/WAL/协作 deadline 非硬时限的限制明确保留，B1 必须另测。见 SNAPSHOT_MAINTENANCE.md。
+
+## Checkpoint29：可信写桥不复用先行Principal或旧命令权限
+
+最终29补充：root/High289定向与冻结full原10082exit0/867passed32既有skips1warning267.24s终态，source/log SHA及确切证据见evidence/checkpoint-29-final-tests.txt。下段“full运行”保留为过程，当前无live测试；仍非执行授权、完整T16/M1或Goal完成。
+
+operator和approver使用独立issuedguard type/membership，不为提交DRAFT临时加批准role。protected startup固定服务/Store/Auth/项目/模式/epoch，writer等待后实际session重新核验并锁覆盖commit；bound旧whole-state入口先于_existing拒绝Hybrid服务事件，普通/幂等与改名写集合都不能绕过。legacy未bound内部DRAFT仍兼容，oldreceipt/request/hash不回填。
+
+command1.1单独URN/closed仅submit_goal、approve、revoke；HTTP sharedcontrolkey绑定actor/project/mode/clientidem，三个action共用核心unique event key而非另建影子账本，客户端JSON不得指定actor、root、Registry或service。Core Store必须实核global expectedversion与goal/authority revision，server precheck不能代替CAS。默认create_app/control_services=None及旧CLI1.0仍RO，不因工具更新自动开放user批准。
+
+同源session/CSRF+角色、bounded JSON与actualfuture容量保护真实POST；client断连不是rollback，不提前释放；命令DTO只显示原fact as-of/version且执行false，不公开raw witness或误判现时批准。旧同源middleware仅对opt-in控制错误输出统一Error，旧RO合同保留。合法Registry50k结构读取容量错配已修，有限4MiB读取包络涵盖原literal编码约6x与重复读取；合法literal组合是保守容量回归，不虚称已复现旧2MiB失败。CAS摘要只返回授权的一致current_version，前后scope复查并拒绝corrupt类型；source失败sanitized503而非client验证或版本冲突。
+
+root/High289目标回归通过，actualsocket断连及正常owned回收是证据，不声称writer仍阻塞时下线/UI/安装/lease/真实工程科研/M1完整证据；新中央全量原10082运行。后续直接推进可信配置安装、proposal/authority公共桥与确认UI，再STOP/fencing/runtime/实验，不把首切片当完整T16或Goal。

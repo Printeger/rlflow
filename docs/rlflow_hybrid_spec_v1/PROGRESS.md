@@ -1,5 +1,27 @@
 # Hybrid v1 开发进度
 
+Checkpoint29完整终态覆盖下述live过程：protected operator DraftService/全局CAS、command1.1与defaultRO/显式opt-inHTTP写桥、actualowned socket断连容量/持久原receipt/条件批准，root/High各289定向passed，四项范围finding关闭，无剩余MUST_FIX。冻结full原10082terminal exit0：867passed/32既有外部/H1skips/1既有Starlette warning267.24s；compileall/pip/diff0、offline18checks；source/schema/logSHA见evidence/checkpoint-29-final-tests.txt，接口与边界见HYBRID_CONTROL_API.md。当前无live测试/负载，USER package-lock不动不stage。默认CLI仍只读、没有安装配置开关/确认UI/完整proposal-approval公共展示/MCP/STOP新执行/lease/model或工程科研闭环，无新browser/性能证据，完整T09/T16/M1/B1/24h/8h与M0–M5 Goal active。下一直接实现可信配置安装入口与公共读桥，再确认UI/STOP/fencing/runtime，不把本次commandSUCCEEDED当executionREADY或全Goal通过。
+
+Checkpoint29当前全量原session10082 live，audit/hybrid-v1/checkpoint-29-full-r1.log。仅查同handle直到终态，勿重起或并行测试/benchmark，source/tests/schema冻结。最新提交21c1061，29未提交，源结果见下条目标/独立终态；User package-lock保留。
+
+Checkpoint29最终目标终态：rootr5原50814exit0，289passed1既有warning28.73s；High原19197exit0，同13modules289passed1既有warning28.89s、范围无剩余MUST_FIX。actualsocket客户端超时→pending保持→429→实际DRAFT提交→原receipt重试→prepare/条件批准→owned回收通过；不声称阻塞writer下线、UI/CLI安装入口或执行。合法高结构/literal编码包络、CAS授权摘要、uniformboundary/source503均闭合；旧command1.0 unchanged。offline spec18checks通过/新schema package-docs相同。当前root冻结全量checkpoint-29-full-r1.log运行，原handle下条登记，source/test/schema冻结，无parallel tests/bench，795仅绑定28。后续full终态归档与commit，然后接CLI可信opt-in配置/只读proposal和authority桥/确认UI；完整Goal active，USER package-lock不动。
+
+Checkpoint29 r4原96741终态288passed/1failed28.80s（1既有warning）：合法literal-marker膨胀catalog+大合法proposal整HTTP链通过；corrupt-version测试期望503而先行ObservationReader source ProtocolError误映射成400。已在guarded propose的source读失败转source Conflict，legacy无guard行为保留；summary仍实际int/int64核验不echo。读预算保守4MiB有限，literal组合是包络回归，不声称已复现旧2MiB失败（approval request仅nonce，不含整个proposal，High已纠正跨record粗算）。原50k节点/60000metadata容量finding仍是真实问题且已修。当前rootr5原handle后条登记，source/testfreeze，无parallel；尚未独立HTTP/full终态，Goal active。
+
+Checkpoint29 HTTP扩展：r1原47147终态277passed23.99s，新增owned真实loopback uvicorn+httpx断连/超时、pool实际容量直到workerterminal、持久DRAFT原receipt重试、实际nonce批准及owned thread/lifespan回收；r2原57544终态278passed25.11s，皆1既有Starlette warning。High进一步发现合法高结构catalog读取容量、CAS缺current_version、旧boundary错误不符合新Error合同三项；候选修复已落盘（aggregate结构cap覆盖2MiB合法字节包络，不缩窄Registry；授权前后再验scope的一致current_version；opt-incontrol wrongOrigin/重复header统一Error，旧RO保持），新增高结构60000 metadata合法approve/GET/retry、stale与撤销后无摘要泄漏、raw重复header负例。DTO标as_of_state_version，不冒充当前authority。rootr3原handle见后条，source/tests冻结，不并行。无UI/CLI安装开关/lease/执行证明，完整Goal active。
+
+Checkpoint29 HTTP候选已接入（未提交）：command1.1独立URN/closed submit_goal-approve-revoke；create_app默认control_services=None仍只读，可信startup固定双服务/Store/Auth/project/mode/root/Origin/Registry；有界JSON/结构/时间、actual session/角色/CSRF/Origin；共享HTTP control_command_id由actor/project/mode/clientkey派生，跨action同key冲突由同一核心unique event事务保证，旧内部receipt/key不改写。POST confirmations是临时nonce视图；POST commands202只表示事实已持久，DTO SUCCEEDED不执行；GET command有界原receipt/source查询、Bearer只读、不序列化registry witness。独立有限worker pool容量绑定真实future，断连不提前释放，lifespan等待回收。High发现旧Store.transact duplicate/noop旁路，已在_existing前拒绝Hybrid服务事件（bounddraft及所有新authority），补真实负例；不会把假guard当合法factory。此前DraftService root241passed16.65s原15116已终态，但新delta需复验：现在root13modules checkpoint-29-control-r1.log运行，源码/测试冻结，暂无新full/实际socket/browser/安装UI证明。795只绑定28；完整T09/T16/M0–M5 Goal active，用户package-lock不动。
+
+Checkpoint29 DraftService候选已落盘：独立OperatorSessionGuard/issued identity与approval完全分离；fixed Store/Auth/project/mode/epoch owner，服务本次active requesthash；bound Store draft duplicate及任意draft集合写入都需actual operator guard/actor，Auth锁涵盖commit，finally清理，unbound legacy不回填不增权。内部propose增加private factory桥，requiredglobalCAS在服务拒绝None；无HTTP/command1.1/执行。CAS High原90556已terminal182passed10.51s/无MUST_FIX，解冻后新source，旧CAS测试结果不能代替新源。root11modules checkpoint-29-draft-service-r1.log运行（下条原handle登记），新增真实writer/SQLite等待撤销/到期、角色分离、fake/copy/foreign/cross-thread/afterexit guard、duplicate fresh-auth、commitcleanup/四public表rollback、epoch/owner及generic改名旁路负例。源码测试冻结，无parallel tests/bench；795全量仅绑定28，Goal active。
+
+Checkpoint29全局CAS前置定向终态：r2原44734exit0，7modules182passed10.51s；尚未新全量、未提交。High获准独立同7模块一次复验，root无parallel tests/benchmark并保持source/test冻结。下一同29直接加入独立operator-session守卫与固定DraftService，不把operator临时升级approver，随后command1.1/显式opt-inHTTP桥；旧config默认只读、不信JSON actor/catalog/path，不自动READY或执行。完整Goal active。
+
+Checkpoint29当前r2原session44734 live，audit/hybrid-v1/checkpoint-29-global-cas-r2.log；恢复只查此handle，勿重复/并行或source/test编辑。latest提交21c1061仅绑定28/795，29CAS未提交、尚未独立执行；User package-lock保留。
+
+Checkpoint29 r1原73359终态1failed/181passed10.50s：绕过caller CAS的负例实际已由RuntimeState validator拒绝，预期异常类型误写ProtocolError；标准contracts包装为ContractError，已仅修正测试精确类型与global version reason，不弱化gate。下一r2单次原handle执行；仍无operator-session/HTTP桥或新full结果，源码冻结期间不并行，Goal active。
+
+Checkpoint29写桥前置开始（未提交）：28已提交21c1061/795全量终态。先给内部DRAFT request增加兼容optional expected_state_version，旧request/hash不回填；新值绑定完整request与原receipt，实际Store.expected与core receipt accepted_version=expected+1双校验，duplicate仍先原receipt后CAS。还没有operator-session DraftService/command1.1/HTTP桥，不能只把server resolve的Principal传旧propose当作持续认证。root冻结定向checkpoint-29-global-cas-r1.log运行，见后续原handle；源码/测试冻结，无parallel测试/benchmark；全量795仅绑定28，用户package-lock保留，Goal active。
+
 Checkpoint28完整终态覆盖下述live过程：不可变条件性批准/撤销、实际human session确认、固定服务与核心事务gate、原receipt/fact/head三对象source核验及手动/周期snapshot+recover闭合完成；root/High9modules分别207passed12.82s/12.75s，无剩余范围MUST_FIX。冻结全量原38620 terminal exit0：795passed/32既有外部/H1skips/1既有Starlette warning/255.47s；compileall/pip/diff0。见HYBRID_APPROVAL_FACTS.md/evidence/checkpoint-28-final-tests.txt。目前没有live测试或负载。仍无HTTP/UI写桥、实际数据/OSpreflight、lease/STOP新执行闭环或真实用户批准；无新browser/性能证据。下一版本化DRAFT提交/查询与精确human确认HTTP桥，然后STOP/fencing/lease/runtime；完整T09/M1/B1/24h/8h及M0–M5 Goal active，用户package-lock不动不stage。
 
 Checkpoint28全量原handle登记：session38620，audit/hybrid-v1/checkpoint-28-full-r1.log，当前live；源码/测试冻结，勿重复或并行测试/负载。后续终态记录覆盖此过程，旧762只绑定27。
@@ -93,7 +115,9 @@ Checkpoint17：归档任务100/1k/10k真实Store/公共桥探针r2终态exit0、
 | T06 | 只读基础切片实现，未完整验收 | 同源登录/project scope/短期 Bearer、snapshot/page、bounded durable SSE、loopback CLI；无写命令/任意 artifact；见 LOCAL_WEB.md |
 | T07–T08 | 只读 UI、虚拟事件/公共日志/工具返回与资源面板已实现，未完整验收 | 真实 snapshot/SSE reducer、预算/分页/详情、虚拟窗口/锚点/键盘、日志、离线/身份隔离、closed工具metadata、真实HOST与worker来源/陈旧/版本屏障；Chrome QA通过；B1/真实完整闭环与M1 gate待完成 |
 | T09 | DRAFT/1.1/Registry与内部条件性批准事实已实现，完整任务未完成 | 私有immutable revision/批准撤销事实/原receipt、CAS head、恢复原事件核验；fixture真实human session认证确认但无HTTP/UI桥或执行；实际数据来源与能力核验、lease仍待实现 |
-| T10–T17 | 未开始 | 策略、受控 Runtime、单写、独立评审、预算、skill、控制与恢复 |
+| T10–T15 | 未开始 | 策略、受控 Runtime、单写、独立评审、预算、skill |
+| T16 | 内部可信会话服务/显式HTTP首切片候选，未完整验收 | command1.1 submit/prepare/approve/revoke与原receipt、global/revision CAS、无execute；CLI安装配置/UI/完整命令/STOP桥待完成，见HYBRID_CONTROL_API.md |
+| T17 | 未开始 | 停止与恢复/fencing/实际受管执行闭环 |
 | T18–T20 | 未开始 | 本地与 fixture 实验 adapter、科研状态、证据页面 |
 | T21–T22 | 未开始 | 资源隔离、故障/性能/24h 与 8h soak |
 | T23–T25 | 未开始 | 安装/迁移、可信远程、历史回放 |

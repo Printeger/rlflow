@@ -30,4 +30,6 @@ epoch、全局版本、DRAFT revision/hash、完整注册配置和 authority rev
 
 ## 尚未完成
 
+后续 checkpoint29 已新增固定 operator 服务与显式 opt-in 的 command1.1 HTTP 桥，见 HYBRID_CONTROL_API.md；不是默认 CLI 开启写入，也未交付确认 UI。下段保留 checkpoint28 当时边界，28 的回归不能替代29验证。
+
 暂无 proposal1.1 HTTP/MCP/skill 提交桥、确认 UI 或写路由；未创建用户真实批准，也未启动模型、GPU 或本开发 Goal。实际 adapter 数据校验、能力 preflight、STOP/fencing、lease、调度和工程/科研闭环仍需后续实现。T09、M1/B1、长期测试及完整 M0–M5 目标没有因内部服务测试而完成。

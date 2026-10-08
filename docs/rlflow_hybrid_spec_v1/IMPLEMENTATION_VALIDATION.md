@@ -1,5 +1,9 @@
 # 系统实施验收记录
 
+Checkpoint29完整终态：root/High13modules289passed/1既有warning，中央full原10082terminal exit0，867passed/32既有外部/H1skips/1既有warning267.24s。compileall/pip/diff0，offline18checks，范围finding关闭；见HYBRID_CONTROL_API.md与evidence/checkpoint-29-final-tests.txt。新增持续operator会话/DRAFT全局CAS/显式opt-inHTTP事实控制及actualsocket断连原receipt；下方live记录为历史过程，当前没有运行测试。仍无CLI安装配置/确认UI/STOP执行/lease/真实数据OSprobe或工程科研闭环，M1–M5完整目标保持active，无新browser/性能证据。
+
+Checkpoint29候选：operator fixedDraftService持续认证、全局CAS兼容桥、command1.1与默认RO/显式opt-inHTTP提交确认批准撤销及原receipt DTO已实现；旧legacy duplicate旁路、合法catalog容量、current_version摘要及uniformError/source503四finding闭合。root/High13modules各289passed/1既有warning，28.73s/28.89s，actualowned uvicorn/httpx socket断连/真实提交/原重试/条件批准+回收；offline spec18checks。当前全量原10082 live checkpoint-29-full-r1.log，源冻结，无新full结果；未接CLI安装配置、公共proposal/approval列表、确认UI、MCP/lease/STOP/执行，非完整T16/M1–M5，Goal active。
+
 Checkpoint28完整终态：固定服务真实human session/Origin/CSRF/nonce明确确认、immutable批准撤销事实与原receipt、服务stagedfact核心gate、原事件三摘要历史恢复验证完成。root/High各207目标passed；全量原38620 terminal exit0，795passed/32既有skips/1既有Starlette warning/255.47s，compileall/pip/diff0，无剩余范围MUST_FIX；见HYBRID_APPROVAL_FACTS.md/evidence/checkpoint-28-final-tests.txt。下方过程保留，不再live。仍仅LEASE_VALIDATION_PENDING或REVOKED/execution_enabled=false，未接HTTP/UI、lease/实际能力probe/工程科研执行，无新增browser/性能或完整M1–M5验收，Goal active。
 
 Checkpoint28候选：不可变条件性批准/撤销及原receipt、服务明确确认/issuedguard/stagedfact、原事件三对象摘要历史核验已经接入；root9modules207passed12.82s、独立207passed12.75s，无剩余范围MUST_FIX。当前冻结全量原38620 live，audit/hybrid-v1/checkpoint-28-full-r1.log；未取得新全量结果，不将27的762转记。详见HYBRID_APPROVAL_FACTS.md；未接HTTP/UI写桥或lease/执行，完整T09/M1–M5/Goal保持未完成。

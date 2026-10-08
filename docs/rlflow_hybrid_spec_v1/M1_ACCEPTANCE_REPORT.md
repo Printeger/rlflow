@@ -1,12 +1,16 @@
 # M1 退出门槛审计（尚未通过）
 
+最新29终态：root/High各289定向，冻结full原10082exit0，867passed/32既有skips/1warning267.24s，范围无MUST_FIX。下方候选/pending段为过程；无新browser/性能或实际工程科研闭环，M1/完整Goal仍未通过。当前production代码含显式opt-in不可执行HTTP控制，默认CLI只读；证据见checkpoint-29-final-tests.txt。
+
+最新29候选：内部持续operator认证与显式opt-in command1.1 HTTP桥已实现，root/High各289目标passed，实际owned loopback HTTP断连/容量/原重试/条件批准与正常回收；无新browser/性能/UI/安装开关/执行证据。中央full原10082仍运行，下列795全量仅绑定28，M1未通过、完整Goal active。
+
 2026-10-09，最新 checkpoint28（新增内部条件性批准/撤销事实与原事件恢复核验，仍无HTTP/UI写路由、lease或执行）；root及独立定向各207passed，全量原38620终态795passed/32既有skips/1warning/255.47s，范围无剩余MUST_FIX。此前性能绑定 checkpoint21/旧源码，不自动推广到新代码。此文件补齐 IMPLEMENTATION_PLAN §5 要求的 M1 报告；**不是 M1 完成声明**。M0–M5 的完整目标不变，剩余开发没有外部阻塞。
 
 ## 当前可运行范围
 
-既有 Store 的真实事务经同事务 observation/outbox、closed public projection/counters、snapshot/keyset page、认证只读 HTTP/SSE 接入 Dashboard。当前 UI 支持真实业务事件的拓扑/状态/原因/预算未知、有限对象与虚拟事件窗口、公共日志、绑定 CPU 工具返回、HOST/磁盘与 worker loop/supervisor telemetry；未知不转0或模型 RUNNING。HTTP 不启动 scheduler 或调用模型，没有写命令或 artifact 路径。运行方式见 LOCAL_WEB.md。
+既有 Store 的真实事务经同事务 observation/outbox、closed public projection/counters、snapshot/keyset page、认证只读 HTTP/SSE 接入 Dashboard。当前 UI 支持真实业务事件的拓扑/状态/原因/预算未知、有限对象与虚拟事件窗口、公共日志、绑定 CPU 工具返回、HOST/磁盘与 worker loop/supervisor telemetry；未知不转0或模型 RUNNING。默认 CLI/只读应用仍无写命令或 artifact 路径；29可由可信宿主显式注入不可执行控制服务，见HYBRID_CONTROL_API.md。两种HTTP均不启动 scheduler 或调用模型。运行方式见 LOCAL_WEB.md。
 
-最新生产源码冻结全回归：checkpoint28 **795 passed / 32既有外部/H1 skipped / 1既有警告 / 255.47s**，其中包括 Web/观测/telemetry/Store、private draft与1.1声明、Registry、认证事务guard与内部批准/撤销事实及恢复。source/log SHA 见 evidence/checkpoint-28-final-tests.txt。现有 UI checkpoint15 sandbox Chrome+Node **20 passed / 0 skipped / 9.44s**，用 owned loopback 与明确标记的业务 Fixture；HOST 资源来自实际 OS，本轮未新增 browser 结果。没有重新把这些测试跑成真实供应商闭环，也没有把节点心跳当作模型活动。
+最新生产源码冻结全回归：checkpoint29 **867 passed / 32既有外部/H1 skipped / 1既有警告 / 267.24s**，包括 Web/观测/telemetry/Store、private DRAFT/Registry/条件批准与恢复、持续operator事务guard/globalCAS、opt-in控制HTTP及实际socket断连原重试。source/log SHA 见 evidence/checkpoint-29-final-tests.txt。现有 UI checkpoint15 sandbox Chrome+Node **20 passed / 0 skipped / 9.44s**，用 owned loopback 与明确标记的业务 Fixture；HOST 资源来自实际 OS，本轮未新增 browser 结果。没有重新把这些测试跑成真实供应商闭环，也没有把节点心跳当作模型活动。
 
 ## 场景到证据
 

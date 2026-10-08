@@ -80,6 +80,14 @@ class _ApprovalSessionGuard:
         return self._check()
 
 
+@dataclass(frozen=True, eq=False)
+class _OperatorSessionGuard:
+    _check: object
+
+    def check(self):
+        return self._check()
+
+
 class AuthStore:
     """In-memory, revocable credentials. Restart signs everyone out safely."""
 
@@ -93,6 +101,7 @@ class AuthStore:
         self.ttl, self.max_sessions, self.clock = ttl, max_sessions, clock
         self._sessions = {}
         self._approval_guards = {}
+        self._operator_guards = {}
         self._lock = threading.Lock()
         # Rate-limit globally, not by untrusted forwarded addresses or user ID.
         self._login_times = []
@@ -207,3 +216,39 @@ class AuthStore:
     def approval_guard_session_key(self, guard, *, project_id):
         self.check_approval_guard(guard,project_id=project_id)
         return self._approval_guards[guard][2]
+
+    @contextmanager
+    def operator_guard(self, token, *, project_id, csrf):
+        """Separate scoped human draft-write authority, never approval authority.
+
+        Store writer/BEGIN must precede this context; hold through actual commit.
+        Membership is separate from approval guards, including for dual-role users.
+        """
+        with self._lock:
+            owner=threading.get_ident();active=[True]
+            def check():
+                if not active[0] or threading.get_ident()!=owner:
+                    raise PermissionError('operator session guard is no longer active')
+                self._expire()
+                access=self._sessions.get(self._key(token)) if isinstance(token,str) and token.isascii() and 20<=len(token)<=128 else None
+                if (access is None or access.method!='session' or access.principal.kind!='human'
+                        or not access.principal.allows(project_id,'operator')
+                        or not isinstance(csrf,str) or not csrf.isascii() or not 20<=len(csrf)<=128
+                        or access.csrf is None or not hmac.compare_digest(csrf,access.csrf)):
+                    raise PermissionError('live scoped human operator session required')
+                return access
+            guard=_OperatorSessionGuard(check)
+            self._operator_guards[guard]=(owner,project_id)
+            try:
+                guard.check()
+                yield guard
+            finally:
+                active[0]=False
+                self._operator_guards.pop(guard,None)
+
+    def check_operator_guard(self, guard, *, project_id):
+        # Called only under this issued context's already-held Auth lock.
+        if (type(guard) is not _OperatorSessionGuard
+                or self._operator_guards.get(guard)!= (threading.get_ident(),project_id)):
+            raise PermissionError('active issued operator guard required')
+        return guard.check()

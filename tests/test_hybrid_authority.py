@@ -151,6 +151,16 @@ def test_generic_writer_cannot_impersonate_approved_fact_or_guard(tmp_path):
     assert store.audit()==before
 
 
+def test_legacy_whole_state_duplicate_or_noop_cannot_bypass_authority_guard(tmp_path):
+    store,service,args,p,_,_,_=setup(tmp_path)
+    service.approve(prepare(service,args,p)['confirmation'],**args,idempotency_key='real')
+    key,receipt=store.objects(SECTIONS[3])[0];before=store.audit()
+    for event_key in (key,'new_noop'):
+        with pytest.raises(PermissionError):store.transact('HYBRID_GOAL_APPROVED',event_key,lambda s:None,
+            object_id=receipt['request_hash'],producer='hybrid-core')
+    assert store.audit()==before
+
+
 def test_periodic_snapshot_validates_historical_witness_after_config_change(tmp_path):
     store,service,args,p,_,_,_=setup(tmp_path)
     service.approve(prepare(service,args,p)['confirmation'],**args,idempotency_key='approve')

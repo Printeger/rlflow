@@ -1,5 +1,9 @@
 # 需求包离线校验报告
 
+Checkpoint29系统最新终态：root/High各289定向passed、全量原10082terminal exit0，867passed/32既有skips/1既有warning267.24s，compileall/pip/diff0，范围无MUST_FIX。见HYBRID_CONTROL_API.md/evidence/checkpoint-29-final-tests.txt；当前无live测试，下段pending为历史过程。未完成CLI安装开关/确认UI/lease/STOP执行、M1–M5全验收，Goal active。本文件仍保留原离线校验与历史实施，不以18项静态检查代替系统验收。
+
+Checkpoint29当前候选：root/High13modules各289passed/1既有warning，actualowned HTTP断连与条件批准/原回执通过、范围无剩余MUST_FIX；全量原10082仍运行，尚未记新full结果。见HYBRID_CONTROL_API.md/evidence待归档；无CLI安装开关/确认UI/lease/执行，完整Goal active。下列旧checkpoint原文保留为历史，不是最新源码验收；本轮18项离线重验记录在文末。
+
 Checkpoint27完整终态覆盖下述live过程：真实session认证与Store→Auth事务守卫、撤销/过期/幂等/rollback闭合，root112passed9.28s/独立112passed9.31s、范围无MUST_FIX，冻结全回归762passed/32既有外部/H1skips/1既有Starlette warning/247.08s，原62752terminal exit0，不再live。compileall/pip/diff通过，见HYBRID_APPROVAL_AUTH.md/evidence/checkpoint-27-final-tests.txt。仍无ApprovalService/批准事实/Origin桥/写路由或执行权限；无新browser/性能证据。下一不可变批准/撤销和receipt/snapshot/recovery，完整T09/M1/B1/长期与M2–M5继续开发，Goal active，用户package-lock保留。
 
 Checkpoint27目标终态：实际credential/session与writer/SQL等待撤销、guard内并发撤销、准备完events/public表后过期整事务rollback、duplicate新鲜认证/COMMIT trace、异常释放与线程生命周期，root112passed9.28s/独立112passed9.31s。范围无MUST_FIX；冻结全量原62752仍运行，不能提前记通过或套25的689。边界见HYBRID_APPROVAL_AUTH.md；没有approve服务/fact/Origin路由/lease/执行或新性能/浏览器证据，完整目标active。
@@ -73,3 +77,32 @@ Checkpoint12公共绑定工具返回：最终冻结532passed/32skipped/1warning/
 Checkpoint13资源与worker freshness后端：最终冻结556passed/32skipped/1warning/208.02s，target98passed，High24passed，Chrome+Node15passed/0skipped，防御性JSON异常注入通过。来源范围/非阻塞/独立序号/高水位/读时陈旧与generation隔离证据见CHECKPOINT_13.md、RESOURCE_TELEMETRY.md和evidence；后端范围无新增MUST_FIX。telemetry SSE/资源UI、M1 gate/B1/M2–M5及长期验收仍未完成，Goal活跃。
 
 Checkpoint14 telemetry SSE/资源UI：最终冻结562passed/32skipped/1warning/209.07s，target63passed，High33Python/5JSpassed，Chrome+Node20passed/0skipped。原采样因果版本、旧槽UNKNOWN、实际ASGI排队增龄及optional异常后domain继续、独立UI样本版本/陈旧和真实HOST OS显示通过；两类High finding关闭。证据见CHECKPOINT_14.md/evidence，桌面/390px手机已检查。不是B1/M1 gate或完整Hybrid闭环验收，继续完整Goal。
+
+## 2026-10-09 新版本 schema 离线重验
+
+执行日期：2026-10-09（本轮离线重验；系统实施验收另见 IMPLEMENTATION_VALIDATION.md）。
+
+结果：**18 项检查通过**。
+
+1. JSON Schema meta-validation: command.schema.json
+2. JSON Schema meta-validation: command_v1_1.schema.json
+3. JSON Schema meta-validation: event.schema.json
+4. JSON Schema meta-validation: goal.schema.json
+5. JSON Schema meta-validation: goal_v1_1.schema.json
+6. JSON Schema meta-validation: payloads.schema.json
+7. Goal proposal fixture valid and UNAPPROVED
+8. Pause command fixture valid
+9. Nested goal reference in submit_goal resolved offline
+10. Negative fixture rejected: proposal self-approval
+11. Negative fixture rejected: client-supplied trusted actor
+12. Negative fixture rejected: pause without expected version
+13. Negative fixture rejected: arbitrary shell parameter
+14. Scoped emergency stop can omit expected_version
+15. 6 event fixtures: envelope, typed payload, sequence, identity, budget arithmetic
+16. Configuration template cannot directly enable a real runtime
+17. OpenAPI starter YAML: 12 unique operations, required path parameters, local references
+18. 36 acceptance cases, 26 implementation tasks, 16 source entries, no tool-citation leakage
+
+## 检查边界
+
+仅运行本包 schema/fixture、YAML、引用、编号和安全模板的离线检查。OpenAPI 未由真实服务器导出，也未执行完整 OpenAPI 语义一致性认证；泛型读模型及其余领域 payload 仍由 T03 固化。未启动 rlflow/Codex/GPU，未验证真实运行隔离、恢复、性能、费用或研究有效性。

@@ -12,7 +12,7 @@ import secrets
 import threading
 from urllib.parse import urlsplit
 
-from .hybrid_goals import (bounded_copy, check_bytes, digest, head_key, SECTIONS as GOALS,
+from .hybrid_goals import (bounded_copy, check_bytes, digest, head_key, control_command_key, SECTIONS as GOALS,
                            validate_record as validate_goal_record)
 from .hybrid_protocol import ID, HASH, COUNT, TIME, TEXT, obj, enum, nullable, validate_schema, ProtocolError
 from .hybrid_registry import Registry, CATALOG
@@ -35,6 +35,7 @@ APPROVE_REQUEST = obj({**COMMON, 'action': {'const': 'approve'}, 'confirmation':
 REVOKE_REQUEST = obj({**COMMON, 'action': {'const': 'revoke'}, 'goal_id': ID,
                       'approval_key': ID, 'expected_version': POSITIVE,
                       'expected_authority_revision': POSITIVE, 'reason': TEXT})
+for schema in (APPROVE_REQUEST,REVOKE_REQUEST):schema['properties']['control_command_id']=ID
 REQUEST = {'oneOf': [APPROVE_REQUEST, REVOKE_REQUEST]}
 CHAIN = {'authority_revision': POSITIVE, 'previous_fact_key': nullable(ID), 'previous_fact_hash': nullable(HASH)}
 RECORDS = {
@@ -51,6 +52,7 @@ RECORDS = {
 
 
 def command_key(request):
+    if 'control_command_id' in request:return request['control_command_id']
     return 'authority_command_' + sha([request['action'], request['actor'], request['project_id'],
                                        request['data_mode'], request['idempotency_key']])
 
@@ -81,6 +83,9 @@ def timestamp(value):
 def validate_request(request):
     check_bytes(request)
     validate_schema(REQUEST, request)
+    if ('control_command_id' in request and request['control_command_id']!=control_command_key(
+            request['actor'],request['project_id'],request['data_mode'],request['idempotency_key'])):
+        raise ProtocolError('control command identity mismatch')
     counters = [expected_version(request), expected_authority_revision(request)]
     if request['action'] == 'approve':counters += [request['confirmation']['expected_revision'], request['confirmation']['ttl_seconds']]
     if any(type(n) is not int or not 0 <= n <= 2**63-1 for n in counters):
@@ -313,19 +318,21 @@ class ApprovalService:
                                                'expires':min(now+120,access.expires_at)}
         return {**view,'confirmation':confirm}
 
-    def approve(self, confirmation, *, token, csrf, origin, idempotency_key):
+    def approve(self, confirmation, *, token, csrf, origin, idempotency_key, _control_command_id=None):
         access=self._session(token,csrf,origin);confirm=bounded_copy(confirmation);validate_schema(CONFIRMATION,confirm)
         request={'action':'approve','project_id':self.project_id,'data_mode':self.data_mode,
                  'actor':{'id':access.principal.id,'kind':'human'},'idempotency_key':idempotency_key,'confirmation':confirm}
+        if _control_command_id is not None:request['control_command_id']=_control_command_id
         return self._write(request,token,csrf)
 
     def revoke(self, *, token, csrf, origin, goal_id, approval_key, expected_version,
-               expected_authority_revision, reason, idempotency_key):
+               expected_authority_revision, reason, idempotency_key, _control_command_id=None):
         access=self._session(token,csrf,origin)
         request={'action':'revoke','project_id':self.project_id,'data_mode':self.data_mode,
                  'actor':{'id':access.principal.id,'kind':'human'},'idempotency_key':idempotency_key,
                  'goal_id':goal_id,'approval_key':approval_key,'expected_version':expected_version,
                  'expected_authority_revision':expected_authority_revision,'reason':reason}
+        if _control_command_id is not None:request['control_command_id']=_control_command_id
         return self._write(request,token,csrf)
 
     def _write(self, request, token, csrf):

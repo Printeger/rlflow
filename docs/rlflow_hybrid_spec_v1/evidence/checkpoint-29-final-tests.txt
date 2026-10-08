@@ -1,0 +1,54 @@
+Checkpoint29: protected operator drafts + opt-in non-executing control HTTP
+Parent21c1061; branchhybrid-v1; USER untracked package-lock.json untouched/not staged.
+
+Root exact argv:
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q tests/test_hybrid_control_api.py tests/test_hybrid_draft_service.py tests/test_hybrid_draft_global_cas.py tests/test_hybrid_authority.py tests/test_hybrid_goals.py tests/test_approval_guard_identity.py tests/test_approval_session_guard.py tests/test_hybrid_registry.py tests/test_hybrid_protocol.py tests/test_store_policy.py tests/test_contracts.py tests/test_web_auth.py tests/test_web_api.py
+Original session50814 terminal exit0: 289 passed, 1 existing Starlette warning in 28.73s.
+audit/hybrid-v1/checkpoint-29-control-r5.log SHA256 a8e501b92f8fd770c1b7cfce5e8d7324578bebe74ac9c3130797b5b05ada4805
+
+Independent High exact argv: same13modules, prefix env -u PYTHONPATH PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 PYTHONDONTWRITEBYTECODE=1 .venv/bin/python -m pytest -q -p no:cacheprovider.
+Original session19197 terminal exit0: 289 passed, 1 existing warning in 28.89s.
+audit/hybrid-v1/checkpoint-29-control-high-r1.log SHA256 0a63a2f898a8d28210aa1902870e0147052f64658d0a06d2cfa40895470b50b9
+Current slice: no remaining MUST_FIX. No independent writes; no model/GPU/benchmark or concurrent pytest.
+
+Full exact argv: PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q
+Original session10082 terminal exit0; audit/hybrid-v1/checkpoint-29-full-r1.log.
+867 passed, 32 existing external/H1 skips, 1 existing Starlette warning in267.24s.
+Full log SHA256 ca510d3e000dc65bd76d83b9b52b2c44a8684f5be1a0fa00fdb6004ac2b22988
+Source/tests/schema frozen through each actual live original test process; terminal handle confirmed before edits/new runs.
+
+Root and High independently matched frozen SHA256:
+99e820d114c26e2a90a72b3ab30eaea012116926e1828462e5557794ab444782 rlflow/hybrid_control.py
+ef1ec2be06b46867b541f14aad9936ff2c7b201d6cae369b414346df70822d54 rlflow/hybrid_drafts.py
+122d6b69e529e729b5fdba940d9b4d717cba798c8d873216ccced5ab9894471b rlflow/hybrid_goals.py
+9012b3e5943408f0839507e5ff5934e13f42ea19ab306ceb46dfa6dddb46eb27 rlflow/hybrid_authority.py
+063789dadfe334151e195eab030b256cfef44355a0ffa3257b9063cb8138a180 rlflow/web_auth.py
+d97e7fe7c2e8b494215ac133d20abbe4093708d4082155f90482bfc22863bf49 rlflow/store.py
+ce1a06a22205b211e59bbb85e3609463930583ac98b62172b910b6a73741d7ee rlflow/web_api.py
+91b2b2bb15bf1c267eb1d4875e20f955ffe2fb8768766d0213473a81ba757553 rlflow/hybrid_protocol.py
+2fae72c5fa00d78e310d13f26084c59ad677a101ccdcc1161b9fa8fc725e2c77 rlflow/hybrid_schemas/command_v1_1.schema.json (same docs/schemas copy)
+7d7d1b980cc452367f0e10da7a19a79401a231e1dc3fc1733f0b96bb14f4db7a tests/test_hybrid_control_api.py
+45d92ab814d90d7b357a9a3163c9d036e68ec00d0435d134603e94956ca9ecba tests/test_hybrid_draft_service.py
+43e24b2f4517f331bd7b9c4ccf26d0cf89b4d2247ea0b4c42031ba4f5abdc34e tests/test_hybrid_draft_global_cas.py
+95ec404d640c102b8ea97889e20f06dbbcf2386d7643908b2564a1bf6f8af29d tests/test_hybrid_authority.py
+1441d138d1cb70613bcf98aabdef4b0a537b2e935f8dc66ae2b7f5fa7e19d7da goal_v1_1 package/docs copy
+c8e8b4cf37815895b36e34a19cf48e67a872e6fc44843a2f136f48038c4daef8 oldcommand1.0 package/docs unchanged
+
+Offline provided spec validator run alone before independent/full:
+.venv/bin/python docs/rlflow_hybrid_spec_v1/validate_spec.py
+exit0: PASS18checks/6events/12starterAPIoperations/36acceptance IDs/26tasks.
+audit/hybrid-v1/checkpoint-29-spec.log SHA256 c132d2b12d4dd1fd40795a6614491f2957a567d03c2f203ae5174c5e4fa6c165
+Generated report's historical implementation sections restored verbatim via apply_patch; new18check section/date appended. Static starter verification is not full OpenAPI/runtime acceptance.
+Compileall/pipcheck/diffcheck final recheck exit0 after actual full terminal. No live test process remains.
+
+Actual socket assertion: owned non-daemon uvicorn thread + prebound127.0.0.1 random-port socket, actual httpx human fixture login/JSON commands. ReadTimeout/disconnect while worker blocked leaves pending=1; secondrequest429/no earlyStorewrite; release→actualDRAFT/onecorewrite→indexed originalcommandGET+sameidem retry; real nonce prepare+conditionalapprove/no tasks or sessions. Finally release worker, should_exit, join, close; thread dead/poolclosed/pending0. Separate helper cancellation test shields actual concurrentfuture. Not a writer-still-blocked shutdown race, not real user consent or approved engineering/research execution.
+
+Closed findings: legacy whole-state duplicate/noop bypass before _existing; legal60000metadata catalog vs too-small50knode read cap; authorized CAS current_version summary; opt-in boundary wrongOrigin/duplicate headers uniformError. Literal13000marker+large225KiBproposal is conservative encoded-capacity regression, NOT a claimed old2MiB failure reproduction (approvalrequest contains nonce only, read budgets percommand). Source corruption503 vs client400 corrected only for guarded source precheck; summary validates actual int/int64 and never echoes malformed version.
+
+Retained failures/earlier evidence:
+CASroot73359 terminal181passed1failed10.50s: negative expectedProtocolError but runtime correctly wrapsContractError; fixture exacttype fixed. CAS44734 root182passed10.51s and High90556182passed10.51s are pre-service hashes only.
+Draft15116 terminal241passed16.65s precedes HTTP/legacyfix.
+Control47147 root277passed23.99s;57544 root278passed25.11s addedsocket;60948 root287passed28.24s added3HTTPfixes. All terminal,1existingwarning.
+Control96741 terminal288passed1failed28.80s: corruptedsource wronglymapped400, fixedsource-error classification without relaxing gate;50814 final289 above. Logs preserved, no hidden/replaced failure.
+
+No CLI install/provision control config, publicproposal/authority UI bridge, confirmationUI/MCP/skill/STOP/fencing/lease/preflight/dispatch, actualengineering/research loop, browser/performance/B1/NFR06/24h/8h or fullM0-M5 completion claimed. Default app/oldCLI remains read-only; Goalactive.

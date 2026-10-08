@@ -230,7 +230,7 @@ OBJECTS['Telemetry'] = obj({
 def schemas():
     root = Path(__file__).with_name("hybrid_schemas")
     values = {name: json.loads((root / f"{name}.schema.json").read_text())
-              for name in ("event", "command", "goal", "goal_v1_1", "payloads")}
+              for name in ("event", "command", "command_v1_1", "goal", "goal_v1_1", "payloads")}
     return values
 
 

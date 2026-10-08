@@ -125,6 +125,8 @@ class Store:
         self._hybrid_auth_owner = None
         self._hybrid_registry = None
         self._hybrid_authority_service = None
+        self._hybrid_draft_auth_owner = None
+        self._hybrid_draft_service = None
         self.root = Path(root).resolve()
         (self.root / "runtime").mkdir(parents=True, exist_ok=True)
         self.db = self.root / "runtime/research.db"
@@ -418,6 +420,12 @@ class Store:
                 row=db.execute('SELECT value FROM projection WHERE section=? AND object_key=?',(section,objkey)).fetchone()
                 return self._decode_value(db,json.loads(row[0])) if row else None
             validate_transition(payload,lookup,event_type=event_type,key=key,object_id=object_id,producer=producer,version=ver,registration=self._goal_registration(db))
+            if self._hybrid_draft_auth_owner is not None:
+                access=self._check_draft_guard(db,_authorization,object_id)
+                receipt=next(v for s,k,v in payload['put'] if s==goal_sections[2] and k)
+                if receipt['request']['actor']!={'id':access.principal.id,'kind':access.principal.kind}:
+                    raise Conflict('draft actor differs from actual session')
+                if 'expected_state_version' not in receipt['request']:raise Conflict('bound draft requires global expected version')
         source_event_id = uuid.uuid4().hex
         timestamp = time.time()
         # Preserve the unencoded patch for the small allowlisted public bridge.
@@ -460,10 +468,35 @@ class Store:
         from .hybrid_authority import ApprovalService
         if type(auth) is not AuthStore or type(registry) is not Registry or type(service) is not ApprovalService:raise TypeError('invalid authority owner')
         with self.lock():
+            if self._hybrid_draft_auth_owner is not None and self._hybrid_draft_auth_owner is not auth:
+                raise Conflict('draft and approval owners must share AuthStore')
             if self._hybrid_auth_owner is not None and (self._hybrid_auth_owner is not auth or self._hybrid_registry is not registry or self._hybrid_authority_service is not service):
                 raise Conflict('authority owner cannot be rebound in-place')
             self._hybrid_auth_owner,self._hybrid_registry=auth,registry
             self._hybrid_authority_service=service
+
+    def bind_hybrid_drafts(self, auth, service):
+        """Opt-in protected startup binding; old internal drafts stay compatible."""
+        from .web_auth import AuthStore
+        from .hybrid_drafts import DraftService
+        if type(auth) is not AuthStore or type(service) is not DraftService:raise TypeError('invalid draft owner')
+        with self.lock():
+            if self._hybrid_auth_owner is not None and self._hybrid_auth_owner is not auth:
+                raise Conflict('draft and approval owners must share AuthStore')
+            if self._hybrid_draft_auth_owner is not None and (self._hybrid_draft_auth_owner is not auth or self._hybrid_draft_service is not service):
+                raise Conflict('draft owner cannot be rebound in-place')
+            self._hybrid_draft_auth_owner,self._hybrid_draft_service=auth,service
+
+    def _check_draft_guard(self, db, guard, request_hash):
+        registration=self._goal_registration(db);service=self._hybrid_draft_service
+        if (self._hybrid_draft_auth_owner is None or service is None
+                or registration!=(service.project_id,service.data_mode)):
+            raise PermissionError('protected registered draft owner required')
+        meta=db.execute('SELECT store_epoch FROM observation_meta WHERE singleton=1').fetchone()
+        if meta is None or meta['store_epoch']!=service.store_epoch:raise Conflict('draft service epoch changed')
+        access=self._hybrid_draft_auth_owner.check_operator_guard(guard,project_id=registration[0])
+        service.check_live_request(request_hash,guard)
+        return access
 
     def _check_hybrid_guard(self, db, guard):
         registration=self._goal_registration(db)
@@ -496,6 +529,9 @@ class Store:
         """Legacy whole-state callback; new hot paths should use transact_objects."""
         with self.lock(), self.connect() as db:
             db.execute("BEGIN IMMEDIATE")
+            from .hybrid_authority import EVENTS as authority_events
+            if event_type in authority_events.values() or (event_type=='HYBRID_GOAL_DRAFTED' and self._hybrid_draft_auth_owner is not None):
+                raise PermissionError('Hybrid service events require guarded object transactions')
             if self._existing(db,key,event_type,object_id):
                 db.commit()
                 return self.view()
@@ -558,6 +594,8 @@ class Store:
                 if authorization is not None:authorization.check()
                 from .hybrid_authority import EVENTS as authority_events
                 if event_type in authority_events.values():self._check_hybrid_guard(db,authorization)
+                if event_type=='HYBRID_GOAL_DRAFTED' and self._hybrid_draft_auth_owner is not None:
+                    self._check_draft_guard(db,authorization,object_id)
                 previous = db.execute("SELECT version FROM projection_meta WHERE singleton=1").fetchone()[0]
                 if self._existing(db,key,event_type,object_id):
                     if authorization is not None:

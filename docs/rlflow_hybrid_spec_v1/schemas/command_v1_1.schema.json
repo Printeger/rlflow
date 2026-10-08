@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:rlflow:spec:command:1.1",
+  "title": "Explicit non-executing Hybrid control command",
+  "oneOf": [
+    {"type":"object","additionalProperties":false,"required":["schema_version","action","target","expected_version","parameters"],
+     "properties":{"schema_version":{"const":"1.1"},"action":{"const":"submit_goal"},
+       "target":{"type":"object","additionalProperties":false,"required":["kind","id"],"properties":{"kind":{"const":"project"},"id":{"$ref":"#/$defs/id"}}},
+       "expected_version":{"$ref":"#/$defs/count"},
+       "parameters":{"type":"object","additionalProperties":false,"required":["goal","expected_revision"],"properties":{"goal":{"$ref":"urn:rlflow:spec:goal-proposal:1.1"},"expected_revision":{"$ref":"#/$defs/count"}}}}},
+    {"type":"object","additionalProperties":false,"required":["schema_version","action","target","expected_version","parameters"],
+     "properties":{"schema_version":{"const":"1.1"},"action":{"const":"approve"},
+       "target":{"type":"object","additionalProperties":false,"required":["kind","id"],"properties":{"kind":{"const":"goal"},"id":{"$ref":"#/$defs/id"}}},
+       "expected_version":{"$ref":"#/$defs/count"},
+       "parameters":{"type":"object","additionalProperties":false,"required":["confirmation"],"properties":{"confirmation":{"$ref":"#/$defs/confirmation"}}}}},
+    {"type":"object","additionalProperties":false,"required":["schema_version","action","target","expected_version","parameters"],
+     "properties":{"schema_version":{"const":"1.1"},"action":{"const":"revoke"},
+       "target":{"type":"object","additionalProperties":false,"required":["kind","id"],"properties":{"kind":{"const":"approval"},"id":{"$ref":"#/$defs/id"}}},
+       "expected_version":{"$ref":"#/$defs/count"},
+       "parameters":{"type":"object","additionalProperties":false,"required":["goal_id","expected_authority_revision","reason"],"properties":{"goal_id":{"$ref":"#/$defs/id"},"expected_authority_revision":{"type":"integer","minimum":1,"maximum":9223372036854775807},"reason":{"type":"string","maxLength":4000}}}}}
+  ],
+  "$defs": {
+    "id":{"type":"string","minLength":1,"maxLength":160,"pattern":"^[A-Za-z0-9][A-Za-z0-9_.:-]*$"},
+    "count":{"type":"integer","minimum":0,"maximum":9223372036854775807},
+    "hash":{"type":"string","pattern":"^sha256:[0-9a-f]{64}$"},
+    "confirmation":{"type":"object","additionalProperties":false,"required":["id","goal_id","store_epoch","expected_version","expected_revision","expected_authority_revision","proposal_hash","scope_hash","config_hash","ttl_seconds","view_hash"],
+      "properties":{"id":{"$ref":"#/$defs/id"},"goal_id":{"$ref":"#/$defs/id"},"store_epoch":{"$ref":"#/$defs/id"},
+        "expected_version":{"type":"integer","minimum":1,"maximum":9223372036854775807},"expected_revision":{"type":"integer","minimum":1,"maximum":9223372036854775807},
+        "expected_authority_revision":{"$ref":"#/$defs/count"},"proposal_hash":{"$ref":"#/$defs/hash"},"scope_hash":{"$ref":"#/$defs/hash"},"config_hash":{"$ref":"#/$defs/hash"},
+        "ttl_seconds":{"type":"integer","minimum":1,"maximum":86400},"view_hash":{"$ref":"#/$defs/hash"}}}
+  }
+}
