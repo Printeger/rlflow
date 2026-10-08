@@ -1,5 +1,7 @@
 # 需求包离线校验报告
 
+Checkpoint23有限组合HTTP独立终态：100k历史+10k归档task、400实际Store写/双SSE各400完整事件/128查询（64snapshot+64page），核心100401/公共100451、task精确不变/session0/source unchanged/ownedAPI TERM-reaped。submit-call→完整帧p95 246.724ms、snapshot8.144/page10.167ms，完整raw独立重算精确匹配；root21passed/10.21s、High21passed/10.65s，三项MUST_FIX关闭。见HTTP_PERFORMANCE.md与evidence/checkpoint-23-http.jsonl/final-tests.txt。生产未改，不虚称full/browser重跑，不代表DOM延迟/B1/完整NFR/M1或M0–M5 Goal通过。
+
 Checkpoint17归档任务规模：r2真实100/1k/10k任务+每档audit==replay，无工作阶段core/cursor不变且session0；10k scoped/legacy写p95=7.061/14.747ms、viewkeys2.677ms，无工作CPU p50=10.257ms/次非5min平均。High测量assert省略调用finding关闭，两driver拒绝-O及真实负例；root20passed、独立7passed、原始分布/来源SHA归档。见TASK_PERFORMANCE.md/evidence。生产未改，无全量/browser重跑；旧100k额外RO真实audit通过且DB字节不变。不代表活跃闭环/组合B1/M1 gate，继续完整Goal。
 
 Checkpoint16 真实历史单轴：新增驱动及40项定向/独立High28项通过；实际100k core/public写终态exit0、recover==audit==replay，普通写p95 8.337045→8.682933ms、ratio1.041488≤2；100个千次边界max11.077177ms、公共版本/值精确核对通过。原始样本与SHA见HISTORY_PERFORMANCE.md/evidence/checkpoint-16-history.jsonl及checkpoint-16-final-tests.txt。生产模块未改，不虚称全量/browser重跑。M1_ACCEPTANCE_REPORT.md明确尚未通过：单对象warm/direct Reader探针不替代10k任务/3项目/限定硬件/并发B1、RSS/WAL/idle/24h/8h或M2–M5闭环。无新外部阻塞，Goal保持active。

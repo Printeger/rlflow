@@ -1,0 +1,19 @@
+Checkpoint23 fixture HTTP probe, not full B1/M1/Goal
+Parent source HEAD: 49f709b904c2ce528d2f3ffc19a46cf01d60d684
+Production source last change: 7be43b8
+Root related tests r6: 21 passed in 10.21s; session45590 exit0
+Independent High tests: 21 passed in 10.65s; session7669 exit0
+Load: session79247 exit0; child1198582 planned TERM -15/reaped/ownsfalse
+No concurrent tests/model/daemon during load; source frozen
+Compileall and git diff --check: exit0
+No new full-suite or browser rerun; production unchanged
+Final raw independent evidence review: all planned writes/queries/two SSE receivers,
+outbox digest/core source/epoch/task/session/source/identity/cleanup/nearest-rank
+statistics independently recomputed exactly; no remaining MUST_FIX; no rerun.
+SHA256:
+ce60992856a5c8ad7db0b6741b8c011635e39be653b0623fbe679cece112b0c0  tests/acceptance_http_v1.py
+87779578e248009f28f24af485462a0da01f26af8092537932974bf65191de0d  tests/test_acceptance_http_v1.py
+c5b50277b584264a4f793f7ab6fbdc34ed2c8b420efa7f5b0b0398a501dfb911  audit/hybrid-v1/checkpoint-23-http-unit-r6.log
+9a214bd7ed821abc20be6fd34bfd40e519e862922aa8c1dae681caa50377a856  audit/hybrid-v1/checkpoint-23-high-http-r1.log
+030e1c15bb3f17d81bc6bc01241b0f2ff90949433f51ebdbc458d1a64b5e6951  evidence/checkpoint-23-http.jsonl
+092914159d481c3ab47b7c22ab12a37c8fc502ed1502ca5aa053ed59dced1808  audit/hybrid-v1/checkpoint-23-http-r1/state/runtime/research.db

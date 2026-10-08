@@ -111,6 +111,10 @@ critical domain/control保持原FIFO；optional source独立task和单latest pay
 
 Checkpoint18补充：严格allowlist只读备份100k fixture历史，再事务增加10k归档task，不由label暗授调度权限。使用独立Python wrapper的PDEATHSIG与完整父身份前后检查，不用多线程父中的preexec_fn；所有启动后打印/测量均在直接child cleanup finally。源码冻结单次300s真实daemon结果1.773328%单核CPU，未达目标，不改阈值或混用API/B1证据。全仓库watch仍违反NFR06独立条件；下一优化保留同read事务/授权/STOP/prepare前后generation。first基线未序列化明确披露，raw rows独立计算亦未达标，下一driver修复不篡改本次证据。见IDLE_PERFORMANCE.md。
 
+## Checkpoint23：先闭合 HTTP 测量证据，不修改性能合同
+
+新增独占fixture单writer/父-owned readonly loopback API有限驱动，默认生产SSE配置，双独立consumer各真实重连，并发bounded snapshot/page。绝对发行计划保存完整分母与lag；逐计划write/连续核心version/非duplicate/至少一个outbox来源覆盖，允许一对多，不用客户端与现存outbox相等掩盖bridge遗漏。异常保存有界public帧/原因并立即传播，正常cleanup之前核对API存活，异常/强制KILL拒绝成功；父死亡SIGKILL防uvicorn graceful延存，正常TERM-reap。异步finally先回收API再等待executor，不宣称取消线程写回滚或硬deadline。提交调用→HTTP帧上界与DOM可见/真实commit区分；实际单档案32s数据不代替完整B1/NFR/M1/长期。见HTTP_PERFORMANCE.md。
+
 ## Checkpoint15：移出周期性全状态构造
 
 选择兼容完整快照的两阶段维护：core 第1000次写同事务只标记 due；单个可选线程从一致只读事务构造/validate/hash，非阻塞 writer 事务核对 immutable tip 后原子发布快照与 acknowledgement。新版 due 不被旧构造清除，不新增业务事件或第二个控制 writer。增加 marker 部分索引，不据此声称 ObjectMap 全 key 枚举已经解决。首次缺表迁移与已有槽损坏严格区分，实际 BLOB 正文核验，不信摘要列独自证明完整。保留显式手动 snapshot 与原恢复格式。暂不直接引入 chunk 格式，减少对既有恢复合同的同时改动；full-state RSS/WAL/协作 deadline 非硬时限的限制明确保留，B1 必须另测。见 SNAPSHOT_MAINTENANCE.md。

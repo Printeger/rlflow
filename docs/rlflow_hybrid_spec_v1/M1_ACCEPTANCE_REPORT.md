@@ -13,17 +13,19 @@
 | PRD 场景 | 当前证据与范围 | 剩余门槛 |
 |---|---|---|
 | A10 兼容 adapter 不可观测 | hybrid observation 的缺usage/无有效startup proof、telemetry generation/旧槽UNKNOWN、closed工具metadata、UI Fixture/UNKNOWN通过；checkpoint08–14 | T11 Hybrid执行adapter及真实vendor event/usage/interrupt证据未完整接入；不能标完整A10通过 |
-| A14 snapshot C→SSE | test_snapshot_stream_seam_and_idempotency、实际ASGI seam/reconnect、真实loopback及Chrome追平通过 | 100k/B1速率、维护并发与端到端延迟未测；短功能范围已证实 |
+| A14 snapshot C→SSE | test_snapshot_stream_seam_and_idempotency、实际ASGI seam/reconnect、真实loopback及Chrome追平；checkpoint23真实100k/10k单项目HTTP双SSE/重连与400写入outbox核对 | 完整B1、维护并发与浏览器端到端延迟未测；HTTP探针不新增强制seam竞态证据 |
 | A15 断连/重复/乱序 | reducer去重/版本、实际SSE断连追平、项目身份generation、事件缺口触发resync通过；静止不重复脉冲 | B1与8h断连长期一致性未证；当前没有新增Hybrid usage结算，不能推广为T14父子账款验收 |
 | A16 旧cursor/epoch | retention floor、缺event/projection drift、rotate_epoch保留history且旧cursor拒绝、队列溢出/slow socket重建通过 | 可信备份/恢复演练与安全epoch切换/repair CLI需T23交付，不能据显式测试rotate宣布真实restore完成 |
 | A17 没真实事件不增加业务数 | browser heartbeat/资源不推进业务cursor/counts、不调用app RAF、reducer重复不续动效；telemetry独立sample因果age通过 | B1长时idle/时钟扰动完整矩阵未测；短范围通过 |
 | A18 浏览器失联不冒充GPU停止 | Chrome offline显示/停止脉冲、资源FRESH/STALE分域；GPU当前UNKNOWN | 未运行真实GPU，运行中GPU断网场景未证；不能为验收启用昂贵训练。受管CPU负载/后续批准GPU证据分开 |
-| A32 100k/8h | Store增量事务/marker索引、周期维护锁外、虚拟窗口geometry/缓存测试通过；100k单对象历史ratio1.041488/完整性、另10k归档task probe通过（TASK_PERFORMANCE.md） | 两轴尚未组合；活跃任务/3项目/限定硬件/10/s+50/s/双端完整B1、RSS/WAL/5min idle及8h页面/24h fixture未完成 |
+| A32 100k/8h | Store增量事务/marker索引、周期维护锁外、虚拟窗口geometry/缓存；100k单对象历史ratio1.041488、10k归档task；组合daemon300s与checkpoint23单项目HTTP计划10/s+50/s完整400写入/双SSE | 活跃任务/3项目/限定硬件/浏览器双端完整B1、合计RSS/WAL/无全仓库poll及8h页面/24h fixture未完成 |
 | A35 手机/键盘/减少动画 | 390px Chrome无横向溢出、虚拟事件键盘导航、reduced-motion/静止、文字状态通过 | Hybrid Web审批/STOP命令尚未接入，既有CLI/core批准/STOP不变；可信手机交互/T16/T24及完整可访问性验收未完成 |
 
 对应测试源码：tests/test_hybrid_observation.py、test_web_api.py、test_web_local.py、test_live_stream.py、test_telemetry.py；web_checks/browser.test.mjs、reducer.test.mjs、virtual-list.test.mjs、log-view.test.mjs、telemetry-view.test.mjs。表格不使用“有测试名”代替完整场景；上述通过仅指已记录冻结执行的匹配范围。
 
 ## 当前结论及下一项
+
+Checkpoint23实际100k历史+10k归档task的32s有限HTTP负载已终态exit0：计划/实际400写、128查询、两消费者各400完整公开事件/一次重连，核心100401/公开100451/session0/source不变。提交调用开始→完整HTTP帧p95=246.724ms、snapshot8.144ms/page10.167ms，分phase发行lag与全部raw保留；不是DOM可见/完整B1/NFR gate。见HTTP_PERFORMANCE.md。Root及独立High相关21tests通过，终态原始证据High独立逐项重算吻合、无剩余MUST_FIX，无新生产代码修改。
 
 Checkpoint22新的同100k/10k归档档案daemon-only300.000624s实测单核CPU0.849998%，相较旧单对1.7733%下降，CPU子指标<1%；301采样RSS33.641MiB、核心/公共/任务/会话/来源不变，完整原始baseline可复算。见IDLE_PERFORMANCE.md/evidence。仍全控制仓库逐秒轮询、无API合计与完整B1/长期，所以NFR06/M1 gate依旧未通过，不拿局部CPU结果解除其它门槛。
 

@@ -1,5 +1,13 @@
 # Hybrid v1 开发进度
 
+Checkpoint23独立终态覆盖下述过程记录：原79247已exit0/API1198582 TERM-15/reaped/ownsfalse；100k+10k归档档案真实32秒400写、两SSE各400事件/各一次重连、128查询全部完成，core100401/public100451/task10000 exact/session0/source不变。submit-call→HTTP完整帧p95 246.724ms、snapshot8.144/page10.167ms；全计划/发行lag/raw/digest/核心来源与hash独立逐项重算精确吻合，无剩余MUST_FIX。Root21passed/10.21s、High21passed/10.65s；生产源码未改，未新增full/browser重跑。见HTTP_PERFORMANCE.md/evidence。仅单项目归档HTTP子证据，非DOM/B1/NFR/M1通过。下一按前置T01/T03推进T09合同与可信主体基础（不提前启用可写闭环），并保留完整B1/无全仓库poll/长期等M1缺口；Goal active，用户package-lock保留。
+
+Checkpoint23进行中（未提交）：新增有限HTTP并发驱动，生产默认SSE参数、两条独立连接各真实Last-Event-ID重连、并发snapshot/page、绝对计划30s×10/s+2s×50/s共400次真实Store写。保存全部计划/发行lag/调用返回/完整收帧并按最终outbox+digest核对；分phase统计，不把commit-return负差冒充真实commit latency；完整core/task/session/source不变量、最终校验失败raw与owned API回收均覆盖。相关r4 **16passed/5.66s**，30731终态exit0；High完整驱动只读复核中，尚未100k/10k负载。默认pytest受到全局ROS插件缺lark影响，沿用禁用第三方plugin自动加载的既有测试环境；r3文件名错误无测试执行亦保留。生产源码未改，用户package-lock不stage；完整B1/NFR06/M1–M5仍未完成，Goal active。
+
+Checkpoint23基础：22已提交49f709b/CPU子指标独立确认0.849998%，完整NFR06/B1/M1仍缺。新增tests/acceptance_http_v1.py父-owned loopback readonly API child基础：复用完整parent guard、PDEATHSIG改SIGKILL避免uvicorn graceful父死亡延存、父预绑127 socket传fd、privatepipe传token不入argv/log、正常TERM/kill/reap及失败fd关闭；child仅ObservationReader/create_app，不Store/daemon。r6相关11passed/2.77s、compileall/diff通过，原98336终态exit0、无live child；High只读基础无MUST_FIX（未独立跑测试）。r1测试head独立store_epoch字段不存在失败保留，改head cursor精确核验epoch后passed；模板仅两个sentinel唯一检查非整段SHA锁定。生产源码未改，用户package-lock保留不stage。
+
+下一实现有限HTTP/SSE并发driver（尚无负载证据）：严格100k history只读backup+10kDONE/allfalse；生产默认SSE参数、两个独立receivers、唯一trusted writer绝对发行计划10/s30s+50/s2s，保存全部发行delay/提交前后monotonic/完整frame接收时间/状态/错误/吞吐分母，真正并发bounded snapshot/page。实际SQLite outbox序列核对seam/顺序/无重复缺口/Last-Event-ID重连，heartbeat不计domain。launch后立即finally覆盖print/readiness/client，证据strip token；先真实认证snapshot核验项目/fixture/epoch/cursor。只测单项目归档HTTP/transport，不冒充浏览器NFR01、API+daemon idle、3projects/activeGoal/限定硬件或fullB1。继续安全sourceguard局限设计及完整M0–M5，不在checkpoint终止Goal。
+
 Checkpoint22独立终态核验完成：High逐float精确重算baseline/CPU/elapsed、RSS/301单调样本/allfalse DONE任务与core/public/epoch/session/sourceDB+WAL/identity/generation/log/退出/归档SHA全部匹配，无剩余证据/安全MUST_FIX。生产仍7be43b8，未新增full/browser/test或benchmark重跑；见IDLE_PERFORMANCE.md/evidence/checkpoint-22-final-tests.txt。仅daemon-onlyCPU子指标0.849998%通过，无全仓库轮询/B1/M1/完整M0–M5仍待实现，Goal active。
 
 Checkpoint22终态exit0覆盖下述live记录：原53811已结束/child1197221 TERM-reap/ownsfalse，100k+10k同档案实际300.000624s单核CPU0.849998%（daemon-only CPU子指标<1%）、sampled RSS35274752B、301样本；baseline原始重算精确一致，core100001/public100051/task10000/session0/source保持不变，telemetryfinalseq300仅辅助。见IDLE_PERFORMANCE.md与evidence/checkpoint-22-idle.jsonl，独立终态核验待补。旧1.7733%失败保留；本对仅合计观察不做单项因果，仍全仓库watch/API+B1/长期/完整M1 gate及M2–M5未满足，Goal active。

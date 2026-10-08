@@ -2,6 +2,8 @@
 
 目前仍可推进开发，没有需要终止完整 Goal 的外部阻塞。
 
+Checkpoint23组合100k/10k真实API的有限400写/双SSE/128查询已终态并独立重算，root+High相关21tests通过；无新增外部阻塞。完整B1仍缺3项目/活跃Goal/限定硬件/浏览器可见与合计资源，长期及独立无全仓库poll要求未完成。下一按依赖推进完整M1验收与T09–T25，不把HTTP延迟子证据当作M1或完整Goal完成。
+
 Checkpoint17归档任务cardinality与优化模式拒绝已验证，无新外部阻塞；10k短循环CPU中位数只提示后续idle诊断，不虚称5min NFR失败/通过。下一项组合真实100k/10k、有限实际idle/活跃工作与B1；完整M1/M2–M5继续保留。
 
 Checkpoint16单对象真实100k历史终态/完整性/ratio1.041488已验证，无新外部阻塞；完整B1、任务cardinality、活跃reconcile/idle/维护并发/RSS/WAL和长期证据仍未完成。M1_ACCEPTANCE_REPORT.md明确列出范围，下一项继续实际10k任务测量，不把单轴通过当完成或阻塞。
