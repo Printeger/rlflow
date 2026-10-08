@@ -1,5 +1,9 @@
 # 开发决策记录
 
+## Checkpoint33：内部 exec 准备不能恢复或启动执行
+
+复用实际 isolation.codex_command 生成受保护的 packet/schema/argv/MCP/masking 物料，不造第二份 native policy。Registry profile闭合、版本锁、明确model/effort、CPU禁网/no delegation；paths/role/config输入及目录身份入plan，签发对象+原内存seal防止篡改后重算manifest。未知/重启物料拒绝，而不是仅凭本地文件恢复。无Store/HTTP/worker/预算/ACK/release；start无条件拒绝，source_authority及所有执行门UNVERIFIED。阶段选择把有限物料机制先确定性验证，再加source-bound持久intent和统一admission；不是用准备状态代替完整T11/T12/T14/T17。16MiB仅最终物料/读取上界，非临时磁盘硬配额；seal不证明候选内容或OS资源。OpenAI Docs用于区分exec和AppServer官方接口形态；不把官方通用说明当本地固定CLI/账号运行证明。见HYBRID_EXEC_PREPARATION.md。
+
 ## Checkpoint32：浏览器确认是精确事实同意，不是执行授权
 
 新增独立有界GoalPanel控制状态，公共最后快照与私有合同/nonce/pending分离。auth/observation双generation保护全局401副作用，避免旧请求注销新身份；private ticket拒迟到body。原 server view完整显示后才明确approve，编辑/刷新/较新coreversion使nonce失效，不靠heartbeat续期。条件批准只记录LEASE_VALIDATION_PENDING，lease/OS/实际输入验证另行实现。

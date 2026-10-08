@@ -1,5 +1,7 @@
 # 当前实现到需求的差距矩阵
 
+checkpoint33增量：T11内部native exec物料组件已实现与冻结root/High115/full1003回归，复用原native masking/MCP策略；全部执行门仍UNVERIFIED，不能启动。持久source-bound intent/expectedseal/completion、actual bounded snapshot、lease/budget/STOP和实际执行仍缺，见HYBRID_EXEC_PREPARATION.md。下段checkpoint32 UI结果保留；不将准备组件称为T11/M2完成，完整M1/M0–M5验收仍未通过。
+
 checkpoint32当前增量：合同/原始receipt/条件批准与恢复闭合、保护1.1本地配置、head/private review和真实human条件事实UI已验证，见HYBRID_CONTROL_UI.md。DRAFT提交不是Registry已核验，条件批准不是lease或执行。root/High34Node+2browser+134backend及full949/32skip证据归档；T11有限adapter、T12lease、T14结算、T17可靠STOP、公开条件/实验全链、实际工程科研/B1/长期/安装与全部M0–M5验收仍缺。下表仍含初始基线，不将已交付UI写成“尚无前端”。
 
 基线：`d25cf02`，2026-10-08；必须按当前工作树继续核验。

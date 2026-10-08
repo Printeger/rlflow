@@ -1,0 +1,62 @@
+Checkpoint33 internal non-executing native exec preparation
+2026-10-09. No persistent preparation/HTTP/worker/model/release integration.
+Goal active; not T11/T12/T14/T17 or M0-M5 completion.
+
+Root initial adapter r1 TERMINAL exit1: 53passed/1failed/0.48s.
+Candidate directory rebind left write path missing; _path propagated raw
+FileNotFoundError rather than uniform Conflict. Fixed by sanitizing path errors.
+audit/hybrid-v1/checkpoint-33-adapter-r1.log
+SHA855fbc7466906166925ff76a81d2f0bfe59b27a564e1d51e291d1f4c1b030127
+Root adapter r2 TERMINAL exit0:54passed/0.45s.
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q tests/test_execution_adapter.py
+audit/hybrid-v1/checkpoint-33-adapter-r2.log
+SHAedb981ada456105cd424b11f1708fb7bd1467c5b353d51e379c8da6b819c5f84
+
+Root target original74807 TERMINAL exit0:115passed/37.53s.
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q
+ tests/test_execution_adapter.py tests/test_isolation.py
+ tests/test_cpu_approval.py tests/test_engine.py
+audit/hybrid-v1/checkpoint-33-target-r1.log
+SHA066df7603744d96822594f24f17f9a207ff92aac5714ae72b54588dc4ab8768d
+Independent High exactly same4modules ONCE, sequential/no parallel tests:
+original39508 TERMINAL exit0:115passed/38.13s.
+audit/hybrid-v1/checkpoint-33-high-r1.log
+SHA23bff78d035f3ce8829dd607e5a0f471bb73f67964a1b917cc392e0ec8a71868
+Static review MUST_FIX write_roots bound-after-iteration fixed: concrete
+list/tuple <=128 checked BEFORE candidate/write IO; generator/129 negative tests.
+Final implementation review no remaining MUST_FIX for adapter-only scope.
+
+Root full original77231 confirmed TERMINAL exit0:
+1003passed/32existing external-H1 skips/1existing Starlette warning/286.87s.
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q
+audit/hybrid-v1/checkpoint-33-full-r1.log
+SHA8d96d9c8f66c5814969b625cda5014903082d4db19c36a8db9573b2120aef32d
+No source/test edits during any run; no parallel test/benchmark launches.
+Root source-start/end files byte equal, independentstart/end same 3SHA:
+5fe49b64d625e338f034ea5f137b679ba2ec76b24ece163754bb315c1ea22ef8 rlflow/execution_adapter.py
+f013b53ae6926d28eebbfd1ae209db116804edcc495c3ca33dbf1373c33888bc rlflow/isolation.py
+1e08da11ea51372ac56f26e8e4aba76a1d009b1c920e7e4241d14e5a7a93315f tests/test_execution_adapter.py
+.venv/bin/python -m compileall -q rlflow tests: exit0.
+.venv/bin/python -m pip check:exit0 No broken requirements found.
+git diff --check:exit0.
+No new protocol/schema files or UI changes; no new offlinevalidator/browser/
+performance/soak claimed. Existing old proofs not relabeled as33.
+
+Adapter tests use actual codex_command policy with explicit temporary model
+metadata and mock ONLY --version subprocess. Popen forbidden. No model/provider
+call, worker/start/ACK/task/session/budget/store mutation. Existing isolation
+tests also exercise real owned bounded CPU/doctor/recovery; not Hybrid execution.
+Exactmodel gpt-6.1-sol/medium fixture, no account access proof or fallback.
+Issued identity/config/role/path binding, original seal prevents file+manifest
+rehash, unknownrestart material refuses, directory/fifo/symlink/hardlink/mode
+negative tests, decodeJSON argv quoted/unicode paths, nonblockingflock,
+ownedstagecleanup preserving unrelatedsentinel, no authenvironment persist.
+16MiB final/read cap NOT temporary disk quota; seal NOT whole scratch/candidate
+content/OS/lease/source proof. All execution gates UNVERIFIED; startalwaysdenies.
+
+Next provisional bundle->core immutable intent with original expectedseal->
+publish->completion, full actual sourceproof and bounded real candidate snapshot.
+Then lease/budget/STOP admission, runtime, engineering/research, install/recovery,
+M1/B1/NFR06,24hfixture/8hUI and independent final M0-M5 audit remain pending.
+No pushes, hosting, system changes, expensive training or paid model calls.
+USER package-lock.json untouched/not staged. Goal remains active.

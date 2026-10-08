@@ -9,12 +9,14 @@ import ctypes
 import errno
 import hashlib
 import json
+import math
 import os
 from pathlib import Path
 import platform
 import re
 import resource
 import signal
+import stat
 import subprocess
 import sys
 import tempfile
@@ -35,6 +37,43 @@ ROOT = Path(__file__).resolve().parents[1]
 
 class IsolationError(RuntimeError):
     pass
+
+
+def read_model_catalog(path):
+    """Bounded public model metadata only; never a model/account access grant."""
+    descriptor = os.open(path, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK | os.O_CLOEXEC)
+    try:
+        info = os.fstat(descriptor)
+        if not stat.S_ISREG(info.st_mode) or info.st_size > 16 * 1024**2:
+            raise IsolationError('Model catalog is not a bounded regular file')
+        chunks=[];size=0
+        while block:=os.read(descriptor,min(65536,16*1024**2+1-size)):
+            size+=len(block)
+            if size>16*1024**2:raise IsolationError('Model catalog exceeds bound')
+            chunks.append(block)
+        raw=b''.join(chunks)
+        def pairs(values):
+            result={}
+            for key,value in values:
+                if key in result:raise IsolationError('Duplicate model catalog key')
+                result[key]=value
+            return result
+        def constant(value):raise IsolationError('Nonfinite model catalog number')
+        value=json.loads(raw,object_pairs_hook=pairs,parse_constant=constant)
+        stack=[(value,0)]
+        while stack:
+            item,depth=stack.pop()
+            if depth>64:raise IsolationError('Model catalog exceeds depth bound')
+            if isinstance(item,float) and not math.isfinite(item):constant(item)
+            if isinstance(item,dict):stack.extend((v,depth+1) for v in item.values())
+            elif isinstance(item,list):stack.extend((v,depth+1) for v in item)
+        if not isinstance(value,dict) or not isinstance(value.get('models'),list):
+            raise IsolationError('Invalid model catalog')
+        return value
+    except (ValueError,UnicodeError,RecursionError) as error:
+        raise IsolationError('Invalid model catalog') from error
+    finally:
+        os.close(descriptor)
 
 
 def _check(result: int, name: str) -> int:
@@ -420,7 +459,7 @@ def codex_command(role: str, candidate: str | Path, scratch: str | Path,
         raise IsolationError('Codex version does not match '+PINNED_VERSION)
     if _census_catalog is None:
         cache = Path(os.environ.get('CODEX_HOME',str(Path.home()/'.codex')))/'models_cache.json'
-        catalog = json.loads(cache.read_text())
+        catalog = read_model_catalog(cache)
     else:
         # Only the local rejecting census uses a synthetic catalog. It must never
         # be a fallback for a real account/model missing from the operator cache.
