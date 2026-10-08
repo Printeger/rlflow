@@ -69,6 +69,20 @@
           <p id="events-empty" class="empty">本次连接尚无新业务事件。面板保持静止。</p>
         </section>
       </div>
+      <section class="panel logs-panel">
+        <div class="panel-heading"><h2>公共状态日志</h2><span class="muted">CORE_STATUS / TOOL_METADATA 未接入 / raw logs PRIVATE_ONLY</span></div>
+        <p class="muted">固定模板只证明核心已提交状态观测，不证明工具或模型运行。正文按需读取，不提供私有模型日志。</p>
+        <form id="log-filters" class="controls" method="get" action="/">
+          <label for="log-severity">级别</label><select id="log-severity"><option value="">全部</option><option>INFO</option><option>WARNING</option><option>ERROR</option></select>
+          <label for="log-kind">关联类型</label><select id="log-kind"><option value="">全部</option><option value="task">Task</option><option value="execution">Session</option><option value="experiment">Experiment</option></select>
+          <label for="log-object">公开 ID</label><input id="log-object" placeholder="ref_…（需关联类型）" maxlength="160">
+          <button type="submit">读取 / 刷新日志</button>
+        </form>
+        <p id="log-note" class="muted" role="status">尚未读取。</p>
+        <div id="logs" class="event-list" tabindex="0" aria-label="公共状态日志，方向键、Home、End导航，Enter读取正文"></div>
+        <div class="control-strip"><button id="log-new" hidden></button><button id="log-next" disabled>下一日志页</button></div>
+        <p id="log-empty" class="empty" hidden>当前覆盖范围与筛选下无日志；不代表没有历史业务事件。</p>
+      </section>
       <footer class="footer"><span id="sync-time">尚未同步</span><span id="cursor">无 durable cursor</span><span>资源与 worker freshness：UNKNOWN</span></footer>
     </div>
   </main>

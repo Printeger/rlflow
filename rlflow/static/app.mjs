@@ -1,5 +1,6 @@
 import {installSnapshot, applyEvent, mergePage, total, cursor, objectKey, SyncError} from './reducer.mjs';
 import {VirtualList} from './virtual-list.mjs';
+import {checkLogPage,checkLogBody} from './log-view.mjs';
 
 const $ = id => document.getElementById(id);
 const motionPreference = matchMedia('(prefers-reduced-motion: reduce)');
@@ -10,6 +11,51 @@ let raf = null, pulseTimer = null;
 let authGeneration = 0, authController = null;
 const pulses = new Map();
 const eventList = new VirtualList($('events'), eventNode, event => event.event_id);
+let logSerial = 0, logDetailSerial = 0, logPage = null, logNext = null, logPending = 0;
+const logList = new VirtualList($('logs'),logNode,row => row.id);
+function clearLogs() {
+  ++logSerial; ++logDetailSerial; logPage = null; logNext = null; logPending = 0; logList.setItems([]);
+  $('log-note').textContent = '尚未读取。'; $('log-next').disabled = true; $('log-new').hidden = true; $('log-empty').hidden = true;
+  $('log-new').textContent = ''; $('details').close(); $('detail-title').textContent = ''; $('detail-content').textContent = '';
+}
+function logScope() { return {project:state.project,mode:state.mode,epoch:state.epoch}; }
+function logNode(row) {
+  const button = text('button','', 'event-row'); button.dataset.logId = row.id;
+  const summary = text('span',`${row.severity} · CORE_STATUS`);
+  summary.append(text('span',`${row.object_count} objects · ${short(row.id)}`,'muted'));
+  button.append(text('span',row.occurred_at.slice(11,19),'muted'),summary);
+  button.title = `${row.severity} · ${row.id} · ${row.occurred_at} · Enter / 点击懒加载正文`;
+  button.addEventListener('click',async () => {
+    const selected = generation, ticket = logSerial, chosen = ++logDetailSerial, scope = logScope();
+    try { const value = await request(`${base()}/logs/${encodeURIComponent(row.id)}`);
+      if (selected === generation && ticket === logSerial && chosen === logDetailSerial) details(`CORE_STATUS · ${row.id}`,checkLogBody(value,row,scope));
+    } catch (error) { if (selected === generation && ticket === logSerial && chosen === logDetailSerial) $('log-note').textContent = `正文未加载：${error.message}`; }
+  }); return button;
+}
+async function loadLogs(after='') {
+  if (!state || !project || state.project !== project.id) return;
+  const ticket = ++logSerial, selected = generation, scope = logScope(), previousHigh = after ? logPage?.high_water : null;
+  const severity = $('log-severity').value, kind = $('log-kind').value, objectId = $('log-object').value.trim();
+  if (!!kind !== !!objectId) { $('log-note').textContent = '关联类型和公开 ID 必须一起填写；下方保留上次读取结果。'; return; }
+  const query = new URLSearchParams({limit:'50',after});
+  if (severity) query.set('severity',severity);
+  if (kind) {query.set('kind',kind);query.set('object_id',objectId);}
+  $('log-note').textContent = '读取日志…下方保留上次读取结果。';
+  try {
+    const value = await request(`${base()}/logs?${query}`);
+    if (selected !== generation || ticket !== logSerial) return;
+    logPage = checkLogPage(value,scope,previousHigh); logNext = value.next_cursor;
+    logPending = Math.max(0,state.seq-cursor(value.high_water).seq);
+    $('logs').scrollTop = 0; logList.setItems(value.items); $('log-next').disabled = !logNext;
+    $('log-empty').hidden = value.items.length>0;
+    $('log-note').textContent = `${severity || 'ALL'} · ${kind ? kind+' '+objectId : '全部关联'} · 本页 ${value.items.length} · 日志 high-water ${value.high_water} · 覆盖 seq > ${value.coverage_after_seq}（不含更早历史）`;
+    updateLogPending();
+  } catch (error) { if (selected === generation && ticket === logSerial) $('log-note').textContent = `日志不可用：${error.message}；保留上次日志，不把缺覆盖解释成没有事件。`; }
+}
+function updateLogPending() {
+  $('log-new').hidden = !logPending;
+  $('log-new').textContent = `${logPending} 次新提交（可能不匹配筛选）；读取最新日志`;
+}
 function beginAuth() {
   authController?.abort(); authController = new AbortController();
   return {ticket:++authGeneration, signal:authController.signal};
@@ -19,6 +65,7 @@ function clearObservation() {
   state = null; project = null; pageIds = []; nextPage = null; unread = 0; lastHeard = 0;
   for (const id of ['executions','budgets','objects','events']) $(id).replaceChildren();
   eventList.setItems([]);
+  clearLogs(); $('log-severity').value = ''; $('log-kind').value = ''; $('log-object').value = '';
   for (const id of ['task-total','execution-total','approval-total']) $(id).textContent = 'UNKNOWN';
   for (const id of ['project-title','mode-note','cursor','sync-time','core-flags','execution-caption','object-page-note','detail-content']) $(id).textContent = '';
   $('details').close(); $('next-page').disabled = true; $('new-events').hidden = true;
@@ -71,6 +118,7 @@ function highlight(node, key, eventId) {
   if (raf === null && pulseTimer === null) raf = requestAnimationFrame(pulseStep);
 }
 function details(title, value) {
+  ++logDetailSerial;
   $('detail-title').textContent = title; $('detail-content').textContent = JSON.stringify(value,null,2);
   if (!$('details').open) $('details').showModal();
 }
@@ -166,6 +214,7 @@ function openStream(selected) {
       const value = JSON.parse(message.data), result = applyEvent(state,value,message.lastEventId);
       state = result.state; lastHeard = performance.now();
       if (!result.duplicate) {
+        if (logPage && value.seq>cursor(logPage.high_water).seq) {logPending++;updateLogPending();}
         const kind = $('kind-select').value;
         for (const row of value.payload.upsert) {
           const key = objectKey(row);
@@ -219,6 +268,8 @@ function failStream(error, selected) {
 async function selectProject() {
   const selected = ++generation; ++pageSerial; closeStream();
   project = projects.find(value => value.id === $('project-select').value);
+  if (state?.project !== project?.id) clearLogs();
+  else {++logSerial; ++logDetailSerial; $('details').close(); $('detail-title').textContent = ''; $('detail-content').textContent = '';}
   if (!project) return;
   $('details').close(); setConnection('CONNECTING');
   problem(state && state.project !== project.id ? `正在切换到 ${project.id}；下方仍是 ${state.project} 的最后快照。` : '');
@@ -226,11 +277,13 @@ async function selectProject() {
     const snapshot = await request(`${base()}/snapshot`);
     if (selected !== generation) return;
     state = installSnapshot(snapshot,project.id,project.data_mode); lastHeard = performance.now(); pageIds = []; nextPage = null; unread = 0;
+    if (logPage && cursor(logPage.high_water).epoch !== state.epoch) clearLogs();
+    if (logPage) {logPending = Math.max(0,state.seq-cursor(logPage.high_water).seq);updateLogPending();}
     $('project-title').textContent = project.id;
     $('mode-note').className = 'notice ' + (project.data_mode === 'fixture' ? 'fixture' : '');
     $('mode-note').textContent = project.data_mode === 'fixture' ? 'FIXTURE / 隔离测试数据，不证明供应商模型或生产运行。' : 'LIVE / 真实公共投影。连接正常不代表模型运行，观察不足会明确显示。';
     problem(''); render(); openStream(selected);
-    await Promise.allSettled([loadPage(), loadOverview('execution',30), loadOverview('stage',10)]);
+    await Promise.allSettled([loadPage(), loadOverview('execution',30), loadOverview('stage',10),loadLogs()]);
   } catch (error) { if (selected === generation) { setConnection(error.incompatible ? 'INCOMPATIBLE' : 'OFFLINE'); problem(error.message); if (error.status === 401) $('login-panel').hidden = false; } }
 }
 async function loadOverview(kind, limit) {
@@ -271,6 +324,10 @@ $('project-select').addEventListener('change',selectProject); $('refresh').addEv
 $('kind-select').addEventListener('change',() => loadPage()); $('next-page').addEventListener('click',() => loadPage(nextPage));
 $('event-filter').addEventListener('input',scheduleRender); $('close-details').addEventListener('click',() => $('details').close());
 $('new-events').addEventListener('click',() => { unread = 0; $('events').scrollTop = 0; scheduleRender(); });
+$('log-filters').addEventListener('submit',event => {event.preventDefault();loadLogs();});
+$('log-next').addEventListener('click',() => loadLogs(logNext)); $('log-new').addEventListener('click',() => loadLogs());
+$('log-filters').addEventListener('input',() => {$('log-next').disabled = true;});
+$('details').addEventListener('close',() => {++logDetailSerial;});
 $('reduce-motion').checked = motionPreference.matches;
 $('reduce-motion').addEventListener('change',stopPulses); motionPreference.addEventListener('change',stopPulses);
 document.addEventListener('visibilitychange',stopPulses);

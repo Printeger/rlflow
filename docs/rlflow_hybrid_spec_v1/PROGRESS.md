@@ -13,9 +13,9 @@
 | T02 | 无生成探测与隔离兼容完成 | 315 schema；version+protocol SHA pin；initialize-only 独立握手成功；真实 usage/interrupt/子代理未证实，禁用不支持能力 |
 | T03 | 初始闭合合同已实现，后续扩展中 | GoalContract/Task/Lease/Attempt/Approval/Evidence/Experiment/Usage/Budget/CommandReceipt、公共快照与已注册 payload；完整 API 实际接口尚待 T06/T16 |
 | T04 | 初始事务观测桥已验证，性能验收未完成 | 只读 bounded snapshot/page、增量 counters、同事务 outbox、epoch、真实进程故障测试；B1 100k 与备份恢复集成待验证 |
-| T05 | 启动释放与公共CORE_STATUS日志后端已验证，完整观测未完成 | CLI_RELEASE_ACK/固定日志同事务一次性；CORE_STATUS不证明工具/模型执行；日志UI/tool metadata/资源/vendor活动待验证 |
+| T05 | 启动释放与公共CORE_STATUS日志后端已验证，完整观测未完成 | CLI_RELEASE_ACK/固定日志同事务一次性；CORE_STATUS不证明工具/模型执行；tool metadata/资源/vendor活动待验证 |
 | T06 | 只读基础切片实现，未完整验收 | 同源登录/project scope/短期 Bearer、snapshot/page、bounded durable SSE、loopback CLI；无写命令/任意 artifact；见 LOCAL_WEB.md |
-| T07–T08 | 初始只读 UI 与事件虚拟化已实现，未完整验收 | 真实 snapshot/SSE reducer、卡片/预算/分页/详情、虚拟窗口/阅读锚点/键盘、离线/身份隔离；Fixture Chrome QA 通过；日志/资源、真实运行与完整 M1 验收待完成 |
+| T07–T08 | 初始只读 UI、事件虚拟化与公共日志已实现，未完整验收 | 真实 snapshot/SSE reducer、卡片/预算/分页/详情、虚拟窗口/阅读锚点/键盘、日志筛选/lazy正文、离线/身份隔离；Fixture Chrome QA 通过；资源、真实运行与完整 M1 验收待完成 |
 | T09–T17 | 未开始 | 合同、策略、受控 Runtime、单写、独立评审、预算、skill、控制与恢复 |
 | T18–T20 | 未开始 | 本地与 fixture 实验 adapter、科研状态、证据页面 |
 | T21–T22 | 未开始 | 资源隔离、故障/性能/24h 与 8h soak |
@@ -31,10 +31,12 @@ High 独立 Web 复核的项目读源 TOCTOU、健康 backlog 误判/过量预�
 
 最新 checkpoint 03：68 项 startup/protocol/observation 回归及独立 High 审查通过；冻结全回归 **399 passed / 32 skipped / 135.90s**。新启动观测不改 source status/phase/预算/批准，明确 CLI_RELEASE_ACK 不是模型 RUNNING。证据见 CHECKPOINT_03.md。
 
-下一项：接入已实现的CORE_STATUS日志UI筛选/lazy正文，再补T05工具metadata/资源、首次历史/error、动效/连接恢复与真实来源端到端，执行M1验收。虚拟窗口/日志后端不代表真实模型运行或8h soak。M1–M5与完整Goal仍未完成。
+下一项：补T05工具metadata/资源、首次历史/error、动效/连接恢复与真实来源端到端，执行M1验收。虚拟窗口/公共日志不代表真实模型运行或8h soak。M1–M5与完整Goal仍未完成。
 
 最新 checkpoint 04：冻结全回归 **402 passed / 32 skipped / 139.90s**，browser+reducer **9 passed / 0 skipped**，High 初始 UI 三项 MUST_FIX 全部关闭。实际登录/snapshot/SSE/详情/离线恢复/手机/身份隔离证明见 CHECKPOINT_04.md，未覆盖完整 M1。
 
 Checkpoint05：geometry/reducer/browser **11 passed**，Web/CLI Python回归 **11 passed**。本轮未修改Python，不虚称全量重跑；见CHECKPOINT_05.md。下一项公共日志安全方案High复核中。
 
 Checkpoint06：CORE_STATUS后端/API，目标80passed，独立High日志27passed，三项MUST_FIX关闭；r3最终冻结 **430 passed/32 skipped/143.61s**，浏览器回归11passed。详见CHECKPOINT_06.md与evidence/checkpoint-06-final-tests.txt。下一项日志UI，未声称完整T05/M1验收。
+
+Checkpoint07：公共日志UI筛选/固定high-water分页/按需正文/虚拟窗口/覆盖说明已接入；最终Chrome/reducer/geometry/log-validator **13 passed/0 skipped/5.85s**，相关Python **39 passed/1 warning/5.21s**。High发现的详情残留与ref类型隐式转换已修复并独立复验，刷新失败保留同项目页及迟到响应隔离通过。见CHECKPOINT_07.md；后端未改，未虚称重跑430全量。下一项工具metadata/资源，完整Goal保持活跃。

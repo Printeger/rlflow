@@ -39,3 +39,5 @@
 Checkpoint05虚拟事件窗口：geometry/reducer/browser11通过，Web/CLI回归11通过；命令和源码hash见CHECKPOINT_05.md。该前端变化不是完整M1或后端100k性能验收。
 
 Checkpoint06公共CORE_STATUS日志后端/API：冻结430passed/32skipped/143.61s，浏览器回归11passed，High本范围MUST_FIX关闭。见CHECKPOINT_06.md/evidence/checkpoint-06-final-tests.txt；状态日志不证明工具/模型实际运行，日志UI、工具metadata、资源、完整M1–M5仍待交付。
+
+Checkpoint07公共日志UI：Chrome/Node13passed/0skipped/5.85s，相关Python39passed/1warning/5.21s，High本范围MUST_FIX关闭，语法/编译/diff通过。见CHECKPOINT_07.md/evidence/checkpoint-07-final-tests.txt。本轮没有后端全量重跑，工具metadata/资源及M1–M5、长期验收仍待完成。

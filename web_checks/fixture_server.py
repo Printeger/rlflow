@@ -53,6 +53,9 @@ def main():
                     with auth._lock: auth._sessions.clear()
                 elif command["op"] == "burst":
                     for index in range(command["count"]): task(f'burst_{index}', f'Bounded fixture {index}')
+                elif command["op"] == "usage":
+                    store.transact_objects("USAGE_OBSERVED",command["id"],[("usage",command["id"])],
+                        lambda s:s.setdefault("usage",{}).update({command["id"]:{"status":command["status"],"task_id":"initial"}}))
                 else: raise ValueError("unknown fixture control")
                 print(json.dumps({"reply": command["op"], "head": ObservationReader(store.root).head()}), flush=True)
         finally:

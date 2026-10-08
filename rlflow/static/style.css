@@ -42,6 +42,7 @@ p { margin:10px 0; } .muted { color:var(--muted); font-size:12px; } .eyebrow { c
 .object-title { min-width:0; overflow-wrap:anywhere; } .object-title .muted { display:block; margin-top:3px; }
 .event-list { height:340px; overflow:auto; overflow-anchor:none; border:1px solid var(--border); margin-top:16px; border-radius:4px; background:#0c151f; }
 .virtual-spacer { pointer-events:none; }
+.logs-panel { margin-top:20px; } .logs-panel .controls input { flex:1; min-width:160px; }
 .event-row { width:100%; height:64px; overflow:hidden; border:0; border-bottom:1px solid #203247; border-radius:0; text-align:left; background:transparent; display:grid; grid-template-columns:68px minmax(0,1fr); gap:8px; font-size:12px; padding:12px; }
 .event-row > span { min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .event-row > span > span { display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }

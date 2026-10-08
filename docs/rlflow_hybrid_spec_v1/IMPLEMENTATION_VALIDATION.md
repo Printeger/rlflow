@@ -96,3 +96,7 @@ CORE_STATUS同事务append-only投影、closed schema、scoped summary/lazy-body
 初始实验test错误使用未支持的experiments集合，被RuntimeState拒绝；已改实际usage relation fixture，不放宽产品schema。两次全回归在审查修复期间主动SIGINT停止、保留原日志，不列为成功。独立复验后r3最终冻结运行，后端日志的实际边界/失败/恢复与证据见CHECKPOINT_06.md。资源与工具动作metadata、真实供应商、完整M1–M5仍待交付。
 
 r3冻结最终 **430 passed/32 skipped/1 warning/143.61s**，编译/diff check通过；命令/源码hash/实际结果见evidence/checkpoint-06-final-tests.txt。本轮仍无日志UI与真实工具日志验收证明，下一项继续实现。
+
+## Checkpoint07：公共日志 UI
+
+最终Chrome/reducer/geometry/log-validator **13 passed/0 skipped/5.85s**，相关Python logs/API/local **39 passed/1 warning/5.21s**；模块语法/fixture编译/diff通过。列表不预读正文、索引过滤/固定high-water下一页、独立业务cursor、虚拟DOM、503同项目保留/恢复、乱序body与身份重置后迟到list/body隔离已验证。High本范围无剩余MUST_FIX，具体修复/过程失败/hash/命令见CHECKPOINT_07.md及evidence/checkpoint-07-final-tests.txt。未改后端且未重跑全量430/32；工具metadata/资源/完整M1–M5继续保留。

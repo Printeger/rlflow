@@ -36,8 +36,9 @@ test('real local Dashboard: durable SSE, offline recovery, identity clearing and
         return original.call(window,callback);
       };
     });
-    const page = await context.newPage(), errors = [];
+    const page = await context.newPage(), errors = [], logBodies = [];
     page.on('pageerror',error => errors.push(error.message));
+    page.on('request',request => {if (/\/logs\/log_/.test(request.url())) logBodies.push(request.url());});
     await page.goto(origin);
     const login = async name => {
       await page.locator('#principal').fill(name); await page.locator('#passphrase').fill(phrase);
@@ -55,6 +56,9 @@ test('real local Dashboard: durable SSE, offline recovery, identity clearing and
     await page.waitForFunction(previous => document.querySelector('#sync-time').textContent !== previous,heartbeatTime);
     assert.equal(await page.locator('#task-total').textContent(),'1');
     assert.equal(await page.evaluate(() => window.observerRafCalls),0);
+    await page.waitForFunction(() => !!document.querySelector('#logs [data-log-id]'));
+    assert.equal(logBodies.length,0);
+    assert.match(await page.locator('#log-note').textContent(),/覆盖 seq > 0/);
     await page.locator('.execution-node').focus(); await page.keyboard.press('Enter');
     assert.equal(await page.locator('#details').evaluate(node => node.open),true);
     await page.locator('#close-details').click();
@@ -76,10 +80,10 @@ test('real local Dashboard: durable SSE, offline recovery, identity clearing and
     await page.waitForFunction(at => document.querySelector('#cursor').textContent === at,burst.head.cursor,{timeout:20000});
     assert.equal(await page.locator('#task-total').textContent(),'208');
     assert.equal(await page.locator('.execution-node').count(),1);
-    assert.ok(await page.locator('.event-row').count() <= 16);
+    assert.ok(await page.locator('#events .event-row').count() <= 16);
     await page.locator('#events').evaluate(box => {box.scrollTop=640;});
-    await page.waitForFunction(() => !!document.querySelector('[data-virtual-index="10"]'));
-    const anchor = await page.locator('[data-virtual-index="10"]').getAttribute('data-event-id');
+    await page.waitForFunction(() => !!document.querySelector('#events [data-virtual-index="10"]'));
+    const anchor = await page.locator('#events [data-virtual-index="10"]').getAttribute('data-event-id');
     const beforeTop = await page.locator(`[data-event-id="${anchor}"]`).evaluate(node => node.getBoundingClientRect().top-node.parentElement.getBoundingClientRect().top);
     const added = await control({op:'task',id:'while_reading'});
     await page.waitForFunction(at => document.querySelector('#cursor').textContent === at,added.head.cursor);
@@ -88,7 +92,7 @@ test('real local Dashboard: durable SSE, offline recovery, identity clearing and
     assert.equal(await page.locator('#new-events').isVisible(),true);
     await page.locator('#events').focus(); await page.keyboard.press('End');
     await page.waitForFunction(() => document.activeElement.dataset.virtualIndex === '199');
-    assert.ok(await page.locator('.event-row').count() <= 16);
+    assert.ok(await page.locator('#events .event-row').count() <= 16);
     await page.keyboard.press('Enter'); await page.waitForFunction(() => document.querySelector('#details').open);
     await page.locator('#close-details').click();
     await page.locator('#new-events').click();
@@ -96,13 +100,76 @@ test('real local Dashboard: durable SSE, offline recovery, identity clearing and
     await page.locator('#events').focus(); await page.keyboard.press('Home');
     assert.equal(await page.evaluate(() => document.activeElement.dataset.virtualIndex),'0');
     await page.locator('#event-filter').fill('NO_MATCHING_PUBLIC_EVENT');
-    await page.waitForFunction(() => !document.querySelector('.event-row'));
+    await page.waitForFunction(() => !document.querySelector('#events .event-row'));
     await page.locator('#event-filter').fill('');
-    await page.waitForFunction(() => !!document.querySelector('.event-row'));
+    await page.waitForFunction(() => !!document.querySelector('#events .event-row'));
+    // Public logs are separately paged, never advance the domain reducer cursor.
+    await page.locator('#log-new').click();
+    await page.waitForFunction(() => document.querySelector('#log-note').textContent.includes('本页 50'));
+    const firstLog = await page.locator('#logs [data-log-id]').first().getAttribute('data-log-id');
+    const logWater = await page.locator('#log-note').textContent();
+    const domainWater = await page.locator('#cursor').textContent();
+    await page.locator('#log-next').click();
+    await page.waitForFunction(first => document.querySelector('#logs [data-log-id]')?.dataset.logId !== first,firstLog);
+    assert.equal(await page.locator('#log-note').textContent(),logWater);
+    assert.equal(await page.locator('#cursor').textContent(),domainWater);
+    assert.ok(await page.locator('#logs .event-row').count() <= 16);
+    const errorLog = await control({op:'usage',id:'fixture_failure',status:'FAILED'});
+    await page.waitForFunction(at => document.querySelector('#cursor').textContent === at,errorLog.head.cursor);
+    await page.locator('#log-severity').selectOption('ERROR');
+    await page.locator('#log-filters button').click();
+    await page.waitForFunction(() => document.querySelector('#log-note').textContent.includes('ERROR · 全部关联 · 本页 1'));
+    assert.equal(logBodies.length,0);
+    const publicTask = await page.evaluate(async () => {
+      const result = await fetch('/api/v1/projects/project_fixture/objects?kind=execution&limit=1');
+      return (await result.json()).items[0].task_id;
+    });
+    await page.locator('#log-kind').selectOption('task'); await page.locator('#log-object').fill(publicTask);
+    await page.locator('#log-filters button').click();
+    await page.waitForFunction(id => document.querySelector('#log-note').textContent.includes('task '+id+' · 本页 1'),publicTask);
+    await page.locator('#logs').focus();await page.keyboard.press('Home');await page.keyboard.press('Enter');
+    await page.waitForFunction(() => document.querySelector('#details').open);
+    assert.equal(logBodies.length,1);
+    assert.match(await page.locator('#detail-content').textContent(),/observed state FAILED/);
+    assert.match(await page.locator('#detail-content').textContent(),/PRIVATE_ONLY/);
+    await page.locator('#close-details').click();
+    await page.locator('#log-kind').selectOption('experiment');
+    await page.locator('#log-filters button').click();
+    await page.waitForFunction(() => !document.querySelector('#log-empty').hidden);
+    assert.equal(await page.locator('#logs [data-log-id]').count(),0);
+    await page.locator('#log-kind').selectOption('');await page.locator('#log-object').fill('');
+    await page.locator('#log-severity').selectOption('');await page.locator('#log-filters button').click();
+    await page.waitForFunction(() => !!document.querySelector('#logs [data-log-id]'));
+    let releaseBody, enteredBody, bodyDone;
+    const enteredB = new Promise(resolve => {enteredBody=resolve;}), releasedB = new Promise(resolve => {releaseBody=resolve;}), doneB = new Promise(resolve => {bodyDone=resolve;});
+    const oldLog = await page.locator('#logs [data-log-id]').first().getAttribute('data-log-id');
+    const newLog = await page.locator('#logs [data-log-id]').nth(1).getAttribute('data-log-id');
+    await page.route('**/logs/'+oldLog,async route => {
+      const response = await route.fetch(); enteredBody(); await releasedB; await route.fulfill({response}); bodyDone();
+    });
+    await page.locator('#logs [data-log-id]').first().click(); await enteredB;
+    await page.locator('#logs [data-log-id]').nth(1).click();
+    await page.waitForFunction(id => document.querySelector('#detail-title').textContent.includes(id),newLog);
+    const finishedBody = page.waitForEvent('requestfinished',{predicate:request => request.url().endsWith('/logs/'+oldLog)});
+    releaseBody();await doneB;await finishedBody;
+    assert.match(await page.locator('#detail-title').textContent(),new RegExp(newLog));
+    await page.unroute('**/logs/'+oldLog); await page.locator('#close-details').click();
+    // A failed same-project snapshot refresh preserves the last scoped log page.
+    const retainedLog = await page.locator('#logs [data-log-id]').first().getAttribute('data-log-id');
+    await page.route('**/snapshot',route => route.fulfill({status:503,contentType:'application/json',body:JSON.stringify({code:'UNAVAILABLE'})}));
+    await page.locator('#refresh').click();
+    await page.waitForFunction(() => document.querySelector('#error-banner').textContent.includes('503'));
+    assert.equal(await page.locator('#logs [data-log-id]').first().getAttribute('data-log-id'),retainedLog);
+    await page.unroute('**/snapshot');await page.locator('#refresh').click();
+    await page.waitForFunction(() => document.querySelector('#connection').textContent==='LIVE');
+    // Snapshot intentionally does not synthesize historical event rows.
+    await control({op:'usage',id:'refresh_observed',status:'UNKNOWN'});
+    await page.waitForFunction(() => !!document.querySelector('#events .event-row'));
     assert.ok(await page.locator('.object-row').count() <= 50);
     assert.equal(await page.evaluate(() => localStorage.length+sessionStorage.length),0);
     await mkdir(resolve(repo,'web_checks/artifacts'),{recursive:true});
     await page.screenshot({path:resolve(repo,'web_checks/artifacts/dashboard-desktop.png'),fullPage:true});
+    await page.locator('.logs-panel').screenshot({path:resolve(repo,'web_checks/artifacts/dashboard-logs.png')});
     await page.setViewportSize({width:390,height:844});
     await page.emulateMedia({reducedMotion:'reduce'});
     await page.waitForFunction(() => {
@@ -113,6 +180,18 @@ test('real local Dashboard: durable SSE, offline recovery, identity clearing and
     },{},{timeout:3000});
     assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
     await page.screenshot({path:resolve(repo,'web_checks/artifacts/dashboard-mobile.png'),fullPage:true});
+    // A list response fetched under the old identity cannot return after logout.
+    let releaseList, enteredList, listDone;
+    const enteredL = new Promise(resolve => {enteredList=resolve;}), releasedL = new Promise(resolve => {releaseList=resolve;}), doneL = new Promise(resolve => {listDone=resolve;});
+    await page.route('**/logs?**',async route => {
+      const response = await route.fetch();enteredList();await releasedL;await route.fulfill({response});listDone();
+    });
+    await page.locator('#log-filters button').click();await enteredL;await page.locator('#logout').click();
+    releaseList();await doneL;await page.unroute('**/logs?**');
+    assert.equal(await page.locator('#logs [data-log-id]').count(),0);
+    assert.equal(await page.locator('#detail-content').textContent(),'');
+    assert.equal(await page.locator('#detail-title').textContent(),'');
+    await login('local');await page.waitForFunction(() => document.querySelector('#connection').textContent==='LIVE');
     await control({op:'expire'});
     await page.waitForFunction(() => !document.querySelector('#login-panel').hidden);
     await login('no_projects');
@@ -120,6 +199,8 @@ test('real local Dashboard: durable SSE, offline recovery, identity clearing and
     for (const selector of ['.execution-node','.object-row','.event-row','#budgets > *']) assert.equal(await page.locator(selector).count(),0);
     assert.equal(await page.locator('#task-total').textContent(),'UNKNOWN');
     assert.equal(await page.locator('#detail-content').textContent(),'');
+    assert.equal(await page.locator('#detail-title').textContent(),'');
+    assert.equal(await page.locator('#log-new').textContent(),'');
     await page.locator('#logout').click();
     assert.equal(await page.locator('#dashboard').evaluate(node => node.hidden),true);
     // An authenticated bootstrap stalled at projects must not revive the UI after logout.

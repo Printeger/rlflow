@@ -57,3 +57,7 @@ START_ACK 写于 exec 前，故仅公开 CLI_RELEASE_ACK/startup_released_at，�
 CORE_STATUS日志同原public event事务提交，不新增调度器或模型调用；正文仅opaque ID/对象版本/有限状态/固定模板，不复制任何自由文本。不从core数据库状态推出generation/request/执行活动，工具日志以后独立绑定。日志游标固定high-water与filter hash，独立于SSE消费位置。普通列表信任同事务compact witness并验证其hash/元数据/source digest；lazy正文再验证实际source bytes和重构模板。过滤命中逐个public envelope核验membership/severity，避免不受限批量最大事件加载。
 
 append-only refs增加INSERT成员/severity guard；只读路径仍防御异常索引与缺log/source。初始化和reader检查三日志表闭合，all absent才允许显式旧库启用；部分缺表拒绝，不自动创造空refs使历史覆盖假完整。未过滤keyset仅对本次窗口验证连续性与floor，不扫描全部历史。真实资源/工具metadata/日志UI与M1长期gate继续保留，不以该status log切片取代。
+
+## 2026-10-08：日志显示与业务消费隔离
+
+公共日志页固定high-water，单页50条替换而非无界累计，虚拟DOM与SSE消费位置独立。SSE新增仅显示可能不匹配筛选的提交数；改变过滤必须读首页，不借日志滚动修改domain cursor。正文只在用户选择后读取，list/detail serial处理乱序，身份/项目/epoch清理隐藏dialog的内容而非仅close。同项目刷新失败保留已验证页，明确OFFLINE；不为资源/工具未知提供模拟数据。

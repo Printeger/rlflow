@@ -39,11 +39,13 @@ SSE：`domain` 有 durable id；5 秒 `heartbeat` 无 id；`resync_required` 携
 
 公开 OpenAPI/docs、任意 artifact、写命令均不存在。响应设 no-store、nosniff、no-referrer、self-only CSP（包括 form-action）。UI 仅文本渲染，未将口令/session/CSRF 持久化到浏览器 storage。JavaScript 不工作时表单也只使用 POST；后端拒绝非 JSON 请求。新认证清空旧身份 DOM/缓存，认证和项目异步响应有独立 generation guard。
 
-打开服务的本地 URL、使用 prepare 配置的主体与口令。纯 reducer 将 snapshot 与 SSE 接缝、epoch、去重、对象版本和权威 counters 分开。总对象缓存最多200，保留最近至多30 execution/10 stage；事件摘要200，虚拟窗口只渲染可见行，方向键/Home/End/Enter可导航与读详情，阅读位置按事件ID保持。费用/模型活动/资源未知不会改为0/RUNNING；Fixture始终有标签。静止/追平/离线/隐藏/减少动画不持续运行脉冲。日志、资源、条件矩阵、完整error合同、真实运行/长期soak仍待完成。
+打开服务的本地 URL、使用 prepare 配置的主体与口令。纯 reducer 将 snapshot 与 SSE 接缝、epoch、去重、对象版本和权威 counters 分开。总对象缓存最多200，保留最近至多30 execution/10 stage；事件摘要200，虚拟窗口只渲染可见行，方向键/Home/End/Enter可导航与读详情，阅读位置按事件ID保持。费用/模型活动/资源未知不会改为0/RUNNING；Fixture始终有标签。静止/追平/离线/隐藏/减少动画不持续运行脉冲。工具metadata、资源、条件矩阵、完整error合同、真实运行/长期soak仍待完成。
 
 ## 验证
 
-公共日志仅证明核心已提交状态观测，不是模型原始stdout/stderr/思维过程。新prepare自动启用；已有观察者不在Web GET升级。若只缺全部三日志表，可在可信终端显式调用原有 `enable(Store(existing_root), existing_project_id, data_mode=existing_mode)`，不重写已有登录config；从启用seq开始记录，coverage_after_seq说明历史缺口。部分缺表拒绝，需后续明确离线恢复，不能新建空refs伪称覆盖完整。日志列表cursor不是SSE cursor，改变kind/id/severity需重新从首页读取。前端日志入口下一项接入，当前仅HTTP API可查询。
+公共日志仅证明核心已提交状态观测，不是模型原始stdout/stderr/思维过程。新prepare自动启用；已有观察者不在Web GET升级。若只缺全部三日志表，可在可信终端显式调用原有 `enable(Store(existing_root), existing_project_id, data_mode=existing_mode)`，不重写已有登录config；从启用seq开始记录，coverage_after_seq说明历史缺口。部分缺表拒绝，需后续明确离线恢复，不能新建空refs伪称覆盖完整。日志列表cursor不是SSE cursor，改变kind/id/severity需重新从首页读取。
+
+UI“公共状态日志”支持级别与task/execution/experiment公开ref ID筛选；类型和ID必须一起填写。单页50条、下一页固定原high-water，不累计无界DOM；Enter/点击才读取正文。新提交只提示可能不匹配筛选，点击读取最新才更新日志页，不改业务cursor。页面显示coverage边界，空页不代表没有更早历史；工具metadata未接入、raw logs PRIVATE_ONLY。刷新失败保留同项目日志并显示OFFLINE，换项目/身份/epoch则清除旧页和详情。
 
 ```bash
 PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q tests/test_web_auth.py tests/test_web_api.py tests/test_live_stream.py tests/test_web_local.py tests/test_hybrid_observation.py
@@ -56,7 +58,7 @@ PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q tests/test_public
 
 ```bash
 npm ci --prefix web_checks
-node --test web_checks/reducer.test.mjs web_checks/virtual-list.test.mjs web_checks/browser.test.mjs
+node --test web_checks/reducer.test.mjs web_checks/virtual-list.test.mjs web_checks/log-view.test.mjs web_checks/browser.test.mjs
 ```
 
-测试启动 stdin 控制、loopback 临时 fixture，检查实际持久化提交到 SSE/DOM、离线追平、208 项总数与有界窗口、XSS 文本、键盘详情、手机无横向溢出、身份更换和迟到认证、无 JS 原生 POST；结束关闭 Chrome、服务并清理其唯一临时目录。截图保存在忽略的 web_checks/artifacts；不触碰真实 state、模型、GPU或根目录用户 package-lock。
+测试启动 stdin 控制、loopback 临时 fixture，检查实际持久化提交到 SSE/DOM、离线追平、208 项总数与有界窗口、XSS 文本、键盘详情、手机无横向溢出、日志high-water/过滤/lazy正文/乱序和刷新失败保留、身份更换和迟到响应、无 JS 原生 POST；结束关闭 Chrome、服务并清理其唯一临时目录。截图保存在忽略的 web_checks/artifacts；不触碰真实 state、模型、GPU或根目录用户 package-lock。
