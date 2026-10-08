@@ -108,3 +108,7 @@ r3冻结最终 **430 passed/32 skipped/1 warning/143.61s**，编译/diff check�
 ## Checkpoint09：执行前工具发现源
 
 REGISTER先于CPU副作用、固定有界hash-chain journal、登记当时launch witness及fd分页/checkpoint拒绝已实现。目标56passed/4.31s，High父目录durability finding修复后独立54passed/1deselected；冻结全回归 **478passed/32skipped/1warning/146.63s**。compileall/pip check/diff通过。首轮52passed/1failed为oversize测试断言顺序错误，正确拒绝保留，未减少测试。见CHECKPOINT_09.md/TOOL_DISCOVERY_PROTOCOL.md/evidence/checkpoint-09-final-tests.txt；core pending/事务cursor、公开collector/工具UI与资源仍未实现，M1–M5继续推进。
+
+## Checkpoint10：core private工具collector/恢复ledger
+
+27新增cases与engine/store/obs/log目标205passed/59.70s，最终冻结 **505passed/32skipped/1warning/172.21s**。High非法return异常、producer/reader Unicode bytes不匹配finding均关闭，当前source与事务范围无MUST_FIX；compileall/pip check/diff通过。绑定真实model-free CPU返回、原预算/authority不变、outbox同回滚、并发一次性、restart/recover/audit、null不追认、终态历史、公平pending/global cursor与Unicode/容量已验证。具体命令/hash/过程失败见CHECKPOINT_10.md/evidence/checkpoint-10-final-tests.txt。未加入公共tool allowlist/body/UI、尚无资源、严格工具STOP、M1–M5或长期验收；周期snapshot全量maintenance例外保留。

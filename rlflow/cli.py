@@ -132,7 +132,7 @@ def main(argv=None):
         store = Store(a.state_dir,allow_rebuild=a.command in {"rebuild","storage-recover"})
         if a.command == "storage-audit":
             audited = store.audit()
-            matches=audited==store.view()
+            matches=audited==store.replay()
             output({"version":audited["version"],"projection_matches":matches})
             if not matches:return 1
         elif a.command == "storage-recover":

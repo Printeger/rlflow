@@ -479,6 +479,8 @@ def accept_result(store, sid):
     # A prior reconcile pass may have observed no ACK just before the receipt.
     from .startup_observation import observe as observe_startup
     observe_startup(store, sid)
+    from .tool_collector import collect as collect_tools
+    collect_tools(store,sid)
     state = store.view()
     session = state["sessions"][sid]
     if session["status"] not in ACTIVE:
@@ -939,6 +941,8 @@ def reconcile(store):
             continue
         from .startup_observation import observe as observe_startup
         observe_startup(store, sid)
+        from .tool_collector import collect as collect_tools
+        collect_tools(store,sid)
         d = Path(session["directory"])
         if not owns(session.get('identity')) and not (d/'receipt.json').exists() and (d/'lifeguard-request.json').exists():
             from .lifeguard import reclaim
@@ -957,6 +961,8 @@ def reconcile(store):
         elif session["status"] != "RECONCILE":
             store.transact("ROLE_RECONCILE_REQUIRED", sid + ":uncertain",
                            lambda s, sid=sid: s["sessions"][sid].update(status="RECONCILE"), object_id=sid)
+    from .tool_collector import scan as scan_tools
+    scan_tools(store)
     return store.view()
 
 

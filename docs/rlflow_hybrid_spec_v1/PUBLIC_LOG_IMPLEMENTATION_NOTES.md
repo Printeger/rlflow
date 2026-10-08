@@ -12,6 +12,8 @@
 
 Checkpoint09增加执行前durable REGISTER和有界fd reader，登记时捕获已有launch witness、null不事后升级。没有core pending/事务offset或公开collector接入，Web仍不读journal。完整协议/容量/损坏拒绝与下一阶段合同见TOOL_DISCOVERY_PROTOCOL.md；不以private source当公开工具验收。
 
+Checkpoint10已实现core私有ledger、事务offset/receipt、indexed公平pending、完整release/startup/permission与result来源核验，见CHECKPOINT_10.md。工具事实尚未加入公共allowlist/log模板或UI，Web仍不读私有源；VERIFIED绑定证据不是vendor/model运行证明。下一项闭合公共projection与builder/API/UI；旧历史、disk raw与资源/STOP仍保留缺口。
+
 ## 下一候选切片
 
 先接入明确标为 `CORE_STATUS` 的真实状态日志：来源为已经校验、同事务提交的公共domain envelope，不读取raw模型文件；正文仅从kind/opaque ID/version/有限状态/seq生成固定模板，禁止复制description/reason/source任意文本。这是真正的core状态日志，不是stdout/stderr/工具日志替代，不宣称完整T05完成。

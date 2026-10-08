@@ -1,0 +1,39 @@
+2026-10-08 checkpoint10 frozen private core collector evidence; NOT complete M1/Goal.
+
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q -rs
+audit/hybrid-v1/checkpoint-10-full-pytest.log
+505 passed, 32 skipped, 1 warning in 172.21s (0:02:52)
+Existing external dispatcher18/H1 14 skips; installed Starlette anyio alias deprecation.
+
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q tests/test_tool_collector.py tests/test_tool_journal.py tests/test_tool_return_facts.py tests/test_command_checkpoints.py tests/test_engine.py tests/test_store_policy.py tests/test_hybrid_observation.py tests/test_public_logs.py
+audit/hybrid-v1/checkpoint-10-targeted-final.log
+205 passed in 59.70s
+
+Independent High: collector24 passed; final Unicode/capacity3 passed/24 deselected2.51s.
+Both MUST_FIX closed: IsolationError escaping core; Unicode producer/reader byte cap mismatch.
+
+.venv/bin/python -m compileall -q rlflow tests/test_tool_collector.py
+.venv/bin/python -m pip check
+git diff --check
+All exit 0; No broken requirements found.
+
+SHA256 frozen source/output:
+6355e522ab1b64a2143da13708a4f8b597bf6dd882c23feee37c3a9543ef1ac8  rlflow/tool_collector.py
+db96b4a43679dfe6787309788b39bcc02a4d3b60eefc49d860894f9ce1be28e1  rlflow/store.py
+0e306c40ced71cbcd5753abc87dd790aec6b49f9c986b3c3a618a646fc611666  rlflow/engine.py
+4c49c31d4db13811374f2da0d72d3b5318fc1f9582a8d201d7b728b9c06556fa  rlflow/cli.py
+cf9048f535a6ec6495fe6a889e71159fcecff7d10712b21a8758343f9dad8f91  schemas/RuntimeState.json
+501ec572159da078ec06eb56b2f8dc103ed448d3ee6fb3e55f051f66a09776f0  schemas/ToolLedger.json
+e385f298221b6bd69dabc04c2d634f3af129eea7b52077dc757dd0bbb6f28f66  tests/test_tool_collector.py
+a73c8c59f793302cd3130a0aa5363266b1788e66d1f9fed1cfb5a37d87387392  audit/hybrid-v1/checkpoint-10-targeted-final.log
+e124206996e7877aca83d4cb7a27ecd42546e9c32127dd8f59c14fa0b54dad56  audit/hybrid-v1/checkpoint-10-full-pytest.log
+
+Process failures retained: r2 collector20 pass/1 fail/1 error22.34s (fixture wrong
+terminal enum; runtime source/test edit collided with release freeze). Corrected
+fixture to existing ACCEPTED+stage revocation and froze sources, did not relax guards.
+Two nonexistent target filenames executed no tests; not counted as passes.
+
+No model/GPU/train/public listener/production/push; root package-lock untouched.
+Private ledger not public tool metadata; Web allowlist/raw-body unchanged.
+VERIFIED means bound trusted return provenance, not vendor/model execution proof.
+Per-1000-version full snapshot remains unbounded maintenance exception pending T04/B1.

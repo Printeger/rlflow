@@ -13,7 +13,7 @@
 | T02 | 无生成探测与隔离兼容完成 | 315 schema；version+protocol SHA pin；initialize-only 独立握手成功；真实 usage/interrupt/子代理未证实，禁用不支持能力 |
 | T03 | 初始闭合合同已实现，后续扩展中 | GoalContract/Task/Lease/Attempt/Approval/Evidence/Experiment/Usage/Budget/CommandReceipt、公共快照与已注册 payload；完整 API 实际接口尚待 T06/T16 |
 | T04 | 初始事务观测桥已验证，性能验收未完成 | 只读 bounded snapshot/page、增量 counters、同事务 outbox、epoch、真实进程故障测试；B1 100k 与备份恢复集成待验证 |
-| T05 | 启动释放、CORE_STATUS与private工具返回事实基础已验证，完整观测未完成 | CLI_RELEASE_ACK/固定日志同事务一次性；bound private return不授予authority或证明STARTED；public工具collector/资源/vendor活动待验证 |
+| T05 | 启动释放、CORE_STATUS与private工具ledger/collector已验证，完整观测未完成 | CLI_RELEASE_ACK/固定日志同事务一次性；REGISTER+事务cursor/receipt与完整绑定核验；private VERIFIED不授予authority或证明vendor/STARTED；公共工具projection/log/UI、资源待接入 |
 | T06 | 只读基础切片实现，未完整验收 | 同源登录/project scope/短期 Bearer、snapshot/page、bounded durable SSE、loopback CLI；无写命令/任意 artifact；见 LOCAL_WEB.md |
 | T07–T08 | 初始只读 UI、事件虚拟化与公共日志已实现，未完整验收 | 真实 snapshot/SSE reducer、卡片/预算/分页/详情、虚拟窗口/阅读锚点/键盘、日志筛选/lazy正文、离线/身份隔离；Fixture Chrome QA 通过；资源、真实运行与完整 M1 验收待完成 |
 | T09–T17 | 未开始 | 合同、策略、受控 Runtime、单写、独立评审、预算、skill、控制与恢复 |
@@ -44,3 +44,5 @@ Checkpoint07：公共日志UI筛选/固定high-water分页/按需正文/虚拟�
 Checkpoint08：worker新MCP config含closed request/generation指针，bound intent补scratch/memory与private fixed return fact，回放/崩溃不重复执行。目标68passed/1skipped，独立High31passed/1deselected范围无MUST_FIX；最终全回归 **455 passed/32 skipped/1 warning/145.80s**。见CHECKPOINT_08.md与evidence/checkpoint-08-final-tests.txt。公开工具collector尚未实现，UI保持未接入；下一项bounded发现/可信release核验/事务公共事实，然后资源。完整Goal仍活跃。
 
 Checkpoint09：执行前durable REGISTER与closed bounded fd reader已实现，杜绝只依赖返回通知的漏发现窗口；登记时缺launch witness不事后升级。High父目录fsync MUST_FIX关闭，target56passed，独立54passed/1deselected；冻结全回归 **478 passed/32 skipped/1 warning/146.63s**。见CHECKPOINT_09.md/TOOL_DISCOVERY_PROTOCOL.md及evidence。下一项core indexed pending/事务cursor与receipt语义digest、完整release/permission核验及公共工具事实接入，然后资源；M1–M5/完整Goal仍未完成。
+
+Checkpoint10：core private collector/ledger、同事务source cursor+receipt语义digest、indexed公平pending/global scan、完整request/release/startup/permissions/result绑定已接入engine。热view排除ledger、CLI audit/full replay完整保留；非法return隔离与Unicode byte-cap两项High finding关闭。最终target205passed，冻结全回归 **505passed/32skipped/1warning/172.21s**。见CHECKPOINT_10.md/evidence。下一项闭合公共tool projection/log模板/API/UI，再补资源与M1 gate；private VERIFIED不冒充供应商或启动事实，完整Goal仍活跃。

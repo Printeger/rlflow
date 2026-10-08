@@ -69,3 +69,7 @@ append-only refs增加INSERT成员/severity guard；只读路径仍防御异常�
 ## 2026-10-08：REGISTER优先于工具副作用
 
 只在返回后append journal会漏掉result已提交而通知前崩溃的命令。因此以执行前durable REGISTER建立后续pending发现key，返回通知非正确性依赖；未来core bounded indexed pending轮转，不glob目录。目录入口与journal均fsync后才执行。fd reader保存source identity+offset/checkpoint链，partial/替换/破损不能静默归零；登记当时缺launch witness不能事后补release授权。private发现协议见TOOL_DISCOVERY_PROTOCOL.md。
+
+## 2026-10-08：工具ledger沿用core事务与恢复
+
+不建立第二个DB/控制writer：optional closed tool_sources/receipts/scan走Store对象事务、projection_status索引、append-only event与replay。热view必须排除ledger全keys，完整audit比较replay；legacy callback不改private集合。完成状态与证据验证分开，UNKNOWN pending不能因null witness提前移出索引；fair游标要有revision/round，防止位置循环复用旧幂等key。验证绑定被冻结request/当时release而非当前授权或PID活性；正常历史不因撤权失真。容量上界对齐producer Unicode字节，超限unsupported不是corruption。公开投影在下一切片显式闭合，不自动把私有事实塞进CORE_STATUS body。

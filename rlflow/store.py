@@ -62,6 +62,7 @@ def initial():
 
 
 _UNLOADED = object()
+PRIVATE_HOT_SECTIONS = frozenset(('tool_sources','tool_receipts','tool_scan'))
 
 
 class ObjectMap(dict):
@@ -253,6 +254,7 @@ class Store:
             db=self.connect();db.execute("BEGIN")
         state={"version":db.execute("SELECT version FROM projection_meta WHERE singleton=1").fetchone()[0]}
         for section,value in db.execute("SELECT section,value FROM projection WHERE object_key=''"):
+            if section in PRIVATE_HOT_SECTIONS:continue  # Explicit get/keyset; never expand all ledger keys.
             value=self._decode_value(db,json.loads(value))
             state[section]=ObjectMap(self,db,section) if isinstance(value,dict) else value
         return state
@@ -379,6 +381,8 @@ class Store:
             maps={k:v for k,v in after.items() if isinstance(v,ObjectMap)}
             scalars={k:canonical(v) for k,v in after.items() if not isinstance(v,ObjectMap) and k!="version"}
             details = mutate(after)
+            if PRIVATE_HOT_SECTIONS.intersection(after):
+                raise Conflict('Private tool ledger requires explicit object transaction')
             if after.get("version")!=previous:raise Conflict("state version is controller-owned")
             puts=[];deletes=[]
             partial=initial()

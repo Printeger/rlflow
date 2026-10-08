@@ -829,6 +829,15 @@
     },
     "usage": {
       "type": "object"
+    },
+    "tool_sources": {
+      "type":"object","additionalProperties":{"$ref":"ToolLedger.json#/$defs/source"}
+    },
+    "tool_receipts": {
+      "type":"object","additionalProperties":{"$ref":"ToolLedger.json#/$defs/receipt"}
+    },
+    "tool_scan": {
+      "type":"object","additionalProperties":{"$ref":"ToolLedger.json#/$defs/scan"}
     }
   },
   "required": [

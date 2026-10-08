@@ -1,6 +1,6 @@
 # 可信工具事实发现协议（T05，当前private源）
 
-2026-10-08。实现源：tool_journal.py、worker.prepare、persistent_cpu_exec。公开collector/pending ingestion尚未实现；这不是公开API或放行授权合同。
+2026-10-08。实现源：tool_journal.py、worker.prepare、persistent_cpu_exec；checkpoint10增加tool_collector.py及私有事务ledger。公开工具projection/log/API/UI尚未接入；这不是公开API或放行授权合同。
 
 ## 已实现的写入顺序
 
@@ -19,6 +19,8 @@ read_page只接受可信目录fd与固定文件名，NOFOLLOW/NONBLOCK、regular
 此checkpoint witness只检测边界及后续链，不宣称每轮核验整个历史prefix；同权限恶意trusted writer可以改写journal和DB，需依赖已存在OS角色隔离及后续控制代码发布边界。恢复复制导致inode改变必须显式处理，不能静默归零。
 
 ## 后续collector必需合同
+
+以下private ingestion已在checkpoint10实现：三个可选closed RuntimeState集合，普通hot view排除ledger、完整replay保留；index keyset/fair pending/global scan与cursor/receipt/revision同事务CAS；source问题持久隔离，storage提交失败回滚重试；完整request/startup/登记时witness+intent/result来源校验，null不追认。intent16MiB/result6MiB支持producer最坏JSON escaping，超容量明确UNSUPPORTED。具体证据见CHECKPOINT_10.md。以下保留原设计合同作为追踪，不代表剩余公开接入已验收：
 
 - 在core中添加indexed pending与receipt语义digest，不能无限累加session内map或每轮glob目录。
 - 同一core事务提交journal offset/checkpoint、pending/receipt变更、观察event与public log；同key同digest重放，相同key不同digest拒绝，不能只依赖Store._existing的类型/object ID比较。
