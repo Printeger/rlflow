@@ -1,0 +1,34 @@
+Checkpoint17 evidence (2026-10-08; production baseline9d7b897; production unchanged)
+Scope: warm archived synthetic task cardinality100/1000/10000. NOT active work, combined100k history, fullB1/M1, or measured5-minute idle.
+Commands:
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q tests/test_acceptance_tasks_v1.py tests/test_acceptance_history_v1.py tests/test_projection_v3.py
+.venv/bin/python -m tests.acceptance_tasks_v1 audit/hybrid-v1/checkpoint-17-tasks-r2 --sizes 100 1000 10000 --samples 30
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q tests/test_acceptance_tasks_v1.py tests/test_acceptance_history_v1.py (independent High)
+.venv/bin/python -m compileall -q tests/acceptance_tasks_v1.py tests/acceptance_history_v1.py tests/test_acceptance_tasks_v1.py
+.venv/bin/python -m pip check (No broken requirements found)
+git diff --check (passed)
+Root20passed/2.34s; independent7passed/6.13s. First five-test target passed; High then found actual work inside assert could disappear under optimization, repaired and actual -O subprocess negative tests added for both drivers. r1 preserved; r2 rerun all3 profiles, optimize0, terminal exit0/session56885.
+Each profile one actual bootstrap Store.transact_objects for allschema-valid DONE fixture tasks, completion allfalse; no authority/stage/queued/session/job/repair/release. Thirty scoped + thirty legacy actualtask0 version writes; core61 each, public62/66/111 due genuine200-object bootstrap public batches, sessions0. No daemon, realGoal, model/GPU/paid calls or history removal.
+All6 wall+CPU distributions have30 raw samples; nearest-rank p95. High independently recomputed all distributions; no remaining MUST_FIX. Limited reconcile/dispatch_one calls now outside asserts; no-work phase leaves core version/public cursor unchanged while optional private telemetry may write.
+100: scoped/legacy/view/no-work wallp95 ms5.118500/8.011567/0.220702/6.342692; CPU no-work p50=2.399684ms; cumulative RSS42860KiB.
+1000: wallp95 8.711955/8.774685/0.394784/4.114630; CPU p50=3.201414ms; RSS52736KiB.
+10000: wallp95 7.061118/14.747284/2.677056/10.979106; CPU p50=10.256932ms; RSS115604KiB.
+Direct snapshot p95ms1.976179/1.943449/1.956029; directtaskpage p95ms0.247162/0.318893/0.266313. These excludeHTTP/auth/SSE/browser. Sequential blocks/firstimports/cache affectmeasurement; CPU percall cannot be multiplied into measured5min idle, telemetry sampling rate differs. RSS cumulative acrossprofiles includingaudit, not perprofile/API sum; hostunconstrained.
+Each profile audit==replay; core/task counts retained. Raw r2 data tracked checkpoint-17-tasks.jsonl byte-identical to localrawlog. DB fixtures retained outsideGit.
+Extra old100k RO audit: explicit Store.audit(db) and replay(db) calls not inassert, noinit/repair, optimize0/version100000/equal; stateSHA edc23fb0b25922136c69e727117faa73f35ef0eb14507c65b9822f06f40181ad. OriginalDBSHA remains bb148ad0b22bfbe27632915e3985b1a643bcf3fb1836f6fa84e045ad3756db4c; noreseed100k.
+Did not rerun full586/browser20 inthischeckpoint; those belong to productioncheckpoint15. WholeGoal remains active; next combined100k+10k, finite actualidle/activework/B1 thenM2-M5.
+SHA:
+26076a11c07fc41620c0f90ee9d360da3713191470f7a86854d65b153e05b051  tests/acceptance_tasks_v1.py
+dd0e28dee8a6172f259570fc6b2922d24e6eb662c8eccd18cfd8fa189f42f7b4  tests/acceptance_history_v1.py
+08ed8682b45a8eac8e946cd41cdb7583a11ec474f96ce953f9d650176d763e4f  tests/test_acceptance_tasks_v1.py
+730cfd02250958b15b5ba0d361b15aed3c3eb3c61eab615ac6fcbf728dfc6f31  audit/hybrid-v1/checkpoint-17-tasks-r1.log
+282794fb6dce21fe26f32ac73a04f4b81c5d0f088a9fd5c73f61c544b75286cf  audit/hybrid-v1/checkpoint-17-tasks-r2.log
+06ca81d2dad002998f1edaf6e5085798550ed9fd2c677dd01c1aced720143646  audit/hybrid-v1/checkpoint-17-probe-unit-r1.log
+103084a6dc193ae95fd6220886986b4f6aeebbc41663ad521482f9ae5e3b0614  audit/hybrid-v1/checkpoint-17-probe-unit-r2.log
+25f26faa2d218d7be0920687f3c8b0055061aa90e532bb5d2f793becef6675e6  audit/hybrid-v1/checkpoint-17-high-r1.log
+3f21239f382847b70c8de5bcf7a8ec543021db19da2630d931c45797f21c43da  audit/hybrid-v1/checkpoint-17-history-recheck-r1.log
+5608fe4f0aa766dfd70c1fefdf777ce1e25576fb65370ede4d7ecb09d5271d40  audit/hybrid-v1/checkpoint-17-provenance-r1.log
+282794fb6dce21fe26f32ac73a04f4b81c5d0f088a9fd5c73f61c544b75286cf  docs/rlflow_hybrid_spec_v1/evidence/checkpoint-17-tasks.jsonl
+38a02c1991f54aaef3dd037c6f6e0b36d10c99fa4ad9ac3a39ea808879b42a82  audit/hybrid-v1/checkpoint-17-tasks-r2/100/runtime/research.db
+36f2c5401bf28c8db1972274092614f9e43e1f38a8cc40e7735d1d4db12fb391  audit/hybrid-v1/checkpoint-17-tasks-r2/1000/runtime/research.db
+248d283af7637195a19cb316209cc22568261a1bb7999516246782a98fa9b104  audit/hybrid-v1/checkpoint-17-tasks-r2/10000/runtime/research.db

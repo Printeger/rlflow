@@ -18,7 +18,7 @@
 | A16 旧cursor/epoch | retention floor、缺event/projection drift、rotate_epoch保留history且旧cursor拒绝、队列溢出/slow socket重建通过 | 可信备份/恢复演练与安全epoch切换/repair CLI需T23交付，不能据显式测试rotate宣布真实restore完成 |
 | A17 没真实事件不增加业务数 | browser heartbeat/资源不推进业务cursor/counts、不调用app RAF、reducer重复不续动效；telemetry独立sample因果age通过 | B1长时idle/时钟扰动完整矩阵未测；短范围通过 |
 | A18 浏览器失联不冒充GPU停止 | Chrome offline显示/停止脉冲、资源FRESH/STALE分域；GPU当前UNKNOWN | 未运行真实GPU，运行中GPU断网场景未证；不能为验收启用昂贵训练。受管CPU负载/后续批准GPU证据分开 |
-| A32 100k/8h | Store增量事务与marker索引、周期维护锁外、虚拟窗口100k geometry、bounded缓存确定性测试通过；真实100k历史单轴终态ratio1.041488/完整性通过 | 完整B1（10k任务/3项目/限定硬件/10/s+50/s/双端）、RSS/WAL/idle及8h页面/24h fixture未完成 |
+| A32 100k/8h | Store增量事务/marker索引、周期维护锁外、虚拟窗口geometry/缓存测试通过；100k单对象历史ratio1.041488/完整性、另10k归档task probe通过（TASK_PERFORMANCE.md） | 两轴尚未组合；活跃任务/3项目/限定硬件/10/s+50/s/双端完整B1、RSS/WAL/5min idle及8h页面/24h fixture未完成 |
 | A35 手机/键盘/减少动画 | 390px Chrome无横向溢出、虚拟事件键盘导航、reduced-motion/静止、文字状态通过 | Hybrid Web审批/STOP命令尚未接入，既有CLI/core批准/STOP不变；可信手机交互/T16/T24及完整可访问性验收未完成 |
 
 对应测试源码：tests/test_hybrid_observation.py、test_web_api.py、test_web_local.py、test_live_stream.py、test_telemetry.py；web_checks/browser.test.mjs、reducer.test.mjs、virtual-list.test.mjs、log-view.test.mjs、telemetry-view.test.mjs。表格不使用“有测试名”代替完整场景；上述通过仅指已记录冻结执行的匹配范围。

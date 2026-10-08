@@ -1,5 +1,7 @@
 # 系统实施验收记录
 
+Checkpoint17归档任务规模：r2真实100/1k/10k任务+每档audit==replay，无工作阶段core/cursor不变且session0；10k scoped/legacy写p95=7.061/14.747ms、viewkeys2.677ms，无工作CPU p50=10.257ms/次非5min平均。High测量assert省略调用finding关闭，两driver拒绝-O及真实负例；root20passed、独立7passed、原始分布/来源SHA归档。见TASK_PERFORMANCE.md/evidence。生产未改，无全量/browser重跑；旧100k额外RO真实audit通过且DB字节不变。不代表活跃闭环/组合B1/M1 gate，继续完整Goal。
+
 Checkpoint16 真实历史单轴：新增驱动及40项定向/独立High28项通过；实际100k core/public写终态exit0、recover==audit==replay，普通写p95 8.337045→8.682933ms、ratio1.041488≤2；100个千次边界max11.077177ms、公共版本/值精确核对通过。原始样本与SHA见HISTORY_PERFORMANCE.md/evidence/checkpoint-16-history.jsonl及checkpoint-16-final-tests.txt。生产模块未改，不虚称全量/browser重跑。M1_ACCEPTANCE_REPORT.md明确尚未通过：单对象warm/direct Reader探针不替代10k任务/3项目/限定硬件/并发B1、RSS/WAL/idle/24h/8h或M2–M5闭环。无新外部阻塞，Goal保持active。
 
 Checkpoint15 周期快照维护：冻结全回归586passed/32既有外部依赖skipped/1既有warning/215.49s，定向108passed，独立High37passed/无新增MUST_FIX，Chrome+Node20passed/0skipped/9.44s。第1000次写只标记due、锁外构造/原子发布确认、marker索引、真实线程并发及三处实际进程死亡恢复通过。小型单样本8MiB锁占用43.238→15.825ms但总耗时更高，非B1/RSS/WAL或硬时限验收。见CHECKPOINT_15.md/SNAPSHOT_MAINTENANCE.md/evidence；legacy热路径、M1 gate、M2–M5/闭环/长期验收继续保留。

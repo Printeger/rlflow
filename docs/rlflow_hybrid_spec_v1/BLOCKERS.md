@@ -2,6 +2,8 @@
 
 目前仍可推进开发，没有需要终止完整 Goal 的外部阻塞。
 
+Checkpoint17归档任务cardinality与优化模式拒绝已验证，无新外部阻塞；10k短循环CPU中位数只提示后续idle诊断，不虚称5min NFR失败/通过。下一项组合真实100k/10k、有限实际idle/活跃工作与B1；完整M1/M2–M5继续保留。
+
 Checkpoint16单对象真实100k历史终态/完整性/ratio1.041488已验证，无新外部阻塞；完整B1、任务cardinality、活跃reconcile/idle/维护并发/RSS/WAL和长期证据仍未完成。M1_ACCEPTANCE_REPORT.md明确列出范围，下一项继续实际10k任务测量，不把单轴通过当完成或阻塞。
 
 Checkpoint15 已移出周期快照全状态构造并通过586/32全回归、独立37项和browser20项，没有新增外部阻塞。full-state builder仍非chunk/硬RSS/硬时限；发布BLOB、WAL retention、大规模尾延迟/idle与B1未完成，已有metadata损坏仅fail closed非自动repair交付。继续性能分轴测量和热路径整改，再完成M1 gate进入M2–M5，不将单样本锁占用探针冒充完整验收。

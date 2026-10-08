@@ -1,5 +1,9 @@
 # 开发决策记录
 
+## Checkpoint17：测量调用与assert分离
+
+验收驱动不能在优化模式静默省略真实工作。任务no-work调用先执行，再核对结果；history/tasks入口拒绝optimized Python，真实-O负例在任何输出创建前失败。保留r1并重新完整运行任务r2，实际profile与归档业务语义分开。短块CPU分布不替代5min idle，顺序累计RSS不冒充独立control+API RSS。归档10k/真实单轴100k均有证据，后续必须组合并引入活跃工作/实际API与浏览器负载，不以可通过的窄probe缩减完整B1。
+
 ## Checkpoint16：历史轴与投影轴分开验收
 
 不把静态“普通写无全history replay”当性能通过。实际Store→observer逐次提交100k公共/控制事件，预定尾200窗口（普通199+一个千次边界）与全100边界分列，不挑快样本或造历史；锁body时长与总耗时分开，direct Reader和维护另测。结果ratio1.041488/完整性通过但限定warm单usage固定cardinality、宽宿主、无并发；原始JSONL随Git保存、DB本地保留、SHA绑定。生产未改，不重复声明新全量/browser执行；下一项依然真实10k任务和活跃工作轴及完整B1。M1_ACCEPTANCE_REPORT明确未过gate，不能用本probe缩减M0–M5。

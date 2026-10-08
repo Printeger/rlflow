@@ -1,5 +1,7 @@
 # Hybrid v1 开发进度
 
+Checkpoint17：归档任务100/1k/10k真实Store/公共桥探针r2终态exit0、每档audit==replay/core61/session0；10k scoped/legacy write p95=7.061/14.747ms、viewkeys2.677ms、无工作CPU p50=10.257ms/次，不能等同5min idle或活跃闭环。High发现assert可删除调用的测量保真缺陷已修：实际调用移出assert、两driver拒绝-O、实际负例验证；root20passed、独立7passed。见TASK_PERFORMANCE.md/evidence。生产未改；下一项组合100k/10k、有限idle/活跃工作与完整B1，M1 gate及M2–M5仍未完成，Goal active。
+
 2026-10-08。完整目标保持 M0–M5 / T00–T25，不以首个切片作为完成。
 
 当前分支 `hybrid-v1`，基线 `d25cf02`。开发由 Codex Goal 负责，未启动 rlflow 来调度本次开发，未调用业务模型或训练。

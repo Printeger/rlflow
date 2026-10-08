@@ -12,6 +12,7 @@ from pathlib import Path
 import platform
 import resource
 import statistics
+import sys
 import time
 
 from rlflow.observation import enable, ObservationReader
@@ -29,6 +30,7 @@ def distribution(values):
 
 
 def measure(output, *, checkpoints=(10000,100000), samples=200):
+    if sys.flags.optimize:raise RuntimeError('optimized Python is unsupported for acceptance probes')
     if (type(samples) is not int or samples<2 or not checkpoints
             or any(type(v) is not int or v<=samples for v in checkpoints)
             or tuple(sorted(set(checkpoints)))!=tuple(checkpoints)):
@@ -46,7 +48,7 @@ def measure(output, *, checkpoints=(10000,100000), samples=200):
                 if name=='writer':holds.append((time.perf_counter_ns()-start)/1e6)
     store.lock=instrument
     manifest={'scope':'fixed projection / real core and public history; NOT full B1',
-              'python':platform.python_version(),'cpu_count':os.cpu_count(),
+              'python':platform.python_version(),'optimize':sys.flags.optimize,'cpu_count':os.cpu_count(),
               'machine':platform.machine(),'checkpoints':list(checkpoints),'samples':samples,
               'maintenance':'explicit after measurement window; no daemon',
               'resources':'host unconstrained; no model/GPU/browser/paid resources'}
