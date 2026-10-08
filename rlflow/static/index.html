@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="rlflow 本地只读实时观测。业务事实来自持久化后端事件，不使用模拟计数。">
+  <meta name="description" content="rlflow 本地实时观测与显式条件事实控制，不启用执行。业务事实来自持久化后端事件，不使用模拟计数。">
   <title>rlflow · Live observation</title>
   <link rel="stylesheet" href="/static/style.css">
   <script type="module" src="/static/app.mjs"></script>
@@ -11,14 +11,14 @@
 <body>
   <header class="masthead">
     <a class="brand" href="/" aria-label="rlflow 首页"><span class="brand-mark">r/</span> rlflow <span class="muted">HYBRID</span></a>
-    <span class="observer-tag">READ-ONLY OBSERVER</span>
+    <span id="observer-tag" class="observer-tag">READ-ONLY OBSERVER</span>
     <span id="connection" class="status-pill" role="status">NOT CONNECTED</span>
   </header>
   <main>
     <section id="login-panel" class="panel login-panel">
       <div class="eyebrow">LOCAL CONTROL PLANE / AUTHENTICATION</div>
       <h1>观察真实工作，保留未知。</h1>
-      <p>此页面只读取已持久化的状态与事件，不会启动 Agent 或训练。</p>
+      <p>此页面观测已持久化的状态与事件；显式启用的 Hybrid 控制可记录草案/条件批准，不会启动 Agent 或训练。</p>
       <form id="login-form" method="post" action="/api/v1/login">
         <label for="principal">本地主体</label><input id="principal" name="principal" value="local" autocomplete="username" required maxlength="160">
         <label for="passphrase">登录口令</label><input id="passphrase" name="passphrase" type="password" autocomplete="current-password" required maxlength="1024">
@@ -37,7 +37,7 @@
       <section class="metrics" aria-label="后端状态摘要">
         <div class="metric"><span>TASKS / 后端总数</span><strong id="task-total">—</strong></div>
         <div class="metric"><span>EXECUTIONS / 后端总数</span><strong id="execution-total">—</strong></div>
-        <div class="metric"><span>APPROVALS / 可观测对象</span><strong id="approval-total">—</strong></div>
+        <div class="metric"><span>LEGACY APPROVALS / 原公共域</span><strong id="approval-total">—</strong></div>
         <div class="metric"><span>ACTUAL COST / 实测费用</span><strong class="unknown">UNKNOWN</strong></div>
       </section>
       <div class="live-layout">
@@ -79,6 +79,28 @@
           <p id="events-empty" class="empty">本次连接尚无新业务事件。面板保持静止。</p>
         </section>
       </div>
+      <section class="panel goals-panel" aria-labelledby="goal-title">
+        <div class="panel-heading"><h2 id="goal-title">Hybrid 目标与条件批准</h2><div class="controls"><button id="goal-refresh" type="button">读取最新 heads</button><button id="goal-next" type="button" disabled>下一页</button></div></div>
+        <p class="boundary-note">HEAD_ONLY 是当前投影摘要，不是完整授权证明。human operator/approver 可私有审阅；条件批准不产生 lease，不启动执行。旧只读配置不安装这些接口。</p>
+        <p id="goal-note" class="muted" role="status">尚未读取 Hybrid 合同。</p>
+        <div id="goal-list" class="object-list"></div>
+        <div id="goal-editor" hidden>
+          <label for="goal-json">Operator：完整显式 1.1 proposal JSON（项目/模式必须匹配，不自动填写或扩权）</label>
+          <textarea id="goal-json" rows="8" spellcheck="false" maxlength="262144"></textarea>
+          <button id="goal-submit" type="button" disabled>提交不可执行 DRAFT</button>
+        </div>
+        <div id="goal-private" hidden>
+          <div class="panel-heading"><h3>授权 human 私有审阅</h3><button id="goal-close" type="button">关闭并清除私有内容</button></div>
+          <pre id="goal-review"></pre>
+          <div class="controls"><label for="goal-ttl">批准事实期限（秒，不是 nonce 期限）</label><input id="goal-ttl" type="number" min="1" max="86400" value="300"><button id="goal-prepare" type="button" disabled>准备精确确认视图</button></div>
+          <pre id="goal-confirmation"></pre>
+          <label class="check"><input id="goal-consent" type="checkbox">我已审阅服务器显示的完整 proposal、changes、binding 和未验证限制，仅同意记录条件批准，不代表执行授权。</label>
+          <button id="goal-approve" type="button" disabled>明确记录条件批准</button>
+          <div class="controls"><label for="goal-reason">撤销原因</label><input id="goal-reason" maxlength="4000"><button id="goal-revoke" type="button" disabled>明确撤销本批准</button></div>
+        </div>
+        <div class="controls"><button id="goal-retry" type="button" hidden>手动重试原 payload / 原 key</button><button id="goal-abandon" type="button" hidden>清除本地意图（不取消服务器提交）</button></div>
+        <pre id="goal-receipt" aria-label="原持久命令回执，不是当前执行状态"></pre>
+      </section>
       <section class="panel logs-panel">
         <div class="panel-heading"><h2>公共观测日志</h2><span class="muted">CORE_STATUS / TOOL_METADATA / raw logs PRIVATE_ONLY</span></div>
         <p class="muted">CORE_STATUS 为核心状态观测；TOOL_METADATA 为已验证绑定的 CPU 返回，不证明模型启动、任务成功或完整历史。正文按需读取，不提供私有模型日志。</p>

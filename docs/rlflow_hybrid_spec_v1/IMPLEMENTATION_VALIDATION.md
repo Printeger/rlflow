@@ -1,5 +1,7 @@
 # 系统实施验收记录
 
+Checkpoint32完整终态：root/独立High同三组顺序一次，各34Node、2实际browser、134backend终态exit0；10source/testSHA一致，三项MUST_FIX闭合。中央full原36465 terminalexit0：949passed/32既有外部H1 skips/1既有Starlettewarning/286.41s；compileall/py_compile/pip check/node syntax/diff0，当前无live测试。UI已接真实head/human私有review/显式DRAFT/精确条件批准撤销/不确定原键重试；large合法int64无法精确显示时拒绝批准，old401不注销新身份。证据与范围见HYBRID_CONTROL_UI.md/evidence/checkpoint-32-final-tests.txt，Sites local-only无上传托管。原SSE/日志/移动端保留，但完整公共Goal条件页/SSE映射、lease/STOP执行、工程科研、M1/B1/NFR06/24h/8h和M0–M5全验收仍未通过，Goal active。USERpackage-lock保留；下一真实不可执行codex-exec准备物料→lease/budget/可靠STOP，不把条件事实当可写执行闭环。
+
 Checkpoint31 完整终态：root 原87433与独立High原56356均 terminal exit0，同13modules各347passed/1既有warning，41.81s/41.97s；范围MUST_FIX关闭。中央full原10588 terminal exit0：949passed/32既有外部H1 skips/1既有Starlette warning/282.61s；compileall、pip check、diff0，源SHA不变，当前无live测试。新增有界head/private review桥、完整原GoalRecord事件证明、安全snapshot/recover闭合，见 HYBRID_GOAL_READS.md 与 evidence/checkpoint-31-final-tests.txt。实际保护配置加载→owned TCP读写/正常关闭不是CLI main、UI/性能或执行证明；M1/B1/NFR06/24h/8h、确认UI、lease/STOP/runtime、工程科研闭环与M0–M5完整Goal仍未通过且保持active。下一直接接真实合同审阅/nonce确认UI；USER package-lock不动。
 
 Checkpoint30最新终态覆盖下述旧过程：root/High14modules各301passed、原84286/81244exit0；中央full原11956terminalexit0，913passed/32既有外部/H1skips/1既有warning274.16s，compileall/pip/diff0，范围无MUST_FIX。可信CLI配置1.1与existing-only attach不迁移/恢复/写业务、不自动加roles；默认1.0仍RO。见TRUSTED_WEB_CONFIG.md/evidence/checkpoint-30-final-tests.txt。配置ASGI集成与CLI mock不冒充新TCP/UI/性能验收；无live测试，无lease或实际工程科研闭环，M1–M5完整Goal active。

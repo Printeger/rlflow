@@ -1,5 +1,7 @@
 # 本地只读 Web 服务（T06 基础切片）
 
+checkpoint32 已接入本地不可执行条件事实控制 UI：显式1.1项目、human角色、原始JSON DRAFT、私有审阅/精确确认/撤销及手动同键重试，见 [HYBRID_CONTROL_UI.md](HYBRID_CONTROL_UI.md)。默认1.0仍只读，未启用lease/模型；旧“确认UI尚未接入”段落为历史范围。
+
 显式启用的控制项目在 checkpoint31 新增真实 Goal head 列表与 human private review；权限、来源覆盖和非执行范围见 [HYBRID_GOAL_READS.md](HYBRID_GOAL_READS.md)。尚未连接 Dashboard 确认交互。
 
 当前提供真实 SQLite 观测 API、SSE 和 `/` 下的只读 Dashboard；不能据此判定 M1 完成。默认 `1.0` 配置不开放命令或修改批准。checkpoint30 新增受保护本地 `1.1` 配置，可显式启用不可执行的 DRAFT/条件批准/撤销 HTTP 服务，见 [TRUSTED_WEB_CONFIG.md](TRUSTED_WEB_CONFIG.md)。两者均不启动 scheduler、模型、lease，不提供 artifact 路径；启动不创建/迁移业务 Store。

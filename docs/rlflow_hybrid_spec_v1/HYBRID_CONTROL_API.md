@@ -1,5 +1,7 @@
 # 显式启用的 Hybrid 控制 HTTP 桥
 
+checkpoint32本地 UI 已增量接入，见 [HYBRID_CONTROL_UI.md](HYBRID_CONTROL_UI.md)。没有新增控制语义或lease/启动接口；默认只读行为不变。
+
 checkpoint31 新增同固定服务/有限 pool 的 Goal head 列表与 human private review，完整读取合同及来源证明见 [HYBRID_GOAL_READS.md](HYBRID_GOAL_READS.md)。原命令语义不变，不授执行权。
 
 Checkpoint29 实现：root 与独立 High 13 模块各 289 项通过，冻结全量原10082终态867 passed/32既有skipped/1既有warning/267.24秒，范围无剩余 MUST_FIX。包含实际 owned loopback HTTP 断连与条件性批准；不是 UI、安装配置或完整 T16 验收。证据见evidence/checkpoint-29-final-tests.txt。

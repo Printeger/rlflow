@@ -2,6 +2,7 @@ import {installSnapshot, applyEvent, mergePage, total, cursor, objectKey, SyncEr
 import {VirtualList} from './virtual-list.mjs';
 import {checkLogPage,checkLogBody} from './log-view.mjs';
 import {TelemetryView} from './telemetry-view.mjs';
+import {GoalPanel} from './goal-panel.mjs';
 
 const $ = id => document.getElementById(id);
 const motionPreference = matchMedia('(prefers-reduced-motion: reduce)');
@@ -11,6 +12,9 @@ let renderTimer = null, pendingHighlights = new Map(), pageSerial = 0, unread = 
 let raf = null, pulseTimer = null;
 let authGeneration = 0, authController = null;
 let telemetry = null, telemetryError = '';
+const goals=new GoalPanel({context:()=>session && state && project && state.project===project.id ?
+  {session,authGeneration,project:state.project,mode:state.mode,epoch:state.epoch,version:state.sourceVersion} : null,
+  request,onExpired:error=>{if(error.status===401){session=null;$('login-panel').hidden=false;}problem('私有 Hybrid 控制已清除；请核对权限或重新登录。');}});
 const pulses = new Map();
 const eventList = new VirtualList($('events'), eventNode, event => event.event_id);
 let logSerial = 0, logDetailSerial = 0, logPage = null, logNext = null, logPending = 0;
@@ -59,10 +63,12 @@ function updateLogPending() {
   $('log-new').textContent = `${logPending} 次新提交（可能不匹配筛选）；读取最新日志`;
 }
 function beginAuth() {
+  goals.clear();
   authController?.abort(); authController = new AbortController();
   return {ticket:++authGeneration, signal:authController.signal};
 }
 function clearObservation() {
+  goals.clear();
   ++generation; ++pageSerial; closeStream(); clearTimeout(renderTimer); renderTimer = null;
   state = null; project = null; pageIds = []; nextPage = null; unread = 0; lastHeard = 0;
   telemetry = null;telemetryError='';renderResources();
@@ -105,8 +111,10 @@ function setConnection(value) {
 }
 function problem(message) { $('error-banner').textContent = message; $('error-banner').hidden = !message; }
 async function request(url, options = {}) {
+  const requestAuth=authGeneration,requestGeneration=generation;
   const response = await fetch(url, {credentials:'same-origin', cache:'no-store', ...options});
   if (!response.ok) {
+    if(response.status===401 && requestAuth===authGeneration && requestGeneration===generation) {goals.clear();session=null;$('login-panel').hidden=false;closeStream();}
     const error = new Error(response.status === 401 ? '登录已到期，请重新登录；最后快照保留。' : `读取失败 (${response.status})；最后快照保留。`);
     error.status = response.status; throw error;
   }
@@ -236,7 +244,7 @@ function openStream(selected) {
     if (selected !== generation || current !== source) return;
     try {
       const value = JSON.parse(message.data), result = applyEvent(state,value,message.lastEventId);
-      state = result.state; lastHeard = performance.now();
+      state = result.state; goals.changed(state.sourceVersion); lastHeard = performance.now();
       if (!result.duplicate) {
         telemetry?.invalidateWorkers([...value.payload.upsert.filter(r=>r.kind==='execution').map(r=>r.id),
           ...value.payload.removed.filter(r=>r.kind==='execution').map(r=>r.id)],value.payload.source_state_version);
@@ -272,7 +280,7 @@ function openStream(selected) {
     if (selected !== generation || current !== source) return;
     try { const value = JSON.parse(message.data);
       closeStream();
-      if (value.reason === 'AUTH_EXPIRED') { session = null; $('login-panel').hidden = false; setConnection('AUTH EXPIRED'); problem('登录已到期。最后快照不代表当前状态。'); }
+      if (value.reason === 'AUTH_EXPIRED') { goals.clear();session = null; $('login-panel').hidden = false; setConnection('AUTH EXPIRED'); problem('登录已到期。最后快照不代表当前状态。'); }
       else if (value.reason === 'SOURCE_UNAVAILABLE') { setConnection('OFFLINE'); problem('后端观测源不可用。保留最后快照，请重建快照重试。'); }
       else selectProject();
     } catch (error) { failStream(error,selected); }
@@ -285,7 +293,7 @@ function openStream(selected) {
       checkingAuth = true;
       request('/api/v1/session').catch(error => {
         if (error.status === 401 && selected === generation && current === source) {
-          closeStream(); session = null; $('login-panel').hidden = false; setConnection('AUTH EXPIRED'); problem(error.message);
+          goals.clear();closeStream(); session = null; $('login-panel').hidden = false; setConnection('AUTH EXPIRED'); problem(error.message);
         }
       }).finally(() => { checkingAuth = false; });
     }
@@ -293,10 +301,11 @@ function openStream(selected) {
 }
 function failStream(error, selected) {
   if (selected !== generation) return;
-  closeStream(); problem(`同步被拒绝：${error.message}。未推断业务状态。`);
+  goals.clear();closeStream(); problem(`同步被拒绝：${error.message}。未推断业务状态。`);
   if (error.incompatible) setConnection('INCOMPATIBLE'); else selectProject();
 }
 async function selectProject() {
+  goals.clear();
   const selected = ++generation; ++pageSerial; closeStream();
   telemetry=null;telemetryError='';renderResources();
   project = projects.find(value => value.id === $('project-select').value);
@@ -316,7 +325,7 @@ async function selectProject() {
     $('mode-note').className = 'notice ' + (project.data_mode === 'fixture' ? 'fixture' : '');
     $('mode-note').textContent = project.data_mode === 'fixture' ? 'FIXTURE / 隔离测试数据，不证明供应商模型或生产运行。' : 'LIVE / 真实公共投影。连接正常不代表模型运行，观察不足会明确显示。';
     problem(''); render(); openStream(selected);
-    await Promise.allSettled([loadPage(), loadOverview('execution',30), loadOverview('stage',10),loadLogs()]);
+    await Promise.allSettled([loadPage(), loadOverview('execution',30), loadOverview('stage',10),loadLogs(),goals.load()]);
   } catch (error) { if (selected === generation) { setConnection(error.incompatible ? 'INCOMPATIBLE' : 'OFFLINE'); problem(error.message); if (error.status === 401) $('login-panel').hidden = false; } }
 }
 async function loadOverview(kind, limit) {

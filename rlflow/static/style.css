@@ -60,3 +60,9 @@ dialog::backdrop { background:#000a; } pre { white-space:pre-wrap; overflow-wrap
 .sr-only { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0,0,0,0); }
 @media (max-width:950px) { .live-layout { grid-template-columns:1fr; } .project-heading { flex-direction:column; align-items:flex-start; } }
 @media (max-width:600px) { main { padding:24px 14px; } .masthead { padding:12px 14px; gap:10px; flex-wrap:wrap; } .brand .muted { display:none; } .observer-tag { font-size:12px; } .status-pill { margin-left:auto; } .metrics { grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; } .metric { padding:12px; } .metric strong { font-size:23px; } .execution-grid { grid-template-columns:1fr; } .panel { padding:16px; } h1 { font-size:23px; } .panel-heading { align-items:flex-start; flex-wrap:wrap; } .login-panel { margin:4vh auto; } }
+/* Hybrid controls preserve the observation panel's quiet, source-scoped language. */
+.goals-panel { margin-top: 1rem; }
+.goal-row { display: block; width: 100%; text-align: left; overflow-wrap: anywhere; }
+.goals-panel pre { max-height: 28rem; overflow: auto; white-space: pre-wrap; overflow-wrap: anywhere; }
+.goals-panel textarea { display: block; width: 100%; max-width: 100%; margin: .5rem 0; font: inherit; }
+.goals-panel .controls { flex-wrap: wrap; }

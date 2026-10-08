@@ -1,5 +1,7 @@
 # 可信 Web 控制配置（checkpoint30）
 
+checkpoint32新增本地条件事实确认 UI，见 [HYBRID_CONTROL_UI.md](HYBRID_CONTROL_UI.md)；默认角色/配置边界不变，仍没有执行授权。以下checkpoint30未接UI描述保留为当时范围。
+
 本切片把 checkpoint29 的不可执行 HTTP 控制桥接到实际 `rlflow.web serve`。不是执行授权、完整安装迁移或 M1/M2–M5 通过声明。checkpoint31 已新增 head 列表及 human private review 读桥，见 [HYBRID_GOAL_READS.md](HYBRID_GOAL_READS.md)；Dashboard 确认 UI 仍未接入。命令语义见 [HYBRID_CONTROL_API.md](HYBRID_CONTROL_API.md)。
 
 ## 默认与显式启用

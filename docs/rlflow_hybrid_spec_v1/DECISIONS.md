@@ -1,5 +1,11 @@
 # 开发决策记录
 
+## Checkpoint32：浏览器确认是精确事实同意，不是执行授权
+
+新增独立有界GoalPanel控制状态，公共最后快照与私有合同/nonce/pending分离。auth/observation双generation保护全局401副作用，避免旧请求注销新身份；private ticket拒迟到body。原 server view完整显示后才明确approve，编辑/刷新/较新coreversion使nonce失效，不靠heartbeat续期。条件批准只记录LEASE_VALIDATION_PENDING，lease/OS/实际输入验证另行实现。
+
+不能将JS JSON.parse/stringify当无损人类意图：decoded重复键、unsafe整数及nonfinite先拒绝，合法原proposal字节入包络；incoming proposal/diff若JS不能精确表示则拒绝人类确认。Python canonical/hash保留服务器定义，不伪造兼容编码。一个只读key/body内存意图绑定身份/项目/epoch，response丢失只手动原键重试；CAS409停止，不自动换expected重放。截图测试改每run独占目录，早期旧PNG覆写事实披露但原日志不改。Sites按local-only实现，不注册/上传/托管。见HYBRID_CONTROL_UI.md。
+
 ## Checkpoint31：有界原记录证明与部分覆盖不可混淆
 
 新 GoalRecord 的私有 source_command_key 绑定完整原 record/receipt/原 revision head；不改 proposal/request/hash，不回填旧记录。完整 snapshot/recover 对旧新记录都核原对象摘要，避免删除可选指针降级安全闭合。网页旧无指针记录明确 PARTIAL_NO_SOURCE_POINTER，列表明确 HEAD_ONLY；不扫描所有历史获取假“完整来源”。

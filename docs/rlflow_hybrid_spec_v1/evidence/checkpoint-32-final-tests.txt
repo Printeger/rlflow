@@ -1,0 +1,88 @@
+Checkpoint32 actual local non-executing human fact-control UI
+2026-10-09. Final frozen implementation evidence; independent/full passed.
+Goal active, not M1/T16/M0-M5 completion.
+
+Root final node units: r7 TERMINAL exit0
+34 passed /0 skipped /121.042918ms
+node --test web_checks/goal-panel.test.mjs web_checks/goal-view.test.mjs
+  web_checks/reducer.test.mjs web_checks/log-view.test.mjs
+  web_checks/telemetry-view.test.mjs web_checks/virtual-list.test.mjs
+audit/hybrid-v1/checkpoint-32-ui-unit-r7.log
+SHA 9044bd9eb1fb7cef7fac8de6c2781b37d05f0821ac86713fc10ca095d1330693
+
+Root final actual browser: original54103 TERMINAL exit0
+2 passed /0 skipped /34303.217961ms
+node --test web_checks/hybrid-browser.test.mjs web_checks/browser.test.mjs
+audit/hybrid-v1/checkpoint-32-browser-r6.log
+SHA 3fec987634df09a3fc208de45a3ade568bbefc227e0bdf5c142b734217d1a5f4
+Owned actual loopback+Chrome with chromiumSandbox:true; no vendor/model/GPU.
+Real Hybrid core DRAFT/conditional approval/revoke, committed response loss
+and original-key/bytes duplicate receipt, no task/session created, old held401
+after new login ignored, viewer roles/XSS/keyboard/390px/TTL invalidation.
+Strict pasted duplicate/unsafe/nonfinite input: noPOST and version unchanged.
+Valid server int64 9007199254740993 persisted by actual bound DraftService:
+approver refuses imprecise review, no preparation/approval, authority unchanged.
+Legacy durable SSE/offline/logs/identity clearing/native POST still pass.
+Normal owned process shutdown; not blocked writer/CLI main/lease/STOP execution.
+
+Root backend target: original95452 TERMINAL exit0
+134 passed /1 existing Starlette warning /26.39s
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q
+  tests/test_web_api.py tests/test_web_local.py tests/test_web_control_config.py
+  tests/test_hybrid_reads.py tests/test_hybrid_control_api.py tests/test_web_auth.py
+audit/hybrid-v1/checkpoint-32-web-r1.log
+SHA 03897a1eeb11a93bbceae772d91515ca38f5ba390a868c3821b0728e87de968b
+
+Independent native High: exact same3 groups sequential ONCE, all TERMINAL exit0;
+unit34passed/0skip121.864225ms (no persistent handle), browser original83351
+2passed/0skip34294.136204ms, backend original84518 134passed/1warning26.33s.
+10 source/test SHA before/after identical. All3 MUST_FIX closed; no new blocker.
+Logs checkpoint-32-ui-unit-high-r1.log /checkpoint-32-browser-high-r1.log
+/checkpoint-32-web-high-r1.log.
+unit SHA ed8472b0fd35903f9a7caf295a96a1701170a8526df923b47514fb7cd1e424af
+browser SHA 3f3092dd725668fecaf7b61437b77e6725a6cfcc62aad4aa4314782f338d5a5a
+web SHA f922a2a5163710b486b996906a0bb44ec7b962dcd7592bb47461c18489f93bdd
+No source/test edits during runs; original handles followed to true terminal.
+Root system full original36465 TERMINAL exit0:
+949passed/32existing externalH1 skips/1existing Starlettewarning/286.41s
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q
+audit/hybrid-v1/checkpoint-32-full-r1.log
+SHA defb55d01eb1c7e39c4384ae30d5efe978681edb2f31ba196a622051009fcc62
+No separate parallel test/load launches, each original handle observed terminal.
+10 source/test SHA still identical after full; no live run now.
+compileall rlflow tests, py_compile both web fixture servers, pip check,
+node --check app/goal-panel/goal-view, git diff --check all exit0.
+
+Frozen source/test SHA256:
+b8f7e72c66fe84e31fbe0bd9471e587f7a1b640f8487fdff6a6829d2af5d7462 rlflow/static/app.mjs
+89840ea6d9e662cd54c75b83cd5c2f94afd9fa0699bf28fe47eef4f6728538f1 rlflow/static/index.html
+40a611aa1d9eb89a693335a0f2468a9d430dc8df08bc44daed1bd3e8361a498a rlflow/static/style.css
+0fb7667cbc3d14a95df2aadb3eaf766361f9bc50db6ce6cac2ce47b533d9c8ed rlflow/static/goal-panel.mjs
+ac598a141452b348904e3064f33e87890a060a6d5c2c7c0f88d70e72dbf61574 rlflow/static/goal-view.mjs
+f69ad4c003c58823595cd30718637ee3c979839ebb6b832f9ee7b9872f37a821 web_checks/goal-panel.test.mjs
+80153cef054d5cf3c254f2ac20983106071388e94868b1daee0d00803c31b3d7 web_checks/goal-view.test.mjs
+b0f225f947805d1676cef53cec2d9409219c68642776557a91a283566293fd2f web_checks/hybrid-browser.test.mjs
+d64d67bb3e81af744d222a0b3fe3415170bbcac57a8b41633c0ccf081c5bb74d web_checks/hybrid_fixture_server.py
+02d6f0550a0c7bd301782eade5897970e781179a273528aa77bb3b246666ea70 web_checks/browser.test.mjs
+
+Intermediate preserved logs, not final source evidence:
+unitr1:25passed112.197813ms; unitr2:29passed/2failed123.506395ms,
+Node18 test lacks browser WebCrypto global, explicit node:crypto fixture fixed.
+unitr3:31passed116.008263ms; r4:33passed126.333262ms;
+r5:33passed124.464629ms; r6:34passed116.896289ms.
+browserr1 original8337:1passed17790.996382ms;
+r2 original53957:2passed28661.309286ms; r3 original6070:2passed28868.581206ms;
+r4 original26212:2passed28869.489460ms; r5 original15896:2passed34298.179566ms.
+Three High MUST_FIX closed before final root versions: late401 generation,
+operator pasted input intent, incoming consent unsafe budget representation.
+
+Screenshots: legacy fixed-name mutable previews were updated by early browser
+reruns; do not reuse their old PNG hashes as newsource visual evidence.
+Now each run has a unique artifacts/run-* directory. Root r6 run-TqoBSC mobile
+preview visually checked for retained source-scoped panel layout; readonly
+fixture screenshot does NOT show actual human confirmation UI or live vendor.
+No offline spec validator rerun: protocol/schema files unchanged.
+No Browser storage, hosted Site, push, paid/GPU workload or USER package-lock edit.
+Full public Goal detail/SSE/condition evidence matrix, lease/STOP/runtime,
+engineering/research/install/B1/NFR06/24h/8h and all M0-M5 still required.
+Boundary details: HYBRID_CONTROL_UI.md; USER package-lock untracked untouched.

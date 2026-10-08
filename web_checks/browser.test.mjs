@@ -208,8 +208,9 @@ test('real local Dashboard: durable SSE, offline recovery, identity clearing and
     assert.ok(await page.locator('.object-row').count() <= 50);
     assert.equal(await page.evaluate(() => localStorage.length+sessionStorage.length),0);
     await mkdir(resolve(repo,'web_checks/artifacts'),{recursive:true});
-    await page.screenshot({path:resolve(repo,'web_checks/artifacts/dashboard-desktop.png'),fullPage:true});
-    await page.locator('.logs-panel').screenshot({path:resolve(repo,'web_checks/artifacts/dashboard-logs.png')});
+    const artifactRun=await mkdtemp(resolve(repo,'web_checks/artifacts/run-'));
+    await page.screenshot({path:resolve(artifactRun,'dashboard-desktop.png'),fullPage:true});
+    await page.locator('.logs-panel').screenshot({path:resolve(artifactRun,'dashboard-logs.png')});
     await page.setViewportSize({width:390,height:844});
     await page.emulateMedia({reducedMotion:'reduce'});
     await page.waitForFunction(() => {
@@ -219,7 +220,8 @@ test('real local Dashboard: durable SSE, offline recovery, identity clearing and
       });
     },{},{timeout:3000});
     assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
-    await page.screenshot({path:resolve(repo,'web_checks/artifacts/dashboard-mobile.png'),fullPage:true});
+    await page.screenshot({path:resolve(artifactRun,'dashboard-mobile.png'),fullPage:true});
+    console.log(`BROWSER_PREVIEW_ARTIFACTS: ${artifactRun}`);
     // A list response fetched under the old identity cannot return after logout.
     let releaseList, enteredList, listDone;
     const enteredL = new Promise(resolve => {enteredList=resolve;}), releasedL = new Promise(resolve => {releaseList=resolve;}), doneL = new Promise(resolve => {listDone=resolve;});

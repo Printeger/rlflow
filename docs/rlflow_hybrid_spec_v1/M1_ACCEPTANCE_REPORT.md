@@ -1,5 +1,7 @@
 # M1 退出门槛审计（尚未通过）
 
+Checkpoint32完整终态：root/独立High同三组顺序一次，各34Node、2实际browser、134backend终态exit0；10source/testSHA一致，三项MUST_FIX闭合。中央full原36465 terminalexit0：949passed/32既有外部H1 skips/1既有Starlettewarning/286.41s；compileall/py_compile/pip check/node syntax/diff0，当前无live测试。UI已接真实head/human私有review/显式DRAFT/精确条件批准撤销/不确定原键重试；large合法int64无法精确显示时拒绝批准，old401不注销新身份。证据与范围见HYBRID_CONTROL_UI.md/evidence/checkpoint-32-final-tests.txt，Sites local-only无上传托管。原SSE/日志/移动端保留，但完整公共Goal条件页/SSE映射、lease/STOP执行、工程科研、M1/B1/NFR06/24h/8h和M0–M5全验收仍未通过，Goal active。USERpackage-lock保留；下一真实不可执行codex-exec准备物料→lease/budget/可靠STOP，不把条件事实当可写执行闭环。
+
 Checkpoint31 完整终态：root 原87433与独立High原56356均 terminal exit0，同13modules各347passed/1既有warning，41.81s/41.97s；范围MUST_FIX关闭。中央full原10588 terminal exit0：949passed/32既有外部H1 skips/1既有Starlette warning/282.61s；compileall、pip check、diff0，源SHA不变，当前无live测试。新增有界head/private review桥、完整原GoalRecord事件证明、安全snapshot/recover闭合，见 HYBRID_GOAL_READS.md 与 evidence/checkpoint-31-final-tests.txt。实际保护配置加载→owned TCP读写/正常关闭不是CLI main、UI/性能或执行证明；M1/B1/NFR06/24h/8h、确认UI、lease/STOP/runtime、工程科研闭环与M0–M5完整Goal仍未通过且保持active。下一直接接真实合同审阅/nonce确认UI；USER package-lock不动。
 
 最新30终态：root/High各301定向，中央full原11956exit0，913passed/32既有skips/1warning274.16s，范围无MUST_FIX，compileall/pip/diff0。实际CLI私有1.1配置可启用不可执行事实控制，旧1.0配置仍只读；existing-only attach无迁移/恢复/业务写，不承诺绝对无SQLite sidecar变化。证据见checkpoint-30-final-tests.txt/TRUSTED_WEB_CONFIG.md；配置ASGI+CLI mock不是新TCP或browser/性能证据。确认UI、goal/head公共桥、真实执行工程科研、B1/NFR06/长期仍缺，M1/完整Goal未通过，下方旧段为各自源版本证据。
@@ -14,7 +16,7 @@ Checkpoint31 完整终态：root 原87433与独立High原56356均 terminal exit0
 
 既有 Store 的真实事务经同事务 observation/outbox、closed public projection/counters、snapshot/keyset page、认证只读 HTTP/SSE 接入 Dashboard。当前 UI 支持真实业务事件的拓扑/状态/原因/预算未知、有限对象与虚拟事件窗口、公共日志、绑定 CPU 工具返回、HOST/磁盘与 worker loop/supervisor telemetry；未知不转0或模型 RUNNING。默认1.0配置/只读应用仍无写命令或 artifact 路径；29可信宿主注入与30私有1.1配置可显式启用不可执行控制服务，见HYBRID_CONTROL_API.md/TRUSTED_WEB_CONFIG.md。均不启动 scheduler 或调用模型。运行方式见 LOCAL_WEB.md。
 
-最新生产源码冻结全回归：checkpoint31 **949 passed / 32既有外部/H1 skipped / 1既有警告 / 282.61s**，包括原控制/观测/Web/telemetry/私有事实与实际socket回归，以及有界Goal读取/原事件与snapshot/recover证明。source/log SHA 见 evidence/checkpoint-31-final-tests.txt。现有 UI checkpoint15 sandbox Chrome+Node **20 passed / 0 skipped / 9.44s**，用 owned loopback 与明确标记的业务 Fixture；HOST 资源来自实际 OS，本轮未新增 browser 结果。没有重新把这些测试跑成真实供应商闭环，也没有把节点心跳当作模型活动。
+最新生产源码冻结全回归：checkpoint32 **949 passed / 32既有外部/H1 skipped / 1既有警告 / 286.41s**，source/log SHA 见 evidence/checkpoint-32-final-tests.txt。本轮root/独立High各34Node+2真实sandbox Chrome browser+134backend定向通过，既有SSE/离线/日志/资源/身份/nativePOST与新角色控制、原nonce/原键重试、JS精度/XSS/移动端负例共同核验。owned loopback业务Fixture明确隔离，HOST资源为实际OS；旧checkpoint15的20项结果仅绑定旧源码。本轮没有把这些测试当真实供应商/lease/工程科研闭环，也没有把节点心跳当模型活动。
 
 ## 场景到证据
 
@@ -27,7 +29,7 @@ Checkpoint31 完整终态：root 原87433与独立High原56356均 terminal exit0
 | A17 没真实事件不增加业务数 | browser heartbeat/资源不推进业务cursor/counts、不调用app RAF、reducer重复不续动效；telemetry独立sample因果age通过 | B1长时idle/时钟扰动完整矩阵未测；短范围通过 |
 | A18 浏览器失联不冒充GPU停止 | Chrome offline显示/停止脉冲、资源FRESH/STALE分域；GPU当前UNKNOWN | 未运行真实GPU，运行中GPU断网场景未证；不能为验收启用昂贵训练。受管CPU负载/后续批准GPU证据分开 |
 | A32 100k/8h | Store增量事务/marker索引、周期维护锁外、虚拟窗口geometry/缓存；100k单对象历史ratio1.041488、10k归档task；组合daemon300s与checkpoint23单项目HTTP计划10/s+50/s完整400写入/双SSE | 活跃任务/3项目/限定硬件/浏览器双端完整B1、合计RSS/WAL/无全仓库poll及8h页面/24h fixture未完成 |
-| A35 手机/键盘/减少动画 | 390px Chrome无横向溢出、虚拟事件键盘导航、reduced-motion/静止、文字状态通过 | Hybrid Dashboard审批/STOP交互尚未接入，29/30 HTTP条件批准已有但无STOP执行桥，既有CLI/core批准/STOP不变；可信手机交互/T16/T24及完整可访问性验收未完成 |
+| A35 手机/键盘/减少动画 | 390px Chrome无横向溢出、虚拟事件键盘导航、reduced-motion/静止、文字状态通过；32条件批准/撤销与键盘/手机布局已有owned browser证据 | STOP执行UI/桥仍缺，既有CLI/core批准/STOP不变；可信手机端到端/T16/T24及完整可访问性验收未完成 |
 
 对应测试源码：tests/test_hybrid_observation.py、test_web_api.py、test_web_local.py、test_live_stream.py、test_telemetry.py；web_checks/browser.test.mjs、reducer.test.mjs、virtual-list.test.mjs、log-view.test.mjs、telemetry-view.test.mjs。表格不使用“有测试名”代替完整场景；上述通过仅指已记录冻结执行的匹配范围。
 
