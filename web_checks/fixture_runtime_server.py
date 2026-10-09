@@ -12,6 +12,7 @@ import uvicorn
 from tests.test_execution_adapter import setup as native_setup
 from tests.test_hybrid_fixture_runtime import runtime
 from tests.test_hybrid_fixture_runtime_control import setup
+from rlflow.web_auth import Credential, Principal
 
 
 def main():
@@ -22,6 +23,10 @@ def main():
     native = native_setup.__wrapped__(root, patch)
     fixture = runtime.__wrapped__(root, native, SimpleNamespace(), patch)
     context = next(fixture)
+    auth = context[0].store._hybrid_auth_owner
+    auth.credentials['fixture_viewer'] = Credential.create(
+        Principal('fixture_viewer', 'human', {'viewer'}, {context[0].workspace.project_id}),
+        'Working plan isolated synthetic fixture passphrase')
     owner, lease, service, app, _, _, _, _ = setup(context, origin=origin)
     attempt = owner._issued(lease)
     server = uvicorn.Server(uvicorn.Config(app, log_level='error', access_log=False, proxy_headers=False))

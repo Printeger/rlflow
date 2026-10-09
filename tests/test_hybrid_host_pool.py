@@ -1,5 +1,6 @@
 """Actual shared fixture slots; no paid model/provider or runtime handoff."""
 import copy
+from contextlib import closing
 import json
 import os
 from pathlib import Path
@@ -203,7 +204,7 @@ def test_actual_dead_child_idle_kernel_lock_does_not_refund_durable_slot(pool):
 
 def damage(owner, sql, parameters=()):
     # Explicit test-only corruption, restoring the immutable trigger definition.
-    with sqlite3.connect(owner.root / 'pool.db') as db:
+    with closing(sqlite3.connect(owner.root / 'pool.db')) as db, db:
         db.execute('DROP TRIGGER immutable_update')
         db.execute(sql, parameters)
         db.execute(next(ddl for ddl in pool_module._DDL if ddl.startswith('CREATE TRIGGER immutable_update')))
@@ -214,14 +215,14 @@ def test_raw_slot_index_cannot_hide_nonlatest_occupied_fact(pool):
     claim = take(owner, members[0], 'hidden')
     take(owner, members[1], 'latest')
     damage(owner, "UPDATE ledger SET slot=NULL,action='REGISTER' WHERE key=?", (json.loads(claim.raw)['key'],))
-    with sqlite3.connect(owner.root / 'pool.db') as db: db.execute("UPDATE heads SET raw='null' WHERE slot=0")
+    with closing(sqlite3.connect(owner.root / 'pool.db')) as db, db: db.execute("UPDATE heads SET raw='null' WHERE slot=0")
     with pytest.raises(Conflict): owner.snapshot()
     with pytest.raises(Conflict): take(owner, members[1], 'not_free')
 
 
 def test_index_ddl_is_pinned_before_hot_lookup(pool):
     owner, _ = pool
-    with sqlite3.connect(owner.root / 'pool.db') as db:
+    with closing(sqlite3.connect(owner.root / 'pool.db')) as db, db:
         db.execute('DROP INDEX slot_tip'); db.execute('CREATE INDEX slot_tip ON ledger(slot,seq DESC)')
     with pytest.raises(Conflict, match='schema/index'): owner.snapshot()
 
@@ -231,9 +232,9 @@ def test_oversize_sql_cells_fail_closed_before_projection_adoption(pool, target)
     owner, members = pool; claim = take(owner, members[0], 'bounded')
     oversized = 'x' * (2 * 1024**2)
     if target == 'head':
-        with sqlite3.connect(owner.root / 'pool.db') as db: db.execute('UPDATE heads SET raw=? WHERE slot=0', (oversized,))
+        with closing(sqlite3.connect(owner.root / 'pool.db')) as db, db: db.execute('UPDATE heads SET raw=? WHERE slot=0', (oversized,))
     elif target == 'member':
-        with sqlite3.connect(owner.root / 'pool.db') as db: db.execute('UPDATE members SET store_root=? WHERE id=?', (oversized, members[0].id))
+        with closing(sqlite3.connect(owner.root / 'pool.db')) as db, db: db.execute('UPDATE members SET store_root=? WHERE id=?', (oversized, members[0].id))
     else:
         damage(owner, 'UPDATE ledger SET ' + target + '=? WHERE key=?', (oversized, json.loads(claim.raw)['key']))
     with pytest.raises(Conflict):
@@ -244,7 +245,7 @@ def test_oversize_sql_cells_fail_closed_before_projection_adoption(pool, target)
 def test_head_numeric_equivalence_is_not_byte_identity(pool):
     owner, members = pool; take(owner, members[0], 'head')
     value = owner.snapshot()['heads'][0]; value['version'] = float(value['version'])
-    with sqlite3.connect(owner.root / 'pool.db') as db:
+    with closing(sqlite3.connect(owner.root / 'pool.db')) as db, db:
         db.execute('UPDATE heads SET raw=? WHERE slot=0', (canonical(value).decode(),))
     with pytest.raises(Conflict, match='derived indexed head'): owner.snapshot()
 

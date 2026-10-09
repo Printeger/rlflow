@@ -1,5 +1,11 @@
 # 开发决策记录
 
+## Checkpoint48：domain事实触发读取，不把连接或历史终态变成执行/FREE证明
+
+真实snapshot/domain版本绑定完整scope，高水位不足使新命令禁用；自动只读批次有限合并而不固定轮询。原POST在途不被domain打断，UNKNOWN与STOP原key/内容保持不变。真实fetch错误只有实际重连generation允许一次恢复，迟到旧GET也遵守；同LIVE心跳不重试。闭合原timeline保留UNKNOWN/NOT_OBSERVED，不以STARTED历史或LIVE连接冒充当前运行。
+
+真实Chrome暴露原生timer receiver错误与Pool进程全局新增FD误拒；分别用wrapper和仅expected(dev,ino)候选精确修复。Pool before旧目标/0/多候选仍fail-closed，原物理pin与COMMIT再核不变。旧损坏注入SQLite上下文不关connection由实际实验确认，修正测试生命周期而不放宽保护。High差量复核与原swap/restore回归关闭必要边界。所有失败保留，最后必要前端53pass/HostPool31pass/精确source损坏1pass，新两身份browser1pass；未改通过套不重复，详见48证据。下一实际CPU执行profile与原protocol scope分开设计，不能改名fixture为native/真正工程科研。
+
 ## Checkpoint47：历史 Task、当前 owner hint 与原命令安全续清分离
 
 现有 Dashboard 独立固定 CPU 面板复用45读取与46人工命令，不改变不可执行 Goal 批准。新只读 discovery 明确不是 lease；控制接口未安装仍可读取历史。exact detail版本手动CAS，无自动重基/重发。命令在途方法内拒刷新/选择，identity/project/epoch/auth清除仍立刻生效。独立MUST要求STOP202保留immutable body/key/selector；即便Task已终态也不退休原意图，因为此DTO没有PoolFREE观察，仅手动续原清理或明确清除。真实browser故障证明该行为，不新造FREE字段/第二队列/owner。第二轮owner提示被acceptedStop文案覆盖导致真实超时，合并两提示而非放宽检查。细节与原日志见HYBRID_FIXTURE_DASHBOARD.md及47 evidence；不扩展native/模型/candidate/任意树权限。

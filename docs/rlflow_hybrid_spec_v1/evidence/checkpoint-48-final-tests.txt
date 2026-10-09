@@ -1,0 +1,128 @@
+Checkpoint48 — original durable-event-driven fixed CPU Task observation
+Parent: 96517431950fe5c0ae46a3ca9c4763638a942630 (Checkpoint47)
+Scope: private finite CPU/SQLite/loopback/Chrome; no paid model/GPU/native/candidate
+execution, production migration, public hosting, protected workspace writes.
+All tests serial; every original run polled to actual terminal before repairs.
+
+DELIVERY / ACCEPTANCE
+Verified nonduplicate durable domain events invalidate the existing Task panel.
+Snapshot floor, event high-water and timer scope bind project/mode/epoch/identity/
+auth-generation. One active readonly batch, coalesced automatic batches <=1Hz.
+Actual selected original Task/Attempt/reservation timeline is reread and validated;
+at most seven legal phases, closed source DTO, no current-run/FREE inference.
+Viewer disconnect retains as-of detail; actual SSE recovery restores original
+START/G/ACK five phases and STOP seven phases, with zero viewer command POST.
+Heartbeat does not trigger GET/POST. Offline cancels queued timer. HTTP/source
+failure requires manual read; real network restoration allows one readonly retry,
+including an old GET failing after SSE recovery. Repeated same-generation failure
+blocks again; active heartbeats do not unlock failures. Commands retain original
+body/key/CAS and STOP cleanup intent; in-flight commands are not invalidated.
+Pool native FD provenance ignores foreign inodes from concurrent Project WAL/SHM
+but rejects an old target, zero/multiple target FDs or a swapped/wrong connection.
+Original private FD/path/ownership/inheritance/SQL/COMMIT checks remain intact.
+
+ACTUAL RUNS / FAILURES / DIAGNOSIS
+1. node --test web_checks/fixture-panel.test.mjs
+   r1 original191ff8: 11pass 78.134ms; r2 original22dda0: 12pass77.282ms.
+   r3 originalb44070 exit1: 12pass/1fail78.210ms: dirty returned null, not false.
+   Explicit Boolean fix, not relaxed assertion.
+   r4 original9520a7:14pass78.661ms; r5 originalf4df36:15pass79.036ms;
+   r6 original6e0e9c:15pass79.448ms; r7 originalc03b6e:16pass79.638ms.
+   r7 production/test JS bytes remain final; includes snapshot floor, cross-project
+   and same-project epoch reset, coalescing, inflight POST, blocked failure, and
+   old held GET failing after actual reconnect-generation change.
+2. node --test web_checks/fixture-live-browser.test.mjs (actual local Chrome)
+   r1 original3837 terminal638d4f exit1:1fail38.593s (runner38.793s), login wait.
+   Diagnostic r1 original68025 terminald57f82 exit1:1fail38.629s, actual DOM error
+   Illegal invocation. Independent Chrome native timer probe originala4a8f0 exit0:
+   raw timer member calls both Illegal invocation; arrow wrapper passes.
+   Changed diagnostic approach after two equivalent failures; precise wrappers,
+   no timeout increase, no removed checks. No Start/G at these initial failures.
+   r2 original95021 terminalc25905 exit1:1fail45.255s, VIEWER recovery wait, not
+   operator Start. Original main preliminary Start interpretation was corrected
+   by actual trace and full two-page/host diagnostic, not used as success evidence.
+   Diagnostic r2 original75273 terminalf95baa exit1:1fail45.975s: actual host
+   STARTED_AS_OBSERVED/version16, operator five phases; viewer LIVE/asof12,
+   Failed to fetch held autoBlocked. Implemented transport-only readonly recovery.
+   r3 original97698 terminalf7b1c4 exit1:1fail60.140s (runner60.333s): actual host
+   inspect thread Pool._native_sql_fd denied because unrelated Project RW SQLite
+   descriptors appeared between global FD censuses. Pool mutex already existed;
+   it cannot serialize unrelated Project WAL/SHM. Fixed expected-inode candidate
+   selection, not a test-only mutex, runtime timeout or disabled identity check.
+   r4 original1109 terminal1e0222 exit0:1pass29.755s (runner29.948s): actual two
+   human identities, viewer offline catchup5/7, original CPU reap/Pool0, no viewer
+   POST/heartbeat GET, bounded auto list reads, UNKNOWN/NOT_OBSERVED and logout.
+   r4 inputs unchanged except two TEST-ONLY corruption connection lifetime fixes.
+3. PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q
+   tests/test_hybrid_pool_fd_scope.py --disable-warnings
+   Original64477 terminalbe66e7 exit0:5pass2.51s. Actual another thread opens
+   and holds foreign SQLite/WAL/SHM during Pool census; snapshot/claim work.
+   Original old/zero/two target, wrong connection with foreign noise all deny.
+4. Necessary Pool production regression (not whole prior44/46 repetition):
+   PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q
+   tests/test_hybrid_host_pool.py tests/test_hybrid_fixture_runtime_control.py
+   tests/test_hybrid_fixture_runtime_reads.py --disable-warnings
+   Original49236 terminald9cf4a exit1:52pass/3fail/3warnings351.29s.
+   Three exact corruption expectations were preempted by before-existing-target
+   protection: index_ddl, head_numeric_equivalence, explicit_and_startup_audit.
+   Actual minimal diagnostic original70c16f exit0: SQLite connection context only
+   ends transaction; target RW FD stays open. Explicit close or closing context
+   eliminates it. No production relaxation. Changed Pool corruption injectors
+   to with closing(connect(...)) as db, db, preserving commit and all assertions.
+   HostPool-only repaired run original3978 terminalc9e041 exit0:31pass76.37s.
+   Includes original actual connection swap/restore rejection before SQL writes.
+   Passed unchanged control/reads modules not rerun. Original3fail retained; not
+   falsely reported as a fresh post-repair55pass integration.
+5. Independent review found one same-lifetime Pool corruption injector in Runtime
+   tests; same closing repair, no production change. Only precise required test:
+   PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q
+   tests/test_hybrid_fixture_runtime.py::test_pool_free_tampered_project_source_is_rejected_by_current_and_cold_audit
+   --disable-warnings
+   Original35333 terminal5ab327 exit0:1pass9.85s. Exact Project phase source
+   corruption denied, original source restored, audit verifies.
+6. Necessary existing frontend/command recovery regression:
+   node --test --test-concurrency=1 web_checks/reducer.test.mjs
+   web_checks/virtual-list.test.mjs web_checks/log-view.test.mjs
+   web_checks/telemetry-view.test.mjs web_checks/goal-view.test.mjs
+   web_checks/goal-panel.test.mjs web_checks/fixture-panel.test.mjs
+   web_checks/browser.test.mjs web_checks/hybrid-browser.test.mjs
+   web_checks/fixture-runtime-browser.test.mjs
+   Original26954 terminal9ff896 exit0:53pass/0fail/0skip62.100s.
+   Includes actual47 STOP fault/manual-original-key cleanup/reap/Pool0 regression.
+   Final new live browser item2 not repeated; no unchanged profile/whole44/46 rerun.
+
+INDEPENDENT READONLY HIGH DELTA REVIEW
+Existing hybrid_architecture_review, no writes/tests. Snapshot-floor, full-scope
+reset, same-project epoch CONNECTING contamination, and old GET after reconnect
+findings implemented with exact deterministic tests. Expected-inode Pool fix
+closed statically; original swap-restore regression required and now passes.
+Corruption connection-lifetime delta correct; generic corruption checks no longer
+get an early FD denial in place of actual downstream damaged-fact validation.
+Remaining Runtime injector repaired and its exact case passes. No production MUST
+remains confirmed in these reviewed deltas. Previously passed reviews not repeated.
+
+INPUTS / BOUNDARY
+Original frozen 238 final manifest:
+checkpoint-48-final-inputs.sha256
+e5a7dead02b9fc2e96dd189e74f323633e8276dfd5629ce98d4c93748ea673e5
+After two test-only closing repairs, same238 final repaired manifest:
+checkpoint-48-final-repaired-inputs.sha256
+452be49e16447df1296b943c9843e5b6449f4b217386843a5cfc03355d67cec0
+Other original input/candidate/diagnostic/recovery manifests retained separately.
+Raw logs, including every failure, live under audit/hybrid-v1/; hashes archived
+in checkpoint-48-log-sha256.txt after final terminal.
+Final repaired238 SHA check exit0 chunk183d4e. compileall exit0 chunk54b6fd;
+pip check exit0 chunk9b1ac3; git diff --check exit0 (rechecked after docs).
+No live tests at final archive; no source/test/schema edits during live suites.
+USER package-lock.json unchanged/unstaged:
+becc7e2a36dfcad4ffe934b5ff2f0f68187611d6c0641bd63d81367651cfbf09
+
+GAPS / NEXT
+This slice is real durable observation of the fixed CPU protocol execution, NOT
+native/model/candidate execution, trusted provider invoice, arbitrary-tree STOP,
+strict OS/data/network resources, engineering/research acceptance, long soak,
+install-migration or full Goal completion. These acceptance conditions remain.
+Next must deliver a finite actual engineering/research execution behavior under
+an explicitly separate approved model-free CPU profile, rather than more visual
+or preparation-only components. Profile and safety design precede any new effect.
+No permission inferred for paid models/GPU/production migration.

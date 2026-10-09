@@ -1,6 +1,6 @@
 """Real fixed local CPU participant; no native CLI/model/candidate execution."""
 from dataclasses import replace
-from contextlib import contextmanager
+from contextlib import contextmanager, closing
 from datetime import timedelta
 import json
 import hashlib
@@ -323,7 +323,7 @@ def test_pool_free_tampered_project_source_is_rejected_by_current_and_cold_audit
     # trigger/fact afterwards; neither historical delivery nor production moves.
     path = pool.root / 'pool.db'
     def replace_raw(text):
-        with sqlite3.connect(path) as db:
+        with closing(sqlite3.connect(path)) as db, db:
             trigger = db.execute("SELECT sql FROM sqlite_master WHERE name='immutable_update'").fetchone()[0]
             db.execute('DROP TRIGGER immutable_update')
             db.execute('UPDATE ledger SET raw=?,hash=? WHERE key=?',

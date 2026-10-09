@@ -18,6 +18,19 @@ export function checkFixturePage(v,s,after=''){
   if(v.next_after!==null && (!id(v.next_after) || v.next_after<=after || v.next_after<previous))fail();return v;
 }
 export function checkFixtureDetail(v,s,selected){scope(v,s);if(!closed(v,[...meta,'task']))fail();task(v.task,v.as_of_state_version);if(v.task.id!==selected.id || v.task.reservation_id!==selected.reservation_id || v.task.attempt_id!==selected.attempt_id)fail();return v;}
+export function checkFixtureTimeline(v,s,selected){
+  if(!closed(v,[...meta,'task','events']))fail();
+  const {events,...detail}=v;checkFixtureDetail(detail,s,selected);
+  if(!Array.isArray(events) || events.length<1 || events.length>7)fail();
+  let phase=-1,version=-1;const seen=new Set();
+  for(const event of events){
+    if(!closed(event,['event_id','state_version','recorded_at','recorded_phase']))fail();
+    const next=phases.indexOf(event.recorded_phase);
+    if(!closed(event,['event_id','state_version','recorded_at','recorded_phase']) || !id(event.event_id) || seen.has(event.event_id) || !count(event.state_version) || event.state_version<=version || event.state_version>v.as_of_state_version || !(next===phase+1 || next===5 && phase>=0 && phase<5) || typeof event.recorded_at!=='string' || !event.recorded_at.endsWith('Z') || !Number.isFinite(Date.parse(event.recorded_at)))fail();
+    phase=next;version=event.state_version;seen.add(event.event_id);
+  }
+  if(events[0].recorded_phase!=='REGISTER_NO_HANDOFF' || events.at(-1).recorded_phase!==v.task.recorded_phase || version!==v.task.recorded_at_state_version)fail();return v;
+}
 export function checkFixtureReceipt(v,body,actor){
   if(!closed(v,['schema_version','command_id','action','status','accepted_state_version','request_hash','actor_id','task_id','recorded_phase','execution_status','native_execution_enabled','arbitrary_tree_stop','duplicate']) || v.schema_version!=='1.1' || !id(v.command_id) || v.action!==body.action || v.status!=='ACCEPTED' || v.accepted_state_version!==body.expected_state_version+1 || !count(v.accepted_state_version) || !/^sha256:[0-9a-f]{64}$/.test(v.request_hash) || v.actor_id!==actor || v.task_id!==body.task_id || v.recorded_phase!==(body.action==='START_FIXED_CPU'?'HANDOFF_UNKNOWN':'STOP_REQUESTED') || v.execution_status!=='UNKNOWN' || v.native_execution_enabled!==false || v.arbitrary_tree_stop!==false || typeof v.duplicate!=='boolean')fail();return v;
 }

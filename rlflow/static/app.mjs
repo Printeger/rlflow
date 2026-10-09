@@ -111,6 +111,7 @@ function short(value) { return value ? value.slice(0,14) + (value.length > 14 ? 
 function base() { return `/api/v1/projects/${encodeURIComponent(project.id)}`; }
 function setConnection(value) {
   connection = value; $('connection').textContent = value;
+  fixtures.connection(value);
   $('connection').className = 'status-pill ' + value.toLowerCase().replaceAll(' ','-');
   if (!['LIVE','CATCHING UP'].includes(value)) stopPulses();
 }
@@ -251,6 +252,7 @@ function openStream(selected) {
       const value = JSON.parse(message.data), result = applyEvent(state,value,message.lastEventId);
       state = result.state; goals.changed(state.sourceVersion); lastHeard = performance.now();
       if (!result.duplicate) {
+        fixtures.changed(state.sourceVersion);
         telemetry?.invalidateWorkers([...value.payload.upsert.filter(r=>r.kind==='execution').map(r=>r.id),
           ...value.payload.removed.filter(r=>r.kind==='execution').map(r=>r.id)],value.payload.source_state_version);
         if (logPage && value.seq>cursor(logPage.high_water).seq) {logPending++;updateLogPending();}

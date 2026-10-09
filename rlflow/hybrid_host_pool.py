@@ -73,8 +73,14 @@ def _rw_descriptors():
 
 def _native_sql_fd(db, before, expected):
     after = _rw_descriptors()
-    created = [(fd, pair_) for fd, pair_ in after.items() if before.get(fd) != pair_]
-    if len(created) != 1 or list(created[0][1]) != list(expected):
+    target = tuple(expected)
+    # Other project readers can concurrently open RW WAL/SHM descriptors.
+    # Only the original Pool inode can witness this fixed trusted connector;
+    # unrelated inodes are not candidate capabilities. Never adopt an already
+    # open target or choose among multiple new target descriptors.
+    created = [(fd, pair_) for fd, pair_ in after.items()
+               if pair_ == target and before.get(fd) != pair_]
+    if target in before.values() or len(created) != 1:
         raise Conflict('actual native pool SQLite descriptor identity differs or is uncertain')
     fd = created[0][0]
     _check_sql_fd(fd, expected)
