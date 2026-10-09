@@ -1,5 +1,9 @@
 # 需求包离线校验报告
 
+Checkpoint50 FINAL：必要五模块原48336终cd5b24 exit0，123pass/1warning73.89s；262冻结SHA前后匹配9521d2d9…09c2da，compileall/pipcheck/diff各exit0。真实appraisal/原PoolFREE/当前vs历史/原幂等与实际丢COMMIT receipt恢复、周期快照和坏snapshot/删域拒绝/读末TTL/有界来源按原六新case分别通过；不是最终fresh六case套。开发两失败均夹具注入/还原，日志未隐藏且生产约束未放宽。High四窄MUST已静态关闭。无live测试，正在提交50，见evidence/checkpoint-50-final-tests.txt与日志hash。仅固定实验AS_OF、coverage=[]/Goalfalse/review未做，完整工程科研/原Goal验收仍缺；下方WIP均历史。
+
+50 WIP：原93316终f68b7e exit0 2pass37.18s，真实原CPU→研究appraisal/asof/过期历史/幂等/manual恢复及noG/通用writer拒。原86683终fbe9d7 exit1 2pass/1夹具projection.version漏列fail39.71s，已通过真实换版/撤销降历史；原7231终84c113 exit1 1pass/1注入被append-trigger拒fail29.29s，完整丢COMMIT返回/周期快照/重算删域坏snapshot/projection删域维护保due通过；test-only注入恢复trigger后原77235终c19f16 exit0 1pass12.77s。原失败全部保留，无生产trigger/必要断言放宽。High窄MUST闭合，5依赖模块原48336 LIVE、262SHA冻结9521d2d9…09c2da；最终50尚待。见HYBRID_CPU_ASSESSMENT.md；不是fresh全新trial suite/Goal条件完成或独立研究review。
+
 Checkpoint49 FINAL：原数值smoke1pass21.00s与真实FD关闭故障原cap恢复通过，独立评价误差0.08821911547006896对baseline0.14159265358979312，仅固定三seed本次观测。必要集成原83562终efa0ca exit0：182pass/2warning437.80s；最终后端既有真实命令browser原71053终55ddf3 exit0：1pass16.108s（runner16.307s），原key重试/ACK/STOP故障续清/reap/FREE/owner关闭。241冻结SHA前后匹配、compileall/pipcheck/diff各exit0。没有重复已通过的数值正例/FD故障或48全前端，不宣称post-repair全部数值freshsuite；所有原失败/诊断及独立review误报撤回保留。证据evidence/checkpoint-49-final-tests.txt与checkpoint-49-log-sha256.txt。无live测试，正在提交；当前Goal证据激活和科研下一步、工程/native/长期等仍待验收。下方WIP是历史。
 
 49 WIP：原CPU trial smoke12961终252173 exit0 1pass21.00s，真实384点/96、101、104inside/独立均误差0.088219/原stream SHA/持久AUDIT_ONLY/consume1/reap/FD全闭/Pool0/重复不写及历史ACKfalse/raw/metrics/hash拒绝通过。实际FDclose故障→STOP_REQUESTED/UNKNOWN/占槽1→原cap续清FREE已通过。原12829边界4pass/1新夹具hashfail29.44s；test-only hash修复后定向73931 2pass1warning9.05s。开发同3s失败与非执行cProfile诊断完整保留，未提高TTL；去重复仍完整审批校验并精确绑定同revision。当前唯一必要7模块83562 LIVE、241SHA冻结6672c9ec…91f3fe，尚无49最终检查/提交。48实际da1d541。CPU增量不替代当前Goal证据激活、独立研究/工程/native/长期完整验收，详见HYBRID_CPU_TRIAL.md。

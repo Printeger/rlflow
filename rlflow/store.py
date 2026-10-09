@@ -76,7 +76,7 @@ PRIVATE_HOT_SECTIONS = frozenset(('tool_sources','tool_receipts','tool_scan',
     'hybrid_budget_entries','hybrid_budget_goal_heads','hybrid_budget_reservation_heads','hybrid_budget_project_heads',
     'hybrid_workspace_facts','hybrid_workspace_heads','hybrid_workspace_claims',
     'hybrid_runtime_installation_intents','hybrid_runtime_installation_publications',
-    'hybrid_working_plan_intents','hybrid_working_plan_results'))
+    'hybrid_working_plan_intents','hybrid_working_plan_results','hybrid_cpu_trial_assessments'))
 
 
 class ObjectMap(dict):
@@ -146,6 +146,7 @@ class Store:
         self._hybrid_workspace_service = None
         self._hybrid_installation_service = None
         self._hybrid_working_plan_service = None
+        self._hybrid_cpu_assessment_service = None
         self._existing_identity = None
         self.root = Path(root).resolve()
         (self.root / "runtime").mkdir(parents=True, exist_ok=True)
@@ -236,7 +237,8 @@ class Store:
         for name in ('_hybrid_auth_owner', '_hybrid_registry', '_hybrid_authority_service',
                      '_hybrid_draft_auth_owner', '_hybrid_draft_service', '_hybrid_preparation_service',
                      '_hybrid_controller_service', '_hybrid_admission_service', '_hybrid_budget_service',
-                     '_hybrid_workspace_service', '_hybrid_installation_service', '_hybrid_working_plan_service'):
+                     '_hybrid_workspace_service', '_hybrid_installation_service', '_hybrid_working_plan_service',
+                     '_hybrid_cpu_assessment_service'):
             setattr(store, name, None)
         db = sqlite3.connect(store.db.as_uri() + '?mode=ro', uri=True, timeout=5)
         try:
@@ -411,6 +413,20 @@ class Store:
 
     def _apply(self, state, payload, db, event):
         preparation_decoded=False
+        from .hybrid_cpu_assessment import SECTION as cpu_section, EVENT as cpu_event, validate_transition as cpu_transition
+        if (event['event_type']==cpu_event or any(s==cpu_section for s,k,v in payload.get('put',[])) or
+                any(s==cpu_section for s,k in payload.get('delete',[])) or cpu_section in payload.get('set',{})):
+            from .hybrid_reads import ReadBudget
+            budget=ReadBudget(db,4*1024**2)
+            decoded={**payload,'put':[[s,k,budget.decode(v)] for s,k,v in payload.get('put',[])]}
+            cpu_transition(decoded,lambda s,k:({} if s in state else None) if k=='' else state.get(s,{}).get(k),
+                event_type=event['event_type'],key=event['idempotency_key'],object_id=event['object_id'],producer=event['producer'],
+                version=event['new_state_version'],registration=self._goal_registration(db))
+            from .hybrid_cpu_assessment import event_inputs
+            value=next(v for s,k,v in decoded['put'] if k)
+            if event['input_versions']!=canonical(event_inputs(value)).decode():
+                raise Conflict('CPU appraisal original canonical inputs differ')
+            payload=decoded;preparation_decoded=True
         from .hybrid_working_plan import SECTIONS as plan_sections, EVENTS as plan_events, validate_transition as plan_transition
         if (event['event_type'] in plan_events or any(s in plan_sections for s,k,v in payload.get('put',[])) or
                 any(s in plan_sections for s,k in payload.get('delete',[])) or set(payload.get('set',{})) & set(plan_sections)):
@@ -670,6 +686,13 @@ class Store:
 
     def _commit(self, db, event_type, key, payload, previous, object_id, producer, inputs, *, _authorization=None):
         ver = previous + 1
+        from .hybrid_cpu_assessment import SECTION as cpu_section, EVENT as cpu_event, validate_transition as cpu_transition
+        if (event_type==cpu_event or any(s==cpu_section for s,k,v in payload['put']) or
+                any(s==cpu_section for s,k in payload['delete'])):
+            service=self._check_cpu_assessment_guard(db,_authorization)
+            cpu_transition(payload,_authorization.lookup,event_type=event_type,key=key,object_id=object_id,
+                producer=producer,version=ver,registration=self._goal_registration(db))
+            service.check_live_write(db,payload,inputs,_authorization)
         from .hybrid_working_plan import SECTIONS as plan_sections, EVENTS as plan_events, validate_transition as plan_transition
         if (event_type in plan_events or any(s in plan_sections for s,k,v in payload['put']) or
                 any(s in plan_sections for s,k in payload['delete'])):
@@ -864,6 +887,9 @@ class Store:
         return service
 
     def _preparation_complete(self, db, state):
+        from .hybrid_cpu_assessment import validate_complete as cpu_complete
+        cpu_complete(state,self._goal_registration(db),lambda k:self._cpu_assessment_event(db,k),
+            self._cpu_assessment_summary(db,state['version']))
         from .hybrid_preparation import validate_complete
         validate_complete(state,self._goal_registration(db),lambda k:self._preparation_event(db,k))
         from .hybrid_controller import validate_complete as controller_complete
@@ -1143,6 +1169,60 @@ class Store:
             raise Conflict('budget original decoded scope inputs differ')
         return ((row['event_type'],row['producer'],row['object_id'],row['new_state_version']),expected_objects(value))
 
+    def bind_hybrid_cpu_assessment(self, service):
+        from .hybrid_cpu_assessment_service import CpuAssessmentService
+        if type(service) is not CpuAssessmentService or service.store is not self:
+            raise TypeError('invalid original CPU appraisal owner')
+        with self.lock():
+            if self._hybrid_cpu_assessment_service not in (None,service):
+                raise Conflict('CPU appraisal owner cannot be rebound')
+            self._hybrid_cpu_assessment_service=service
+
+    def _check_cpu_assessment_guard(self,db,guard):
+        service=self._hybrid_cpu_assessment_service
+        if service is None: raise PermissionError('protected CPU appraisal owner required')
+        service.check_guard(db,guard);return service
+
+    def _cpu_assessment_summary(self,db,version):
+        from .hybrid_cpu_assessment import EVENT
+        row=db.execute('SELECT CASE WHEN typeof(idempotency_key)=\'text\' AND length(CAST(idempotency_key AS BLOB))<=160 THEN idempotency_key END AS idempotency_key,new_state_version FROM events WHERE event_type=? AND seq<=? ORDER BY seq DESC LIMIT 1',
+            (EVENT,version)).fetchone()
+        count=db.execute('SELECT COUNT(*) FROM events WHERE event_type=? AND seq<=?',(EVENT,version)).fetchone()[0]
+        if row is not None and (row[0] is None or type(row[1]) is not int):
+            raise Conflict('CPU appraisal original bounded tip differs')
+        return (tuple(row) if row is not None else None),count
+
+    def _cpu_assessment_event(self,db,key,*,max_bytes=256*1024,_parse=None,_decode=None):
+        from .hybrid_cpu_assessment import SECTION,EVENT,validate_record,event_inputs
+        from .hybrid_goals import digest
+        if _parse is None and _decode is None:
+            from .hybrid_reads import ReadBudget
+            read=ReadBudget(db,4*1024**2);_parse,_decode=read.parse,read.decode
+        row=db.execute('SELECT CASE WHEN typeof(event_type)=\'text\' AND length(CAST(event_type AS BLOB))<=64 THEN event_type END AS event_type,CASE WHEN typeof(producer)=\'text\' AND length(CAST(producer AS BLOB))<=64 THEN producer END AS producer,CASE WHEN typeof(object_id)=\'text\' AND length(CAST(object_id AS BLOB))<=128 THEN object_id END AS object_id,new_state_version,CASE WHEN typeof(payload_sha256)=\'text\' AND length(CAST(payload_sha256 AS BLOB))<=64 THEN payload_sha256 END AS payload_sha256,CASE WHEN typeof(input_versions)=\'text\' AND length(CAST(input_versions AS BLOB))<=4096 THEN input_versions END AS input_versions,CASE WHEN typeof(payload)=\'text\' AND length(CAST(payload AS BLOB))<=? THEN payload END AS payload FROM events WHERE idempotency_key=?',
+            (max_bytes,key)).fetchone()
+        if row is None:return None
+        if any(row[n] is None for n in ('event_type','producer','object_id','payload_sha256','input_versions','payload')) or type(row['new_state_version']) is not int:
+            raise Conflict('CPU appraisal source exceeds bound or header type differs')
+        payload=_parse(row['payload'].encode())
+        if (sha(payload)!=row['payload_sha256'] or type(payload) is not dict or
+                set(payload)!={'format','put','delete','details'} or type(payload['format']) is not int or
+                payload['format']!=2 or payload['delete']!=[] or payload['details'] is not None or type(payload['put']) is not list):
+            raise Conflict('CPU appraisal original source integrity/shape differs')
+        rows=[];markers=[];seen=set()
+        for item in payload['put']:
+            if type(item) is not list or len(item)!=3 or item[0]!=SECTION or type(item[1]) is not str or item[1] in seen:
+                raise Conflict('CPU appraisal original descriptor differs')
+            seen.add(item[1]);value=_decode(item[2])
+            if not item[1]:markers.append(value)
+            else:validate_record(item[1],value);rows.append((item[1],value))
+        tip,_=self._cpu_assessment_summary(db,row['new_state_version']-1)
+        if len(rows)!=1 or rows[0][0]!=key or markers!=([{}] if tip is None else []):
+            raise Conflict('CPU appraisal original single fact/marker differs')
+        if row['input_versions']!=canonical(event_inputs(rows[0][1])).decode():
+            raise Conflict('CPU appraisal original canonical inputs differ')
+        return ((row['event_type'],row['producer'],row['object_id'],row['new_state_version']),
+            [(SECTION,key,digest(rows[0][1]))])
+
     def bind_hybrid_admission(self, service):
         from .hybrid_admission_service import AdmissionService
         if type(service) is not AdmissionService or service.store is not self:
@@ -1371,7 +1451,8 @@ class Store:
             from .hybrid_workspace import EVENT as workspace_event
             from .hybrid_runtime_installation import EVENTS as installation_events
             from .hybrid_working_plan import EVENTS as working_plan_events
-            if event_type in working_plan_events or event_type in installation_events or event_type in (controller_event,admission_event,budget_event,workspace_event) or event_type in preparation_events or event_type in authority_events.values() or (event_type=='HYBRID_GOAL_DRAFTED' and self._hybrid_draft_auth_owner is not None):
+            from .hybrid_cpu_assessment import EVENT as cpu_event
+            if event_type==cpu_event or event_type in working_plan_events or event_type in installation_events or event_type in (controller_event,admission_event,budget_event,workspace_event) or event_type in preparation_events or event_type in authority_events.values() or (event_type=='HYBRID_GOAL_DRAFTED' and self._hybrid_draft_auth_owner is not None):
                 raise PermissionError('Hybrid service events require guarded object transactions')
             if self._existing(db,key,event_type,object_id):
                 db.commit()
@@ -1442,6 +1523,9 @@ class Store:
                 from .hybrid_workspace import EVENT as workspace_event, SECTIONS as workspace_sections
                 from .hybrid_runtime_installation import EVENTS as installation_events, SECTIONS as installation_sections
                 from .hybrid_working_plan import EVENTS as working_plan_events, SECTIONS as working_plan_sections
+                from .hybrid_cpu_assessment import EVENT as cpu_event, SECTION as cpu_section
+                if event_type==cpu_event or any(s==cpu_section for s,k in objects):
+                    self._check_cpu_assessment_guard(db,authorization)
                 if event_type in working_plan_events or any(s in working_plan_sections for s,k in objects):
                     self._check_working_plan_guard(db,authorization)
                 if event_type in installation_events or any(s in installation_sections for s,k in objects):

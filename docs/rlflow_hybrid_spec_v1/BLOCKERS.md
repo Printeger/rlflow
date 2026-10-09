@@ -1,5 +1,9 @@
 # 阻塞与证据缺口
 
+Checkpoint50 FINAL：实际有限研究三轴appraisal/next及当前vs历史读取，必要回归123pass73.89s、262SHA和最终检查通过，High已确认窄MUST闭合，无live测试，正在提交。无需新增用户权限才能继续有限model-free范围；下一真实Experiment/证据对外读桥及独立评价/条件决策、实际工程candidate/native，而不是把建议当完成。付费/GPU/生产边界与严格OS/任意树/invoice/安装/长期缺口保留。USERlock未动。下方WIP均历史。
+
+50 WIP：实际有限研究appraisal/next与当前vs历史读回已交付，原结果不改、全局条件不自动激活。必要5依赖模块原48336 LIVE、262SHA冻结，尚无最终50验收/commit；开发两失败均新测试还原/注入夹具，定向已通过，High四窄MUST静态闭合。无新增外部用户决策阻塞；下一对外真实Experiment/evidence读桥、独立评价与条件/有限研究决定，以及真正工程candidate/native；严格OS/任意树/invoice/安装/长期缺口保留。49已提交c218732。下方历史不替代本状态。
+
 Checkpoint49 FINAL：真实固定CPU计算/原始值独立验证/持久AUDIT_ONLY/STOP故障原cap恢复与必要集成182pass及实际命令browser1pass通过，241SHA及最终检查一致，无live测试。正在提交49；无新增需用户决定的阻塞。下一必须补当前合同证据激活、有限科研评价/下一步实际行为，不能停在AUDIT_ONLY。工程candidate/native、严格OS/data/network、任意树STOP、真实invoice、24h/8h与安装迁移仍未完成；付费/GPU/生产权限不扩。USERlock未改未stage。下方WIP均历史。
 
 49 WIP：实际单数值trial已有原raw/独立评价/持久AUDIT_ONLY/原STOPFREE及FD关闭失败恢复证据，仍没有正式科研Goal evidence activation/独立研究结论/下一步或真正工程candidate闭环。native、模型invoice、严格OS/data/network、任意树STOP、24h/8h与安装迁移缺口不变。原3s失败已改变为无执行剖析并定位重复完整审批计算，未延时/绕权限；新版actualsmoke1pass21s。唯一必要7模块原83562仍LIVE、241SHA冻结，最终49未验收/commit。48已提交da1d541；无需用户新增资源权限才能继续这个有限model-free范围，USERlock未动。

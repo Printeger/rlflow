@@ -1,0 +1,31 @@
+# 有限数值试验的真实研究评估：Checkpoint50
+
+49已提交c218732600d5be80f1c1263ac2dd086cd384848b。50不扩CPU执行权限或新UI，实际消费原终态数值试验，在原Store独立hybrid_cpu_trial_assessments域提交不可变研究评估并有界读回；原结果仍AUDIT_ONLY不被覆盖。
+
+## 交付与验收行为
+
+CpuAssessmentService只能绑定原FixtureRuntimeOwner。assess接原Lease/当前Controller token，不接caller结果JSON、脚本、FD或独立评审身份；原CPU结果对象与原terminal值一致，原source已reap/全部FD关闭、原Pool slot全部FD关闭，实际Pool._point证明原FIXTURE_FREE和close_witness、terminal hash。原Pool事件完整闭合副本进入appraisal事实，纯历史验证核pool/claim/lease/terminal绑定；读回不冒称当前主机FREE。
+
+同原项目/mode/epoch/Goal、contract revision/批准/Registry、SPEC/input/program/evaluator/profile来源在原writer内核当前一致，原controller双TTL与consent原expires在最终sample后再COMMIT。原来源/结果/终态的完整event哈希及有界依赖校验保持；历史记录的UTC不能早于terminal，原controller版本必须早于新评估。实际guard/Store._commit拒绝legacy、通用object writer或lookalike绕过；复用原writer，不引入第二执行队列。
+
+成功试验记录execution_status=SUCCEEDED、scientific_validity=VALID、hypothesis_outcome=SUPPORTED/REFUTED；VALID仅完整384点/三固定seed/原评价规格，有限原数字比较不等于统计泛化、科研方法普遍成立或Goal成功。next_action=REQUEST_INDEPENDENT_REVIEW仅建议，不派发模型/Reviewer或实验。未G且原STOP/FREE的试验记NOT_EXECUTED、UNASSESSED、INCONCLUSIVE、NO_AUTOMATIC_RETRY；可能G但无完整结果则RESULT_UNAVAILABLE，同样不自动重试。
+
+全局condition的verification仍是自由文本，不能按关键词或自动选第一条条件；所有appraisal condition_coverage=[]、goal_completed=False、independent_review_status=NOT_PERFORMED、dispatch_enabled=False。当前激活只EXPERIMENT_CURRENT_AS_OF，不声称CTL条件进度或完成门已实现。
+
+inspect只取单key原fact/原event/完整Budget/source历史闭包并重新核当前Goal/approval/Registry。所有源与metadata读取后轻量采样，原evaluated_at<=now<expires才显示EXPERIMENT_CURRENT_AS_OF；过期/撤销/换版变HISTORICAL_ONLY，原fact不改，不接管/relaunch。exact旧request duplicate回原receipt，current_activation=NOT_RECHECKED，不能把历史幂等返回解释成续批准。新event header/input/payload/summary key在SQL端typeof+字节CASE限额后才进入Python。
+
+Store audit/replay/manual snapshot/recover，以及周期maintenance在同RO snapshot/同ReadBudget捕获原assessment事件和包括空域的true summary；锁外完整闭包校验后才发布。删域/坏引用/重算坏snapshot hash不能合法化，失败保due与原历史。
+
+## 实际验证与失败（FINAL）
+
+原开发93316终f68b7e exit0：2pass37.18s，真实CPU原结果→appraisal持久读回/current→过期历史/幂等/audit/replay/manual恢复，另原noG→未执行/不自动重试及generic writer拒绝。CPU执行本身不变；此新执行用于验证新消费与研究状态交付，不作为49新的性能基准。
+
+原边界86683终fbe9d7 exit1：2pass（实际换版/撤销降历史）/1fail39.71s。丢实际COMMIT返回、周期快照发布、重算删域snapshot拒恢复、projection删域拒维护均已通过后，仅测试还原projection时漏version列产生IntegrityError。只修测试四列还原，不放宽生产。未重跑两通过项。
+
+原修复7231终84c113 exit1：1pass（完整丢返回/周期坏快照链）/1fail29.29s；新读末TTL与UTC时间平移断言通过后，巨大header注入被原append-only trigger阻止，非生产source拒绝失败。仅在新私有夹具暂时移除并原样恢复trigger进行腐坏注入，之后原header CASE拒绝及恢复完整audit实际通过：原77235终c19f16 exit0、1pass12.77s。没有改生产trigger、原schema或删断言。
+
+High确认maintenance完整闭包、读末TTL、UTC/controller版本因果、SQL文本头上界四项窄修复已静态关闭；无剩余confirmed MUST，静态检查不替代测试。唯一必要五模块Store/contracts/snapshot依赖回归原48336终cd5b24 exit0：123pass/1warning73.89s；262全部源/测试/schema/web输入冻结且前后SHA匹配，manifest9521d2d930a9777c21b5e4f83c3b634bd3eafca8945f899f540ab3d24309c2da。compileall/pipcheck/diff/最终262SHA各exit0，无live测试，正在归档提交50。未重复49数值suite、48/47browser或整个旧全量；不冒称最终fresh六新case全套，实际各原终态与修复见evidence/checkpoint-50-final-tests.txt。
+
+## 下一缺口
+
+下一须接可检索真实Experiment/appraisal及原研究证据/下一步的对外产品读桥，完成独立评价/条件有效映射与有限决策闭环；随后实际工程candidate/native。当前单纯建议不是已执行独立review，不以它替代M3/完整Goal。付费模型/GPU/生产迁移/保护checkout写入不启用；严格OS/data/network、任意树STOP、invoice、安装迁移和24h/8h门保持未验证。

@@ -1,0 +1,90 @@
+Checkpoint50 — original finite CPU trial research appraisal and current readback
+Parent: c218732600d5be80f1c1263ac2dd086cd384848b (Checkpoint49).
+Private finite CPU/SQLite only; no paid model/GPU, arbitrary candidate/native
+execution, production migration, external hosting or protected checkout write.
+
+DELIVERY / ACCEPTANCE
+Original real CPU result -> actual original terminal/reap/all-source-FD closure/
+all-slot-FD closure/original Pool FREE point -> current Goal/approval/Registry/
+SPEC/input/evaluator grant -> guarded original writer/final TTL -> immutable
+hybrid_cpu_trial_assessments research status and next-action recommendation.
+Original result remains AUDIT_ONLY. No free-text condition auto-interpretation:
+condition_coverage=[], goal_completed=false, independent_review=NOT_PERFORMED,
+dispatch_enabled=false. VALID/SUPPORTED means fixed three-seed raw rule only,
+not scientific generalization, independent review, complete Goal or native.
+No-G is NOT_EXECUTED/UNASSESSED/INCONCLUSIVE/NO_AUTOMATIC_RETRY. Possible G with
+missing result is RESULT_UNAVAILABLE, also no automatic retry. Exact old receipt
+duplicate returns NOT_RECHECKED, not renewed evidence authority. Current read
+freshly checks current references and final-after-IO TTL; old revision, revoked,
+expired or changed-source evidence remains immutable HISTORICAL_ONLY.
+Closed whole original fact/event/input provenance, SQL-limited corrupted headers,
+UTC terminal-before-appraisal and controller source-version order, generic writer
+denial, audit/replay/manual snapshot/recover and periodic RO snapshot closure.
+Periodic capture includes true event summary for an empty projection domain;
+deleted domain or rehashed bad snapshot cannot be legitimized; due stays pending.
+
+ACTUAL RUNS / FAILURES / REPAIRS (all serial, original terminal before edits)
+1. New actual appraisal tests:
+   PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q
+   tests/test_hybrid_cpu_assessment.py --disable-warnings
+   Original93316 terminalf68b7e exit0:2pass37.18s. Actual numerical result consumed
+   and committed/read current, expiry historical/idempotence/audit/replay/manual
+   snapshot/recovery; original NoG appraisal plus generic/legacy writers denied.
+   This necessary new consumption run does not revise49 numeric/performance data.
+2. New revision/revoke/lost-COMMIT/periodic snapshot boundaries:
+   Original86683 terminalfbe9d7 exit1:2pass/1fail39.71s.
+   tests/test_hybrid_cpu_assessment.py::test_actual_new_authority_or_contract_preserves_historical_trial_only
+   (revision/revoke both passed), plus
+   ::test_actual_lost_commit_receipt_and_bounded_snapshot_original_proofs
+   Sole failure was TEST restore omitted projection.version after required
+   corruption assertions had already passed. Test-only four-column restoration;
+   no production loosening, no repeat of unchanged passed revision/revoke cases.
+3. Targeted repaired snapshot case plus newly required final TTL/causal/header:
+   Original7231 terminal84c113 exit1:1pass/1fail29.29s.
+   ::test_actual_lost_commit_receipt_and_bounded_snapshot_original_proofs passed
+   on final production bytes: actual COMMIT lost receipt -> duplicate original,
+   periodic valid publish, recomputed-hash deleted-domain snapshot rejects,
+   deleted projection rejects periodic publish and retains due, restored audit.
+   ::test_read_final_TTL_and_historical_causal_order_and_bounded_headers failed
+   only when its huge-producer injector hit the original append-only trigger;
+   final TTL expiry-during-proof and shifted-UTC rejection had already passed.
+4. TEST-only corruption injection temporarily drops/restores exact no_update
+   trigger in the new isolated DB, then original trigger and bytes are restored.
+   Only ::test_read_final_TTL_and_historical_causal_order_and_bounded_headers:
+   original77235 terminalc19f16 exit0:1pass12.77s. Final-after-IO TTL, historical
+   UTC rejection, actual1MB hostile header SQL-bound denial and restored audit.
+   No production trigger/schema changes, no repeated snapshot/revision suite.
+5. Necessary existing Store/contracts/periodic-snapshot regression:
+   PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q
+   tests/test_store_policy.py tests/test_validation_recovery.py
+   tests/test_snapshot_maintenance.py tests/test_hybrid_working_plan_store.py
+   tests/test_hybrid_budget_ledger.py --disable-warnings
+   Original48336 terminalcd5b24 exit0:123pass/1warning73.89s.
+   Final262 source/test/schema/web inputs frozen; SHA after actual terminal match.
+   No parallel suites, live input edits, repeated49 numerical suite,47/48 browser,
+   repeated independent executions or gratuitous old whole regression.
+
+INDEPENDENT REVIEW
+Readonly existing High agent, no tests/writes. Confirmed narrow MUST items:
+periodic maintenance full original closure (including empty domain), read-final
+TTL, historical terminal UTC/controller causal order, SQL bounded text headers.
+All statically closed on final production bytes; no remaining confirmed MUST.
+Static findings/closure do not replace the actual execution evidence above.
+
+FINAL CHECKS / INPUTS
+262 final inputs manifest checkpoint-50-final-inputs.sha256 SHA256:
+9521d2d930a9777c21b5e4f83c3b634bd3eafca8945f899f540ab3d24309c2da
+Development/repaired manifests retained separately, not overwritten as final.
+compileall/pip check/git diff check/final262 SHA check all actual exit0.
+All original raw logs, including both fixture failures, retained and hashed in
+checkpoint-50-log-sha256.txt. No live tests remain before commit.
+USER package-lock.json unchanged and unstaged SHA256:
+becc7e2a36dfcad4ffe934b5ff2f0f68187611d6c0641bd63d81367651cfbf09
+Results are additive targeted evidence, not a fresh final full six-new-case run.
+
+NEXT / REMAINING GAPS
+External product experiment/evidence readback and original raw independent review/
+trusted condition mapping/finite research decision; actual engineering candidate/
+native, strict OS/data/network, arbitrary-tree STOP, invoice, installation/
+migration and24h/8h full original acceptance remain open. No newly required user
+paid/GPU/production authority for next bounded model-free slice; Goal remains active.

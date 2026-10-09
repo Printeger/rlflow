@@ -1,5 +1,13 @@
 # 开发决策记录
 
+## Checkpoint50 FINAL：当前只激活有限实验事实，不满足未知条件
+
+原actual结果/PoolFREE/current原批准→独立不可变appraisal，三轴/next读回和当前失效历史保留实际通过；123项必要回归/262SHA/最终检查通过。四窄来源完整性问题修复不增加执行权限，两失败仅测试腐坏注入/还原，各原日志留存。condition_coverage=[]、independent_review未做、GoalcompletedFalse仍硬约束；下一真实产品读桥与独立评价/条件决定才推进缺口，不用VALID/SUPPORTED或新增测试数量冒称完整研究/Goal完成。
+
+## Checkpoint50 WIP：实验评估与当前激活，不伪造条件完成或独立评审
+
+独立protected appraisal域消费49完整原terminal/result和真实PoolFREE，沿原writer/当前Controller/Goal批准/Registry及最终TTL提交不可变三轴研究状态/next建议。条件verification为自由文本，不能关键词或默认第一条件映射，因此condition_coverage=[]、GoalcompletedFalse、independent_review NOT_PERFORMED；CURRENT仅有限实验AS_OF，旧receipt NOT_RECHECKED，读末再核TTL、换版/撤销显示历史。周期快照捕获空域true summary，sourceheaders SQL小上界，原terminal UTC/controller版本先于评估，避免合法shape掩盖删域/未来来源。下一不得用新增测试数量或建议充当真正独立科研/工程闭环。
+
 ## Checkpoint49 FINAL：原证据闭合与预算、STOP不因数值成功而放宽
 
 真实384点数值试验与182项必要集成、既有真实命令browser1项实际通过；结果仍AUDIT_ONLY/goal_completed=False。只复用已经完整验证的approval binding并核外层hk/rk/proposal同revision，不引入权限cache或更长3s gate。历史ACK必须推出G尝试，原raw/指标/SHA重建闭合；真实FD关闭失败仍占槽，原cap续清才能FREE。High确认三项生产MUST闭合，一项deepcopy误报由reviewer核对同SHA实码后明确撤回，不制造额外修复/重测。下一50在原current Goal/approval/Registry条件下激活证据并产生有限科研下一步，不自动宣称Goal完成或授予native/paid/GPU/生产权限。

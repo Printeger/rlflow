@@ -68,6 +68,10 @@ def maintain(store,*,seconds=5,max_bytes=32*1024*1024,max_rows=100000,max_nodes=
                 admission_events={key:store._admission_event(db,key,max_bytes=max(0,min(read.remaining,256*1024)),_parse=source_parse,_decode=decode)
                                   for key in state.get('hybrid_admission_facts',{})}
                 admission_summary=store._admission_summary(db,version)
+                from .hybrid_cpu_assessment import SECTION as cpu_section
+                cpu_events={key:store._cpu_assessment_event(db,key,max_bytes=max(0,min(read.remaining,256*1024)),_parse=source_parse,_decode=decode)
+                            for key in state.get(cpu_section,{})}
+                cpu_summary=store._cpu_assessment_summary(db,version)
                 budget_events={key:store._budget_event(db,key,max_bytes=max(0,min(read.remaining,1024*1024)),_parse=source_parse,_decode=decode)
                                for key in state.get('hybrid_budget_entries',{})}
                 budget_summary=store._budget_summary(db,version)
@@ -85,6 +89,8 @@ def maintain(store,*,seconds=5,max_bytes=32*1024*1024,max_rows=100000,max_nodes=
             check()
             from .contracts import validate_runtime_state
             validate_runtime_state(state);check()
+            from .hybrid_cpu_assessment import validate_complete as cpu_complete
+            cpu_complete(state,registration,cpu_events.get,cpu_summary);check()
             from .hybrid_goals import validate_complete
             validate_complete(state,registration,source_events.get,goal_sources.get);check()
             from .hybrid_authority import validate_complete as authority_complete
