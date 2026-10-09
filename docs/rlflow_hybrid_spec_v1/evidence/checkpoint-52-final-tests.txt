@@ -1,0 +1,19 @@
+Checkpoint52 actual results; parent51 a3b17ff2cf5cd16e1d865f0703e0509c9f683d44. No live tests.
+node --test web_checks/cpu-assessment-panel.test.mjs
+ab34ee exit1 3pass1fail (null-vs-false dirty).
+node --test --test-name-pattern='durable versions' web_checks/cpu-assessment-panel.test.mjs
+e49eec exit0 1pass3unselected after precise Boolean fix.
+node --test --test-name-pattern='closed three-axis|unexecuted conclusions' web_checks/cpu-assessment-panel.test.mjs
+ec0f45 exit0 2pass3unselected, closed/outcome MUST delta.
+Five new pure cases individually passed, not claimed fresh final five-suite.
+node --test web_checks/cpu-assessment-browser.test.mjs
+orig25466 terminald85da3 exit1 18.754s transitional empty JSON test wait.
+orig32528 terminal807a1a exit1 42.953s new fixture inspect after owner close correctly denied.
+orig6369 terminal1bd280 exit0 1pass19.803s actual CPU384→HTTP→Chrome→domain refresh→owner close→logout; zero execution writes/pageerrors.
+node --test --test-concurrency=1 web_checks/browser.test.mjs web_checks/hybrid-browser.test.mjs web_checks/fixture-runtime-browser.test.mjs
+orig53887 terminalda140c exit0 3pass60.360s necessary changed app lifecycle/Goal privileges/Start STOP paths only.
+final268 input SHA manifest327af2341d72dd307b2a362c1663dfda30628cc843836468b01b159eb5cba825 all matched (321d03 exit0).
+node syntax new panel/app; Python compile new private fixture; pip check; git diff check exit0.
+High readonly two confirmed MUST classes closed; no writes/tests/repeated51 review.
+USERpackage-lock SHA becc7e2a36dfcad4ffe934b5ff2f0f68187611d6c0641bd63d81367651cfbf09 unchanged/untracked/unstaged.
+No paidmodel/GPU/production/push. Goal active; independent science review/condition mapping/actual engineering/native/strict OS/tree/invoice/install/soaks remain not proven.

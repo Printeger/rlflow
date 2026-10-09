@@ -1,5 +1,7 @@
 # 阻塞与证据缺口
 
+Checkpoint52 FINAL：原CPU384点/指标/SHA和三轴评估已在现有Dashboard实际显示；持久domain限频只读刷新原所选详情，owner关闭可读、logout清空，零执行写。新5pure case分别通过；实际Chrome原6369终1bd280 exit0 1pass19.803s；必要三既有browser原53887终da140c exit0 3pass60.360s。268SHA/JS syntax/Python compile/pipcheck/diff通过，独立窄MUST关闭，无live测试，正在提交52。失败完整保留，详见HYBRID_CPU_ASSESSMENT_DASHBOARD.md/evidence/checkpoint-52-final-tests.txt。51实际a3b17ff2cf5cd16e1d865f0703e0509c9f683d44；下一真正原证据独立验证/有限决定，条件覆盖空/独立review未做/Goalfalse保持。工程candidate/native、严格OS/任意树/invoice/安装迁移/24h8h缺口仍待，无新增需用户决定阻塞，不扩付费/GPU/生产权限。USERlock未改未stage；下方历史。
+
 Checkpoint51 FINAL：真实有限研究状态/raw证据只读HTTP及实际cold/loopback通过，129项必要回归和264SHA/检查通过，High窄MUST关闭，无live测试，正在提交。无新增外部用户决策阻塞，下一真实Dashboard研究数据接线/独立评价与条件决定，仍不能以GET/VALID或无写cap页面证明科研Goal/工程native完成。严格OS/任意树/invoice/安装/长期缺口与付费/GPU/生产边界保留。USERlock未动，下方WIP均历史。
 
 51 WIP：真实有限研究appraisal与raw样本HTTP已交付、冷只读owner-free/原owner关闭/实际loopback有证据；当前UNKNOWN/NOT_OBSERVED/Goalfalse/coverage空/独立review未做保持。必要五模块原36076仍LIVE、264输入冻结，最终51未提交。无新增外部资源决策阻塞；下一真实研究数据UI/独立评价/条件有限决定，以及真正工程candidate/native/严格OS/任意树/invoice/安装/长期完整Goal缺口，不以GET或VALID替代。50已提交2a43838，USERlock未动。下方WIP均历史。

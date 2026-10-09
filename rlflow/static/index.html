@@ -112,6 +112,12 @@
         <div class="controls"><button id="fixture-start" type="button" disabled>明确启动固定 CPU Task</button><button id="fixture-stop" type="button" disabled>明确 STOP 原固定范围</button><button id="fixture-retry" type="button" hidden>手动重试原 body / 原 key</button><button id="fixture-abandon" type="button" hidden>清除本地意图（不取消执行）</button></div>
         <pre id="fixture-receipt" aria-label="原接收回执，不是当前执行状态"></pre>
       </section>
+      <section class="panel" aria-labelledby="cpu-assessment-title">
+        <div class="panel-heading"><h2 id="cpu-assessment-title">CPU 数值试验 · 原始证据与三轴评估</h2><div class="controls"><button id="cpu-assessment-refresh" type="button">读取最新评估</button><button id="cpu-assessment-next" type="button" disabled>下一评估页</button></div></div>
+        <p class="boundary-note">只读 FIXED_CPU_PI_TRIAL_V1 / 隔离试验。执行成功、科学有效性和假设结论分别展示；仅固定三个种子，不证明推广性。独立评审未完成，合同条件覆盖为空，Goal 未完成。当前运行 UNKNOWN，资源释放 NOT_OBSERVED，实际成本 UNKNOWN；不启用模型、GPU、重试或派发。</p>
+        <p id="cpu-assessment-note" class="muted" role="status"></p><p id="cpu-assessment-live" class="muted" role="status"></p>
+        <div id="cpu-assessment-list" class="object-list"></div><pre id="cpu-assessment-detail" aria-label="原始样本、统计、来源哈希与有限评估"></pre>
+      </section>
       <section class="panel logs-panel">
         <div class="panel-heading"><h2>公共观测日志</h2><span class="muted">CORE_STATUS / TOOL_METADATA / raw logs PRIVATE_ONLY</span></div>
         <p class="muted">CORE_STATUS 为核心状态观测；TOOL_METADATA 为已验证绑定的 CPU 返回，不证明模型启动、任务成功或完整历史。正文按需读取，不提供私有模型日志。</p>

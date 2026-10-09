@@ -1,5 +1,7 @@
 # 开发决策记录
 
+Checkpoint52 FINAL：原CPU384点/指标/SHA和三轴评估已在现有Dashboard实际显示；持久domain限频只读刷新原所选详情，owner关闭可读、logout清空，零执行写。新5pure case分别通过；实际Chrome原6369终1bd280 exit0 1pass19.803s；必要三既有browser原53887终da140c exit0 3pass60.360s。268SHA/JS syntax/Python compile/pipcheck/diff通过，独立窄MUST关闭，无live测试，正在提交52。失败完整保留，详见HYBRID_CPU_ASSESSMENT_DASHBOARD.md/evidence/checkpoint-52-final-tests.txt。51实际a3b17ff2cf5cd16e1d865f0703e0509c9f683d44；下一真正原证据独立验证/有限决定，条件覆盖空/独立review未做/Goalfalse保持。工程candidate/native、严格OS/任意树/invoice/安装迁移/24h8h缺口仍待，无新增需用户决定阻塞，不扩付费/GPU/生产权限。USERlock未改未stage；下方历史。
+
 ## Checkpoint51 FINAL：以实际原raw读取为交付，保留研究/完成分层
 
 真实完整原384样本与指纹、三轴/next、cold只读owner-free与原owner关闭、auth前后/actual loopback已证明；129项必要回归/264SHA/检查通过。新reader同BEGIN版本等值拒损坏，不让current加载失败掩成历史200；缺原投影而原event存在503。原结果、覆盖条件、独立review与Goal完成不被API命名或数值改善升级，下一实际UI和独立评价/条件决定需另行交付。

@@ -1,5 +1,7 @@
 # 需求包离线校验报告
 
+Checkpoint52 FINAL：原CPU384点/指标/SHA和三轴评估已在现有Dashboard实际显示；持久domain限频只读刷新原所选详情，owner关闭可读、logout清空，零执行写。新5pure case分别通过；实际Chrome原6369终1bd280 exit0 1pass19.803s；必要三既有browser原53887终da140c exit0 3pass60.360s。268SHA/JS syntax/Python compile/pipcheck/diff通过，独立窄MUST关闭，无live测试，正在提交52。失败完整保留，详见HYBRID_CPU_ASSESSMENT_DASHBOARD.md/evidence/checkpoint-52-final-tests.txt。51实际a3b17ff2cf5cd16e1d865f0703e0509c9f683d44；下一真正原证据独立验证/有限决定，条件覆盖空/独立review未做/Goalfalse保持。工程candidate/native、严格OS/任意树/invoice/安装迁移/24h8h缺口仍待，无新增需用户决定阻塞，不扩付费/GPU/生产权限。USERlock未改未stage；下方历史。
+
 Checkpoint51 FINAL：必要五模块原36076终79d0fe exit0：129pass/2warning98.67s；264冻结SHA7426d4fc…8435d前后匹配，compileall/pipcheck/diff各exit0。真实rawHTTP/cold owner-free/owner关闭/鉴权读中revoke/keyset/坏源503/实际loopback原4pass49.71s、新projection/source/event版本guard定向1pass10.06s；未重复旧rawpositive/browser/前端/独立suite，不宣称最终fresh五新case套。r1全部新fixture错接口3fail保留。原证据与日志SHA见evidence/checkpoint-51-final-tests.txt，High窄MUST关闭，无live测试，正在提交。当前三轴与Goal/独立review严格分开，后者仍未验收；下方WIP均历史。
 
 51 WIP：原87162终2223b6 exit1 3fail1warning39.80s均新fixture不存在Store.open_existing，rg实际接口后test-only attach_existing修复；原30148终73ec7e exit0 4pass1warning49.71s，真实rawCPU HTTP/冷读且owner关闭/zeroGETeffects/authbeforeafter/default404/query/paging/坏源503与实际loopbackNoG通过。唯一新metadata guard原85002终1983b1 exit0 1pass1warning10.06s，源/投影版本损坏list/detail503+恢复/epoch拒。五既有Web依赖原36076 LIVE、264SHA冻结7426d4fc…8435d，最终51尚待。日志失败保留，不宣称最终fresh五新case或Goal条件完成，详见HYBRID_CPU_ASSESSMENT_API.md。
