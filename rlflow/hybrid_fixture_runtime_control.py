@@ -330,3 +330,25 @@ def install(app, services, projects, auth, *, origin, max_jobs):
             if result is None: raise ControlError(404,'NOT_FOUND','fixture command not found')
             return result
         return await respond(lookup, starts, 200)
+
+    @app.get('/api/v1/projects/{project_id}/fixture-runtime-profile')
+    async def profile(request: Request, project_id: str):
+        def lookup():
+            if request.query_params: raise ValueError('closed profile query required')
+            service, _ = authorize(request, project_id)
+            with service.reader.snapshot() as (_, meta):
+                # Discovery is a point-in-time hint, NEVER a lease or promise
+                # that a future command will pass its original writer guards.
+                try:
+                    service.runtime._actual()
+                    available = True
+                except PermissionError:
+                    available = False
+                result = {**meta, 'control_api_installed':True,
+                    'original_owner_available':available, 'profile':'FIXED_CPU_SINGLE_PARTICIPANT',
+                    'native_execution_enabled':False, 'arbitrary_tree_stop':False}
+            authorize(request, project_id)
+            service.reader.check_current(result['as_of_state_version'])
+            authorize(request, project_id)
+            return result
+        return await respond(lookup, starts, 200)

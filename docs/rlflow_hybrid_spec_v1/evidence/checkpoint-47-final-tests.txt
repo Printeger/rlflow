@@ -1,0 +1,95 @@
+Checkpoint47 FINAL — actual existing Dashboard fixed CPU Task/control vertical slice
+Parent: 3bf6cec99abe8f57c56a8354dfff57dd2d99ea53 (Checkpoint46)
+Scope: local fixed CPU only; no paid model/GPU/native/candidate/delegation/production migration.
+No live tests at final archive. All runs serial; original sessions polled to actual exit.
+
+DELIVERY
+Existing Dashboard loads original-event-verified Task and explicitly opt-in owner discovery.
+Manual Start uses exact detail version; UNKNOWN retries retain exact body/key/selector.
+Start accepted retry reads original receipt only, no new dispatch/version.
+STOP accepted retains original intent even after Task terminal: manual original cleanup,
+not auto retry, not inferred PoolFREE. Scope/auth clearing invalidates late responses.
+In-flight refresh/selection rejected at DOM and method boundaries, no stuck IN_FLIGHT.
+History/current owner/receipt/ACK/terminal/resource observation remain separate.
+
+ACTUAL TESTS, COMMANDS, ORIGINAL TERMINALS
+1. node --test web_checks/fixture-panel.test.mjs
+   r1 original203dcc exit0: 5 passed, 0 failed, 69.69ms.
+   After two independent recovery MUST fixes, r2 original948bb5 exit0:
+   7 passed, 0 failed, 74.64ms. Final changed-note version also covered by item5.
+2. PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q
+   tests/test_hybrid_fixture_runtime_profile.py --disable-warnings
+   Original27430 terminalce3fd6 exit0: 1 passed, 1 warning, 8.19s.
+   Discovery production/test bytes unchanged through final manifest; not repeated.
+3. node --test web_checks/fixture-runtime-browser.test.mjs
+   r1 original4197 terminalbd8fde exit0: 1 passed, 15.921s (runner16.121s).
+   Actual Chrome/loopback original CPU Start/G/ACK, browser receipt loss, exact manual
+   retry/duplicate/no version change, actual Stop/reap/Pool0, owner close/logout.
+4. Same browser command after independent recovery findings, with actual one-shot
+   Source cleanup fault after durable STOP:
+   r2 original74937 terminal913d35 exit1: 1 failed, 46.670s.
+   Failure at browser source line43: close_owner note wait timeout30000ms.
+   Preceding durableStop/manual same-key continuation/reap/Pool0 assertions passed.
+   Root cause: acceptedStop note overwrote owner readonly history note. Diagnosed
+   before rerun; combined both notes. Did not increase timeout/drop assertion.
+   r3 original46063 terminale3f4f4 exit0: 1 passed, 19.027s (runner19.221s).
+   Actual durable STOP_REQUESTED + Pooloccupied1 after fault; manual original
+   body/key cleanup -> original producer.returncode non-null + actual Pooloccupied0.
+   UI resource_release_status NOT_OBSERVED. Closed original owner readonly history;
+   logout empties detail/receipt. No page errors. No automatic POST.
+5. node --test --test-concurrency=1 web_checks/reducer.test.mjs
+   web_checks/virtual-list.test.mjs web_checks/log-view.test.mjs
+   web_checks/telemetry-view.test.mjs web_checks/goal-view.test.mjs
+   web_checks/goal-panel.test.mjs web_checks/fixture-panel.test.mjs
+   web_checks/browser.test.mjs web_checks/hybrid-browser.test.mjs
+   Original35307 terminal43b5d0 exit0: 43 passed, 0 failed/skip, 44.709s.
+   Necessary existing app/auth clearing/DOM/old real Dashboard/Hybrid regression.
+   Did not repeat final new fixture browser item4 or prior46 suites.
+6. PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q
+   tests/test_web_api.py tests/test_hybrid_control_api.py
+   tests/test_hybrid_fixture_runtime_reads.py --disable-warnings
+   Original19337 terminala73384 exit0: 55 passed, 2 warnings, 92.29s.
+   Necessary new discovery route/read scope and existing opt-in HTTP regression.
+   No blanket full Python repeat: no46 execution mutation, no unresolved execution
+   finding, previous44 full and46 integration remain separately identified.
+
+INDEPENDENT READONLY HIGH REVIEW
+Existing hybrid_architecture_review: no writes/tests.
+Two MUST: accepted STOP lost original cleanup intent; refresh/selection discarded
+in-flight reply leaving permanent IN_FLIGHT. Both fixed; static delta closure.
+Explicitly agreed not retiring STOP on Task terminal (PoolFREE not observed here).
+Reviewer separately identified overwritten readonly note before original r2 end;
+main waited original actual exit, then applied exactly combined-note repair.
+Other scope/DTO/discovery/textContent/actual browser provenance: no confirmed MUST.
+Final one-line note combination implements recommendation, no repeat46 review.
+
+INPUTS / FINAL CHECKS
+236 files frozen for original r2:
+checkpoint-47-inputs.sha256
+SHA d3bbb3ff4398d25ee3cbace466af060a5d96accf07f627bdf55b7e93805c182a
+Final 236 files frozen before r3, retained through both regressions:
+checkpoint-47-final-inputs.sha256
+SHA b2eb3b7e579cb16781cc6509a019630bc3cdd845a7d86dbdbdc57c9a2295aadc
+Actual sha256sum -c --status final manifest exit0 chunk4f950e.
+compileall rlflow/server/new profile test exit0 chunk8c1877.
+pip check exit0 chunkb94865; git diff --check exit0 chunke8ae87.
+USER package-lock.json unmodified/unstaged SHA
+becc7e2a36dfcad4ffe934b5ff2f0f68187611d6c0641bd63d81367651cfbf09.
+
+RAW LOG SHA256 (audit/hybrid-v1/)
+checkpoint-47-ui-unit-r1.log f68e10604d3bd2b26b4cfed6c0bb106d30aa7fe6bac244af881adef83a74ddd7
+checkpoint-47-ui-unit-r2.log 4c533b268f0f90d9f2a4698ee2c3896e3a3652c12400b32b0597c3265cf40821
+checkpoint-47-profile-r1.log 2e37e34f63a4dae6c14d5a94b4e4912ba5d8144cc2093902b4b1601579f8f241
+checkpoint-47-browser-r1.log bcd7f77eec98fc7a344814dd4b94b780c4f4bbfe5304c63d05248aa4d52297e1
+checkpoint-47-browser-r2.log d07ad748128ffc89209ba69f2fb2df2f04248750a8e952e142556e5943c22e6f
+checkpoint-47-browser-r3.log 65cdf0b38b5b0ad2023fc304c96f0eef6ca8e4f8fc1959aa165bcd7af08ebdb0
+checkpoint-47-web-regression-r1.log e7a16ccaf1665d891acb07f42db462fb5848039679d45f4ac43632c43c1ca3cb
+checkpoint-47-http-regression-r1.log 8d2419b622031801c95caceda315aca3bc692f0dde01632dca4fbe7a30da5027
+
+NEXT / GAPS
+Next dependency slice: connect this Task panel to real durable-event invalidation
+and bounded read-only live refresh/timeline, with stale/connection/source distinction
+and no event/heartbeat-triggered writes. Actual runtime capabilities unchanged.
+Native/model/candidate/strictOS/data/network/arbitrary tree/trusted invoice and
+real engineering/research/long soak/install-migration/full Goal remain unproven.
+No new external user decision blocker for local CPU/browser/read-only work.

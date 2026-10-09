@@ -1,0 +1,50 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {spawn} from 'node:child_process';
+import {mkdtemp,rm} from 'node:fs/promises';
+import {tmpdir} from 'node:os';
+import {resolve} from 'node:path';
+import {createInterface} from 'node:readline';
+import {chromium} from 'playwright-core';
+const repo=resolve(new URL('..',import.meta.url).pathname);
+test('actual loopback browser fixed CPU START/ACK, lost receipt original-key retry, STOP/reap/FREE, owner closure',{timeout:90000},async()=>{
+  const fixture=await mkdtemp(resolve(tmpdir(),'rlflow-fixture-runtime-browser-'));
+  const child=spawn(resolve(repo,'.venv/bin/python'),[resolve(repo,'web_checks/fixture_runtime_server.py'),fixture],{stdio:['pipe','pipe','pipe'],env:{PATH:'/usr/bin:/bin',LANG:'C.UTF-8'}});
+  let stderr='',browser;const messages=[],waiters=[];child.stderr.on('data',v=>stderr+=v);
+  createInterface({input:child.stdout}).on('line',line=>{try{const v=JSON.parse(line),waiter=waiters.shift();if(waiter)waiter(v);else messages.push(v);}catch{stderr+=line;}});
+  const next=()=>messages.length?Promise.resolve(messages.shift()):new Promise((resolve,reject)=>{const timer=setTimeout(()=>reject(new Error(`fixture timeout: ${stderr}`)),20000);waiters.push(v=>{clearTimeout(timer);resolve(v);});});
+  const control=async op=>{child.stdin.write(JSON.stringify({op})+'\n');return next();};
+  try{
+    const {origin,principal,phrase}=await next();
+    browser=await chromium.launch({channel:'chrome',chromiumSandbox:true,headless:true,args:['--disable-gpu'],env:{PATH:'/usr/bin:/bin',LANG:'C.UTF-8'}});
+    const page=await browser.newPage({viewport:{width:1440,height:1100}}),errors=[],writes=[];page.on('pageerror',e=>errors.push(e.message));page.on('request',r=>{if(r.method()==='POST' && r.url().includes('/fixture-tasks/'))writes.push({body:r.postData(),key:r.headers()['idempotency-key']});});
+    await page.goto(origin);await page.locator('#principal').fill(principal);await page.locator('#passphrase').fill(phrase);await page.locator('#login-form button').click();
+    await page.waitForFunction(()=>document.querySelector('#fixture-list button'));
+    assert.equal(writes.length,0);const initial=await control('inspect');assert.equal(initial.spawn_entered,false);assert.equal(initial.occupied,1);
+    await page.locator('#fixture-list button').click();await page.waitForFunction(()=>!document.querySelector('#fixture-start').disabled);
+    let lost=false;await page.route('**/fixture-tasks/*/commands',async route=>{if(!lost){lost=true;await route.fetch();await route.abort('failed');}else await route.continue();});
+    await page.locator('#fixture-start').click();await page.waitForFunction(()=>!document.querySelector('#fixture-retry').hidden);
+    const started=await control('inspect');assert.equal(started.phase,'STARTED_AS_OBSERVED');assert.equal(started.spawn_entered,true);assert.equal(started.g_entered,true);assert.equal(writes.length,1);
+    await page.locator('#fixture-retry').click();await page.waitForFunction(()=>document.querySelector('#fixture-receipt').textContent.includes('"duplicate": true'));
+    assert.equal(writes.length,2);assert.deepEqual(writes[0],writes[1]);assert.equal((await control('inspect')).version,started.version);
+    await page.waitForFunction(()=>document.querySelector('#fixture-list button').textContent.includes('STARTED_AS_OBSERVED'));
+    await page.locator('#fixture-list button').click();await page.waitForFunction(()=>!document.querySelector('#fixture-stop').disabled);
+    assert.match(await page.locator('#fixture-detail').textContent(),/"current_execution_status": "UNKNOWN"/);
+    await control('fail_stop_once');await page.locator('#fixture-stop').click();
+    await page.waitForFunction(()=>document.querySelector('#fixture-list button').textContent.includes('STOP_REQUESTED'));
+    const incomplete=await control('inspect');assert.equal(incomplete.occupied,1);
+    assert.match(await page.locator('#fixture-retry').textContent(),/继续原 STOP/);
+    await page.locator('#fixture-retry').click();await page.waitForFunction(()=>document.querySelector('#fixture-list button').textContent.includes('FIXTURE_SCOPE_STOPPED'));
+    assert.deepEqual(writes[2],writes[3]);
+    const stopped=await control('inspect');assert.equal(stopped.phase,'FIXTURE_SCOPE_STOPPED');assert.equal(stopped.process_reaped,true);assert.equal(stopped.occupied,0);
+    await page.locator('#fixture-list button').click();await page.waitForFunction(()=>document.querySelector('#fixture-detail').textContent.includes('FIXTURE_SCOPE_STOPPED'));
+    assert.equal(await page.locator('#fixture-start').isDisabled(),true);assert.equal(await page.locator('#fixture-stop').isDisabled(),true);
+    assert.match(await page.locator('#fixture-detail').textContent(),/"resource_release_status": "NOT_OBSERVED"/);
+    await control('close_owner');await page.locator('#fixture-refresh').click();await page.waitForFunction(()=>document.querySelector('#fixture-note').textContent.includes('只读历史'));
+    assert.equal(writes.length,4);await page.locator('#logout').click();assert.equal(await page.locator('#fixture-detail').textContent(),'');assert.equal(await page.locator('#fixture-receipt').textContent(),'');assert.deepEqual(errors,[]);
+  }finally{
+    if(browser)await browser.close();child.stdin.write('{"op":"stop"}\n');child.stdin.end();
+    const code=await new Promise((resolve,reject)=>{if(child.exitCode!==null)return resolve(child.exitCode);const timer=setTimeout(()=>{child.kill('SIGTERM');reject(new Error(`fixture failed to close: ${stderr}`));},10000);child.once('exit',code=>{clearTimeout(timer);resolve(code);});});
+    assert.equal(code,0,stderr);await rm(fixture,{recursive:true,force:true});
+  }
+});

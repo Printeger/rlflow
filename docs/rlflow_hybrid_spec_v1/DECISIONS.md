@@ -1,5 +1,9 @@
 # 开发决策记录
 
+## Checkpoint47：历史 Task、当前 owner hint 与原命令安全续清分离
+
+现有 Dashboard 独立固定 CPU 面板复用45读取与46人工命令，不改变不可执行 Goal 批准。新只读 discovery 明确不是 lease；控制接口未安装仍可读取历史。exact detail版本手动CAS，无自动重基/重发。命令在途方法内拒刷新/选择，identity/project/epoch/auth清除仍立刻生效。独立MUST要求STOP202保留immutable body/key/selector；即便Task已终态也不退休原意图，因为此DTO没有PoolFREE观察，仅手动续原清理或明确清除。真实browser故障证明该行为，不新造FREE字段/第二队列/owner。第二轮owner提示被acceptedStop文案覆盖导致真实超时，合并两提示而非放宽检查。细节与原日志见HYBRID_FIXTURE_DASHBOARD.md及47 evidence；不扩展native/模型/candidate/任意树权限。
+
 ## Checkpoint46：命令接受与原 phase 同CAS，Start/Stop恢复策略不同
 
 不追加第二准备队列账本。保护fixture命令在原HANDOFF/STOP记录closedactor/key/bodyhash，首次phase同实际COMMIT，后续保持存在性和值不变；确定的Budget entry索引核whole原接受事实。fixture epoch命名空间明确独立于PRD通用commands，action/task/version不拆命名空间；202只ACCEPTED。retained raw失败不换actor/key重写或被新guard借用。

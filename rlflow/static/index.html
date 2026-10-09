@@ -101,6 +101,15 @@
         <div class="controls"><button id="goal-retry" type="button" hidden>手动重试原 payload / 原 key</button><button id="goal-abandon" type="button" hidden>清除本地意图（不取消服务器提交）</button></div>
         <pre id="goal-receipt" aria-label="原持久命令回执，不是当前执行状态"></pre>
       </section>
+      <section class="panel fixture-panel" aria-labelledby="fixture-title">
+        <div class="panel-heading"><h2 id="fixture-title">固定 CPU 协议执行 · LOCAL_PROTOCOL_ONLY</h2><div class="controls"><button id="fixture-refresh" type="button">读取最新 Task</button><button id="fixture-next" type="button" disabled>下一扫描页</button></div></div>
+        <p class="boundary-note">只执行可信宿主已注册的固定 CPU 单参与者；不调用模型、GPU，不修改候选代码。当前运行 UNKNOWN；STARTED_AS_OBSERVED 是历史 ACK。ACCEPTED 不是运行/停止成功；终态不证明此读接口观察了资源 FREE。STOP 不覆盖任意进程树。</p>
+        <p id="fixture-note" class="muted" role="status"></p>
+        <div id="fixture-list" class="object-list"></div>
+        <pre id="fixture-detail" aria-label="原事件验证的固定 CPU Task"></pre>
+        <div class="controls"><button id="fixture-start" type="button" disabled>明确启动固定 CPU Task</button><button id="fixture-stop" type="button" disabled>明确 STOP 原固定范围</button><button id="fixture-retry" type="button" hidden>手动重试原 body / 原 key</button><button id="fixture-abandon" type="button" hidden>清除本地意图（不取消执行）</button></div>
+        <pre id="fixture-receipt" aria-label="原接收回执，不是当前执行状态"></pre>
+      </section>
       <section class="panel logs-panel">
         <div class="panel-heading"><h2>公共观测日志</h2><span class="muted">CORE_STATUS / TOOL_METADATA / raw logs PRIVATE_ONLY</span></div>
         <p class="muted">CORE_STATUS 为核心状态观测；TOOL_METADATA 为已验证绑定的 CPU 返回，不证明模型启动、任务成功或完整历史。正文按需读取，不提供私有模型日志。</p>

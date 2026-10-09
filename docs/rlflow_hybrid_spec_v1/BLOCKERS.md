@@ -1,5 +1,7 @@
 # 阻塞与证据缺口
 
+47 FINAL：人工固定CPU Dashboard真实Start/ACK/原key恢复/STOP故障后原key续清/reap/实际Pool0已交付；两独立命令恢复MUST已关闭，文案超时根因修复后browser1pass19.027s，必要web43pass/HTTP55pass/236SHA+检查通过，无live测试。46已提交3bf6cec；47正在提交。无新增需要用户决定的外部阻塞，继续48真实durable事件→有限只读Task刷新/时间线。这里只证明LOCAL_PROTOCOL_ONLY固定单参与者；当前UNKNOWN/资源NOT_OBSERVED保持，不证明native、真正工程科研、模型费用、严格cgroup/data/network、任意树/长期/安装迁移。STOP原意图可能在终态后继续保留，系FREE观察缺口的保守恢复设计，不自动重复执行。下方旧状态为历史。
+
 46 FINAL：保护固定CPU人工HTTP执行/STOP实际闭环、原phase同CAS命令、断线幂等/末端auth/STOP过期及丢返回收尾已交付；必要集成214pass648.99s，fork增量warm1pass14.71s/静态关闭/216未变SHA+最终218SHA/检查通过，正在提交，无live测试/新增外部用户决策。下一前端Task/controls/API真实接线与browser E2E，历史/current边界不能省。异常acceptedStart不保证自动ACK；完整native/paidmodel/GPU/实际invoice/cgroup/任意树/工程科研/长期/UI安装迁移仍待验收，权限不扩大。45 commit06e24e8；下方“正在提交45”/WIP为历史。
 
 45 FINAL：实际fixture Task只读API与源证明/有限时间线/真实loopback已交付，影响web回归158pass、216SHA/静态检查通过，High新增两MUST关闭。44 commit2b06d34；45正在提交，无live测试/新增外部决策阻塞。控制端到端尚待46（实际末边界human auth、durable CAS/idempotency、disconnect/STOP闭环），不是已完成。native/模型实际用量invoice/严格OS-data-network-candidate/任意树STOP、工程科研、UI长期与安装迁移的原缺口/权限保持；完整Goal继续。下方“正在提交44”及LIVE是历史。
