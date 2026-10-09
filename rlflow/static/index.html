@@ -113,6 +113,13 @@
         <div class="controls"><button id="fixture-start" type="button" disabled>明确启动固定 CPU Task</button><button id="fixture-stop" type="button" disabled>明确 STOP 原固定范围</button><button id="fixture-retry" type="button" hidden>手动重试原 body / 原 key</button><button id="fixture-abandon" type="button" hidden>清除本地意图（不取消执行）</button></div>
         <pre id="fixture-receipt" aria-label="原接收回执，不是当前执行状态"></pre>
       </section>
+      <section class="panel" aria-labelledby="cpu-unit-title">
+        <div class="panel-heading"><h2 id="cpu-unit-title">已批准 CPU 实验 · 一次执行 / 本范围 STOP</h2><button id="cpu-unit-refresh" type="button">读取原 Unit</button></div>
+        <p class="muted">只使用原已批准固定 384 点实验；不新建授权、不调用模型/GPU、不接管冷 owner。STOP 独立于 Run 在途请求，无版本要求。</p>
+        <p id="cpu-unit-note" role="status"></p><p id="cpu-unit-live" class="muted"></p><pre id="cpu-unit-detail"></pre>
+        <div class="controls"><button id="cpu-unit-run" disabled>明确执行已批准实验一次</button><button id="cpu-unit-stop" disabled>紧急 STOP 本范围</button><button id="cpu-unit-run-retry" hidden>手动重试原 Run body/key</button><button id="cpu-unit-run-abandon" hidden>清除本地 Run 意图</button><button id="cpu-unit-stop-retry" hidden>手动继续原 STOP 清理</button><button id="cpu-unit-stop-abandon" hidden>清除本地 STOP 意图</button></div>
+        <pre id="cpu-unit-run-receipt" aria-label="Run 接收事实"></pre><pre id="cpu-unit-stop-receipt" aria-label="STOP 意图接收事实，不是 FREE"></pre>
+      </section>
       <section class="panel" aria-labelledby="candidate-output-title">
         <div class="panel-heading"><h2 id="candidate-output-title">工程候选 · 实际写后测试与原始证据</h2><div class="controls"><button id="candidate-output-refresh" type="button">读取工程产出</button><button id="candidate-output-next" type="button" disabled>下一产出页</button></div></div>
         <p class="muted">固定 add 缺陷修复的历史审计；无执行权限。当前执行 UNKNOWN / 资源 NOT_OBSERVED；不以三个测试通过证明 Goal 完成。</p>

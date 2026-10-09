@@ -1,0 +1,98 @@
+Checkpoint 61 / STANDARD / FINAL development slice
+Base: hybrid-v1 / 8d1d2f5. Private finite CPU + SQLite + loopback Chrome only.
+No paid model/API, GPU, production migration, public hosting or git push.
+No running tests remain. Original Checkpoint41 validation was not restarted.
+
+Delivered: authenticated actual original CPU Unit Run -> 384 raw/sealed samples
+-> original STOP/reap/FD close/Pool FREE -> machine pending independent review.
+Independent STOP latches after auth/target/key conflict checks, before capacity
+or Pool/Store waits. Immutable human STOP acceptance is not lifecycle FREE.
+One original HANDOFF/Popen/consume; lost response manual identical Run key/body
+reads original receipt only. Accepted STOP cleanup survives session expiry.
+Actual backend child-before-G STOP and actual Chrome held-Run-response STOP
+are separate evidence: Chrome STOP did NOT kill a still-running child.
+As-of facts do not prove current resources, independent Reviewer or Goal done.
+
+Backend argv prefix (all runs below):
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest
+Positive/module/persistence/source-error/final-boundaries use -q -s TARGET --disable-warnings.
+Full uses -q --disable-warnings (no selected target).
+Each stdout/stderr redirected to audit/hybrid-v1/checkpoint-61-NAME-r1.log.
+Runs were sequential; actual terminal completion preceded edits and next run.
+
+positive: tests/test_hybrid_cpu_unit_control.py::test_actual_HTTP384_machine_PENDING_REVIEW_once_and_STOP_after_safe_cleanup
+original90299 / terminal82ebc0 exit1: 1failed/1warning21.72s.
+Actual HTTP execution assertions passed; final audit failed because new logical
+STOP-map validator incorrectly required a physical empty-key marker. Fixed
+logical-map interpretation, retained physical whole-event marker proof.
+
+unit: tests/test_hybrid_cpu_unit_control.py
+original22387 / terminal051941 exit1: 8passed/1failed/1warning111.59s.
+Only failure: isolated corruption fixture UPDATE blocked by original immutable
+event trigger. Test-only save/drop/restore that trigger in private SQLite;
+no weakening production append-only behavior and no identical blind rerun.
+
+persistence: tests/test_hybrid_cpu_unit_control.py::test_protected_STOP_source_and_failed_accept_no202_retry_same_body
+original59315 / terminal2310f9 exit0: 1passed/1warning11.12s.
+Rollback no202/latch retained; same-key cleanup; generic protected duplicates
+denied; corrupted source audit/maintenance rejected; restored maintenance passes.
+
+source-error: tests/test_hybrid_cpu_unit_control.py::test_source_schema_corruption_GET503_but_invalid_input400
+original36350 / terminal4fd8fa exit0: 1passed/1warning8.86s.
+Persisted schema failures sanitized503; caller bad input400.
+
+node argv: node --test web_checks/cpu-unit-panel.test.mjs web_checks/fixture-panel.test.mjs web_checks/cpu-assessment-panel.test.mjs web_checks/reducer.test.mjs
+terminal414b34 exit0: 36passed115.911316ms.
+browser argv: node --test web_checks/cpu-unit-browser.test.mjs
+original31618 / terminal98f2bd exit0: 1passed23257.367151ms.
+Actual sandboxed Chrome/private server; held real Run reply still permits STOP,
+lost reply/manual same-key retry does not launch again; actual384/count96,101,104;
+owner closed historical GET/no new control and logout clears private DOM.
+
+full: original99109 / terminalb64541 exit0:
+2288passed/32skipped/3warnings3693.68s (1:01:33).
+Necessary once because Store/contracts/schema/snapshot-maintenance gained a
+protected domain. All303 r4 frozen input paths matched at actual completion.
+32 skips are existing optional external H1 dispatcher cases, not passed cases:
+tests/test_h1_adapter.py:10 and tests/test_experiments_v2.py:13.
+No external H1 workload launched. Warnings hidden by --disable-warnings.
+
+After full terminal, r5 changed only:
+rlflow/hybrid_cpu_unit_control.py (exactdict before body.get)
+rlflow/hybrid_cpu_unit_stop.py (validate all logical IDs / len(rows) coverage)
+tests/test_hybrid_cpu_unit_control.py (two existing cases expanded)
+Other300 r4 source/test/web inputs unchanged. No duplicate full/node/browser.
+final-boundaries targets:
+tests/test_hybrid_cpu_unit_control.py::test_auth_scope_copy_and_direct_SDK_bypass_fail_before_dispatch
+tests/test_hybrid_cpu_unit_control.py::test_source_schema_corruption_GET503_but_invalid_input400
+original7041 / terminal5f32aa exit0: 2passed/1warning19.34s.
+NonobjectJSON None/False/0/string/list400 without spawn/cancel, logical empty
+STOP ID rejected in persisted state and source-completeness check.
+Final evidence is r4 full + r5 targeted delta, NOT a fresh r5 full suite.
+
+Independent readonly High hybrid_architecture_review: initial six source,
+entrypoint, snapshot/Store, capacity and fork MUST fixes and two UI fixes closed;
+source-schema classification residual closed. Final review of only two r5
+narrow fixes: no remaining confirmed MUST; no test execution or file writes.
+Development review is not the product/scientific independent Reviewer.
+
+Final309 input paths = r5 303 + six unchanged prior doc/schema alias pins.
+Manifest: checkpoint-61-final-inputs.sha256
+Manifest SHA256: 27e7584b67cd2c9c324294fbcfc009a4ca4f492e995787dcf1a4b356989cbb2b
+sha256sum -c ... > audit/hybrid-v1/checkpoint-61-final-sha-check.log: exit0.
+Raw eight logs/five r1-r5 freezes/final309 check (14 artifacts) hashes:
+checkpoint-61-log-sha256.txt; originals remain under ignored audit/hybrid-v1.
+Final compileall rlflow tests web_checks/cpu_unit_server.py / pip check /
+node --check app.mjs,cpu-unit-panel.mjs,cpu-unit-browser.test.mjs / git diff --check:
+all exit0 in && chain terminal5d6000; No broken requirements found.
+Earlier combined diagnostic exit1 was rg -v ': OK$' finding no mismatches,
+not a failed SHA check; authoritative final SHA command above exited0.
+USER package-lock.json unchanged, untracked, never staged:
+becc7e2a36dfcad4ffe934b5ff2f0f68187611d6c0641bd63d81367651cfbf09.
+
+Next62: original engineering Unit authenticated execution + original single
+pwrite + machine acceptance + independent scope STOP, actual backend/Chrome.
+Remaining original M0-M5 gates unchanged: native model/runtime, product and
+scientific independent Reviewer, complete Goal/conditions, strict OS/all-tree
+resources, trusted billing, new install/B1, 24h fixture and 8h UI acceptance.
+No new external decision/authority blocker for the next private local slice.

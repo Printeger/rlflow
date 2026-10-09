@@ -70,6 +70,8 @@ class _FiniteExecutionOperation:
         self._check_operation()
         if self._request is None or version != self._request['expected_state_version']:
             raise Conflict('execution unit stale initial HANDOFF writer CAS')
+        if self.runtime._control_service is not None:
+            return self.runtime._control_service._unit_handoff(self, version)
         return self._handoff_prefix + sha(self._request)
 
     def _state(self, status, *, fact=None, cleanup_error=_UNSET):

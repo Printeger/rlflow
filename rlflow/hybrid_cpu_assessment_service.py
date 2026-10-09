@@ -157,6 +157,7 @@ class CpuAssessmentService:
         if self._active is not None: raise Conflict('nested CPU appraisal transaction refused')
         try:
             with self.controller.token_transaction(token,read_bytes=PREPARATION_READ_BYTES,
+                    _commit_context=self.runtime._held if self.runtime._control_service is not None else None,
                     _before_commit=final,_after_final_sample=deadlines) as context: yield context
         finally: self._active=None
 

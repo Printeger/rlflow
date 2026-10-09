@@ -6,6 +6,7 @@ import {GoalPanel} from './goal-panel.mjs';
 import {FixturePanel} from './fixture-panel.mjs';
 import {CpuAssessmentPanel} from './cpu-assessment-panel.mjs';
 import {CandidateOutputPanel} from './candidate-output-panel.mjs';
+import {CpuUnitPanel} from './cpu-unit-panel.mjs';
 
 const $ = id => document.getElementById(id);
 const motionPreference = matchMedia('(prefers-reduced-motion: reduce)');
@@ -26,6 +27,8 @@ const cpuAssessments=new CpuAssessmentPanel({context:()=>session && state && pro
 const candidateOutputs=new CandidateOutputPanel({context:()=>session && state && project && state.project===project.id ?
   {session,authGeneration,project:state.project,mode:state.mode,epoch:state.epoch,version:state.sourceVersion}:null,request});
 const eventList = new VirtualList($('events'), eventNode, event => event.event_id);
+const cpuUnits=new CpuUnitPanel({context:()=>session && state && project && state.project===project.id ?
+  {session,authGeneration,project:state.project,mode:state.mode,epoch:state.epoch,version:state.sourceVersion}:null,request});
 let logSerial = 0, logDetailSerial = 0, logPage = null, logNext = null, logPending = 0;
 const logList = new VirtualList($('logs'),logNode,row => row.id);
 function clearLogs() {
@@ -72,6 +75,7 @@ function updateLogPending() {
   $('log-new').textContent = `${logPending} 次新提交（可能不匹配筛选）；读取最新日志`;
 }
 function beginAuth() {
+  cpuUnits.clear();
   cpuAssessments.clear();candidateOutputs.clear();
   goals.clear();
   fixtures.clear();
@@ -79,6 +83,7 @@ function beginAuth() {
   return {ticket:++authGeneration, signal:authController.signal};
 }
 function clearObservation() {
+  cpuUnits.clear();
   cpuAssessments.clear();candidateOutputs.clear();
   goals.clear();
   fixtures.clear();
@@ -120,6 +125,7 @@ function renderResources() {
 function short(value) { return value ? value.slice(0,14) + (value.length > 14 ? '…' : '') : '未提供'; }
 function base() { return `/api/v1/projects/${encodeURIComponent(project.id)}`; }
 function setConnection(value) {
+  cpuUnits.connection(value);
   connection = value; $('connection').textContent = value;
   fixtures.connection(value);
   cpuAssessments.connection(value);candidateOutputs.connection(value);
@@ -131,7 +137,7 @@ async function request(url, options = {}) {
   const requestAuth=authGeneration,requestGeneration=generation;
   const response = await fetch(url, {credentials:'same-origin', cache:'no-store', ...options});
   if (!response.ok) {
-    if(response.status===401 && requestAuth===authGeneration && requestGeneration===generation) {goals.clear();fixtures.clear();cpuAssessments.clear();candidateOutputs.clear();session=null;$('login-panel').hidden=false;closeStream();}
+    if(response.status===401 && requestAuth===authGeneration && requestGeneration===generation) {cpuUnits.clear();goals.clear();fixtures.clear();cpuAssessments.clear();candidateOutputs.clear();session=null;$('login-panel').hidden=false;closeStream();}
     const error = new Error(response.status === 401 ? '登录已到期，请重新登录；最后快照保留。' : `读取失败 (${response.status})；最后快照保留。`);
     error.status = response.status; throw error;
   }
@@ -265,6 +271,7 @@ function openStream(selected) {
       if (!result.duplicate) {
         telemetry?.invalidateFixedWorkers(state.sourceVersion);
         fixtures.changed(state.sourceVersion);
+        cpuUnits.changed(state.sourceVersion);
         cpuAssessments.changed(state.sourceVersion);candidateOutputs.changed(state.sourceVersion);
         telemetry?.invalidateWorkers([...value.payload.upsert.filter(r=>r.kind==='execution').map(r=>r.id),
           ...value.payload.removed.filter(r=>r.kind==='execution').map(r=>r.id)],value.payload.source_state_version);
@@ -300,7 +307,7 @@ function openStream(selected) {
     if (selected !== generation || current !== source) return;
     try { const value = JSON.parse(message.data);
       closeStream();
-      if (value.reason === 'AUTH_EXPIRED') { goals.clear();fixtures.clear();cpuAssessments.clear();candidateOutputs.clear();session = null; $('login-panel').hidden = false; setConnection('AUTH EXPIRED'); problem('登录已到期。最后快照不代表当前状态。'); }
+      if (value.reason === 'AUTH_EXPIRED') { cpuUnits.clear();goals.clear();fixtures.clear();cpuAssessments.clear();candidateOutputs.clear();session = null; $('login-panel').hidden = false; setConnection('AUTH EXPIRED'); problem('登录已到期。最后快照不代表当前状态。'); }
       else if (value.reason === 'SOURCE_UNAVAILABLE') { setConnection('OFFLINE'); problem('后端观测源不可用。保留最后快照，请重建快照重试。'); }
       else selectProject();
     } catch (error) { failStream(error,selected); }
@@ -313,7 +320,7 @@ function openStream(selected) {
       checkingAuth = true;
       request('/api/v1/session').catch(error => {
         if (error.status === 401 && selected === generation && current === source) {
-          goals.clear();fixtures.clear();cpuAssessments.clear();candidateOutputs.clear();closeStream(); session = null; $('login-panel').hidden = false; setConnection('AUTH EXPIRED'); problem(error.message);
+          cpuUnits.clear();goals.clear();fixtures.clear();cpuAssessments.clear();candidateOutputs.clear();closeStream(); session = null; $('login-panel').hidden = false; setConnection('AUTH EXPIRED'); problem(error.message);
         }
       }).finally(() => { checkingAuth = false; });
     }
@@ -321,12 +328,14 @@ function openStream(selected) {
 }
 function failStream(error, selected) {
   if (selected !== generation) return;
+  cpuUnits.clear();
   cpuAssessments.clear();candidateOutputs.clear();
   fixtures.clear();
   goals.clear();closeStream(); problem(`同步被拒绝：${error.message}。未推断业务状态。`);
   if (error.incompatible) setConnection('INCOMPATIBLE'); else selectProject();
 }
 async function selectProject() {
+  cpuUnits.clear();
   cpuAssessments.clear();candidateOutputs.clear();
   goals.clear();
   fixtures.clear();
@@ -349,7 +358,7 @@ async function selectProject() {
     $('mode-note').className = 'notice ' + (project.data_mode === 'fixture' ? 'fixture' : '');
     $('mode-note').textContent = project.data_mode === 'fixture' ? 'FIXTURE / 隔离测试数据，不证明供应商模型或生产运行。' : 'LIVE / 真实公共投影。连接正常不代表模型运行，观察不足会明确显示。';
     problem(''); render(); openStream(selected);
-    await Promise.allSettled([loadPage(), loadOverview('execution',30), loadOverview('stage',10),loadLogs(),goals.load(),fixtures.load(),cpuAssessments.load(),candidateOutputs.load()]);
+    await Promise.allSettled([loadPage(), loadOverview('execution',30), loadOverview('stage',10),loadLogs(),goals.load(),fixtures.load(),cpuUnits.load(),cpuAssessments.load(),candidateOutputs.load()]);
   } catch (error) { if (selected === generation) { setConnection(error.incompatible ? 'INCOMPATIBLE' : 'OFFLINE'); problem(error.message); if (error.status === 401) $('login-panel').hidden = false; } }
 }
 async function loadOverview(kind, limit) {

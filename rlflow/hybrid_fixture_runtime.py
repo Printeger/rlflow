@@ -151,7 +151,10 @@ class FixtureRuntimeOwner:
     def _unit_effect_check(self, attempt):
         # Pure memory check AFTER the last source/SQL/Controller fence.
         unit = self._execution_units.get(id(attempt['lease']))
-        if unit is not None: unit._check_final()
+        if unit is not None:
+            unit._check_final()
+            if self._control_service is not None:
+                self._control_service._check_authority(cleanup=False, attempt=attempt)
 
     def _plan_original(self, bundle, token, observation):
         entry = self.plans.builder._slot(bundle); seed = entry['seed']

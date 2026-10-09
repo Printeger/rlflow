@@ -14,6 +14,7 @@ from .store import Conflict, Store
 
 
 class FixtureTaskReader(HybridReader):
+    _accepted_origin_kind = 'PROTOCOL_CONFORMANCE'
     def __init__(self, store, *, project_id, store_epoch):
         if type(store) is not Store:
             raise TypeError('actual existing Store required')
@@ -53,7 +54,7 @@ class FixtureTaskReader(HybridReader):
         if derived_heads(value)[SECTIONS[2]].get(key) != head:
             raise Conflict('fixture Task head is not original derived head')
         if ('fixture_runtime' not in head or
-                head['fixture_runtime']['origin']['kind'] != 'PROTOCOL_CONFORMANCE'):
+                head['fixture_runtime']['origin']['kind'] != self._accepted_origin_kind):
             return None
         return head, value
 
