@@ -23,12 +23,18 @@ import tempfile
 import time
 if __package__:
     from . import tool_journal
+    from .hybrid_runtime_boundary import check_legacy, check_request, check_cold_entry
 else:
     # The trusted MCP/supervisor also launches this module as an isolated file.
     import importlib.util
     _journal_spec = importlib.util.spec_from_file_location('rlflow_tool_journal',Path(__file__).with_name('tool_journal.py'))
     tool_journal = importlib.util.module_from_spec(_journal_spec)
     _journal_spec.loader.exec_module(tool_journal)
+    _boundary_spec = importlib.util.spec_from_file_location('rlflow_fixed_boundary', Path(__file__).with_name('hybrid_runtime_boundary.py'))
+    _boundary_module = importlib.util.module_from_spec(_boundary_spec)
+    _boundary_spec.loader.exec_module(_boundary_module)
+    check_legacy, check_request = _boundary_module.check_legacy, _boundary_module.check_request
+    check_cold_entry = _boundary_module.check_cold_entry
 
 CODEX = '/usr/local/bin/codex'
 PINNED_VERSION = '0.161.0'
@@ -199,6 +205,8 @@ def cpu_exec(command: str, candidate: str | Path, scratch: str | Path,
              write_roots: list[str] | None = None,
              execute_extra: list[str] | None = None,
              memory_bytes: int = 2 * 1024**3, command_seconds: int = 120, artifact_dir: Path | None = None) -> dict:
+    check_legacy(candidate, scratch, *(write_roots or []), *(read_extra or []), *(execute_extra or []),
+                 *([artifact_dir] if artifact_dir is not None else []))
     if role not in ROLES: raise IsolationError('Unknown role')
     if not isinstance(command, str) or len(command) > 100000:
         raise IsolationError('Command must be a string <= 100000 characters')
@@ -331,6 +339,7 @@ def tool_return_observation(intent, result):
 
 def persistent_cpu_exec(config, args):
     """An explicit command ID is a checkpoint, not permission to rerun an unknown launch."""
+    check_request(config)
     import uuid
     command_id = args.get('command_id', uuid.uuid4().hex)
     if not isinstance(command_id, str) or not command_id or len(command_id) > 200:
@@ -446,6 +455,8 @@ def codex_command(role: str, candidate: str | Path, scratch: str | Path,
     Output's parent is trusted control storage; it MUST be disjoint from role
     writable paths. It stores the MCP config, audit and constrained catalog.
     """
+    check_legacy(candidate, scratch, output, *(write_roots or []), *(read_extra or []), *(execute_extra or []),
+                 *([tool_launch_directory] if tool_launch_directory is not None else []))
     if role not in ROLES: raise IsolationError('Unknown role')
     if tool_context is not None and not tool_context_valid(tool_context):raise IsolationError('Invalid tool context')
     candidate, scratch, output = (Path(p).resolve() for p in (candidate,scratch,output))
@@ -682,7 +693,9 @@ def require_doctor(state_root: str | Path) -> dict:
 
 if __name__ == '__main__':
     if len(sys.argv)>1 and sys.argv[1]=='_supervised':
+        check_cold_entry()
         cfg=json.loads(sys.argv[2])
+        check_request(cfg)
         sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
         from rlflow.lifeguard import start as start_guard,group_identity,kill_group
         from rlflow.store import atomic,canonical
@@ -729,7 +742,9 @@ if __name__ == '__main__':
             atomic(directory/'lifeguard-done',b'done');guard.wait(timeout=3)
         sys.exit(124 if timed else child.returncode if child.returncode>=0 else 128-child.returncode)
     elif len(sys.argv)>1 and sys.argv[1]=='_child':
+        check_cold_entry()
         cfg=json.loads(sys.argv[2])
+        check_request(cfg)
         if cfg.get('guard_directory'):
             sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
             from rlflow.lifeguard import group_identity
@@ -748,6 +763,11 @@ if __name__ == '__main__':
         resource.setrlimit(resource.RLIMIT_CPU,(int(cfg['timeout'])+1,int(cfg['timeout'])+1))
         resource.setrlimit(resource.RLIMIT_AS,(cfg.get('memory_bytes',2*1024**3),cfg.get('memory_bytes',2*1024**3)))
         resource.setrlimit(resource.RLIMIT_FSIZE,(20*1024**2,20*1024**2))
+        # Last trusted-side boundary check, before Landlock removes access to
+        # policy/catalog. Never expose control files to the sandboxed payload.
+        # Guarded installation cannot hot-migrate already-running old children.
+        check_cold_entry()
+        check_request(cfg)
         try:
             _restrict(cfg['read'],cfg['write'],cfg.get('execute'))
         except IsolationError as exc:

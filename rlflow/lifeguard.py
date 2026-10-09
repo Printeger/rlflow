@@ -21,6 +21,8 @@ def kill_group(record):
 
 
 def start(directory,kind,owner,root,limit,object_id,spec=None,resources=None):
+    from .hybrid_runtime_boundary import check_request
+    check_request({'root':root,'directory':directory,'spec':spec,'resources':resources})
     d=Path(directory);request={'directory':str(d),'kind':kind,'owner':owner,'root':str(root),
         'limit':limit,'id':object_id,'spec':spec,'resources':resources,'started_wall':time.time(),'started_monotonic':time.monotonic()}
     path=d/'lifeguard-request.json';atomic(path,canonical(request))
@@ -107,7 +109,10 @@ def reclaim(request,cause='supervisor lost during dispatcher recovery'):
 
 def held_role(path):
     """No CLI executes until its own durable identity and release are bound."""
+    from .hybrid_runtime_boundary import check_cold_entry, check_request
+    check_cold_entry()
     r=json.loads(Path(path).read_text());d=Path(r['directory'])
+    check_request(r, Path(path).absolute())
     if r.get('resources'):
         from .resources import enter
         enter(r['resources'])
@@ -124,6 +129,8 @@ def held_role(path):
     if r.get('resources',{} ) and r['resources'].get('disk'):
         from .resources import confine_writes
         confine_writes(r['resources']['disk']['root'])
+    check_cold_entry()
+    check_request(r, Path(path).absolute())
     os.chdir(r['scratch'])
     os.execvpe(r['argv'][0],r['argv'],os.environ)
 

@@ -1,5 +1,15 @@
 # 开发决策记录
 
+## Checkpoint40：实际新fixture非执行安装与原seal发布
+
+本切片仅创建新的私有fixture Store/epoch、source/snapshot/working/bootstrap namespace，不热迁移旧root/旧二进制/运行中或UNKNOWN进程。强制release-local策略默认显式UNBOUND；新guarded code自身固定BOUND catalogue，冷legacy子入口无条件拒绝，不能用请求中的foreign root、lease或布尔值解除。
+
+catalog仅引用预分配INTENT key/accepted version，不反向嵌入INTENT digest。hash DAG为catalog→descriptor policy→manifest/releaseID→完整原INTENT seal→physical publish→READY，避免成环；bootstrap template hash排除唯一生成policy，其余来源由固定原Source FD/stamp图核验。Stage closed有界枚举全部项，包括root extras/cache/空目录，不把源码checkout选择域与封存物料域混为一谈。
+
+固定实际owner使用writer外原封存物料witness，再按Store writer→Service→Builder同DB原proof与实际COMMIT。发布必须先有原durable INTENT；使用原parent FD的Linux no-replace rename，原parent fsync后才能生成原publication witness。自行move或磁盘manifest不能直接签发READY；未知返回保留原物料/ID/seal，不自动重建、覆盖、回退或删除。显式原owner retry必须再次核原core seal/实际issued material及fsync；不从DTO重建进程内能力。最终sourceproof后的期限检查和自动snapshot原events/tipCOUNT闭合属于必要边界，不能以开发正例替代。
+
+40原计划中的working-copy非执行计划移至下一依赖切片41；这是可审查checkpoint拆分，不缩减完整Goal/T12或更改验收门槛。实际WorkingPlan必须新对象/原Working slot，不能修改旧Library SnapshotPlan路径或给legacy codex_command加skip_guard请求开关。40所有execution/release仍false；实际Runtime REGISTER、UsageOwner、host共享pool与可靠STOP仍须后续完整实现及验收。
+
 ## Checkpoint39：提交成功后激活原候选，未知返回不当作回滚
 
 Working pending采用单一canonical registry，保持旧实际观察直至真实COMMIT；candidate预分配epoch+1，同一FD，原身份先解析。lost-return仍从原actual slot可达且阻第二次签发；激活使用原候选/绝对epoch，逐字段中途异常可用同pending修复。Service所有非renew写同锁核两层canonical pending，不仅依赖Service挂接字段。先核actualscope/current原HEAD/claim/source/guard，再绑定写尝试request/fact，避免坏scope请求污染清理能力。

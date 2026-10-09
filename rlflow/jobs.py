@@ -20,6 +20,16 @@ import sys
 import time
 import uuid
 
+if __package__:
+    from .hybrid_runtime_boundary import check_legacy, check_cold_entry
+else:
+    import importlib.util
+    _boundary_spec = importlib.util.spec_from_file_location('rlflow_fixed_boundary', Path(__file__).with_name('hybrid_runtime_boundary.py'))
+    _boundary_module = importlib.util.module_from_spec(_boundary_spec)
+    _boundary_spec.loader.exec_module(_boundary_module)
+    check_legacy = _boundary_module.check_legacy
+    check_cold_entry = _boundary_module.check_cold_entry
+
 CANONICAL_STOP = Path.home()/'.local/share/rlflow-standalone/coordination/commander/STOP'
 TERMINAL = {'SUCCEEDED', 'FAILED', 'STOPPED', 'HANDSHAKE_TIMEOUT'}
 _CHILDREN = []
@@ -106,6 +116,7 @@ def _validate(spec):
 
 
 def submit(root, job_id, spec, stop_paths=()):
+    check_legacy(Path(root).absolute())
     spec = _validate(spec)
     path = _directory(root, job_id)
     path.mkdir(parents=True, exist_ok=True)
@@ -126,6 +137,7 @@ def submit(root, job_id, spec, stop_paths=()):
         if state['state'] == 'STOPPED':
             return state
         try:
+            check_legacy(Path(root).absolute())
             with (path / 'supervisor.log').open('ab') as log:
                 proc = subprocess.Popen([sys.executable, str(Path(__file__).resolve()),
                     '_supervise', str(path)], stdin=subprocess.DEVNULL, stdout=log, stderr=log,
@@ -173,6 +185,8 @@ def _save(path, **changes):
 
 
 def _supervise(path):
+    check_cold_entry()
+    check_legacy(Path(path).absolute())
     with _lock(path):
         state = _read(path / 'state.json')
         if state['state'] != 'START_INTENT' or state.get('supervisor') != identity(os.getpid()):
@@ -186,6 +200,7 @@ def _supervise(path):
     child_id = None
     try:
         argv = [sys.executable, str(Path(__file__).resolve()), '_child', str(path), str(ready_w), str(release_r)]
+        check_legacy(Path(path).absolute())
         with (path / 'stdout.log').open('ab') as out, (path / 'stderr.log').open('ab') as err:
             proc = subprocess.Popen(argv, stdin=subprocess.DEVNULL, stdout=out, stderr=err,
                                     pass_fds=(ready_w, release_r), start_new_session=True)
@@ -228,11 +243,13 @@ def _supervise(path):
             _save(path, state=outcome[0], reason=outcome[1], exit_code=proc.returncode)
             return
         # Persist release intent before opening the gate; an interrupted write is never retried.
+        check_legacy(Path(path).absolute())
         _save(path, state='RELEASE_INTENT')
         if _stopped(state):
             _kill_owned(child_id); proc.wait(timeout=3)
             _save(path, state='STOPPED', reason='STOP at final gate', exit_code=proc.returncode)
             return
+        check_legacy(Path(path).absolute())
         os.write(release_w, b'GO\n')
         _save(path, state='RUNNING', released=True)
         while proc.poll() is None:
@@ -255,6 +272,8 @@ def _supervise(path):
 
 
 def _child(path, ready_w, release_r):
+    check_cold_entry()
+    check_legacy(Path(path).absolute())
     state = _read(path / 'state.json')
     spec = state['spec']
     if spec['mode'] == 'short_lived':
@@ -266,6 +285,7 @@ def _child(path, ready_w, release_r):
     readable, _, _ = select.select([release_r], [], [], spec['handshake_timeout'] + spec['before_release_delay'] + 2)
     if not readable or os.read(release_r, 32) != b'GO\n':
         return 8
+    check_legacy(Path(path).absolute())
     time.sleep(spec['duration'])
     result = {'job_id': state['job_id'], 'nonce': state['nonce'], 'backend': 'fake',
               'message': 'CPU fake workload completed', 'success': spec['mode'] != 'fail'}

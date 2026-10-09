@@ -1,5 +1,11 @@
 # 阻塞与证据缺口
 
+Checkpoint40 最终验证全部实际终态：root/High同21modules各534pass/8既有外部H1skip/1既有Starlette warning（345.80s/344.19s）；中央full原14894 actual terminal exit0/chunkd5431d，**1818pass/32既有外部H1skip/1既有warning678.02s**。22source/test/schema SHA与冻结一致，范围无剩余MUST，compileall/pipcheck/diffcheck均exit0，当前无live测试。证据见HYBRID_RUNTIME_BOUNDARY.md及evidence/checkpoint-40-final-tests.txt。实际新private fixture非执行安装已实现，不代表旧namespace迁移/WorkingPlan/Runtime授权/UsageOwner/共享pool/可靠STOP或完整T12/M1/M0–M5验收；无新browser/NFR06/B1/24h/8h/离线18checks证明。下一41实现实际WorkingPlan，Goal active，USERpackage-lock保留未stage。下方candidate/LIVE均为保留历史阶段。
+
+40定向/独立已实际終态：root/High同21各534pass/8既有外部skip/1warning（345.80s/344.19s），22SHA一致、范围MUST关闭；中央FULL原14894 LIVE。无新增外部阻塞，不并行测试且source/tests/schema继续冻结。新fixture非执行安装已实现，不代表既有namespace迁移/完整新安装/WorkingPlan或运行验收；原M1/B1/NFR06/长期、Runtime/UsageOwner/共享pool/可靠STOP与完整Goal后续工作继续保留。
+
+40当前：实际新私有fixture非执行安装/immutable INTENT→kernel no-replace发布/fsync→READY已实现；root最终21modules534pass/8既有外部skip/1既有warning345.80s，22SHA不变，High同组独立LIVE、全量尚未执行。没有新增需终止Goal的外部权限或依赖阻塞。当前后续工作仍包括实际WorkingPlan、Runtime REGISTER/执行/恢复、可信UsageOwner、主机共享pool、可靠process-tree STOP、既有namespace迁移/升级和真实工程/低成本科研闭环；新fixture非执行安装不等于生产新安装全部验收。M1/B1/NFR06及24hfixture/8hUI原门槛未放宽，旧性能/browser证据不重标。见HYBRID_RUNTIME_BOUNDARY.md及evidence/checkpoint-40-final-tests.txt，下一切片设计HYBRID_WORKING_PLAN.md；完整Goal active。
+
 Checkpoint27完整终态覆盖下述live过程：真实session认证与Store→Auth事务守卫、撤销/过期/幂等/rollback闭合，root112passed9.28s/独立112passed9.31s、范围无MUST_FIX，冻结全回归762passed/32既有外部/H1skips/1既有Starlette warning/247.08s，原62752terminal exit0，不再live。compileall/pip/diff通过，见HYBRID_APPROVAL_AUTH.md/evidence/checkpoint-27-final-tests.txt。仍无ApprovalService/批准事实/Origin桥/写路由或执行权限；无新browser/性能证据。下一不可变批准/撤销和receipt/snapshot/recovery，完整T09/M1/B1/长期与M2–M5继续开发，Goal active，用户package-lock保留。
 
 Checkpoint27真实session认证事务守卫root/独立112项通过，中央Store变更全回归62752仍运行，尚无批准事实或执行权限；无新增外部阻塞。guard仅同一受保护进程/一个AuthStore owner的撤销线性化，不能将跨进程Auth副本当一致撤销。后续固定批准服务/Origin确认、不可变批准/撤销、恢复与执行lease/STOP等继续开发，不因认证primitive通过声明T09或完整Goal完成。

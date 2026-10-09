@@ -112,6 +112,8 @@ def authorized(s,spec,root):
 
 
 def submit(store,spec):
+    from .hybrid_runtime_boundary import check_request
+    check_request(spec, store.root)
     jid='J-'+sha({'id':spec['id'],'spec':spec})[:16]
     existing=store.view()['jobs'].get(jid)
     if existing:
@@ -123,6 +125,7 @@ def submit(store,spec):
     resource_record,guarantees,_=reserve_task(store,snapshot.get('stages',{}).get(spec['stage_id'],{}),jid)
     launched=[]
     def reserve(s):
+        check_request(spec, store.root)
         approval=authorized(s,spec,store.root)
         if any(j.get('spec',{}).get('backend') in {'real','runner_cpu'} and j['status'] in {'START_INTENT','RUNNING','RECONCILE'} for j in s['jobs'].values()):
             raise Conflict('another runner job owns the execution slot')
@@ -142,6 +145,7 @@ def submit(store,spec):
         atomic(d/'h1-authority.json',canonical(validate_h1(spec,store.root)))
     from .releases import freeze
     frozen=freeze(store.root/'session_releases')
+    check_request(spec, store.root)
     with (d/'supervisor.log').open('ab') as log:
         proc=subprocess.Popen([sys.executable,'-m','rlflow.experiments','_worker',str(d/'request.json')],cwd=frozen,stdin=subprocess.DEVNULL,stdout=log,stderr=log,start_new_session=True)
     ident=identity(proc.pid)
@@ -156,9 +160,11 @@ def submit(store,spec):
         ready=json.loads((d/'launch-ready.json').read_text())
         binding={'job_id':jid,'identity':ident,'control_release':frozen.name,'generation':state['jobs'][jid]['generation']}
         if ready['binding']!={'session':jid,'generation':binding['generation'],'identity':ident}:raise Conflict('job readiness mismatch')
+        check_request(spec, store.root)
         store.transact('EXPERIMENT_RELEASE_COMMITTED',jid+':supervisor-release',lambda s:s['jobs'][jid].update(launch_phase='RELEASE_COMMITTED',release_binding=binding),object_id=jid)
         from .startup import record
         record(d,'RELEASE_COMMITTED',binding)
+        check_request(spec, store.root)
         atomic(d/'supervisor-release.json',canonical(binding))
     except Conflict:
         atomic(d/'cancel',b'authorization changed before supervisor release')
@@ -226,7 +232,11 @@ def collect(store,jid):
 
 def worker(request):
     import signal
-    r=json.loads(Path(request).read_text());store=Store(r['root']);spec=r['spec'];jid=r['job_id'];d=Path(request).parent
+    from .hybrid_runtime_boundary import check_cold_entry, check_request
+    check_cold_entry()
+    r=json.loads(Path(request).read_text())
+    check_request(r, Path(request).absolute())
+    store=Store(r['root']);spec=r['spec'];jid=r['job_id'];d=Path(request).parent
     start=time.monotonic();released=False;allocated_start=None;status_value='FAILED';error=None;code=None;confirmed_no_release=False
     def interrupted(*_):raise RuntimeError('runner cancelled')
     signal.signal(signal.SIGTERM,interrupted)
@@ -243,6 +253,8 @@ def worker(request):
         raw=Path(pin['path']).read_bytes()
         if hashlib.sha256(raw).hexdigest()!=pin['sha256']:raise Conflict('dispatcher drift before loading')
         module=types.ModuleType('reviewed_h1_dispatcher')
+        check_cold_entry()
+        check_request(r, Path(request).absolute(), pin['path'])
         exec(compile(raw,pin['path'],'exec'),module.__dict__)
         record(d,'READY',binding)
         release_started=time.monotonic()
@@ -260,6 +272,7 @@ def worker(request):
         if committed.get('release_binding')!=release:raise Conflict('job release lacks committed authority')
         def gate():
             nonlocal released,allocated_start
+            check_request(r, Path(request).absolute())
             authorized(store.view(),spec,store.root)
             if (d/'cancel').exists():raise Conflict('cancelled before release')
             held=json.loads((d/'held-child.json').read_text())['held_child']['pid']

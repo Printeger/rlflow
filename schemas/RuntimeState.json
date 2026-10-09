@@ -849,6 +849,8 @@
     "hybrid_workspace_facts": {"type": "object"},
     "hybrid_workspace_heads": {"type": "object"},
     "hybrid_workspace_claims": {"type": "object"},
+    "hybrid_runtime_installation_intents": {"type": "object"},
+    "hybrid_runtime_installation_publications": {"type": "object"},
     "tool_sources": {
       "type":"object","additionalProperties":{"$ref":"ToolLedger.json#/$defs/source"}
     },

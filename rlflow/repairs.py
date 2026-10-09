@@ -51,6 +51,8 @@ def validate_stage(state,stage):
 
 def prepare(store,rid):
     """Create a bounded Engineer/Evaluator task sharing its package's resource pool."""
+    from .hybrid_runtime_boundary import check_legacy
+    check_legacy(store.root)
     from pathlib import Path
     import subprocess
     from .policy import new_stage,available
@@ -88,11 +90,14 @@ def prepare(store,rid):
 
 def promote(store,rid):
     """Verify the fixed regression suite, then publish only at an idle boundary."""
+    from .hybrid_runtime_boundary import check_legacy
+    check_legacy(store.root)
     from pathlib import Path
     import os,subprocess,sys,time
     from .releases import freeze,verify
     from .store import atomic,canonical
     state=store.view();repair=state['repairs'][rid]
+    check_legacy(store.root, repair['repo'])
     if repair['status']!='VERIFIED_AWAITING_RELEASE':return False
     if any(x['status'] in {'START_INTENT','RUNNING','RECONCILE'} for x in state['sessions'].values()):return False
     if any(j['status'] in {'START_INTENT','RUNNING','RECONCILE'} for j in state['jobs'].values()):return False

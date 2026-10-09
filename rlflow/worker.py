@@ -31,7 +31,10 @@ def _kill_group(record):
 
 
 def run(path):
+    from .hybrid_runtime_boundary import check_cold_entry, check_request
+    check_cold_entry()
     request = json.loads(Path(path).read_text())
+    check_request(request, Path(path).absolute())
     d = Path(request['directory'])
     artifact_dir=d
     resource_record=request.get("resources")
@@ -121,6 +124,8 @@ def run(path):
         if guard is None:guard=start_guard(d,'role',identity(os.getpid()),request['root'],max(.01,deadline-time.monotonic()),request['id'],spec={'resources':request.get('resources')})
         if stopped(request['root']) or (d / 'cancel').exists() or time.monotonic() >= deadline:
             raise RuntimeError('STOP/cancel/budget after role setup')
+        check_cold_entry()
+        check_request(request, Path(path).absolute())
         with (artifact_dir / 'events.jsonl').open('xb') as out, (artifact_dir / 'stderr.log').open('xb') as err:
             launch={'directory':str(d),'owner':identity(os.getpid()),'root':request['root'],'scratch':request['scratch'],'argv':argv,'environment':env,'generation':request.get('generation'),'session':request['id'],'release_wait_seconds':request.get('release_wait_seconds',60),'deadline':deadline,'resources':request.get('resources')}
             atomic(d/'model-intent.json',canonical({k:v for k,v in launch.items() if k!='environment'}))
@@ -145,6 +150,7 @@ def run(path):
                 require_stage(state,request['stage_id'])
                 if not runnable(state,state['tasks'][request['task_id']]):raise RuntimeError('worker interrupted')
                 if state['paused'] and not request.get('explicit_step') and request['task_id'] not in state.get('autonomous_tasks',[]):raise RuntimeError('worker interrupted')
+            check_request(request, Path(path).absolute())
             atomic(d/'model-release.json',canonical({'identity':owned,'session':request['id'],'started_monotonic':time.monotonic(),'generation':request.get('generation')}))
             model_start = time.monotonic()
             owned = _group_identity(proc.pid)

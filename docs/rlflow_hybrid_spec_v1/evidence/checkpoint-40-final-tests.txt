@@ -1,0 +1,113 @@
+CHECKPOINT40 VERIFIED NONEXECUTING SLICE — NOT COMPLETE GOAL ACCEPTANCE
+Parent39 d598233. Sole writer root. Goal active. USER package-lock untouched.
+Actual root development latest five modules 171 passed in 46.00s; ORIGINAL68804
+terminal exit0/chunkc4bfdf. No concurrent suite/source/test/schema edits.
+Actual development log SHA256:
+4a7b55311704d09f0b47882c8e4aab4a5c4eee27bbd5a39dc02a0551be7c66e3  audit/hybrid-v1/checkpoint-40-installation-service-r5.log
+High readonly scope review no remaining MUST; actual independent final below.
+Root final integration ORIGINAL24171 actual terminal exit0/chunk0a8c91:
+534 passed, 8 existing external H1 skipped, 1 existing Starlette warning,
+345.80s (0:05:45). Actual22 hashes exactly unchanged after original terminal.
+High final independent exact21 ONCE ORIGINAL72861 actual terminal exit0/chunk1cb997:
+534 passed, 8 existing external H1 skipped, 1 existing Starlette warning,
+344.19s (0:05:44). Complete22 SHA before==after==frozen, root independently
+checked current22 after High terminal and actual log hash/tail. No parallel suite.
+Root/High final log SHA256:
+cd5a24f53a180800a3c75cd2e2ac122121d82d7672508742b772a8c3e31ad8d7  audit/hybrid-v1/checkpoint-40-integration-r1.log
+d52e148e08b30f4482b3e9e57c67a97efe814d7210cd02ef40d6ea79844b33c8  audit/hybrid-v1/checkpoint-40-independent-final.log
+Unique central FULL ORIGINAL14894 actual terminal exit0/chunkd5431d:
+1818 passed, 32 existing external H1 skipped, 1 existing Starlette warning,
+678.02s (0:11:18). Complete22 SHA after==frozen.
+Full stdout/stderr SHA256:
+db93c38de55a623c62b5ae80f145f1b9fd89626de70a84c19ed2cf2104d359e8  audit/hybrid-v1/checkpoint-40-full-r1.log
+Actual argv:
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -B -m pytest -q
+stdout/stderr audit/hybrid-v1/checkpoint-40-full-r1.log
+After full terminal: .venv/bin/python -m compileall -q rlflow tests exit0;
+.venv/bin/python -m pip check exit0 (No broken requirements found.);
+git diff --check exit0. No live suite.
+High final STAGED readonly review:31ownfiles=22frozen+9docs; each indexbytes
+SHA==working==frozen,3final and18historical logs actualSHA/summaries match,
+no remaining MUST_FIX. Known stale builder comments NON_BLOCKING. Independent
+git diff/cached --check both actualexit0/chunks56645d/717463. USERpackage-lock
+only??untracked/unstaged. Initial cachedcheck found evidence EOFblank (ordinary
+diff omitted that new file); doc-only trim repaired, subsequent checks exit0.
+Commit pending; Goal remains active and next41actualWorkingPlan not yet built.
+Root targeted stdout/stderr:
+audit/hybrid-v1/checkpoint-40-integration-r1.log
+Actual argv: PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -B -m pytest -q
+tests/test_hybrid_installation_service.py
+tests/test_hybrid_fixture_materials.py
+tests/test_hybrid_runtime_installation.py
+tests/test_hybrid_runtime_boundary.py
+tests/test_snapshot_maintenance.py
+tests/test_engine.py
+tests/test_jobs.py
+tests/test_isolation.py
+tests/test_experiments_v2.py
+tests/test_startup_v3.py
+tests/test_startup_observation.py
+tests/test_resources_v3.py
+tests/test_repairs_v2.py
+tests/test_releases.py
+tests/test_contracts.py
+tests/test_store_policy.py
+tests/test_hybrid_controller_service.py
+tests/test_hybrid_preparation_service.py
+tests/test_hybrid_budget_service.py
+tests/test_hybrid_workspace_service.py
+tests/test_hybrid_workspace_renewal_service.py
+
+Frozen actual22 source/test/schema SHA256 (before root integration):
+5706b9ab3c968fae36ccb0b4e1cee379861d765c877f7738af2d4b95e388d81f  rlflow/hybrid_runtime_boundary.py
+1d14e0449d8e5f2b5c2eac38c208cee552b4522e949fdcdef0f5d9819ce9af42  rlflow/runtime_boundary_policy.py
+f4c554f5d8ab2fd5e80f52754f1b700f845ca8d8f94208e612b697477aaf45ef  rlflow/hybrid_runtime_installation.py
+ae49fa431fe3a41d07cfa8ac620d6a7b0d06d9802717530d0175f9ae0f7d10e7  rlflow/hybrid_fixture_materials.py
+20644477c6e1d58b8843b9c04d47acd62d69e382ebd4eb7d220b102606d2c901  rlflow/hybrid_installation_service.py
+3c71ef4caefc5574157c9089bb91725f1c9c5fb5877083800228cc6135ebcf4f  rlflow/engine.py
+803f69fc76b0f4cf23f3b7a20dbde01572435bfd91a2ecaed752ea09734cf96a  rlflow/experiments.py
+cac35f28a6e81898dbb1f60e6260f17fafe8ab5d4a5fe4b5845b0d657cb1e81d  rlflow/isolation.py
+b77738df92f90b255805cf4a86adedfc72a6afad3341700a201254896a8c4a37  rlflow/jobs.py
+c00f6c5f2079ecb44c4dd09875781b332ce8a2d2fba6768dc06e30441e7f4852  rlflow/lifeguard.py
+16b979d9f7ecf6db8a6efc7c35a982c5f82cba8e4c1e82d377bf68d2d670d97c  rlflow/repairs.py
+6336e6efca6133c8d40501c808190b871b80bc3bbeca9f25b20deaa8a875f64a  rlflow/resources.py
+ec5ba2cd4b75ea0356abc73ce495f87a55fdffc78a53a3b8a8bcfd5da6016e65  rlflow/startup.py
+ed2b0ca9a8c20956d2d195e60a86da0cbbe2447c166a8cbe12aea772df7e48bc  rlflow/worker.py
+b958d069bbfff722be85ccb8b757d9b105da86a0912a496c8f4d6c7dc4c5f70e  rlflow/store.py
+44cab6c04e48ede1d39e0871490d80f60561602b3a54598e90ee7ff747e51c3e  rlflow/contracts.py
+67c0d21a80c3b3b8f1170cddaf7ca3cca003199c4c516ff017793f9137bdf4c5  rlflow/snapshot_maintenance.py
+fe9def5627fdf4263c7841cc6dfde6fdac9be96895e94c3d4c5f32b161a3b68e  schemas/RuntimeState.json
+d627f6bd761d16b685bf765efe3d36e80237b4928ba62b93423ab52a7ca8cf6f  tests/test_hybrid_runtime_boundary.py
+4196e5b67091e550d68eaa2ddf6e39653f91e67cfc7f61e8ef84e45c199b9aa1  tests/test_hybrid_runtime_installation.py
+47129b029a626b45463be2986624ad362016ea36838e565e89ef0272008cf292  tests/test_hybrid_fixture_materials.py
+394f06918320beef9089ee0eb891f859e994898ecc4ceea53dbdd734c7520d15  tests/test_hybrid_installation_service.py
+
+Scope: mandatory release-local legacy-denial guards; actual NEW private fixture
+bootstrap code-only material; immutable original INTENT -> descriptor-relative
+kernel no-replace publish + fsync -> exact original READY CAS1->2. All execution/
+release flags false, no runtime grant. Heavy file hash/copy outside writer.
+Not existing namespace migration/upgrade/old binary fencing/sameUID OS protection;
+not WorkingExecutionPlan/UsageOwner/shared pool/REGISTER/release/reliable STOP;
+no new browser/NFR06/B1/24hfixture/8hUI/completeT12/M1/M0-M5 acceptance.
+All code/tests/schema remained frozen through root/High/full actual terminal
+results;22 hashes unchanged. No new browser/performance/soak/offline18 run.
+
+Actual historical development log SHA256 (all terminal, failures retained):
+a4bce7c4db793ea29a6b29694be0195cafd5bd81fe306d4c0f706a26485baff3  audit/hybrid-v1/checkpoint-40-boundary-r1.log
+ab12cedf1cb9eea2ed49d8dfbdfb8230c00888857c7dc653540e2b2ea28db48d  audit/hybrid-v1/checkpoint-40-boundary-r2.log
+e8c24a17937c499bac143fcb02bafe262c5c5efd406c1b0a1f17afb3d7c0328c  audit/hybrid-v1/checkpoint-40-boundary-r3.log
+d33fae7cffb3dfef5ff6a85f372a1a926bfc9608797abd84c74e23048e1a21f1  audit/hybrid-v1/checkpoint-40-boundary-r4.log
+d04fdeff13d0405eaf0bd7998c5005e74cbb2a1f510d6906aa31756e01e97929  audit/hybrid-v1/checkpoint-40-legacy-impact-r1.log
+b93d94bfc582a5b1b5f20f069da1284922c1863abefd40ed2d9531e837816127  audit/hybrid-v1/checkpoint-40-legacy-impact-r2.log
+3c3030a3e507a2f6609270e34dedcf3dfa23951040759e232d6445bbe9bb7399  audit/hybrid-v1/checkpoint-40-legacy-impact-r3.log
+73cc3a48b057dfe4c97c164159b62e3ac06db7c0d14d802e91c5ae8423600b8e  audit/hybrid-v1/checkpoint-40-installation-domain-r1.log
+168bb88573b44876966c64ec2dc2b9e030fc7635ca0b18538678f1c492c97ea2  audit/hybrid-v1/checkpoint-40-installation-domain-r2.log
+07a12ac6a660e43f29f886815721118e995176ae6e63aac81342c95e1e05a28d  audit/hybrid-v1/checkpoint-40-installation-domain-r3.log
+644aa1794797d61bce96649f531bb9993abfde9f3e86cc66c6240f11e966e80d  audit/hybrid-v1/checkpoint-40-fixture-material-r1.log
+d5b865b8cb8b04547ab8e1eb28a0b72436e30c2f06aa20fbd3494b940efd21d4  audit/hybrid-v1/checkpoint-40-fixture-material-r2.log
+f21f6cdf6bbed4388f116746bbe962ca01a9bf5ca6f16f37ec9208a9c195ab0e  audit/hybrid-v1/checkpoint-40-fixture-material-r3.log
+be9c4d325ad75b81ed6fb971acee5894f7c527e9b5b1ffdfe861949f736507d2  audit/hybrid-v1/checkpoint-40-installation-service-r1.log
+9d19cd66bd90eccb78ee38605511779c3f785e1f731fc7dcbc0a062eb2c1c2a4  audit/hybrid-v1/checkpoint-40-installation-service-r2.log
+ee097a1f603fc314b616379ecde4d5cea5919e849ed962df1a863d11946db272  audit/hybrid-v1/checkpoint-40-installation-service-r3.log
+07f441748526cfaa694bca058104fc74b1737af6e0422bafbc840f21fa35c7b1  audit/hybrid-v1/checkpoint-40-installation-service-r4.log
+4a7b55311704d09f0b47882c8e4aab4a5c4eee27bbd5a39dc02a0551be7c66e3  audit/hybrid-v1/checkpoint-40-installation-service-r5.log

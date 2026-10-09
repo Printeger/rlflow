@@ -230,6 +230,8 @@ def packet(store, state, task, session):
 
 
 def dispatch_one(store, *, allow_paused=False):
+    from .hybrid_runtime_boundary import check_legacy
+    check_legacy(store.root)
     with store.lock('scheduler'):
         snapshot=store.control_view()
         if stopped(store.root) or bool(store.objects('sessions',ACTIVE)):return None
@@ -255,6 +257,8 @@ def _dispatch_one(store, *, allow_paused=False):
     STOP, active-session, candidate, approval and budget gates still apply.
     Daemons never pass allow_paused.
     """
+    from .hybrid_runtime_boundary import check_legacy, check_request
+    check_legacy(store.root)
     dispatch_generation = daemon_generation()
     # Only a no-work hint: never reserve/prepare from these candidate objects.
     # Keep the original code-generation boundary even on the idle path.
@@ -276,6 +280,7 @@ def _dispatch_one(store, *, allow_paused=False):
     if not queued:
         return None
     task = sorted(queued, key=lambda t: (t.get('package_id', ''), t.get('order', 0), t['id']))[0]
+    check_request(task, store.root)
     st = require_stage(state, task["stage_id"])
     current = candidate(task["repo"],task.get("input_contract"))
     expected_candidate = task.get("accepted_candidate", task["baseline"])
@@ -334,6 +339,7 @@ def _dispatch_one(store, *, allow_paused=False):
         from .escalations import materialize
         session['escalation_package'] = materialize(directory,task['pending_escalation'])
     def reserve(s):
+        check_request(session, store.root, task['repo'])
         if (s["paused"] and not allow_paused and task['id'] not in s.get('autonomous_tasks', [])) or stopped(store.root):
             raise Conflict("dispatch stopped")
         require_stage(s, task["stage_id"])
@@ -390,6 +396,7 @@ def _dispatch_one(store, *, allow_paused=False):
     frozen = freeze(store.root / 'session_releases')
     if daemon_generation() != dispatch_generation:
         raise Conflict('control source changed during dispatch preparation')
+    check_request(request, store.root, task['repo'])
     with (directory / "supervisor.log").open("ab") as log:
         child = subprocess.Popen([sys.executable, "-m", "rlflow.worker", str(directory / "request.json")],
                                  cwd=frozen, stdin=subprocess.DEVNULL, stdout=log, stderr=log, start_new_session=True)
@@ -418,11 +425,13 @@ def _dispatch_one(store, *, allow_paused=False):
                  "generation":session['generation'],"request_sha256":sha(request),
                  "candidate_sha256":sha(session['before']),"authorization":st['authorization'],
                  "reservation_seconds":session['limit'],"resources":session.get("resources")}
+        check_request(request, store.root, task['repo'])
         store.transact('ROLE_RELEASE_COMMITTED',sid+':release-committed',
                        lambda s:s['sessions'][sid].update(launch_phase='RELEASE_COMMITTED',release_binding=binding),
                        expected=latest['version'],object_id=sid)
         from .startup import record
         record(directory,'RELEASE_COMMITTED',binding)
+        check_request(request, store.root, task['repo'])
         atomic(directory / "release", canonical(binding))
     except Conflict:
         atomic(directory / "cancel", b"authorization/STOP/candidate changed before release")
@@ -900,6 +909,8 @@ def reconsider_result(store, sid):
 
 
 def _schedule_pending(store):
+    from .hybrid_runtime_boundary import check_legacy
+    check_legacy(store.root)
     from .repairs import prepare, promote
     for rid, repair in store.objects('repairs',{'NEEDS_ISOLATED_CANDIDATE','VERIFIED_AWAITING_RELEASE'}):
         state=store.view();package=state.get('packages',{}).get(repair['stage_id'])

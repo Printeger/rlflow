@@ -124,6 +124,8 @@ def admit(policy, group_record=None, disk=None):
 
 
 def reserve_task(store, stage, session_id):
+    from .hybrid_runtime_boundary import check_request
+    check_request(stage, store.root)
     import json
     policy=stage.get('resource_policy')
     if policy is None:return None,None,None

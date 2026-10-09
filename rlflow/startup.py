@@ -20,6 +20,8 @@ def record(directory, phase, binding):
 
 
 def validate_release(request, release, process):
+    from .hybrid_runtime_boundary import check_request
+    check_request(request)
     if release.get('session')!=request['id'] or release.get('identity')!=process:
         raise Conflict('release identity mismatch')
     if request.get('recovery_protocol',1)<2:return

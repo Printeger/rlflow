@@ -89,6 +89,10 @@ def maintain(store,*,seconds=5,max_bytes=32*1024*1024,max_rows=100000,max_nodes=
                 workspace_events={key:store._workspace_event(db,key,max_bytes=max(0,min(budget[0],1024*1024)),_parse=source_parse,_decode=decode)
                                   for key in state.get('hybrid_workspace_facts',{})}
                 workspace_summary=store._workspace_summary(db,version)
+                from .hybrid_runtime_installation import SECTIONS as installation_sections
+                installation_events={key:store._installation_event(db,key,max_bytes=max(0,min(budget[0],1024**2)),_parse=source_parse,_decode=decode)
+                                     for section in installation_sections for key in state.get(section,{})}
+                installation_summary=store._installation_summary(db,version)
             check()
             from .contracts import validate_runtime_state
             validate_runtime_state(state);check()
@@ -106,6 +110,8 @@ def maintain(store,*,seconds=5,max_bytes=32*1024*1024,max_rows=100000,max_nodes=
             budget_complete(state,registration,budget_events.get,event_summary=budget_summary);check()
             from .hybrid_workspace import validate_complete as workspace_complete
             workspace_complete(state,registration,workspace_events.get,event_summary=workspace_summary);check()
+            from .hybrid_runtime_installation import validate_complete as installation_complete
+            installation_complete(state,registration,installation_events.get,event_summary=installation_summary);check()
             raw=canonical(state);check()
             if len(raw)>max_bytes:return False
             digest=hashlib.sha256(raw).hexdigest();check()

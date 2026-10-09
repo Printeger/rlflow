@@ -1,0 +1,185 @@
+CHECKPOINT40 HISTORICAL DEVELOPMENT — NOT execution authority
+Superseding actual final evidence: checkpoint-40-final-tests.txt. Root/High exact
+21 each534passed/8existing skips/1warning345.80s/344.19s; central original14894
+terminalexit0/chunkd5431d1818passed/32existing skips/1warning678.02s. Complete22
+SHA unchanged; compileall/pipcheck/diffcheck exit0. Below WIP/absent/LIVE claims
+are historical phase records, NOT current status. No runtime/WorkingPlan/old
+installation migration/completeGoal acceptance. Goal active.
+Parent checkpoint39 d598233, sole writer root. USER package-lock.json untouched.
+No paidmodel/API/GPU, protected workspace mutation, push or public hosting.
+Prefix: PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q
+Serial suites; no source/test/schema edits while any suite is live.
+
+boundary-r1 direct ACTUAL exit0: 41passed0.25s.
+Only tests/test_hybrid_runtime_boundary.py, BEFORE independent static MUST repair.
+Finite original filesystem/catalog/alias/missing/damaged material probes; 16
+protected legacy entry negative cases deny BEFORE Popen/resources/identity IO.
+Actual isolated file entry processes: CPU _supervised/_child, fake child/
+supervisor and missing mandatory policy. No payload executes in protected scope.
+This fixture manually generates its own bound policy; NOT a production installer
+or persisted Store/project/epoch/genesis original-proof acceptance.
+
+High static MUST: policy source single bounded NOFOLLOW/NONBLOCK FD needed;
+catalog parent chain was closed before absolute file open, permitting rebind.
+Repair: original policy FD regular/nlink/cap+stamp+source path proof, compile
+original bytes rather than timestamp .pyc; original catalog inode and retained
+ancestor/parent dirfds, relative open, same fd/file/parent chain/stamp after read.
+Closed actual integer chain/identity length, NUL and affected path caps added.
+
+boundary-r2 direct ACTUAL exit1:45passed1failed0.29s.
+Actual parent rename during relative os.open correctly denies; test expected
+specific 'parent changed' reason, but BoundaryDenied subclasses PermissionError/
+OSError and _held_chain unnecessarily wrapped it into generic chain unavailable.
+No bypass occurred. Production preserves original BoundaryDenied before its
+general OSError handler; no validation/denial gate weakened.
+boundary-r3 direct ACTUAL exit0:46passed0.28s.
+Same module, plus actual parent rebind, actual cold FIFO policy (no blocking),
+boolean chain/identity denial and NUL/cap tests. Both static MUST pending High
+closure verification. No final independent/full/installer/40commit claim.
+
+legacy-impact-r1 ORIGINAL31773 ACTUAL terminal exit1, chunk77dd8e:
+147passed/8failed/8existing external skips96.02s. No source/test/schema edits
+during live run. All8 failures in old isolation tests: final guard after actual
+Landlock cannot read trusted mandatory policy (Errno13), so legitimate CPU
+payload never executes; doctor/six-role/scope/timeout/cleanup evidence fails.
+This is a production placement regression, not an ignored/flaky test failure.
+After terminal, move final guard immediately BEFORE _restrict; preserve initial
+cold guard and all BOUND denials. Do NOT grant sandbox read access to control
+policy/catalog. Independent High static agrees this specific repair and scope.
+tests/test_hybrid_runtime_boundary.py tests/test_engine.py tests/test_jobs.py
+tests/test_isolation.py tests/test_experiments_v2.py tests/test_startup_v3.py
+tests/test_startup_observation.py tests/test_resources_v3.py
+tests/test_repairs_v2.py tests/test_releases.py
+stdout/stderr audit/hybrid-v1/checkpoint-40-legacy-impact-r1.log.
+legacy-impact-r2 ORIGINAL62631 ACTUAL terminal exit0, chunkda5567:
+155passed/8existing external skips95.77s. Same exact10 modules and prefix;
+actual CPU usability/sixroles/OS denial/scope/timeout/owner-death cleanup restored.
+Only binds source BEFORE subsequent stronger BOUND cold-entry gate.
+
+High scoped MUST: cold held-role/raw worker cannot infer actual operation scope
+from caller-provided foreign root/scratch; arbitrary argv may mention protected
+paths. Repair check_cold_entry() takes NO request arguments, only exact explicit
+UNBOUND may return; valid/damaged/missing BOUND rejects all raw child execution.
+Seven cold families check BEFORE request read/JSON parse/dispatcher exec/IO;
+CPU final trusted gate stays BEFORE Landlock, no control-file read grant.
+boundary-r4 direct ACTUAL exit0:61passed0.75s (same component module).
+Adds7 families x2 actual cold subprocess cases: foreign-scope arbitrary argv/
+command pointing at protected sentinel, and FIFO/invalid JSON BEFORE parsing;
+exact BOUND-denial reason, no sentinel/no new request-directory artifacts.
+High readonly scoped closure no remaining MUST; no independent test run.
+Source/installer/WorkingPlan acceptance and latest affected10 rerun still absent.
+Superseding component status: High scoped cold MUST closed, readonly/no tests.
+legacy-impact-r3 ORIGINAL22007 ACTUAL terminal exit0, chunkd01b1a:
+170passed/8existing external skips93.66s. Same exact10 argv modules, prefix and
+new61 component included; latest code source/tests/schema frozen throughout.
+No live suites. No final40 independent/full/installer/WorkingPlan acceptance.
+
+Installation domain prototype (NOT Store/schema wired):
+installation-domain-r1 direct ACTUAL exit1:9pass11fail0.24s.
+Prototype confused prefixed core HASH with unprefixed raw file/catalog hashes;
+positive fixture request digest also wrong. Negatives passing in that run are
+NOT credited as semantic proof because the positive never passed validation.
+Separate RAW_HASH fields from core digest; installation-domain-r2 direct
+ACTUAL exit0:20pass0.11s (tests/test_hybrid_runtime_installation.py).
+High pure seal MUST: catalog/descriptor could say BOUND while manifest policy
+hash independently claimed unrelated bytes. Shared deterministic policy_source
+closes manifest policy hash; bootstrap template hash derives exactly from
+manifest minus generated policy. New descriptor/policy/template mismatch cases.
+installation-domain-r3 direct ACTUAL exit0:84pass0.81s, modules
+test_hybrid_runtime_installation + test_hybrid_runtime_boundary.
+Pure complete event_summary made mandatory, no omitted empty source proof.
+
+Actual fixture material prototype:
+fixture-material-r1 direct ACTUAL exit2:1collection error0.10s, NO tests run;
+incorrect import observation.initialize, actual interface is observation.enable.
+Repair exact existing interface, no acceptance gate weakened.
+fixture-material-r2 ORIGINAL48641 ACTUAL terminal exit0/chunk9e23f0:
+95passed6.07s, exact modules tests/test_hybrid_fixture_materials.py
+tests/test_hybrid_runtime_installation.py tests/test_hybrid_runtime_boundary.py.
+Actual new private fixture directory, real Store/fixture observer epoch/core0,
+main DB inode pin, original owner/chains/namespace/catalog/policy-source/full
+bounded copy+fsync/manifest identity, original immutable material object/raw/path.
+Actual altered policy/catalog/extra/oversize file/destination/namespace denied;
+copied or changed original material denied; failed preparation retains the SAME
+blocked attempt without remint; FIFO read nonblocking regular-file denial;
+actual generated BOUND cold child denies before any business payload/INTENT.
+publish() still ALWAYS denies absent original core INTENT owner. No Store domain
+event/schema/owner/published bootstrap/WorkingPlan/live execution acceptance yet.
+Current actual fixture/pure scope under High readonly review, no live suites.
+
+Installation-service-r1: ORIGINAL49685 actual terminal exit1/chunkb87ad2.
+124 passed, 3 failed in 27.03s. Two positive fixture failures used Store.view,
+which intentionally hides PRIVATE_HOT_SECTIONS; corrected tests to replay.
+Third actual durable COMMIT lost-return was masked by _held_chain catching
+dependent body OSError as path failure. Fixed catch scope to open/walk only;
+original dependent failure is now preserved. No relaxation of grants or gates.
+be9c4d325ad75b81ed6fb971acee5894f7c527e9b5b1ffdfe861949f736507d2  audit/hybrid-v1/checkpoint-40-installation-service-r1.log
+Installation-service-r2: ORIGINAL73641 actual terminal exit0/chunkfcaac4.
+127 passed in 26.91s. Actual argv (same r1/r2 four modules):
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -B -m pytest -q
+tests/test_hybrid_installation_service.py tests/test_hybrid_fixture_materials.py
+tests/test_hybrid_runtime_installation.py tests/test_hybrid_runtime_boundary.py
+9d19cd66bd90eccb78ee38605511779c3f785e1f731fc7dcbc0a062eb2c1c2a4  audit/hybrid-v1/checkpoint-40-installation-service-r2.log
+High MUST: automatic maintenance omitted installation original sources/tipCOUNT;
+final source proof could cross witness deadline after last early check. Patched
+both and added actual maintain/due-retention and AFTER-final-point deadline tests.
+Installation-service-r3 ORIGINAL78007 actual terminal exit0/chunkbd0e1c:
+157 passed in 32.46s, five modules adding tests/test_snapshot_maintenance.py.
+High readonly confirms both INTENT MUST closed; no High tests/edits.
+ee097a1f603fc314b616379ecde4d5cea5919e849ed962df1a863d11946db272  audit/hybrid-v1/checkpoint-40-installation-service-r3.log
+Then implement actual original core INTENT -> descriptor-relative Linux
+renameat2(RENAME_NOREPLACE) -> parent fsync -> original publication witness ->
+fresh original READY CAS1->2. No overwrite fallback, material/IDs/seal retained
+on all unknown returns. Caller move cannot directly issue READY; explicit fixed
+owner reconcile rechecks original material/core seal and fsyncs original parent.
+Installation-service-r4 ORIGINAL84621 actual terminal exit1/chunkb6fb9c:
+165 passed, 1 fixture failed in 49.04s. Actual publication/READY, original
+duplicate, full audit/snapshot/recover/maintenance succeeded; cold check used
+worker.py as a raw script, failing on relative import BEFORE boundary guard.
+This failed invocation is not a cold denial proof. Fixture corrected to actual
+package import/run in -B -I subprocess using the original fixed release path.
+07f441748526cfaa694bca058104fc74b1737af6e0422bafbc840f21fa35c7b1  audit/hybrid-v1/checkpoint-40-installation-service-r4.log
+Installation-service-r5 ORIGINAL68804 actual terminal exit0/chunkc4bfdf:
+171 passed in 46.00s, same five modules; extra tests cover
+parent fsync BEFORE/AFTER return loss, missing libc no-replace with no fallback,
+READY AFTER final original source point deadline (new and duplicate). Correct
+actual package cold worker denies BOUND BEFORE missing request IO. High readonly
+publication/READY review no remaining MUST. No High tests/edits. Log SHA:
+4a7b55311704d09f0b47882c8e4aab4a5c4eee27bbd5a39dc02a0551be7c66e3  audit/hybrid-v1/checkpoint-40-installation-service-r5.log
+22 ownsource/test/schema frozen; final21modules root ORIGINAL24171 LIVE.
+No parallel suite. No final40/full/independent/commit or WorkingPlan/runtime/
+complete Goal acceptance.
+
+Fixture-material-r3: ORIGINAL session84179 actual terminal exit0/chunk995016.
+Actual argv: PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -B -m pytest -q
+tests/test_hybrid_fixture_materials.py tests/test_hybrid_runtime_installation.py
+tests/test_hybrid_runtime_boundary.py
+Result: 110 passed in 14.43s; serial, no source/test/schema edits during suite.
+Actual closed-stage root extras/cache/empty directory/private/nonregular denial,
+1026-file bound; retained source FD graph and captured file stamps deny actual
+private-template file/directory swap-read-restore; final sync/catalog/owner and
+inventory cooperative deadlines deny. Cold stage uses -B so no cache adoption.
+Repeated completed prepare verifies original bytes again; no publish/capability.
+High readonly builder-only three MUST closure confirmed; no tests/edits by High.
+This is NOT final40 independent/full proof.
+f21f6cdf6bbed4388f116746bbe962ca01a9bf5ca6f16f37ec9208a9c195ab0e  audit/hybrid-v1/checkpoint-40-fixture-material-r3.log
+fbd7db4408033da1ad0277b18329ce637f2d8970602edf0000941909238a0423  rlflow/hybrid_fixture_materials.py
+47129b029a626b45463be2986624ad362016ea36838e565e89ef0272008cf292  tests/test_hybrid_fixture_materials.py
+
+Component source SHA at boundary-r3 terminal (NOT final40 freeze):
+4d9783d32628904b09f16cac26194f514c08580653da1a3cfa3330cb274576c0  rlflow/hybrid_runtime_boundary.py
+1d14e0449d8e5f2b5c2eac38c208cee552b4522e949fdcdef0f5d9819ce9af42  rlflow/runtime_boundary_policy.py
+55f7c8e8844a39fae2964ecfea84c2d87c8c826e20ed7486358af7d4f9d33b4f  tests/test_hybrid_runtime_boundary.py
+Local actual terminal logs SHA256:
+a4bce7c4db793ea29a6b29694be0195cafd5bd81fe306d4c0f706a26485baff3  audit/hybrid-v1/checkpoint-40-boundary-r1.log
+ab12cedf1cb9eea2ed49d8dfbdfb8230c00888857c7dc653540e2b2ea28db48d  audit/hybrid-v1/checkpoint-40-boundary-r2.log
+e8c24a17937c499bac143fcb02bafe262c5c5efd406c1b0a1f17afb3d7c0328c  audit/hybrid-v1/checkpoint-40-boundary-r3.log
+
+Source checkout has explicit LEGACY_UNBOUND policy. This is NOT migration of
+checkpoint39 namespaces or an existing installed old release. Old binary/cached
+process and sameUID noncooperative source replacement are outside cooperative
+entry fencing; no OS-blockade claim. Guarded fresh installer, immutable Store
+binding/original event proof, tombstone/upgrade protocol and actual nonexecuting
+WorkingExecutionPlan still absent. No runtime grant, shared host pool, trusted
+UsageOwner, REGISTER/release/reliable STOP, new browser/NFR/B1/24h/8h proof or
+complete T12/M1/M0–M5 acceptance. Goal remains active.
