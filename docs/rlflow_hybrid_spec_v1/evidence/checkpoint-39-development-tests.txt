@@ -1,0 +1,126 @@
+CHECKPOINT39 DEVELOPMENT — not final validation or execution authority
+Final superseding status: root ORIGINAL1676 / High ORIGINAL31145 exact12
+ACTUAL terminal exit0, 408pass each (230.29s/228.66s); central ORIGINAL98257
+ACTUAL terminal exit0, 1671pass/32existing skips/1existing warning633.86s.
+All24 frozen SHA match; compileall/pipcheck/diff ACTUAL exit0. No live suites.
+Final source proof/log hashes in checkpoint-39-final-tests.txt. LIVE/no-final
+statements below are retained chronological development stages, not current.
+Parent checkpoint38 fcfcb4f. USER package-lock.json untouched/unstaged.
+Prefix PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q
+Serial, no source/test/schema edits while live suites; original sessions
+polled to actual terminal. No paidmodel/GPU/protected workspace writes.
+
+renewal-component-r1 direct actualexit0:116passed0.76s.
+Modules: test_hybrid_workspace_renewal, test_hybrid_working_copy,
+test_hybrid_workspace_kernel, test_hybrid_snapshot (tests/*.py).
+BEFORE independent static partial-memory-update MUST repair; not final proof.
+commit-context-r1 original70931 actualexit0:65passed5.84s.
+Modules: tests/test_hybrid_commit_context.py tests/test_hybrid_controller_service.py.
+Actual internal context spans body/finalcheck/SQLCOMMIT/postsuccess callback;
+real SQLite COMMIT before/after raise never calls success hook, actual table
+commit probe distinguishes committed from rolled back. Body/contextenter/
+postcommit failures clear actual active Controller context and permit retry.
+renewal-component-r2 original67412 actualexit0:121passed0.81s.
+Same four modules as r1, after canonical pending/absolute epoch repair.
+FaultSlot raises AFTER each observation/epoch assignment; same original
+pending repairs partial activation, epoch exactly2, same FD retained.
+FaultRegistry raises AFTER attach/abort/retire canonical mutation; lost-return
+attach retained/reachable by actual slot, blocks repeat issuance; deleted
+registry has no second slot.pending source to leave cleanup permanently blocked.
+At component-r2, no persistent renewal/ACK yet; all runtime gates closed.
+
+commit-context-r2 original87016 actualexit0:68passed6.08s, same two modules.
+High static MUST: context could suppress a failed body/final proof, making
+outer SQLite connection normal-exit auto-COMMIT unvalidated writes.
+Protected exit wrapper now always returns False, regardless of held context.
+Three suppression phase tests verify actual disposable SQL table rollback.
+commit-context-r3 original31335 actualexit0:70passed6.22s, same two modules.
+Adds pure after_final_sample and post-COMMIT failure suppression cases: first
+four phases leave no durable table, post-COMMIT table durable but error still
+propagates, never silent success. Actual Controller active always cleared.
+High static both pending and context MUST closed; no independent tests run.
+
+Service wired afterwards: actual prepare pending, source-bound owned writer
+renewal, held Workspace/Working locks THROUGHCOMMIT/activation, original
+private pending ACK/current exactHEAD/historical sourceproof/Kernel, expired
+candidate as cleanup lineage only, explicit definite-uncommitted abort proof.
+service-r1 original86824 actualexit1:6passed/1fixture failure/1existing warning8.80s.
+Fixture incorrectly claimed original Controller default60s; actual token30s
+expires when testing candidate expiry31s. Product correctly rejected expired
+Controller. Fixed fixture to obtain real fresh Controller.acquire at state8
+(new state9), then close at9/10; no production deadline weakening.
+service-r2 original94432 actualexit0:31passed/1existing warning72.44s, exact modules:
+tests/test_hybrid_workspace_renewal_service.py tests/test_hybrid_workspace_service.py
+Source/tests/schema remained frozen; no parallel suites/benchmarks.
+service-r3 original6590 actualexit0:10passed/1existing warning12.42s.
+High request-poison MUST: rejected scope previously bound entry.request too
+early, blocking valid retry and abort. Bind after candidate/current original
+HEAD/claim/source/guard proof, before actual write attempt; wrongworkspace/
+reservation/goal rejected then Service abort or correct retry succeeds.
+service-r4 original84168 actualexit0:12passed/1existing warning15.40s.
+Refresh original actual Prep MaterialWitness OUTSIDE writer/Service/Working
+locks. Recheck actual slot before attaching candidate+fresh witness; existing
+pending never reissued. Two realController+Workspace renewals at20s/40s use
+same FD, epochs2/3, actual Store.lock(nonblocking) fileverify probe outsidewriter.
+Service partial memory assignments now include witness swap fault.
+service-r5 original59624 actualexit0:14passed/1existing warning18.33s.
+High lost-attach canonical-gate MUST: Working pending could exist while Service
+entry absent. Nonrenew record/actualguard/physicalclose now check BOTH canonical
+Working identity and Service entry under same locks. FaultRegistry attachAFTER
+and Service attachBEFORE: close_request denied/no event, same actual pending
+recovered through Service.prepare, Service.abort, two-phase close succeeds.
+service-r6 original45491 actualexit0:17passed/1existing warning22.63s.
+Budget CANCEL/UNKNOWN first wins current CAS, renewal denied/FD held, explicit
+abort then historical close succeeds. Actual writer lock wait advances OLD
+Working mono beyond30s but candidate60s/Controller still valid; no revive/fact,
+FD held and Service abort works. No live tests at r6 terminal.
+r3-r6 exact single module tests/test_hybrid_workspace_renewal_service.py.
+No final independent suite/full/39commit yet; High only static reads.
+
+service-r7 original54605 actualexit0:20passed/1existing warning26.46s.
+Original Working retirement deletion succeeded then return fault: Service still
+holds original ACK, confirms actual current candidate and retries; epoch2.
+Two real bounded threads samepending/differentkeys: one durable winner/one
+Conflict-or-PermissionError, no ABBA. CLOSE_REQUESTED before candidate denies
+renew, explicit Service abort then original two-phase close works.
+service-r8 original39324 actualexit1:22passed/1fixture failure/1teardown error/
+1existing warning31.78s. Actual metadata-corruption fixture used nonexistent
+SQL column inputs instead of input_versions, so did NOT reach corruption proof;
+unresolved pending correctly denied fixture's naive close at teardown.
+Original pytest process actually terminated, no live process/FD adoption.
+Fixed ONLY three fixture SQL references to actual input_versions.
+service-r9 original57378 actualexit0:23passed/1existing warning31.22s,
+single renewal-service module; actual metadata corruption now reached, ACK
+rejects, original fixture bytes/trigger restored then same original pending
+ACK and audit=replay succeed. Service Kernel case injects proof failure,
+not actual service-level unlock; foreignPending is not cross-process restart.
+Final root12 original1676 LIVE; frozen24 in checkpoint-39-final-tests.txt.
+No final independent/full/39commit claim.
+
+Local terminal log SHA256:
+48be045beeb906031d5c763a39d8ded3f03e3ba4c5d88c4f8980afa272673bce  audit/hybrid-v1/checkpoint-39-renewal-component-r1.log
+dfbab23a2aeb5d1d9c0e1e34b89822552d934786c99cfd83a38a5c427bac0def  audit/hybrid-v1/checkpoint-39-commit-context-r1.log
+26496b7a091eeb6c734b3b16adbbf144071bdedf62d470a85618ff8aab3cf7cb  audit/hybrid-v1/checkpoint-39-renewal-component-r2.log
+678a36e84310042a17dfa75bd6ddac0e3eefb4589f443b381e6cd61b66d716fa  audit/hybrid-v1/checkpoint-39-commit-context-r2.log
+15cb54f4af22583223cb1b96c5e19b9f4b62d97a0f66caa1e7e9838e2e7591b8  audit/hybrid-v1/checkpoint-39-commit-context-r3.log
+8aadee43f80a62710e4b4596e54b7afb09cf46c211c3c313fee17663331eca9e  audit/hybrid-v1/checkpoint-39-renewal-service-r1.log
+6ffc5bd1bb101a34ee47b47b66edd06df0d60f10bf77da6913220a0e4926f280  audit/hybrid-v1/checkpoint-39-renewal-service-r2.log
+ee253bb1c0dd63d139e23a3ec07abb183e1ff7be8b7fc9736d9ecb6ac56fda1b  audit/hybrid-v1/checkpoint-39-renewal-service-r3.log
+9e064d43f534268a5ccca2b54b0068707275e036e3cf20f7dfe48b1172c79cdf  audit/hybrid-v1/checkpoint-39-renewal-service-r4.log
+f49d6afb4fdeba32edefd001b66b27226a3228c073b4961fb524cfd98cc20a1e  audit/hybrid-v1/checkpoint-39-renewal-service-r5.log
+c1147dd51b5f1011e862919a3b080029daf89865cda1f44392b34ea9527189f4  audit/hybrid-v1/checkpoint-39-renewal-service-r6.log
+779909e5c73a50c5db814d786e9b3eb2537d707e9edf89e1d5b3fbcf24b5fbb8  audit/hybrid-v1/checkpoint-39-renewal-service-r7.log
+964ac3a0822ca6e2085e626920f4153918f68906683926b1484ef539cf6e2fe1  audit/hybrid-v1/checkpoint-39-renewal-service-r8.log
+e1a90069b4d5b5a0772ed1172fad8c4f74afa2845334c206eab459b1e21baa6b  audit/hybrid-v1/checkpoint-39-renewal-service-r9.log
+
+Working helper/test SHA at component-r2 actual terminal:
+11e43e053a85c6a0441cf8f3e1ef396c0b9573a1794e17e6c0535c062d7de2dc  rlflow/hybrid_working_copy.py
+f747a66517602b70651365822889c45855a79444b0ecd2d02ac2fa27fbe1b7df  tests/test_hybrid_workspace_renewal.py
+
+Controller/helper test SHA at commit-context-r3 actual terminal:
+b9bf6107feacdce7f606496c33e99e8227429cfe6bb70bac89134a6ba2ee667c  rlflow/hybrid_controller_service.py
+ba7b5e95af099544a20d94a9c8e047b84af6e6b004d1560c7cef99f2bac6b865  tests/test_hybrid_commit_context.py
+
+Service/test SHA at service-r6 actual terminal (not final freeze):
+8ad51ad67bb2b96103058033b8cb39de02c536ea46f4874448bfa698f223795d  rlflow/hybrid_workspace_service.py
+114f73fcffa470cc8f4a2874c11a6bcc90ed2a567a9a2eb4ee340f4bff5eb1a5  tests/test_hybrid_workspace_renewal_service.py

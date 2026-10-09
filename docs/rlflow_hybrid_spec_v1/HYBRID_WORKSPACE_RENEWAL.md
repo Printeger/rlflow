@@ -1,6 +1,16 @@
-# Workspace transactional renewal：checkpoint39 设计，尚未实施
+# Workspace transactional renewal：checkpoint39 已验证增量
 
-基于checkpoint38（root/High九modules各358pass，中央full原95667实际1621pass/32既有skip/1warning589.10s）。此文件是下一阶段设计，不是39新运行证据或权限。38服务renew继续拒绝，全部runtime门仍关闭。独立High只读设计已复核以下故障边界。
+基于checkpoint38 `fcfcb4f`，39实际实现与最终验证：root/High同十二modules各408pass（230.29s/228.66s），中央full原98257实际exit0，1671pass/32既有skip/1既有warning633.86s；24SHA一致、范围无剩余MUST、compileall/pipcheck/diff0。最终证据见evidence/checkpoint-39-final-tests.txt，阶段失败/修复保留在checkpoint-39-development-tests.txt。全部runtime门仍关闭；这是执行前协作hold续期，不是完整T12或M0–M5验收。
+
+## 当前实际候选接口
+
+WorkspaceService.prepare_renewal(actual_old, ttl_seconds)在writer/Service/Working锁外重新核验原准备物料并签发actual MaterialWitness，重核原actual slot后生成或找回同一原PendingRenewal；现存pending不重签、续时或换epoch。Working使用单一canonical registry附着/退休/abort，lost-return通过原actual current slot可达；所有非renew写同锁核Service与Working两层pending identity，避免Service挂接失返漏挡后续关闭。
+
+record(renew request, actual Controller token, actual PendingRenewal)同writer核当前source/HELD/claim/原HEAD与原旧、新obs，再绑定实际写尝试request/fact；错误workspace/reservation/goal请求不得污染原pending。Controller内部held context覆盖实际COMMIT及memory-only激活；context不得吞异常导致SQLite外层自动提交。helper激活用原候选与绝对epoch，可修复每次字段赋值后的中间异常；Service交换原候选/实际fresh witness，保留原memory ACK重试。
+
+ack_renewal(original_fact_key, actual_pending)核原完整事件、历史sources/current exactHEAD及实际Kernel，不要求今天human/material/workspace TTL有效；只对齐原候选cleanup lineage。单slot保留最后原ACK对象以支持重复ACK，不覆盖新的未决pending。abort_renewal(actual_pending)须确认未提交原事件及原HEAD（已绑定写尝试时），保留原FD。过期candidate的livecheck仍拒绝；关闭仍要求fresh实际Controller，绝不把ACK当权限刷新或refund。
+
+开发阶段root helper121pass/0.81s、commit-context70pass/6.22s、服务r9 23pass/1既有warn31.22s只绑定各自版本；最终root原1676与High原31145同十二modules各408pass，中央full原98257亦已实际exit0，24SHA前后匹配。High阶段MUST（多字段异常、context吞异常、request污染、lostattach canonical gate）均按具体证据修复，范围无剩余MUST。不修改原T12/PRD验收门槛。服务Kernel案例是注入proof失败，foreignPending不是跨进程重启验证。
 
 ## 不先替换当前观察
 
@@ -36,4 +46,4 @@ COMMIT attempted后异常可能已durable，不能立即abort、关闭FD或重�
 - 双线程只有一个续期胜出、无ABBA；rollback不丢原FD。
 - 原renew历史audit/replay/manual/periodic snapshot/recover闭合。
 
-未实施39前不将此设计记作T12完成；runtime register/release、legacy fencing、共享host pool、可信usage与可靠STOP继续另行交付。
+39已实施并验证此增量，但不记作完整T12完成；runtime register/release、legacy fencing、共享host pool、可信usage与可靠STOP继续另行交付。

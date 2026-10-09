@@ -1,5 +1,7 @@
 # 当前实现到需求的差距矩阵
 
+Checkpoint39 最终验证全部实际终态：root/High同十二modules各408pass（230.29s/228.66s），中央full原98257 exit0 **1671pass/32既有外部H1skip/1既有warning633.86s**；24SHA一致、范围MUST关闭、compileall/pipcheck/diff0，无live测试。见HYBRID_WORKSPACE_RENEWAL.md/evidence/checkpoint-39-final-tests.txt；下方candidate/LIVE是历史阶段。实际事务性renew、原pending未知COMMIT ACK/显式abort已实现，全部runtime授权仍关闭。无新browser/NFR06/B1/24h/8h/离线18checks证明，不关闭完整runtime/legacy/STOP/T12/M1/M0–M5。下一40先做可信安装边界的legacy hard-deny与真实working-copy非执行计划，Goal active，USERpackage-lock保留。
+
 Checkpoint38 最终终态：root/High同九modules各358pass（195.50s/195.74s），中央full原95667实际exit0，1621pass/32既有外部H1skip/1既有warning589.10s；21SHA一致、范围MUST关闭、compileall/pipcheck/diff0，无live测试。见HYBRID_WORKSPACE_HOLD.md/evidence/checkpoint-38-final-tests.txt；下方candidate/LIVE是历史阶段。服务renew仍拒绝，下一39仅设计见HYBRID_WORKSPACE_RENEWAL.md。无新browser/NFR06/B1/24h/8h/离线18checks证明，不关闭完整runtime/legacy/STOP/T12/M1/M0–M5，Goal active。
 
 Checkpoint38 当前增量：实际Linux协作目录hold、物理独立mutable working copy、原来源绑定WorkspaceService acquire、immutable claim与两阶段关闭、audit/replay/manual/periodic snapshot/recover已接线。root最终九modules358pass/1warning195.50s、21SHA匹配；High最终独立复验进行中，full尚未执行。服务renew拒绝，尚无runtime handoff、完整legacy/OS写隔离、共享资源pool/可信usage或可靠STOP，不能关闭完整T12/T14/T17/M1或M0–M5。详见HYBRID_WORKSPACE_HOLD.md/evidence/checkpoint-38-domain-service-tests.txt；下方37为历史证据。

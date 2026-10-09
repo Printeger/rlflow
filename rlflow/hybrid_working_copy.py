@@ -38,6 +38,14 @@ class ClosedWorkingCopyWitness:
     observation: WorkingCopyObservation
 
 
+@dataclass(frozen=True, eq=False)
+class PendingRenewal:
+    """Original preallocated candidate; never a live observation by itself."""
+    id: str
+    previous: WorkingCopyObservation
+    candidate: WorkingCopyObservation
+
+
 class WorkingCopyOwner:
     """Actual issued-object observations, never JSON/path/FD adoption.
 
@@ -56,7 +64,8 @@ class WorkingCopyOwner:
         if self._owner is None:raise Conflict('actual working copy owner unavailable')
         self._lock=threading.RLock();self._clock_lock=threading.Lock()
         self._clock=clock;self._monotonic_ns=monotonic_ns;self._last_sample=None
-        self._issued={};self._closed_witnesses={};self._mount_namespace=os.stat('/proc/thread-self/ns/mnt').st_ino
+        self._issued={};self._closed_witnesses={};self._renewals={}
+        self._mount_namespace=os.stat('/proc/thread-self/ns/mnt').st_ino
         with _chain(self.namespace) as (fds,chain):
             _private(fds[-1]);_local_mount(chain[-1][2]);self._namespace_chain=chain
         self._protected_chains={}
@@ -170,15 +179,102 @@ class WorkingCopyOwner:
         self._owner_check();self._ttl(ttl_seconds)
         with self._lock:
             slot,_,now,mono=self._live(observation)
-            slot['epoch']+=1
-            new=self._observation(slot,ttl_seconds,now,mono);slot['observation']=new
+            if self._pending_for_slot(slot) is not None:raise Conflict('unresolved working renewal')
+            new=self._observation({**slot,'epoch':slot['epoch']+1},ttl_seconds,now,mono)
+            slot['epoch']+=1;slot['observation']=new
             return new
+
+    def prepare_renewal(self, observation, *, ttl_seconds=30):
+        """Preallocate without swapping the original held observation/epoch."""
+        self._owner_check();self._ttl(ttl_seconds)
+        with self._lock:
+            slot,_,now,mono=self._live(observation)
+            if self._pending_for_slot(slot) is not None:raise Conflict('unresolved working renewal')
+            candidate=self._observation({**slot,'epoch':slot['epoch']+1},ttl_seconds,now,mono)
+            pending=PendingRenewal('working_renewal_'+uuid.uuid4().hex,observation,candidate)
+            # ONE canonical attach, no second slot/map update. Lost-return
+            # entry blocks further issuance and is reachable from actual slot.
+            self._renewals[pending.id]={'pending':pending,'slot':slot,'next_epoch':slot['epoch']+1}
+            return pending
+
+    def _pending_for_slot(self,slot):
+        return next((entry['pending'] for entry in self._renewals.values() if entry['slot'] is slot),None)
+
+    def pending_renewal(self,observation):
+        """Protected actual-slot lookup after lost prepare return; no ID adoption."""
+        self._owner_check()
+        with self._lock:
+            slot,_=self._slot(observation)
+            return self._pending_for_slot(slot)
+
+    def _pending_slot(self,pending):
+        # Actual private identity BEFORE reading fields/raw, bounded by slots.
+        if type(pending) is not PendingRenewal:raise PermissionError('actual pending renewal required')
+        entry=next((entry for entry in self._renewals.values() if entry['pending'] is pending),None)
+        if entry is None:raise PermissionError('actual original pending renewal required')
+        slot=entry['slot']
+        if (not any(current is slot for current in self._issued.values()) or
+                slot['observation'] is not pending.previous and slot['observation'] is not pending.candidate or
+                slot['epoch'] not in (entry['next_epoch']-1,entry['next_epoch'])):
+            raise Conflict('actual pending working lineage changed')
+        return entry,slot
+
+    def check_renewal(self,pending,*,live=True):
+        """Owner proof; live=False is cleanup lineage, NOT renewed permission."""
+        self._owner_check()
+        if type(live) is not bool:raise TypeError('internal renewal check mode required')
+        with self._lock:
+            _,slot=self._pending_slot(pending)
+            self._namespace_check()
+            if slot['hold'].check()!=slot['binding']['kernel']:raise Conflict('working renewal Kernel changed')
+            old=json.loads(pending.previous.raw);new=json.loads(pending.candidate.raw)
+            if live:
+                now,mono=self._sample()
+                for observation,value in ((pending.previous,old),(pending.candidate,new)):
+                    if (not datetime.fromisoformat(value['checked_at'].replace('Z','+00:00'))<=now<
+                            datetime.fromisoformat(value['expires_at'].replace('Z','+00:00')) or
+                            not observation.issued_monotonic_ns<=mono<observation.expires_monotonic_ns):
+                        raise Conflict('working renewal old or candidate expired')
+            return {'previous':old,'candidate':new}
+
+    def _activate_renewal(self,pending):
+        """Protected memory-only post-COMMIT swap; retains pending for ACK retry.
+
+        Caller holds actual owner transaction/locks and has already checked
+        Kernel/deadlines. No file/SQL IO, UUID or resampling at activation.
+        """
+        with self._lock:
+            entry,slot=self._pending_slot(pending)
+            # Exact original candidate/absolute epoch repair either partial
+            # assignment on explicit original-object retry; NEVER epoch += 1.
+            slot['observation']=pending.candidate;slot['epoch']=entry['next_epoch']
+            return pending.candidate
+
+    def _retire_renewal(self,pending):
+        """Protected memory ACK ONLY after both owners match durable candidate."""
+        with self._lock:
+            entry,slot=self._pending_slot(pending)
+            if slot['observation'] is not pending.candidate or slot['epoch']!=entry['next_epoch']:
+                raise Conflict('working renewal not activated')
+            # ONE canonical retirement. If interrupted after del, no dangling
+            # slot pending blocks cleanup; Service retains its own original ACK.
+            del self._renewals[pending.id]
+
+    def abort_renewal(self,pending):
+        """Protected caller must first prove definite no-COMMIT; retains FD."""
+        self._owner_check()
+        with self._lock:
+            entry,slot=self._pending_slot(pending)
+            if slot['observation'] is not pending.previous or slot['epoch']!=entry['next_epoch']-1:
+                raise Conflict('activated working renewal cannot abort')
+            del self._renewals[pending.id]
 
     def close_pre_runtime(self, observation):
         """Explicit no-handoff cleanup, even after expiry; NOT runtime STOP."""
         self._owner_check()
         with self._lock:
             slot,value=self._slot(observation)
+            if self._pending_for_slot(slot) is not None:raise Conflict('unresolved working renewal must ACK or abort before close')
             slot['hold'].close()
             if not slot['hold']._closed or slot['hold']._fd is not None or slot['hold']._parent_fd is not None:
                 raise Conflict('working physical close remains uncertain')

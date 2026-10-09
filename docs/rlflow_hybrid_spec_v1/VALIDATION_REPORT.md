@@ -1,5 +1,7 @@
 # 需求包离线校验报告
 
+Checkpoint39 最终验证全部实际终态：root/High同十二modules各408pass（230.29s/228.66s），中央full原98257 exit0 **1671pass/32既有外部H1skip/1既有warning633.86s**；24SHA一致、范围MUST关闭、compileall/pipcheck/diff0，无live测试。见HYBRID_WORKSPACE_RENEWAL.md/evidence/checkpoint-39-final-tests.txt；下方candidate/LIVE是历史阶段。实际事务性renew、原pending未知COMMIT ACK/显式abort已实现，全部runtime授权仍关闭。无新browser/NFR06/B1/24h/8h/离线18checks证明，不关闭完整runtime/legacy/STOP/T12/M1/M0–M5。下一40先做可信安装边界的legacy hard-deny与真实working-copy非执行计划，Goal active，USERpackage-lock保留。
+
 Checkpoint38 最终终态：root/High同九modules各358pass（195.50s/195.74s），中央full原95667实际exit0，1621pass/32既有外部H1skip/1既有warning589.10s；21SHA一致、范围MUST关闭、compileall/pipcheck/diff0，无live测试。见HYBRID_WORKSPACE_HOLD.md/evidence/checkpoint-38-final-tests.txt；下方candidate/LIVE是历史阶段。服务renew仍拒绝，下一39仅设计见HYBRID_WORKSPACE_RENEWAL.md。无新browser/NFR06/B1/24h/8h/离线18checks证明，不关闭完整runtime/legacy/STOP/T12/M1/M0–M5，Goal active。
 
 Checkpoint38 root最终九modules r2原89827实际exit0：358pass/1既有warning195.50s，21SHA匹配冻结版本；High独立final9原71641进行中，root不并行测试，中央full尚未执行。实际协作目录hold、隔离副本、原source-bound持久acquire与两阶段关闭/恢复证据见HYBRID_WORKSPACE_HOLD.md/evidence/checkpoint-38-domain-service-tests.txt。没有新离线18checks/browser/NFR/B1/长期验收，服务renew和全部runtime授权仍关闭，不宣称完整T12/M1/M0–M5完成。

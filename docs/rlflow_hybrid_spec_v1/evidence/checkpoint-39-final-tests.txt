@@ -1,0 +1,107 @@
+Checkpoint39 frozen final — root / independent / central full ACTUAL terminal
+Parent checkpoint38 fcfcb4f. USER package-lock.json untouched/unstaged.
+No paidmodel/API/GPU, protected workspace writes, push/public hosting or
+development Goal self-dispatch. All execution/release flags remain false.
+
+Root final integration-r1 ORIGINAL1676 ACTUAL terminal exit0:
+408 passed / 1 existing Starlette warning / 230.29s.
+All24 SHA verified at terminal equal the final frozen manifest below.
+High exact final12 independent ONCE ORIGINAL31145 ACTUAL terminal exit0:
+408 passed / 1 existing Starlette warning / 228.66s, chunk880482.
+All24 SHA before==after==root final freeze; root verified log/manifest.
+Root central full-r1 ORIGINAL98257 ACTUAL terminal exit0, chunk6e661a:
+1671 passed / 32 existing external H1 skips / 1 existing Starlette warning /
+633.86s. Same pytest prefix, no module filter; stdout/stderr
+audit/hybrid-v1/checkpoint-39-full-r1.log. All24 frozen SHA verified at terminal.
+.venv/bin/python -m compileall -q rlflow tests: ACTUAL exit0.
+.venv/bin/python -m pip check: ACTUAL exit0, No broken requirements found.
+git diff --check: ACTUAL exit0. No live suites/benchmarks.
+Exact argv:
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q
+tests/test_hybrid_workspace_renewal_service.py
+tests/test_hybrid_workspace_renewal.py
+tests/test_hybrid_commit_context.py
+tests/test_hybrid_workspace_service.py
+tests/test_hybrid_workspace.py
+tests/test_hybrid_working_copy.py
+tests/test_hybrid_workspace_kernel.py
+tests/test_hybrid_snapshot.py
+tests/test_hybrid_budget_service.py
+tests/test_hybrid_controller_service.py
+tests/test_hybrid_preparation_service.py
+tests/test_snapshot_maintenance.py
+stdout/stderr audit/hybrid-v1/checkpoint-39-integration-r1.log.
+ALL source/tests/schema frozen through all final runs, no parallel suites or
+benchmarks. High final static/independent frozen review no remaining MUST;
+staged evidence review and additive commit follow, not Goal completion.
+
+Development actual serial terminal runs/failures/repairs/log hashes in
+checkpoint-39-development-tests.txt, NOT automatically final source proof.
+Latest root service-r9 ORIGINAL57378 exit0:23passed/1existing warning31.22s.
+Actual COMMIT return unknown, actual expired candidate ACK with fresh Controller
+then original new-lineage close; per-field helper/Service activation and
+canonical attach/retire fault injection; original request scope rejected without
+poisoning pending; actual material refresh outside writer; two bounded real
+threads one winner; CANCEL/UNKNOWN/CLOSE_REQUESTED prior win; real writer wait
+OLD observation expiry while longcandidate and Controller still valid.
+Actual SQL input_versions metadata corrupted => ACK denies; original fixture
+bytes/trigger restored => SAME actual pending ACK and complete audit succeeds.
+Injected Kernel-proof failure is NOT actual service-level flock unlock test.
+Foreign/copied pending and historical receipt are NOT cross-process restart test.
+
+Scope:
+Same original cooperative directory hold, pre-runtime only. Candidate staged
+without replacing old observation, absolute epoch+1; dual old/new deadlines at
+owned COMMIT. Private canonical pending identity precedes raw parsing, lost
+attach return recoverable by actual current slot. Both Service and Working
+canonical gate block nonrenew writes/physical close while pending.
+Actual Prep material reverified outside writer/Service/Working locks; existing
+pending never reissued. Original source/current budget HELD and NOT_AUTHORIZED/
+immutable claim/head/CAS require same writer at successful renewal.
+Internal held context covers actual SQLCOMMIT and memory activation; __exit__
+cannot suppress proof/commit/postcommit failures into silent success.
+COMMIT raises even AFTER durable => keep original pending; actual original
+event/full sourceproof/current exactHEAD+Kernel required for explicit ACK.
+Expired ACK aligns original cleanup lineage, never renews TTL/UUID/epoch/token.
+Explicit no-event/no-projection/originalHEAD abort retains old FD; no refund.
+Repeated ACK accepts bounded original known ACK only, cannot overwrite a newer
+pending. Historical duplicate lacking actual pending returns receipt only.
+
+NOT full T12/execution lease/runtime register or release, legacy fencing,
+arbitrary sameUID OS-write sandbox, UsageOwner/refund, shared host pool or
+reliable STOP. No new browser/NFR06/B1/24hfixture/8hUI/offline18checks or complete
+M0–M5 acceptance. Large legal Prep full history from existing38 test retained;
+no new claim for huge renewal, combined huge Registry or default32MiB maintenance.
+Goal active; continue remaining safety/runtime and acceptance tasks.
+
+Frozen24 source/test/schema SHA256:
+e6ec857988c8eebcc9b942aea925173864b68f285c90d57a81143d22ce7b18a4  rlflow/hybrid_workspace_kernel.py
+11e43e053a85c6a0441cf8f3e1ef396c0b9573a1794e17e6c0535c062d7de2dc  rlflow/hybrid_working_copy.py
+00bf15ae0470742c1e4d2c82857c64d9e266e5aef1ed312d038ef253f11ad65d  rlflow/hybrid_workspace.py
+8ad51ad67bb2b96103058033b8cb39de02c536ea46f4874448bfa698f223795d  rlflow/hybrid_workspace_service.py
+9f47c01f7274b8e2ec3f6777614191f876bcc920e62ca3bf0f2f1c52e8489bdc  rlflow/store.py
+e33eca192af286212252d0e2ed18b519e5097801f75f69bccd4fb5fd3bde4fba  rlflow/contracts.py
+2324bfa267541d164d376a7e872c4afc78c5eebe2ef9c9f339ca76bc5a5935aa  rlflow/snapshot_maintenance.py
+b9bf6107feacdce7f606496c33e99e8227429cfe6bb70bac89134a6ba2ee667c  rlflow/hybrid_controller_service.py
+29c09b6c18bbb66e53351109f388a9ae0a58c2095aa9298ce20d3b615d8b11d8  rlflow/hybrid_budget_service.py
+6aac15b2427378edd02ffd46e042c31d2153494669c1511368a0e5484b244369  rlflow/hybrid_preparation_service.py
+bf5b4561a1ddca214bf9cbb502fd308a277a1f3a59e5cb4c60850ec9f0243dc8  rlflow/hybrid_snapshot.py
+d8d1ec0d2fc3b41ec1a85088d647dc798816e95a4489a5cf20e671c7db71c015  schemas/RuntimeState.json
+f28e1c4c103df8d4e300430ece68252f3622a044a68f213c242258dc623eb202  tests/test_hybrid_workspace_service.py
+15e8670eae16fc04224ec8a8bef4ac89334f8839ca3d003b53ff2200b7b2c793  tests/test_hybrid_workspace.py
+ac295992785d2a01a6c263cc34c1c4541cdd9e396e6b145dbf470471c13cc482  tests/test_hybrid_working_copy.py
+b2254e0d4d6c30f6f36e36164aa908395cbfaed2e94daf15ea74b6b0c5acfaab  tests/test_hybrid_workspace_kernel.py
+e72c9d18070192b4ae4f9860a6179b67b646c8a52b714e7a42718118bbf9f509  tests/test_hybrid_snapshot.py
+4edf4740ed180e275b94c16f1598f8c78355c6f9b06adb06296e7b4d2b04da11  tests/test_hybrid_budget_service.py
+cb50af02fbb0c6525d4f34907955900e02c3c39342815e529bac49268150366c  tests/test_hybrid_controller_service.py
+90ec178292f3c25e7fc0b5ce6917fab0a824c8ca09fc5f8e7d3cd338cbea5972  tests/test_hybrid_preparation_service.py
+2e54daefca6f6c992b7389bb0b0123b23797f4b2f110d52c360569e4cf216549  tests/test_snapshot_maintenance.py
+b3fd423430cb63b0676e0cdcefb8612ae87c508cb6982d7bfa3b2e43eea6b8f0  tests/test_hybrid_workspace_renewal_service.py
+f747a66517602b70651365822889c45855a79444b0ecd2d02ac2fa27fbe1b7df  tests/test_hybrid_workspace_renewal.py
+ba7b5e95af099544a20d94a9c8e047b84af6e6b004d1560c7cef99f2bac6b865  tests/test_hybrid_commit_context.py
+
+Latest service terminal log SHA256:
+e1a90069b4d5b5a0772ed1172fad8c4f74afa2845334c206eab459b1e21baa6b  audit/hybrid-v1/checkpoint-39-renewal-service-r9.log
+cdb30cf9e8d5c063c3bef8c3f46d509dab05fd435200ab823d8d134b10be8dbd  audit/hybrid-v1/checkpoint-39-integration-r1.log
+d325b914035a19797944d95e182dc43a303fa89717578a0259980889e114c54c  audit/hybrid-v1/checkpoint-39-independent-final.log
+ac4ff23ad59b4c927b26b0e4ad9d7c825f6f8778be26d0fee7f4bc3c485a2091  audit/hybrid-v1/checkpoint-39-full-r1.log

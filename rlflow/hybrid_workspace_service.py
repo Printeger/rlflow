@@ -2,15 +2,16 @@
 
 Copy outside writer, persist original-source-bound hold, request close, physically
 close, then attest completion. Failed commit retains the actual capability.
-Renewal is deliberately refused pending transactional observation activation.
+Renewal uses original pending objects, held-COMMIT activation and explicit ACK.
 """
 from contextlib import contextmanager
+from datetime import timedelta
 import json
 import threading
 
 from .hybrid_workspace import (SECTIONS,EVENT,REQUEST,fact_key,head_key,head,claim_key,claim,
     expected_objects,event_inputs,validate_record,validate_links)
-from .hybrid_working_copy import WorkingCopyOwner,WorkingCopyObservation
+from .hybrid_working_copy import WorkingCopyOwner,WorkingCopyObservation,PendingRenewal
 from .hybrid_controller_service import ControllerService
 from .hybrid_controller import SECTIONS as CONTROLLER,fact_key as controller_key
 from .hybrid_preparation_service import PreparationService
@@ -67,8 +68,128 @@ class WorkspaceService:
         observation=self.working.acquire(witness.materials[0],ttl_seconds=ttl_seconds)
         value=json.loads(observation.raw)
         with self._lock:
-            self._slots[value['workspace_id']]={'observation':observation,'witness':witness,'closed':None}
+            self._slots[value['workspace_id']]={'observation':observation,'witness':witness,'closed':None,
+                                                'renewal':None,'renewal_ack':None}
         return observation
+
+    def prepare_renewal(self,observation,*,ttl_seconds=30):
+        """Preallocate actual candidate outside writer; no durable/live grant."""
+        self.controller._refuse_nested_writer();self.working._ttl(ttl_seconds)
+        with self._lock:
+            original,_=self._issued(observation)
+            intent_key=json.loads(original['witness'].raw)['intent_key']
+            existing=original['renewal']
+        # Reverify original fixed materials OUTSIDE writer and service/Working
+        # locks. A long-running renewal chain cannot reuse stage's30s witness.
+        fresh=self.preparation.issue_material_witness(intent_key) if existing is None else None
+        with self._lock,self.working._lock:
+            slot,_=self._issued(observation)
+            if slot['closed'] is not None:raise Conflict('closed workspace cannot renew')
+            entry=slot['renewal']
+            if entry is None:
+                if fresh is None:raise Conflict('pending renewal changed; fresh preparation retry required')
+                # Recover ONLY original actual-slot lost-return attachment,
+                # never a candidate from an ID/path/JSON/history.
+                pending=self.working.pending_renewal(observation)
+                if pending is None:pending=self.working.prepare_renewal(observation,ttl_seconds=ttl_seconds)
+                entry={'pending':pending,'witness':fresh,'request':None,'fact':None,'committed':False}
+                slot['renewal']=entry
+            pending=entry['pending'];raw=json.loads(pending.candidate.raw)
+            if timestamp(raw['expires_at'])-timestamp(raw['checked_at'])!=timedelta(seconds=ttl_seconds):
+                raise Conflict('original pending renewal TTL differs')
+            return pending
+
+    def _renewal_slot(self,pending,*,allow_ack=False):
+        if type(pending) is not PendingRenewal:raise PermissionError('actual staged pending renewal required')
+        slot=next((slot for slot in self._slots.values() if slot['renewal'] is not None and
+                   slot['renewal']['pending'] is pending),None)
+        if slot is None and allow_ack:
+            slot=next((slot for slot in self._slots.values() if slot['renewal'] is None and
+                       slot['renewal_ack'] is not None and slot['renewal_ack']['pending'] is pending),None)
+            if slot is not None:return slot,slot['renewal_ack']
+        if slot is None:raise PermissionError('actual original workspace renewal required')
+        return slot,slot['renewal']
+
+    def _unresolved_renewal(self,slot):
+        """Working canonical attach may survive a lost Service prepare return."""
+        with self._lock,self.working._lock:
+            observation=slot['observation']
+            return slot['renewal'] is not None or any(
+                row['pending'].previous is observation or row['pending'].candidate is observation
+                for row in self.working._renewals.values())
+
+    def _activate_renewal(self,slot,entry):
+        """Memory-only original candidate swap/ACK; partial return retryable."""
+        pending=entry['pending']
+        if slot['renewal'] is not None and slot['renewal'] is not entry:
+            raise Conflict('another actual renewal is unresolved')
+        retained=any(row['pending'] is pending for row in self.working._renewals.values())
+        if retained:self.working._activate_renewal(pending)
+        else:
+            # Prior ACK may have retired Working's SINGLE canonical entry
+            # before its return failed. Require actual current candidate.
+            working,_=self.working._slot(pending.candidate)
+            if self.working._pending_for_slot(working) is not None:raise Conflict('another working renewal is unresolved')
+        slot['observation']=pending.candidate
+        slot['witness']=entry['witness']
+        if retained:self.working._retire_renewal(pending)
+        slot['renewal_ack']=entry
+        slot['renewal']=None
+
+    def ack_renewal(self,key,pending):
+        """Original durable event + original retained pending, never new TTL."""
+        self.controller._refuse_nested_writer();validate_schema(ID,key)
+        with self.store.lock(),self._lock,self.working._lock,self.store.connect() as db:
+            db.execute('BEGIN IMMEDIATE');version=self._metadata(db)
+            slot,entry=self._renewal_slot(pending,allow_ack=True)
+            request=entry['request'];expected=entry['fact']
+            if request is None or expected is None or fact_key(request)!=key:
+                raise Conflict('renewal original attempted request/fact required')
+            read=ReadBudget(db,PREPARATION_READ_BYTES);value=self._point(db,key,read)
+            self._dependencies(db,value,read)
+            if (value!=expected or value['request']!=request or value['request']['operation']!='renew' or
+                    self._current(db,request,read,version)!=head(value) or
+                    value['observation']!=json.loads(pending.candidate.raw) or
+                    value['observation_issued_monotonic_ns']!=pending.candidate.issued_monotonic_ns or
+                    value['observation_expires_monotonic_ns']!=pending.candidate.expires_monotonic_ns):
+                raise Conflict('renewal ACK differs from original durable candidate')
+            if any(row['pending'] is pending for row in self.working._renewals.values()):
+                self.working.check_renewal(pending,live=False)
+            else:
+                self.working._owner_check();working,_=self.working._slot(pending.candidate)
+                self.working._namespace_check()
+                if working['hold'].check()!=working['binding']['kernel']:raise Conflict('renewal ACK Kernel changed')
+            # Read proof only. No authority write/automatic fresh observation.
+            db.rollback();entry['committed']=True;self._activate_renewal(slot,entry)
+            return pending.candidate
+
+    def abort_renewal(self,pending):
+        """Explicit definite no-COMMIT proof; never abort unknown/durable renew."""
+        self.controller._refuse_nested_writer()
+        with self.store.lock(),self._lock,self.working._lock,self.store.connect() as db:
+            db.execute('BEGIN IMMEDIATE');version=self._metadata(db)
+            slot,entry=self._renewal_slot(pending);request=entry['request']
+            if entry['committed']:raise Conflict('durable renewal cannot abort')
+            if request is not None:
+                read=ReadBudget(db,PREPARATION_READ_BYTES);key=fact_key(request)
+                if db.execute('SELECT 1 FROM projection WHERE section=? AND object_key=?',(SECTIONS[0],key)).fetchone():
+                    raise Conflict('renewal event exists; explicit ACK required')
+                if db.execute('SELECT 1 FROM events WHERE idempotency_key=?',(key,)).fetchone():
+                    raise Conflict('renewal event exists without projection')
+                prior=self._current(db,request,read,version)
+                if prior is None:raise Conflict('renewal original prior head missing')
+                previous=self._point(db,prior['fact_key'],read);self._dependencies(db,previous,read)
+                if (previous['observation']!=json.loads(pending.previous.raw) or
+                        previous['observation_issued_monotonic_ns']!=pending.previous.issued_monotonic_ns or
+                        previous['observation_expires_monotonic_ns']!=pending.previous.expires_monotonic_ns or
+                        entry['fact'] is not None and prior!=entry['fact']['prior_head']):
+                    raise Conflict('renewal original prior lineage changed')
+            db.rollback()
+            retained=any(row['pending'] is pending for row in self.working._renewals.values())
+            if retained:self.working.abort_renewal(pending)
+            else:self.working._slot(pending.previous)
+            slot['renewal']=None
+            return pending.previous
 
     def _issued(self,observation):
         if type(observation) is not WorkingCopyObservation:raise PermissionError('actual staged working observation required')
@@ -127,14 +248,23 @@ class WorkspaceService:
             return {'fact':value,'duplicate':True,'execution_enabled':False,'release_enabled':False}
 
     def _actual(self,value,slot):
-        observation=slot['observation'];record=json.loads(observation.raw)
+        operation=value['request']['operation']
+        if operation!='renew' and self._unresolved_renewal(slot):raise Conflict('workspace has unresolved renewal')
+        observation=slot['renewal']['pending'].candidate if operation=='renew' else slot['observation']
+        record=json.loads(observation.raw)
         if (value['observation']!=record or value['observation_issued_monotonic_ns']!=observation.issued_monotonic_ns or
                 value['observation_expires_monotonic_ns']!=observation.expires_monotonic_ns):
             raise Conflict('workspace differs from actual original observation')
-        operation=value['request']['operation']
-        if operation=='acquire':
-            self.working.check(observation)
-            witness=slot['witness'];ref=value['preparation']
+        if operation in ('acquire','renew'):
+            if operation=='renew':
+                pending=slot['renewal']['pending'];self.working.check_renewal(pending)
+                previous=slot['dependencies'][SECTIONS[0]][value['prior_head']['fact_key']]
+                if (previous['observation']!=json.loads(pending.previous.raw) or
+                        previous['observation_issued_monotonic_ns']!=pending.previous.issued_monotonic_ns or
+                        previous['observation_expires_monotonic_ns']!=pending.previous.expires_monotonic_ns):
+                    raise Conflict('renewal original actual predecessor differs')
+            else:self.working.check(observation)
+            witness=slot['renewal']['witness'] if operation=='renew' else slot['witness'];ref=value['preparation']
             intent=slot['dependencies'][PREPARATION[0]][ref['intent_key']]
             outcome=slot['dependencies'][PREPARATION[1]][ref['result_key']]
             self.preparation.check_material_witness(witness,intent,outcome)
@@ -159,7 +289,7 @@ class WorkspaceService:
         if value['controller']!={'fact_key':controller_key(control['request']),'fact_hash':digest(control),
                 'controller_epoch':control['controller_epoch'],'head_revision':control['head_revision']}:
             raise Conflict('workspace differs from actual current controller')
-        if request['operation']=='acquire':
+        if request['operation'] in ('acquire','renew'):
             current=source_binding(self.budget._load(db,request['goal_ref'],guard.budget))
             if any(current[n]!=v for n,v in value['sources'].items() if n not in ('source_version','evaluated_at')):
                 raise Conflict('workspace current consent changed')
@@ -184,16 +314,19 @@ class WorkspaceService:
         validate_links(value,guard.lookup,current=True)
 
     @contextmanager
-    def _owned_transaction(self,token):
+    def _owned_transaction(self,token,renewal=None):
         def final_check():
             if self._active is None:raise PermissionError('actual final workspace guard missing')
             self._active.check()
         def final_deadlines(now,mono):
             value=json.loads(self._active.raw)
             if now<timestamp(value['recorded_at']):raise Conflict('workspace final clock regressed')
-            if value['request']['operation']=='acquire':
-                observation=self._active.slot['observation'];working_now,elapsed=self.working._sample()
-                witness=self._active.slot['witness'];material_now,material_elapsed=self.preparation._witness_sample()
+            if value['request']['operation'] in ('acquire','renew'):
+                slot=self._active.slot
+                observation=slot['renewal']['pending'].candidate if value['request']['operation']=='renew' else slot['observation']
+                working_now,elapsed=self.working._sample()
+                witness=slot['renewal']['witness'] if value['request']['operation']=='renew' else slot['witness']
+                material_now,material_elapsed=self.preparation._witness_sample()
                 final_now=max(now,working_now,material_now);material=json.loads(witness.raw)
                 if (not timestamp(value['observation']['checked_at'])<=final_now<timestamp(value['observation']['expires_at']) or
                         final_now>=timestamp(value['sources']['expires_at']) or
@@ -202,32 +335,58 @@ class WorkspaceService:
                         not timestamp(material['checked_at'])<=material_now<timestamp(material['expires_at']) or
                         final_now>=timestamp(material['expires_at'])):
                     raise Conflict('workspace consent/material/hold expired at final owned commit')
+                if value['request']['operation']=='renew':
+                    previous=slot['renewal']['pending'].previous;old=json.loads(previous.raw)
+                    if (not timestamp(old['checked_at'])<=final_now<timestamp(old['expires_at']) or
+                            not previous.issued_monotonic_ns<=elapsed<previous.expires_monotonic_ns):
+                        raise Conflict('workspace old observation expired at final renewal commit')
         def clear_active():self._active=None
-        with self.controller.token_transaction(token,read_bytes=PREPARATION_READ_BYTES,
-                _before_commit=final_check,_after_final_sample=final_deadlines,_on_exit=clear_active) as context:
-            # Lock AFTER actual writer acquisition; stage/copy never waits
-            # for Store while holding this lock or WorkingCopyOwner lock.
-            with self._lock:
+        @contextmanager
+        def held_context():
+            with self._lock,self.working._lock:
                 if self._active is not None:raise Conflict('nested workspace transaction refused')
-                yield context
+                yield
+        def activate():
+            slot,entry=renewal;entry['committed']=True;self._activate_renewal(slot,entry)
+        with self.controller.token_transaction(token,read_bytes=PREPARATION_READ_BYTES,
+                _before_commit=final_check,_after_final_sample=final_deadlines,_on_exit=clear_active,
+                _commit_context=held_context,_after_commit=activate if renewal is not None else None) as context:
+            yield context
 
     def record(self,request,token,observation):
         self.controller._refuse_nested_writer();self.controller._issued(token)
         check_bytes(request,8192);validate_schema(REQUEST,request);request=json.loads(canonical(request))
         if (request['project_id'],request['data_mode'],request['store_epoch'])!=(self.project_id,self.data_mode,self.store_epoch):
             raise Conflict('workspace request scope differs')
-        if request['operation']=='renew':raise Conflict('workspace renewal not yet enabled')
         existing=self._existing(request)
         if existing is not None:
             if request['operation']=='complete_close':self._retire_completed(existing['fact'],observation)
+            if request['operation']=='renew' and type(observation) is PendingRenewal:
+                with self._lock:
+                    known=any(slot['renewal'] is not None and slot['renewal']['pending'] is observation for slot in self._slots.values())
+                if known:self.ack_renewal(fact_key(request),observation)
             return existing # Historical receipt, never current ability.
-        slot,record=self._issued(observation)
+        renewal=None
+        if request['operation']=='renew':
+            with self._lock:
+                slot,entry=self._renewal_slot(observation)
+                if entry['request'] is not None and entry['request']!=request:raise Conflict('pending renewal request reused')
+                renewal=slot,entry
+                actual=observation.candidate;record=json.loads(actual.raw)
+        else:
+            slot,record=self._issued(observation);actual=observation
+            if self._unresolved_renewal(slot):raise Conflict('workspace has unresolved renewal')
         if request['workspace_id']!=record['workspace_id']:raise Conflict('workspace actual stage differs')
-        with self._owned_transaction(token) as (db,read,control):
+        with self._owned_transaction(token,renewal) as (db,read,control):
+            if renewal is not None:
+                if self._renewal_slot(observation)!=(slot,renewal[1]):raise Conflict('workspace actual renewal changed')
+                if renewal[1]['request'] is not None and renewal[1]['request']!=request:
+                    raise Conflict('pending renewal request reused')
+            elif self._unresolved_renewal(slot):raise Conflict('workspace has unresolved renewal')
             version=self._metadata(db)
             if version!=request['expected_state_version']:raise Conflict('workspace stale expected version')
             prior=self._current(db,request,read,version)
-            if request['operation']=='acquire':
+            if request['operation'] in ('acquire','renew'):
                 sources=source_binding(self.budget._load(db,request['goal_ref'],read))
                 _,reservation,_=self.budget._heads(db,{**request,'action':'MARK_UNKNOWN'},read,version)
                 if reservation is None:raise Conflict('workspace requires original HELD reservation')
@@ -241,10 +400,10 @@ class WorkspaceService:
             value={'request':request,'request_hash':digest(request),'sources':sources,'preparation':ref,
                 'budget_reservation':reservation,'controller':{'fact_key':controller_key(control['request']),
                     'fact_hash':digest(control),'controller_epoch':control['controller_epoch'],'head_revision':control['head_revision']},
-                'observation':record,'observation_issued_monotonic_ns':observation.issued_monotonic_ns,
-                'observation_expires_monotonic_ns':observation.expires_monotonic_ns,'physical_close':closed,
+                'observation':record,'observation_issued_monotonic_ns':actual.issued_monotonic_ns,
+                'observation_expires_monotonic_ns':actual.expires_monotonic_ns,'physical_close':closed,
                 'controller_checked_monotonic_ns':mono,'recorded_at':now.isoformat().replace('+00:00','Z'),
-                'prior_head':prior,'state':{'acquire':'HELD_PRE_RUNTIME','request_close':'CLOSE_REQUESTED','complete_close':'CLOSED_PRE_RUNTIME'}[request['operation']],
+                'prior_head':prior,'state':{'acquire':'HELD_PRE_RUNTIME','renew':'HELD_PRE_RUNTIME','request_close':'CLOSE_REQUESTED','complete_close':'CLOSED_PRE_RUNTIME'}[request['operation']],
                 'accepted_state_version':version+1,'execution_enabled':False,'release_enabled':False}
             key=fact_key(request);validate_record(SECTIONS[0],key,value)
             dependencies=self._dependencies(db,value,read);slot['dependencies']=dependencies
@@ -254,6 +413,11 @@ class WorkspaceService:
             if request['operation']=='acquire':payload['put'].append([SECTIONS[2],claim_key(request),claim(value)])
             payload['put'].extend([s,'',{}] for s in SECTIONS if not db.execute('SELECT 1 FROM projection WHERE section=? LIMIT 1',(s,)).fetchone())
             guard=_Guard(self,db,read,token,value,slot,dependencies);self._active=guard;guard.check()
+            if renewal is not None:
+                # Bind ONLY after actual candidate/current original lineage,
+                # sources/budget/claim/guard proofs. Rejected caller scope
+                # must never poison the original pending cleanup/retry path.
+                renewal[1]['request']=request;renewal[1]['fact']=value
             self.store._commit(db,EVENT,key,payload,version,request['reservation_id'],'hybrid-core',event_inputs(value),_authorization=guard)
             guard.check()
         if request['operation']=='complete_close':
@@ -288,6 +452,7 @@ class WorkspaceService:
         """Durable CLOSE_REQUESTED first; finite physical cleanup outside writer."""
         self.controller._refuse_nested_writer();validate_schema(ID,close_request_key)
         slot,record=self._issued(observation)
+        if self._unresolved_renewal(slot):raise Conflict('workspace has unresolved renewal')
         with self.store.read_connection() as db:
             db.execute('BEGIN');version=self._metadata(db);read=ReadBudget(db,PREPARATION_READ_BYTES)
             value=self._point(db,close_request_key,read);self._dependencies(db,value,read)

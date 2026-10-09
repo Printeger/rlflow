@@ -4,7 +4,7 @@ This service does not fence legacy dispatch or workspace writers. All execution
 and candidate-write flags remain false; expired takeover does not prove cleanup.
 Tokens are process-local actual issued objects, never reconstructed from facts.
 """
-from contextlib import contextmanager
+from contextlib import contextmanager, ExitStack
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 import json
@@ -143,7 +143,8 @@ class ControllerService:
                     'authority_domain':'HYBRID_CORE_FACTS_ONLY','execution_enabled':False}
 
     @contextmanager
-    def token_transaction(self,token,*,read_bytes=READ_BYTES,_before_commit=None,_after_final_sample=None,_on_exit=None):
+    def token_transaction(self,token,*,read_bytes=READ_BYTES,_before_commit=None,_after_final_sample=None,
+                          _on_exit=None,_commit_context=None,_after_commit=None):
         """Mint a fresh fixed-Store writer, hold owner lock, recheck and commit.
 
         Never accepts a caller's connection/read snapshot. Internal owner API;
@@ -158,6 +159,10 @@ class ControllerService:
             raise TypeError('internal pure deadline callback required')
         if _on_exit is not None and not callable(_on_exit):
             raise TypeError('internal held-writer cleanup callback required')
+        if _commit_context is not None and not callable(_commit_context):
+            raise TypeError('internal held-commit context factory required')
+        if _after_commit is not None and not callable(_after_commit):
+            raise TypeError('internal successful-COMMIT memory callback required')
         with self.store.lock(),self._lock,self.store.connect() as db:
             db.execute('BEGIN IMMEDIATE');budget=ReadBudget(db,read_bytes)
             if self.store._hybrid_controller_service is not self:
@@ -165,18 +170,35 @@ class ControllerService:
             if self._token_active is not None:raise Conflict('nested controller token transaction refused')
             self._token_active=(db,token,budget,threading.get_ident())
             try:
-                self._metadata(db);value=self._token_live(db,token,budget)
-                yield db,budget,value
-                self.check_token_in_transaction(db,token,budget)
-                if _before_commit is not None:_before_commit()
-                # Source/head proof callbacks can be expensive. Sample actual
-                # owner, STOP and both deadlines AFTER all such reads, with no
-                # subsequent source expansion before the owned COMMIT.
-                now,mono=self._final_token_freshness(db,token,budget)
-                # Internal owner deadline comparisons ONLY: no SQL, source
-                # expansion, file IO or new authority after this final sample.
-                if _after_final_sample is not None:_after_final_sample(now,mono)
-                db.commit()
+                with ExitStack() as contexts:
+                    # Factory runs AFTER the writer/Controller/BEGIN. Its
+                    # locks cover body, final proofs, actual COMMIT and ACK;
+                    # an inner caller with-lock around yield would NOT.
+                    if _commit_context is not None:
+                        held=_commit_context();held.__enter__()
+                        def exit_held(exc_type,exc,tb):
+                            held.__exit__(exc_type,exc,tb)
+                            # Internal contexts are lock lifetime only. Never
+                            # allow them to suppress a failed final proof and
+                            # let SQLite's outer context commit on normal exit.
+                            return False
+                        contexts.push(exit_held)
+                    self._metadata(db);value=self._token_live(db,token,budget)
+                    yield db,budget,value
+                    self.check_token_in_transaction(db,token,budget)
+                    if _before_commit is not None:_before_commit()
+                    # Source/head proof callbacks can be expensive. Sample actual
+                    # owner, STOP and both deadlines AFTER all such reads, with no
+                    # subsequent source expansion before the owned COMMIT.
+                    now,mono=self._final_token_freshness(db,token,budget)
+                    # Internal owner deadline comparisons ONLY: no SQL, source
+                    # expansion, file IO or new authority after this final sample.
+                    if _after_final_sample is not None:_after_final_sample(now,mono)
+                    db.commit()
+                    # Never runs when COMMIT raises: the caller retains its
+                    # original pending object for explicit unknown-result ACK.
+                    # Memory-only, no new authority or deadline/UUID creation.
+                    if _after_commit is not None:_after_commit()
             finally:
                 self._token_active=None
                 # Release service active context BEFORE writer/owner unlock,

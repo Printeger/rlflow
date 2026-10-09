@@ -1,5 +1,15 @@
 # 开发决策记录
 
+## Checkpoint39：提交成功后激活原候选，未知返回不当作回滚
+
+Working pending采用单一canonical registry，保持旧实际观察直至真实COMMIT；candidate预分配epoch+1，同一FD，原身份先解析。lost-return仍从原actual slot可达且阻第二次签发；激活使用原候选/绝对epoch，逐字段中途异常可用同pending修复。Service所有非renew写同锁核两层canonical pending，不仅依赖Service挂接字段。先核actualscope/current原HEAD/claim/source/guard，再绑定写尝试request/fact，避免坏scope请求污染清理能力。
+
+原材料复验在writer/Service/Working锁外，actual fresh MaterialWitness仍绑定原intent/snapshot；现存pending不重签。Controller内部commit-context factory在writer→Controller→BEGIN后进入Service→Working，覆盖finalproof、真实SQLCOMMIT和memory-only activation；context退出不得吞异常使SQLite外层自动提交未核写。
+
+COMMIT抛错可能已经durable，必须保留原pending。ACK只以原private request/fact/pending、完整原event/sources/current exactHEAD与actualKernel对齐原candidate清理链，不采用历史JSON、更新TTL/UUID或增加epoch；过期livecheck仍拒绝。明确abort须证明原事件/projection不存在与原HEAD不变（写尝试已绑定时），保留旧FD不refund。单slot最后已知ACK支持原对象重复，但不能覆盖较新的未决candidate。
+
+root/High最终同十二modules各408pass（230.29s/228.66s），24SHA匹配、范围MUST关闭；中央full原98257实际exit0，1671pass/32既有skip/1既有warning633.86s，compileall/pipcheck/diff0，无live测试。见HYBRID_WORKSPACE_RENEWAL.md/evidence/checkpoint-39-final-tests.txt；这不是执行授权/完整T12/legacy排斥/共享pool/可信usage/可靠STOP/M1或M0–M5完成。
+
 ## Checkpoint38：实际协作目录持有与两阶段关闭，不从历史恢复能力
 
 固定私有、物理祖先不重叠的namespace，将原builder签发snapshot复制为独立mutable working copy；base、initial-copy、未来output hash分离。Linux目录FD持有actual exclusive flock，核当前FD锁记录、owner、mount namespace与全部祖先，check不重新加锁。Python fork子副本只close、不LOCK_UN父OFD。失败FD清理仍保留强registry或有界quarantine，期限到期只拒绝、不自动释放未知writer。0700与advisory flock不提供sameUID非协作写保护；全面legacy fencing/OS隔离仍是后续门。

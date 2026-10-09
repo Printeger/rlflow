@@ -1,5 +1,7 @@
 # Workspace hold：checkpoint38
 
+本页记录冻结checkpoint38 `fcfcb4f` 的范围；39事务性renew已实现，root/High同十二modules各408pass、中央full1671pass/32既有skip/1既有warning633.86s均实际终态，最新接线与证据见HYBRID_WORKSPACE_RENEWAL.md/evidence/checkpoint-39-final-tests.txt。下文38服务拒renew不代表39新源码仍无该内部接口，也不将38全回归推广到39。
+
 基于 checkpoint37 `70249f4`。当前已接实际协作目录锁、隔离 working-copy、三 private 持久域与固定 WorkspaceService 的 source/budget/Controller guarded acquire、两阶段关闭及审计/回放/快照恢复。root/High最终九modules各358pass（195.50s/195.74s），中央full原95667实际exit0，1621pass/32既有skip/1既有warning589.10s；21SHA一致、范围无MUST、compileall/pipcheck/diff0。最终证据见evidence/checkpoint-38-final-tests.txt，提交进度见PROGRESS.md。未接runtime注册/release，服务续期暂时拒绝；不是T12/ARC-01/A04完成，不是ExecutionLease。
 
 旧组件 root/独立High各102passed（0.57s/0.58s）只绑定当时冻结6SHA。随后四modules root组合实际终态146pass/1warn30.05s，接Store后service r1/r3/r4实际终态9pass/9.26s、20pass/36.10s、22pass/25.12s；九modules integration r1实际356pass/159.06s/21SHA一致。追加2cases actual writer等待过期及large合法Prep容量闭合，actual2pass22deselected/38.63s；新版final九modules r2原89827实际terminal exit0，358pass/1既有warn195.50s，21SHA完全一致。最终High独立358pass/195.74s及中央full1621pass/589.10s已终态，见最终证据。各结果只绑定当时版本。pure关闭DTO不证明实际FD关闭，actual close witness仅由原owner实际成功关闭全部FD后签发。
