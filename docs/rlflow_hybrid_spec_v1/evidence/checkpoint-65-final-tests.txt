@@ -1,0 +1,117 @@
+Checkpoint65 development acceptance; baseline1170d97; original M0–M5 Goal ACTIVE.
+Python3.12.3 .venv / Node18.19.1, original two isolated fixture projects,
+fixed CPU trial / SQLite / loopback sandboxed Chrome. No model/GPU/production
+migration/push. USER package-lock unchanged and never staged.
+All suites sequential. No live input edits, restarted or duplicate live tests.
+Python uses PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest.
+
+r1: -q -s tests/test_hybrid_delivery_evidence.py (then first two actual cases).
+delivery-r1.log; original44316 terminal958271 exit0; 2passed/1warning97.16s.
+Original CPU384/engineering AST21 -> actual required conditions/verification
+hashes -> UNASSESSED, missing independent Review, Goalfalse; forged distinct
+session strings pass generic DTO validation but delivery POST405/query400;
+cross-project404, no new Popen/poll/write. Actual v2 condition denominator and
+old mapping disabled; independently attached cold source after owner shutdown.
+This is initial coverage, not final current-head acceptance.
+
+High readonly incremental review found currentconsent not bound to protected
+Registry and genuine old heads not proved latest. Same-transaction bounded PK
+suffix proof added, <=256 events/head, original baseline seq/prev/new, contiguous
+suffix through as-of, complete decoded original head descriptors; over-limit,
+gap or source corruption failclosed503. No Store/schema or history writes added.
+
+r2: startup failed before collection, original tool3f7fec exit1. Environment
+auto-loaded ROS launch_testing plugin missing lark. Full traceback retained in
+delivery-r2.log; no product assertion or dependency change. Reused project's
+existing external-plugin-disabled command, rather than retrying unchanged.
+
+r3: -q -s tests/test_hybrid_delivery_evidence.py (then four cases).
+delivery-r3.log; original58546 terminald3a8d2 exit1;
+3passed/1failed/1warning127.38s. Actual two positive/history cases and bounded
+window/baseline/gap case passed. New Registry/head case incorrectly expected
+Oct9 fixed fixture approval CURRENT under Oct10 wall clock; product correctly
+returned UNAVAILABLE. Changed only test clock to original evaluated_at+1s.
+
+First Node check: node --test web_checks/delivery-evidence-panel.test.mjs
+web_checks/cpu-assessment-panel.test.mjs web_checks/candidate-output-panel.test.mjs.
+Toolceab24 exit0; 12passed71.195051ms, direct tool output (not a raw disk log).
+Included nine affected old cases and initial three new cases. High UI review
+found legal CPU UNAVAILABLE rejected; original enum added, denominator tightened
+to1..200/required>=1, new negative GET case. No execution or acceptance added.
+
+r4 Node: node --test web_checks/delivery-evidence-panel.test.mjs.
+panel-r4.log exit0; 4passed69.258275ms. Fake PASS/wrong scope/source/denominator
+rejected; manual GET only; durable/project/auth/epoch/selection/logout late
+replies cannot repopulate; legal original CPU UNAVAILABLE readable and blocked.
+r4 Python: only actual Registry/head case; original88898 terminal046f86 exit1;
+1failed/1warning36.42s. Registry positive/drift assertions passed. Genuine old
+approval was correctly rejected, but Conflict(ValueError) was rewrapped into
+generic schema error. Full exception chain identified response-classification
+bug too: HTTP ValueError catch could return400 for source failures. Preserved
+Conflict before ValueError in reader and HTTP503; kept invalidID/query400.
+No relaxed test or unchanged whole-suite rerun.
+
+r5: actual Registry/head case + Conflict preservation pure case.
+delivery-r5.log; original83655 terminaled6c78 exit0;
+2passed/1warning37.59s. Original fixed-clock current consent positive, legitimate
+Registry drift historical/unavailable; genuine approval after actual revoke and
+v1 Goal head after actual v2 rejected, HTTP503. All original events retained.
+
+r6: node --test web_checks/delivery-evidence-browser.test.mjs.
+browser-r6.log; original23528 terminal19494a exit0;
+1passed51.022448615s (actual case50.823198066s).
+Actual Chrome human Runs: CPU384 and one engineering write/AST21 -> manual
+condition GET -> real required denominators, missing Review, zero satisfied,
+Goalfalse; project/logout clear; totalPopen2/pwrite1/Pool0; deliveryGET2/POST0,
+no additional worker/write or browser page errors. Not independent Review.
+
+r7 necessary regression: -q tests/test_hybrid_cpu_assessment_reads.py
+tests/test_hybrid_candidate_output_reads.py tests/test_hybrid_finite_host_app.py.
+regression-r7.log; original39545 terminal77d900 exit0;
+10passed/1warning203.86s. Final API/app assembly and affected original cold-read
+boundaries, two-project execution/STOP isolation/preflight. No full-library
+rerun: Store/protocol/schema/runtime/control behavior unchanged; checkpoint61
+full and checkpoint64 control/STOP evidence retained, not restated as new runs.
+
+Final High budget MUST: generic current-source Conflict must not become a
+normal historical DTO. After r7 true terminal and input check, only delivery
+reader/test changed. Current approval full original witness is compared with
+protected Registry canonical bytes in the same ReadBudget. Explicit drift is
+historical without current-source loading; only two exact lifecycle Conflict
+reasons may downgrade. Budget/object/blob/witness/schema failures stay503.
+r8: current_source_budget_and_damage case (8 modes) + affected actual Registry/
+head case. delivery-r8.log; original21580 terminale3e21b exit0;
+9passed/1warning38.31s. Parse/expand negative counters, SQL object length gate
+with positive counter, blob/witness/schema failures, expired consent, explicit
+Registry no-load, actual positive consent/drift/revoked/v2-head rejection.
+No budget reset. Final High readonly two-method delta: no unresolved MUST;
+review agent never ran tests or wrote files, and is not product Reviewer.
+
+Final evidence is composite targeted acceptance, not a new all-module run:
+r3's two actual cases+window case, r5 pure Conflict case, r8 actual head case+
+eight budget modes cover13 distinct new cases; old nine Node cases from first
+run plus final four new cases. Passed unchanged cases not repeated. Initial
+failures are retained and not erased by later passes.
+
+330 final source/test/web/root schema/spec schema paths:
+checkpoint-65-final-inputs.sha256 SHA
+7d84aad34e5dba95c40cbeb969f8fd6478066ec3c8f02cae816c75e0f64371db.
+All r1/r2/r3/r4/r5/r6/r7/r8 end checks match their frozen manifests.
+Finalr8 differs from r5 only delivery reader/test; other328 paths unchanged.
+Compileall rlflow/tests, pip check, affected JS syntax, git diff--check exit0
+(tool48434a). Only existing Starlette anyio deprecation warning in Python.
+Raw logs/freeze/end-checks retained locally under ignored audit/hybrid-v1;
+SHA archive checkpoint-65-log-sha256.txt identifies all retained evidence.
+
+Delivery: original result -> original/current full proof -> real conditions ->
+machine-context NOT ConditionEvidence -> explicit missing Review/evidence gate
+-> authenticated API/actual Dashboard. No Goal completion/conditionEvidence
+write/model call/dispatch. CPU UNAVAILABLE is valid negative, not fake PASS.
+Real product Reviewer/native verification needs NEW isolated approval and
+explicit nonzero model budget; original approvals have zero model/token/GPU.
+No user authorization reply received; no paid inference performed.
+Remaining original strictOS/arbitrary-tree/invoice/T21/T22 B1/24hfixture8hUI,
+T23 installation/migration and dependent M5 criteria remain open.
+Next: dependency-valid T21 actual resource isolation/recovery closure within
+original no-paid/no-GPU/no-production boundaries; real Review only after its
+specific isolation and allowance are authorized. Full Goal not complete.

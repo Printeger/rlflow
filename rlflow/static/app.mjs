@@ -25,9 +25,9 @@ const pulses = new Map();
 const fixtures=new FixturePanel({context:()=>session && state && project && state.project===project.id ?
   {session,authGeneration,project:state.project,mode:state.mode,epoch:state.epoch,version:state.sourceVersion}:null,request});
 const cpuAssessments=new CpuAssessmentPanel({context:()=>session && state && project && state.project===project.id ?
-  {session,authGeneration,project:state.project,mode:state.mode,epoch:state.epoch,version:state.sourceVersion}:null,request});
+  {session,authGeneration,project:state.project,mode:state.mode,epoch:state.epoch,version:state.sourceVersion}:null,request,deliveryKind:'CPU_TRIAL'});
 const candidateOutputs=new CandidateOutputPanel({context:()=>session && state && project && state.project===project.id ?
-  {session,authGeneration,project:state.project,mode:state.mode,epoch:state.epoch,version:state.sourceVersion}:null,request});
+  {session,authGeneration,project:state.project,mode:state.mode,epoch:state.epoch,version:state.sourceVersion}:null,request,deliveryKind:'ENGINEERING'});
 const eventList = new VirtualList($('events'), eventNode, event => event.event_id);
 const cpuUnits=new CpuUnitPanel({context:()=>session && state && project && state.project===project.id ?
   {session,authGeneration,project:state.project,mode:state.mode,epoch:state.epoch,version:state.sourceVersion}:null,request});

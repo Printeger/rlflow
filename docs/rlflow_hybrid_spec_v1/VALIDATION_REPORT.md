@@ -1,5 +1,7 @@
 # 需求包离线校验报告
 
+Checkpoint65：原结果的真实合同条件分母/规则哈希、机器上下文非ConditionEvidence、缺Review/缺证阻断和authenticated Dashboard交付；actualChrome CPU384/AST21/无额外worker写入通过。必要三旧module10pass203.86s；新13case采用已过项+最后局部定向的合成证据，不声称最后全套重跑。前端原9+最终新4通过，330最终SHA全匹配，编译/依赖/JS/diff通过，High新增MUST关闭，无live测试。首ROS插件启动阻断、fixture时钟误断言及Conflict继承ValueError分类错误日志均保留，先根因后定向修，不放宽验收。最后源预算差量只影响reader/test，r8原21580终e3e21b exit0 9pass38.31s；不重复未变成功回归/Chrome。详HYBRID_DELIVERY_EVIDENCE.md/evidence/checkpoint-65-final-tests.txt；不是产品Reviewer/完整Goal验收。
+
 Checkpoint64：原固定全集SDK/HTTP/Dashboard紧急STOP通过；r7实际Chrome1+Node4，r10实际权限/key/capacity/pending-future/partial-submit3pass55.35s，必要旧CPU/工程控制与最终app SDK回归r11原52939终6be001 exit0 20pass338.20s。r6/r8双preG屏障失败、诊断与原Pool持锁根因全部保留，r9改真实一LIVE+另一原Run等待Pool验证双G禁止/reap/全FD闭/Pool0，严格Conflict又由r11验证；不声称双同时preG存活。326最终SHA全匹配/compile/pip/JS/diff通过，无live tests，High增量MUST关闭；原raw日志和冻结SHA归档见evidence/checkpoint-64-final-tests.txt，非新全库、独立产品Review或完整Goal验收。63实际039c774，64进入提交；native/Reviewer/条件最终门/T21/T22/T23/M5缺口和原权限保持，USERlock未改未stage，下方为历史。
 
 Checkpoint63：实际共享认证应用及STOP隔离完成，原数据CPU384/工程单写AST21、Chrome两项目与私有DOM通过。后台r1两个测试错误、r2最后bearer未解包失败均保留；r2已通过STOP不重跑，r3仅失败case1pass。受影响冷读/API13pass63.39s、Node12pass、Chrome1pass56.855s；320最终输入全匹配，独立High三MUST静态关闭。详HYBRID_FINITE_HOST_APP.md/evidence/checkpoint-63-final-tests.txt及SHA归档。不是新全库/产品Reviewer/完整Goal/发布验收；无live测试，63正在提交，62实际816eef3。下方旧状态均历史。

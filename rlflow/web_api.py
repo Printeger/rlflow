@@ -63,7 +63,8 @@ class Project:
 def create_app(projects, auth, *, origin="http://127.0.0.1:8765", max_streams=8, stream_options=None,
                control_services=None, max_control_jobs=4, fixture_task_readers=None,
                fixture_runtime_services=None,cpu_assessment_readers=None,candidate_output_readers=None,
-               fixed_unit_telemetry=None,cpu_unit_services=None,engineering_unit_services=None):
+               fixed_unit_telemetry=None,cpu_unit_services=None,engineering_unit_services=None,
+               delivery_evidence_readers=None):
     parsed = urlsplit(origin)
     if parsed.scheme not in {"http", "https"} or not parsed.netloc or parsed.path or parsed.query or parsed.fragment or parsed.username:
         raise ValueError("origin must be a canonical HTTP origin")
@@ -260,6 +261,10 @@ def create_app(projects, auth, *, origin="http://127.0.0.1:8765", max_streams=8,
     if candidate_output_readers is not None:
         from .hybrid_candidate_output_reads import install as install_candidate_reads
         install_candidate_reads(app,candidate_output_readers,registry,auth)
+
+    if delivery_evidence_readers is not None:
+        from .hybrid_delivery_evidence import install as install_delivery_reads
+        install_delivery_reads(app,delivery_evidence_readers,registry,auth)
 
     if cpu_unit_services is not None:
         from .hybrid_cpu_unit_control import install as install_cpu_units

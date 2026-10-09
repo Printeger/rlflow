@@ -1,4 +1,5 @@
 // Readonly original-evidence display. No execution or decision authority.
+import {DeliveryEvidencePanel} from './delivery-evidence-panel.mjs';
 const closed=(v,keys)=>v && typeof v==='object' && !Array.isArray(v) && Object.keys(v).sort().join()===keys.slice().sort().join();
 const id=v=>typeof v==='string' && /^[A-Za-z0-9][A-Za-z0-9_.:-]{0,159}$/.test(v);
 const count=v=>Number.isSafeInteger(v) && v>=0;
@@ -28,28 +29,29 @@ function checkEvidence(e,a){
   if(a.hypothesis_outcome!==(e.hypothesis_supported?'SUPPORTED':'REFUTED'))fail();
 }
 export class CpuAssessmentPanel{
-  constructor({context,request,now=()=>performance.now(),schedule=(fn,ms)=>setTimeout(fn,ms),cancel=id=>clearTimeout(id),prefix='cpu-assessment',check=checkAssessment,path='cpu-trial-assessments',describe=row=>`${row.id} · ${row.assessment.execution_status} / ${row.assessment.scientific_validity} / ${row.assessment.hypothesis_outcome} · ${row.current_activation} @ ${row.checked_at}`,select=row=>({id:row.id,experiment_id:row.experiment_id,attempt_id:row.attempt_id}),note='原始依赖验证；独立评审 NOT_PERFORMED，Goal 未完成。'}){
+  constructor({context,request,deliveryKind=null,now=()=>performance.now(),schedule=(fn,ms)=>setTimeout(fn,ms),cancel=id=>clearTimeout(id),prefix='cpu-assessment',check=checkAssessment,path='cpu-trial-assessments',describe=row=>`${row.id} · ${row.assessment.execution_status} / ${row.assessment.scientific_validity} / ${row.assessment.hypothesis_outcome} · ${row.current_activation} @ ${row.checked_at}`,select=row=>({id:row.id,experiment_id:row.experiment_id,attempt_id:row.attempt_id}),note='原始依赖验证；独立评审 NOT_PERFORMED，Goal 未完成。'}){
     Object.assign(this,{context,request,now,schedule,cancel,check,path,describe,select,note});this.serial=0;this.connectionState='UNKNOWN';this.$=id=>document.getElementById(prefix+'-'+id);
+    if(deliveryKind)this.delivery=new DeliveryEvidencePanel({context,request,kind:deliveryKind,prefix,selection:()=>this.detail && this.selected ? this.selected:null});
     this.$('refresh').addEventListener('click',()=>this.load());this.$('next').addEventListener('click',()=>this.load(this.page?.next_after));this.clear();
   }
   scope(){const c=this.context();return c?{project:c.project,mode:c.mode,epoch:c.epoch,identity:c.session.principal_id,authGeneration:c.authGeneration}:null;}
   ticket(){return {serial:this.serial,scope:this.scope()};}
   current(t){return t.serial===this.serial && JSON.stringify(t.scope)===JSON.stringify(this.scope());}
-  clear(){++this.serial;this.cancel(this.timer);this.timer=null;this.page=null;this.detail=null;this.selected=null;this.after='';this.reading=false;this.blocked=false;this.wanted=0;this.boundScope=null;this.lastRead=-Infinity;this.$('list').replaceChildren();this.$('detail').textContent='';this.$('note').textContent='尚未读取；没有自动执行。';this.render(false);}
+  clear(){++this.serial;this.cancel(this.timer);this.timer=null;this.page=null;this.detail=null;this.selected=null;this.after='';this.reading=false;this.blocked=false;this.wanted=0;this.boundScope=null;this.lastRead=-Infinity;this.delivery?.clear();this.$('list').replaceChildren();this.$('detail').textContent='';this.$('note').textContent='尚未读取；没有自动执行。';this.render(false);}
   floor(){const s=JSON.stringify(this.scope());if(s!==this.boundScope){this.boundScope=s;this.wanted=0;}const c=this.context();if(c?.mode==='fixture' && count(c.version))this.wanted=Math.max(this.wanted,c.version);}
   dirty(){return Boolean(this.page && (this.page.as_of_state_version<this.wanted || this.selected && (!this.detail || this.detail.as_of_state_version<this.wanted)));}
   render(sync=true){if(sync)this.floor();this.$('refresh').disabled=this.reading;this.$('next').disabled=this.reading || !this.page?.next_after;for(const b of this.$('list').children)b.disabled=this.reading;this.$('live').textContent=`${this.connectionState} · as-of ${this.page?.as_of_state_version??'UNKNOWN'} · 持久版本 ${this.wanted} · ${this.blocked || this.dirty()?'STALE':'AS-OF'} · checked_at 不是当前授权，心跳不刷新评估有效性`;}
-  changed(version){this.floor();if(count(version))this.wanted=Math.max(this.wanted,version);this.render();this.queue();}
+  changed(version){this.floor();if(count(version))this.wanted=Math.max(this.wanted,version);this.delivery?.changed(this.wanted);this.render();this.queue();}
   connection(status){this.connectionState=status;if(!['LIVE','CATCHING UP'].includes(status)){this.cancel(this.timer);this.timer=null;}this.render();this.queue();}
   queue(){if(!this.dirty() || this.reading || this.blocked || this.timer!==null || !['LIVE','CATCHING UP'].includes(this.connectionState))return;const t=this.ticket();this.timer=this.schedule(()=>{this.timer=null;if(this.current(t) && !this.blocked && ['LIVE','CATCHING UP'].includes(this.connectionState))this.load(this.after,true);},Math.max(0,1000-(this.now()-this.lastRead)));}
   base(){return `/api/v1/projects/${encodeURIComponent(this.scope().project)}/${this.path}`;}
   async load(after='',automatic=false){
     if(this.reading)return;if(this.scope()?.mode!=='fixture'){this.clear();return;}this.cancel(this.timer);this.timer=null;if(!automatic)this.blocked=false;
-    ++this.serial;const t=this.ticket();this.reading=true;this.lastRead=this.now();this.after=after||'';this.detail=null;this.$('detail').textContent='';this.render();
+    ++this.serial;const t=this.ticket();this.reading=true;this.lastRead=this.now();this.after=after||'';this.detail=null;this.delivery?.clear();this.$('detail').textContent='';this.render();
     try{const page=this.check(await this.request(`${this.base()}?limit=2&after=${encodeURIComponent(this.after)}`),t.scope,null,this.after);if(!this.current(t))return;this.page=page;this.wanted=Math.max(this.wanted,page.as_of_state_version);this.$('list').replaceChildren();for(const row of page.items){const b=document.createElement('button');b.className='object-row';b.textContent=this.describe(row);b.addEventListener('click',()=>this.open(row));this.$('list').append(b);}this.$('note').textContent=`本页 ${page.items.length} · ${this.note}`;if(this.selected)await this.readSelected(t);}
     catch(e){if(this.current(t)){this.blocked=true;this.$('note').textContent=e.status===404?'此项目未安装评估只读接口；不是没有实验。':`来源不可用：${e.message}；保留原 as-of，手动读取恢复。`;}}
     finally{if(this.current(t)){this.reading=false;this.render();this.queue();}}
   }
-  async open(row){if(this.reading)return;this.cancel(this.timer);this.timer=null;++this.serial;const t=this.ticket();this.selected=this.select(row);this.reading=true;this.detail=null;this.$('detail').textContent='';this.render();try{await this.readSelected(t);}catch(e){if(this.current(t)){this.blocked=true;this.$('note').textContent=`证据未读取：${e.message}；不推断完成结论。`;}}finally{if(this.current(t)){this.reading=false;this.render();this.queue();}}}
-  async readSelected(t){const v=await this.request(`${this.base()}/${encodeURIComponent(this.selected.id)}`);if(!this.current(t))return;this.detail=this.check(v,t.scope,this.selected);this.$('detail').textContent=JSON.stringify(this.detail,null,2);}
+  async open(row){if(this.reading)return;this.cancel(this.timer);this.timer=null;++this.serial;const t=this.ticket();this.selected=this.select(row);this.reading=true;this.detail=null;this.delivery?.clear();this.$('detail').textContent='';this.render();try{await this.readSelected(t);}catch(e){if(this.current(t)){this.blocked=true;this.$('note').textContent=`证据未读取：${e.message}；不推断完成结论。`;}}finally{if(this.current(t)){this.reading=false;this.render();this.queue();}}}
+  async readSelected(t){const v=await this.request(`${this.base()}/${encodeURIComponent(this.selected.id)}`);if(!this.current(t))return;this.detail=this.check(v,t.scope,this.selected);this.$('detail').textContent=JSON.stringify(this.detail,null,2);this.delivery?.render();}
 }
