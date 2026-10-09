@@ -2,6 +2,10 @@
 
 版本 1.0 · 与 `PRD.md` 同步。本文是执行拆解，不授予真实模型、训练、迁移或远程开放权限。
 
+Checkpoint37最终root/High九modules各383pass、中央full原87325终态1513pass/32既有skip/1warning488.35s、18SHA一致、范围MUST关闭，compileall/pipcheck/diff0，无live tests；见HYBRID_BUDGET_LEDGER.md/evidence/checkpoint-37-final-tests.txt。下方candidate是历史过程；本轮不改验收/任务依赖，不关闭完整T14/runtime/STOP/M1/B1/长期或M0–M5，Goal active并继续实际workspace排斥/lease与剩余安全门。
+
+Checkpoint37候选补充T14实际累计预留/UNKNOWN/核心取消与历史恢复，不修改原任务依赖或验收标准。root/High九modules各383pass/18SHA一致，中央full87325尚LIVE；可信usage/主机pool/OS资源、完整executionlease/register/release/ACK/STOP及工程科研闭环仍未完成。HELD只是所请求估计占额，不证明workload完整allocation，详见HYBRID_BUDGET_LEDGER.md/evidence/checkpoint-37-final-tests.txt；Goal active，后续按安全前置门持续推进。
+
 ## 1. 实施原则
 
 每个任务交付一个可测试的纵向切片；保留现有角色/预算/隔离不变量，先加观测出口再替换运行路径。没有必要不移动既有 Python 文件；模块边界可先通过小类/函数和 protocol 形成。

@@ -83,6 +83,9 @@ def maintain(store,*,seconds=5,max_bytes=32*1024*1024,max_rows=100000,max_nodes=
                 admission_events={key:store._admission_event(db,key,max_bytes=max(0,min(budget[0],256*1024)),_parse=source_parse,_decode=decode)
                                   for key in state.get('hybrid_admission_facts',{})}
                 admission_summary=store._admission_summary(db,version)
+                budget_events={key:store._budget_event(db,key,max_bytes=max(0,min(budget[0],1024*1024)),_parse=source_parse,_decode=decode)
+                               for key in state.get('hybrid_budget_entries',{})}
+                budget_summary=store._budget_summary(db,version)
             check()
             from .contracts import validate_runtime_state
             validate_runtime_state(state);check()
@@ -96,6 +99,8 @@ def maintain(store,*,seconds=5,max_bytes=32*1024*1024,max_rows=100000,max_nodes=
             controller_complete(state,registration,controller_events.get,event_tip=controller_tip);check()
             from .hybrid_admission import validate_complete as admission_complete
             admission_complete(state,registration,admission_events.get,event_summary=admission_summary);check()
+            from .hybrid_budget_ledger import validate_complete as budget_complete
+            budget_complete(state,registration,budget_events.get,event_summary=budget_summary);check()
             raw=canonical(state);check()
             if len(raw)>max_bytes:return False
             digest=hashlib.sha256(raw).hexdigest();check()

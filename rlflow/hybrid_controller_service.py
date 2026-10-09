@@ -143,7 +143,7 @@ class ControllerService:
                     'authority_domain':'HYBRID_CORE_FACTS_ONLY','execution_enabled':False}
 
     @contextmanager
-    def token_transaction(self,token,*,read_bytes=READ_BYTES,_before_commit=None):
+    def token_transaction(self,token,*,read_bytes=READ_BYTES,_before_commit=None,_after_final_sample=None):
         """Mint a fresh fixed-Store writer, hold owner lock, recheck and commit.
 
         Never accepts a caller's connection/read snapshot. Internal owner API;
@@ -154,6 +154,8 @@ class ControllerService:
             raise Conflict('invalid controller transaction read envelope')
         if _before_commit is not None and not callable(_before_commit):
             raise TypeError('internal final-check callback required')
+        if _after_final_sample is not None and not callable(_after_final_sample):
+            raise TypeError('internal pure deadline callback required')
         with self.store.lock(),self._lock,self.store.connect() as db:
             db.execute('BEGIN IMMEDIATE');budget=ReadBudget(db,read_bytes)
             if self.store._hybrid_controller_service is not self:
@@ -165,8 +167,28 @@ class ControllerService:
                 yield db,budget,value
                 self.check_token_in_transaction(db,token,budget)
                 if _before_commit is not None:_before_commit()
+                # Source/head proof callbacks can be expensive. Sample actual
+                # owner, STOP and both deadlines AFTER all such reads, with no
+                # subsequent source expansion before the owned COMMIT.
+                now,mono=self._final_token_freshness(db,token,budget)
+                # Internal owner deadline comparisons ONLY: no SQL, source
+                # expansion, file IO or new authority after this final sample.
+                if _after_final_sample is not None:_after_final_sample(now,mono)
                 db.commit()
             finally:self._token_active=None
+
+    def _final_token_freshness(self,db,token,budget):
+        active=self._token_active
+        if (active is None or active[0] is not db or active[1] is not token or active[2] is not budget or
+                active[3]!=threading.get_ident() or not db.in_transaction or
+                self.store._hybrid_controller_service is not self):
+            raise PermissionError('actual final held controller transaction required')
+        value=self._issued(token);self._owner_live();now,mono=self._sample()
+        if (value['request']['owner']!=self.owner or value['request']['store_epoch']!=self.store_epoch or
+                not timestamp(value['issued_at'])<=now<timestamp(value['expires_at']) or
+                not value['issued_monotonic_ns']<=mono<value['expires_monotonic_ns']):
+            raise Conflict('controller token expired at final owned commit')
+        return now,mono
 
     def _refuse_nested_writer(self):
         if self._token_active is not None and self._token_active[3]==threading.get_ident():

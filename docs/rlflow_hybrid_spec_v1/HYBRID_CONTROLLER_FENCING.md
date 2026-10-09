@@ -1,5 +1,9 @@
 # 持久 controller fencing：仅 Hybrid 核心事实域
 
+Checkpoint37 最终终态：root/独立High九modules各383pass/1既有warning，158.84s/159.97s；中央full原87325 exit0 **1513passed/32既有外部H1skip/1既有warning488.35s**，18SHA一致、范围无剩余MUST、compileall/pipcheck/diff0，无live tests。实际累计预算/原proof/current heads/恢复与共用最终期限出口见HYBRID_BUDGET_LEDGER.md/evidence/checkpoint-37-final-tests.txt；下方旧candidate/LIVE是保留过程记录，不表示当前测试仍活跃。没有新browser/性能/B1/NFR06/24h/8h或离线18checks证据，不宣称可信UsageOwner/主机pool/runtime release/可靠STOP/T14/M1/完整M0–M5通过，Goal active。
+
+Checkpoint37 候选补充 owned COMMIT 最终时序：`_before_commit` 完成全部当前source/head proofs，随后 `_final_token_freshness` 核actual active db/token/budget/thread、Kernel/config/STOP，再采最后UTC/mono、核原token双TTL；内部 `_after_final_sample` 只做无DB/source/filetree IO期限比较，然后直接owned COMMIT。Budget和Admission复用同一最终UTC以防人的consent或材料期限早于controller、在最后hash/Kernel工作中先到期。root/High九modules各383通过/18SHA一致，当前full原87325仍LIVE，最终交付以checkpoint37证据终态为准；不扩大成workspace或worker lease。
+
 Checkpoint35 增量，基于 checkpoint34 `de06848`。这是内部实际 SQLite 组件，不是 HTTP 开关、workspace writer lease、执行准入或 T12 完成声明。
 
 ## 实际实现

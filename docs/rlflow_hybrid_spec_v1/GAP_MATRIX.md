@@ -1,5 +1,9 @@
 # 当前实现到需求的差距矩阵
 
+Checkpoint37 最终终态：root/独立High九modules各383pass/1既有warning，158.84s/159.97s；中央full原87325 exit0 **1513passed/32既有外部H1skip/1既有warning488.35s**，18SHA一致、范围无剩余MUST、compileall/pipcheck/diff0，无live tests。实际累计预算/原proof/current heads/恢复与共用最终期限出口见HYBRID_BUDGET_LEDGER.md/evidence/checkpoint-37-final-tests.txt；下方旧candidate/LIVE是保留过程记录，不表示当前测试仍活跃。没有新browser/性能/B1/NFR06/24h/8h或离线18checks证据，不宣称可信UsageOwner/主机pool/runtime release/可靠STOP/T14/M1/完整M0–M5通过，Goal active。
+
+Checkpoint37 当前候选：实际累计BudgetService/原metadata/三种indexed最新head/owned最终deadline guard和audit/snapshot/recover闭合已接线，root/High exact九modules各383pass（158.84s/159.97s）、18SHA一致/范围无MUST；中央full原87325仍LIVE、未commit。七维估计占额、UNKNOWN保留、核心exact PRE_RUNTIME取消tombstone、真实批准revision降限/多Goal合计/epoch连续已验证，不再把累计占额写作“尚无”。仍缺可信UsageOwner/父子usage范围去重/USED/adjustment、主机共享3session/GPU/OS资源池、runtime register/release及可靠STOP；project只有曝光aggregate无trustedcap，HELD不证明workload足额或hardtokens。见HYBRID_BUDGET_LEDGER.md/evidence/checkpoint-37-final-tests.txt。无新UI/B1/长期/安装/完整M0–M5证明，Goal active。
+
 Checkpoint36终态：中央full1393/32既有skip/1warning408.56s；root/High exact六modules各263/81.63s及82.57s，15 SHA一致、范围无MUST，无live。实际BLOCKED AdmissionService/同writer guard、fixed point proof、actual UTC/mono witness与原proof/tipCOUNT恢复已实现，见HYBRID_BLOCKED_ADMISSION.md/evidence/checkpoint-36-final-tests.txt；不再称统一BLOCKED准入“尚无”。仍无execution/lease/writer排斥/共享pool/预算/可靠STOP/真实工程科研/完整M0–M5验收；下一真实累计预算，Goal active。
 
 checkpoint35完整终态：中央full原12471 exit0 1296/32既有skip/1warning359.97s；独立High原68295 exact四modules ONCE exit0 166/1warning38.34s，11SHA一致、范围MUST关闭、无live测试。下段pending为旧过程，见evidence/checkpoint-35-final-tests.txt。controller仅CORE_FACTS_ONLY，不关闭ARC01/04/完整T12或其它执行验收；下一bounded当前点证明、锁序、实际BLOCKED准入，完整Goal active。
@@ -22,7 +26,7 @@ checkpoint32当前增量：合同/原始receipt/条件批准与恢复闭合、�
 | 合同授权 T09、T16 | `policy.py`、`authorizations.py`、`packages.py` | 不可变 GoalContract、可信 principal、审批精确版本、CSRF、幂等命令回执 | A01、A02、A20、A21、A29、A30 |
 | Runtime T02、T11–T13 | `worker.py`、`isolation.py`、`startup.py`、`lifeguard.py` | 0.161.0 compatibility、protocol pin、adapter、controller fencing、候选 writer lease、只读固定评审 | A03–A05、A09、A10、A23、A36 |
 | 策略 T10 | `decomposition.py`、`progress.py`、`failures.py`、`escalations.py` | 事件风险激活、DAG 与全局条件、冷却与预算收尾策略 | A02、A06–A08 |
-| 预算 T14 | `accounting.py`、`usage.py`、`model_policy.py` | scope 避免父子重算、跨项目资源池、unknown exposure、硬/软边界显示 | A11–A13、A31 |
+| 预算 T14 | 旧 `accounting.py`、`usage.py`、`model_policy.py`；37候选新增actual `hybrid_budget_service.py`/immutable账本、七维预留、UNKNOWN保留、原HELD取消、revision/epoch连续 | 可信UsageOwner和父子scope去重、USED/adjustment、跨项目主机pool/硬OS资源、prepared workload可信完整allocation、公共预算边界展示，完整T14仍未通过 | A11–A13、A31 |
 | STOP/恢复 T17 | `jobs.py`、`lifeguard.py`、`startup.py` | 命令异步终态、epoch fence、UNKNOWN reconcile 与 UI 一致性 | A20–A23 |
 | 研究 T18–T20 | `experiments.py`、`research.py`、`evidence.py` | 通用本地/fixture adapter，执行/有效性/结论正交，科研闭环，安全产物接口 | A22、A27、A28、A30 |
 | Dashboard T06–T08、T20 | 当前已新增认证只读 API/SSE、真实Live拓扑/状态/原因/预算未知、虚拟事件与公共日志、绑定工具metadata、真实HOST/worker telemetry、手机/键盘/减少动画 | 完整条件/实验/控制页、真实闭环、B1/长期资源验收仍待完成；M1退出门槛见M1_ACCEPTANCE_REPORT.md，不把早期基线“无前端”当当前状态 | A10、A14–A19、A30、A35 |

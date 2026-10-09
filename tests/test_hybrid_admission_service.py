@@ -4,6 +4,7 @@ from datetime import timedelta
 import hashlib
 import json
 import threading
+import inspect
 
 import pytest
 
@@ -235,3 +236,27 @@ def test_material_witness_is_asof_not_file_io_or_execution_under_writer(admissio
     result=service.admit(request,token,witness=witness)
     assert result['fact']['gates']['material_observation']=='VERIFIED_AS_OF'
     assert result['fact']['status']=='BLOCKED' and result['execution_enabled'] is False
+
+
+@pytest.mark.parametrize('expiry',['utc','witness_mono'])
+def test_final_owner_work_cannot_outlive_material_deadline(admission,monkeypatch,expiry):
+    service,request,token,witness=actual(admission)
+    early=timestamp(admission[4]['sources']['evaluated_at'])+timedelta(seconds=10)
+    monkeypatch.setattr(service.controller,'clock',lambda:early)
+    token=service.controller.renew(token,'long-material-controller',expected_version=5,ttl_seconds=60)['token']
+    request['expected_state_version']=6;before=service.store.audit();owner_live=service.controller._owner_live;seen=[0]
+    def expire_after_owner_work():
+        owner_live()
+        if inspect.currentframe().f_back.f_code.co_name=='_final_token_freshness':
+            seen[0]+=1
+            if expiry=='utc':
+                late=timestamp(admission[4]['material_observation']['expires_at'])
+                assert late<timestamp(json.loads(token.raw)['expires_at'])
+                monkeypatch.setattr(service.controller,'clock',lambda:late)
+            else:
+                monkeypatch.setattr(service.preparation,'_witness_monotonic_ns',lambda:witness.expires_monotonic_ns)
+    monkeypatch.setattr(service.controller,'_owner_live',expire_after_owner_work)
+    with pytest.raises(Conflict,match='material observation expired at final'):
+        service.admit(request,token,witness=witness)
+    assert seen[0]==1 and service.store.audit()==before
+    assert service._active is None and service.controller._token_active is None

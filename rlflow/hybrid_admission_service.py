@@ -171,9 +171,17 @@ class AdmissionService:
         def final_check():
             if self._active is None:raise PermissionError('actual final admission guard missing')
             self._active.check()
+        def final_deadlines(now,mono):
+            if self._active is None:raise PermissionError('actual final admission guard missing')
+            value=json.loads(self._active.raw);witness=self._active.witness
+            _,witness_mono=self.preparation._witness_sample()
+            if (not timestamp(value['sources']['evaluated_at'])<=now<timestamp(value['sources']['expires_at']) or
+                    not timestamp(value['material_observation']['checked_at'])<=now<timestamp(value['material_observation']['expires_at']) or
+                    not witness.issued_monotonic_ns<=witness_mono<witness.expires_monotonic_ns):
+                raise Conflict('admission consent or material observation expired at final owned commit')
         if self._active is not None:raise Conflict('nested admission owner transaction refused')
         try:
             with self.controller.token_transaction(token,read_bytes=PREPARATION_READ_BYTES,
-                                                   _before_commit=final_check) as context:
+                    _before_commit=final_check,_after_final_sample=final_deadlines) as context:
                 yield context
         finally:self._active=None

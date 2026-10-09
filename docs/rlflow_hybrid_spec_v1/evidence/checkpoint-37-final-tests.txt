@@ -1,0 +1,128 @@
+Checkpoint37 frozen final validation — root / independent / full terminal
+Parent checkpoint36: 2199f3c. USER package-lock.json not touched or staged.
+No paid model/API/GPU, protected project writes, push, public deployment or
+self-dispatch of this development Goal. Core budget only, execution remains false.
+
+ROOT SERIAL TERMINAL RUNS (all original sessions polled to actual terminal):
+budget-arithmetic-r1 direct exit1: 26 pass / 1 fixture failure, 0.06s.
+  UNKNOWN1 <= reserved3 is legal; negative fixture changed to4, not weaker math.
+budget-arithmetic-r2 direct exit0: 27 pass, 0.05s.
+budget-arithmetic-r3 direct exit0: 36 pass, 0.06s.
+budget-domain-r1 original37057 exit1:45 pass/7 fixture failures/1 warning,7.55s.
+  Original approved model_sessions0; fixture wrongly expected model1 HELD.
+  Used original approved wall_seconds1 instead, no policy or gate weakening.
+budget-domain-r2 original84109 exit0:53 pass/1 existing warning,8.00s.
+budget-domain-r3 original65912 exit0:66 pass/1 existing warning,14.64s.
+budget-store-r1 original5293 exit0:329 pass/1 existing warning,97.28s.
+  BEFORE third metadata hash field and literal-preserving DDL fix.
+budget-index-r1 original79996 exit1:69 pass/1 fixture failure/1 warning,16.65s.
+  Protected readonly attach rejected writable temporary dirs. Fixed fixture
+  permissions and used actual scope; product protection remains intact.
+budget-index-r2 original23910 exit0:70 pass/1 existing warning,17.08s.
+budget-service-r1 original84442 exit1:2 pass/10 fixture failures/1 warning,7.61s.
+  Wrong fixture method Store.object (actual get); invalid generic mutation
+  raised schema error before owner guard. No accepted unauthorized writes.
+budget-service-r2 original82751 exit1:8 pass/4 fixture failures/1 warning,8.50s.
+  Added generic budget object owner check BEFORE mutation/idempotency; kept
+  negative tests requiring actual PermissionError rather than weaker exception.
+budget-service-r3 original99417 exit0:82 pass/1 existing warning,24.87s.
+budget-service-r4 original52785 exit0:26 pass/1 existing warning,19.67s.
+integration-r1 original6625 exit0:367 pass/1 existing warning,123.82s.
+  BEFORE final freshness MUST fixes; never relabeled final frozen validation.
+budget-service-r5 original77989 exit0:44 pass/1 existing warning,51.43s.
+  Includes last callback point-read expiry/STOP across all3actions and large
+  legal role_schema (decoded<4MiB, actual encoded blob>16MiB) reserve, duplicate,
+  UNKNOWN, audit/replay/manual/explicit64MiB periodic snapshot/recover.
+final-freshness-r1 original15819 exit0:136 pass/1 existing warning,77.31s.
+  Same final sample also checks human consent when controller remains live.
+budget-continuity-r1 original67678 exit0:3 pass/45 deselected/1 warning,4.84s.
+  Actual approved revision lower limit, multiple Goal aggregate exposures,
+  observation epoch rotation retaining UNKNOWN; no fake project authority cap.
+integration-r2 original93530 exit0:383 pass/1 existing warning,158.84s.
+  Exact nine modules:
+  tests/test_hybrid_budget_service.py tests/test_hybrid_budget.py
+  tests/test_hybrid_budget_ledger.py tests/test_hybrid_admission_service.py
+  tests/test_hybrid_admission.py tests/test_hybrid_controller.py
+  tests/test_hybrid_controller_service.py tests/test_hybrid_preparation_service.py
+  tests/test_snapshot_maintenance.py
+  Prefix for all pytest: PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q
+  stdout/stderr: audit/hybrid-v1/checkpoint-37-<run-name>.log, non-overwritten.
+ 18SHA recorded during this run (no source edits between start and terminal),
+ rechecked equal at actual terminal. Root alone tested; High only read sources.
+ independent-r1 original32691 actual terminal exit0:383pass/1existing warning,
+ 159.97s, exact same nine modules ONCE. 18SHA before/after equal and identical
+ to root freeze, no source edits/concurrent suites. Final High scope no MUST.
+ Root full-r1 original87325 actual terminal exit0:1513passed/32existing external
+ H1 skips/1existing Starlette warning,488.35s. Prefix same; no concurrent suites
+ or source/test/schema edits. 18SHA identical to frozen root and independent.
+ compileall -q rlflow tests, pip check, git diff --check each terminal exit0.
+ No live tests. Final staged audit/commit tracked in PROGRESS.md.
+ This checkpoint validation is NOT Goal completion.
+
+High static findings closed subject to frozen actual final validation:
+1. DDL validation must not lowercase/remove whitespace inside JSON path literals.
+   Exact generated SQLite DDL accepted; wrong case/space path rejected.
+2. Final source/head proof may outlive controller dual TTL or STOP freshness.
+   Owned exit now checks actual owner/Kernel/config/STOP after all source proofs,
+   then samples UTC/mono, compares deadlines and immediately owns COMMIT.
+3. Human consent may expire in final owner/hash work before longer controller TTL.
+   Internal no-DB/no-source deadline callback uses the SAME last sample.
+   Budget checks consent; Admission checks consent/material UTC + actual
+   witness short-clock monotonic sample. Short human/long controller negative
+   is independent of controller expiry, plus two Admission material negatives.
+
+Frozen source/test/schema SHA256:
+1d1b6e2cd7e06355803628aeedbfd2429cf3d61591c318003acd9964bb62e8ec  rlflow/hybrid_budget.py
+826c818653252dd6473dc049d661b41b7526f0c540532e6b26ba78d82b08903f  rlflow/hybrid_budget_ledger.py
+29c09b6c18bbb66e53351109f388a9ae0a58c2095aa9298ce20d3b615d8b11d8  rlflow/hybrid_budget_service.py
+ca805a6386d08f20d99c610d9071cb9c9d0c4ca8b36796cad8c8b1f59ce32b34  rlflow/hybrid_controller_service.py
+c17b5181affd365b676b6a25973d1168dea7156069cb473d17e27f3b95881817  rlflow/hybrid_admission_service.py
+fa4b6ded9d36480e672d173905a0f04ba6525fda74dffc09702b2eb5c1f808b9  rlflow/store.py
+dbacad6ec4de6bc3576c3e252f6e5ae4ec5b332a2d1f8858352cbd5731c37298  rlflow/contracts.py
+c26cfc8cf90560529c6a6623c083315c402e03c633fce3382804706c48ade500  rlflow/snapshot_maintenance.py
+e72387fe674fc6379f0d5eaf930c7dc7ad2bd30cbd9f8129519ce7836af0de01  schemas/RuntimeState.json
+717b55951eaa84597ad84ce84d1c874e8075b545101cc0d7b4bce4ee8a9914e7  tests/test_hybrid_budget.py
+07aeee70ebb4378345e756f5e3861f5c974225411abf01a48698898c6e195db9  tests/test_hybrid_budget_ledger.py
+4edf4740ed180e275b94c16f1598f8c78355c6f9b06adb06296e7b4d2b04da11  tests/test_hybrid_budget_service.py
+a44a54331f22bfc3e7219d673a35ad566227baf0af8b2ab3582a86aa21e79f56  tests/test_hybrid_admission_service.py
+32c11733f1fcb775b9ac424858ce215264645ba30f2ed2ff5977cf4fbd223cfe  tests/test_hybrid_admission.py
+1dffc4834ce938a424cf74c3d8ea473fdd24188a568c578cf640c3dd60c5e3d6  tests/test_hybrid_controller.py
+cb50af02fbb0c6525d4f34907955900e02c3c39342815e529bac49268150366c  tests/test_hybrid_controller_service.py
+90ec178292f3c25e7fc0b5ce6917fab0a824c8ca09fc5f8e7d3cd338cbea5972  tests/test_hybrid_preparation_service.py
+2e54daefca6f6c992b7389bb0b0123b23797f4b2f110d52c360569e4cf216549  tests/test_snapshot_maintenance.py
+
+Terminal root log SHA256 (historical versions kept; not all final source):
+d6feaada4a3b9323ec178473e1fa7571a1aecfb7a0a1a474bb8e6032d7f63d15  budget-arithmetic-r1
+207d16c6b778c24c7db4ce12f4c37f478b12c1d7c0b25ece21dadf0bd324ea03  budget-arithmetic-r2
+52bf36083c33d32f0f9df9c3792b172cfe45ccf8714479e3d32b61ce2ddfb16b  budget-arithmetic-r3
+622fdb84af68c9ad7cb2d27bd4264bcc255f400ffac928f06b2e56702ae87f6c  budget-domain-r1
+0ec982dcbcc44ddebd53ecf72fe621cdee3189547afa2f51ba8d56cd9b9adac8  budget-domain-r2
+1a4b90216d3bb046ada267d65d8cc0798721fc39ba9a0ce6b007de3573055a6b  budget-domain-r3
+228de540b97e374b32259496650a53d2ad25b654cde94ec587f2d0b38eefd65c  budget-store-r1
+b9eed5f1e7a85263a705edaef7fe459dd8bfa96bf065baa399c8a0c83e0e33d0  budget-index-r1
+d5afbb90043692cd4e8c8b18f61dea790dab53e81e1a60a4d052077c84eefa01  budget-index-r2
+81e45220207a8ad65d726a7ef8885916a7ada04d746d73229db80afbc1198a72  budget-service-r1
+7581768c2bc5a76699c0d43ba3025d4c996b2979c6081f2b6d62819887d4df6b  budget-service-r2
+5d230ac46857a44056912b6684560ae024fc0585fb8f75167990f2c633b1004c  budget-service-r3
+48846d2b98983e31c85e121ee10407c86520416437f38c52998558c611dd207a  budget-service-r4
+1b2b9fb10b56e4035176c5b85d673574086cc5a90223f358f15194e5b0be9d58  budget-service-r5
+f6c51fe3fca6171db860be782b39bf436534d64c5870c51273bc722d52f3fae7  final-freshness-r1
+458d8d625e4971b465548da8246d869c799ddb296afa94fff7ddba9026aa749c  budget-continuity-r1
+ebe8aa7cd56bf2a3863b4f4ad345852599b47bfb3b26f4bec5e0b3289eacc7e2  integration-r1
+c823e84f7fb9606aaddf87f6e23706d671c4c92f97a17264cf4bc10708ee5d22  integration-r2
+5f47fbd8db08774d1b040c56e809235a5ffd0db6b8accba6844f6a87314c01c2  independent-r1
+4b6f4279abdf8428d5c8bdfda4567bd6b82e28a466a6fb9686c16da5cc5ef3b1  full-r1
+
+Limits:
+Actual reservations are the requested soft estimates, NOT proof the prepared
+workload is fully allocated and NOT hard native token/GPU/OS enforcement.
+No UsageOwner/USED/NOT_STARTED/refund/adjustments, runtime registration/release,
+writer/legacy exclusion, shared3model session hostpool or reliable STOP.
+Cancellation only protected exact PRE_RUNTIME HELD+NOT_AUTHORIZED original
+source and irreversible CANCELLED head; UNKNOWN never cancels. Future handoff
+must atomically register intent/UNKNOWN and share reservation CAS.
+Project exposures are aggregates, no trusted project limit or cap is invented.
+No new browser/B1/NFR06/24hfixture/8hUI/offline-validator evidence this slice.
+Existing32external H1 skips/Starlette warning remain, not silently removed.
+Goal M0–M5 remains active; next actual workspace exclusion/leases/sharedpool/
+runtime release/managed STOP and engineering/research/install/long acceptance.

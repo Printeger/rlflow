@@ -1,5 +1,15 @@
 # 开发决策记录
 
+## Checkpoint37 候选：累计占额与不可逆核心取消，不引入调用者自证结算
+
+账户固定project/mode/goal_ref，不含revision/adapter/controller或observation epoch；unknown是reserved子集。原批准合同的七维actual int64限额与明确finalization比例是唯一Goal预算来源；当前无项目总限额可信来源，所以项目对象只派生三类曝光，不把Goal限额相加伪造项目授权。实际API只接受EXECUTION规划桶，FINAL_VALIDATION/RECOVERY须未来可信TaskOwner；softtokens不承诺硬上界，HELD不证明prepared workload完整足额。
+
+一个原事件闭合immutable entry与三种派生head，canonical三字段metadata锚定entry hash、goal account、reservation ID。当前热证明分别核perGoal/perReservation/globalProject indexed tip与精确原派生head，防旧HELD投影回退重复退款；full从全部entries重建head、核历史tip/count与所有原来源。索引DDL精确保留quoted JSON path字节，不使用全SQL去空白/转小写。
+
+UNKNOWN保留全部曝光，当前无UsageOwner，不开放USED/NOT_STARTED/refund/adjustment。取消只接受保护域exact PRE_RUNTIME HELD+NOT_AUTHORIZED原来源，原子不可逆CANCELLED tombstone；未来register/release必须共用head CAS并先记外部handoff intent/UNKNOWN。旧批准到期或修订改变不阻保守清理，但actual当前Controller/Kernel/STOP仍核验；本轮不声称可靠STOP安全cleanup已完成。
+
+独立审查发现两段最终期限窄窗，采用共用Controller owned COMMIT出口：heavy sources/heads callback结束后核owner/Kernel/config/STOP，再最后UTC+mono采样、内部纯deadline callback与COMMIT。Budget与Admission使用同一最终UTC核各自human/material期限，Admission另轻量核actualWitness mono；不会在最后采样后重读DB/材料hash/filetree。验收仍以真实终态和冻结源为准，当前候选不是完整T14/M0–M5交付。
+
 ## Checkpoint36：实际 owned writer 中持久拒绝，不把观察升级为执行权限
 
 Controller 当前检查采用固定 head/tip/fact/direct predecessor 原 source 点证明；full audit/snapshot/recover 保留完整历史职责。统一锁序 writer→controller，owned token transaction 不接受 caller read connection；同线程 nested writer 提前拒绝。Preparation 真实文件核验只在 writer 外，内存原对象 MaterialWitness 用本 boot UTC+mono 30 秒与独立短时钟锁保持 freshness，不取得 Prep owner 大锁或重做文件 IO。

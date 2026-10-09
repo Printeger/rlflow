@@ -1,5 +1,9 @@
 # 需求包离线校验报告
 
+Checkpoint37 最终终态：root/独立High九modules各383pass/1既有warning，158.84s/159.97s；中央full原87325 exit0 **1513passed/32既有外部H1skip/1既有warning488.35s**，18SHA一致、范围无剩余MUST、compileall/pipcheck/diff0，无live tests。实际累计预算/原proof/current heads/恢复与共用最终期限出口见HYBRID_BUDGET_LEDGER.md/evidence/checkpoint-37-final-tests.txt；下方旧candidate/LIVE是保留过程记录，不表示当前测试仍活跃。没有新browser/性能/B1/NFR06/24h/8h或离线18checks证据，不宣称可信UsageOwner/主机pool/runtime release/可靠STOP/T14/M1/完整M0–M5通过，Goal active。
+
+Checkpoint37 系统候选：root/High exact九modules各383pass/1既有warning，158.84s/159.97s，18source/test/schema SHA一致、范围无MUST；中央full原87325仍LIVE未完成验收/commit。实际预算原proof/indexed当前heads/累计连续/恢复和Controller最终sample-domain deadline guard见HYBRID_BUDGET_LEDGER.md/evidence/checkpoint-37-final-tests.txt。不是本需求包离线18checks的新运行，也没有新browser/性能/B1/soak证明；无runtime release/可信usage/sharedpool/可靠STOP或完整M0–M5完成，Goal active。
+
 Checkpoint36系统终态：中央full原11991 exit0 1393passed/32既有skip/1warning408.56s；root/High exact六modules各263passed，15 SHA不变、范围无MUST、compileall/pipcheck/diff0，无live。见HYBRID_BLOCKED_ADMISSION.md/evidence/checkpoint-36-final-tests.txt；不是本需求包旧18checks离线validator的新运行，没有重跑或重标browser/NFR/B1/soak。BLOCKED事实非执行、完整M0–M5 Goal active。
 
 Checkpoint35系统最终终态：中央full原12471 exit0 1296/32既有skip/1warning359.97s；独立High原68295 exact四modules ONCE exit0 166/1warning38.34s，11SHA一致、范围MUST关闭、compileall/pipcheck/diff0，无live测试。下段pending为旧过程，见evidence/checkpoint-35-final-tests.txt。这不是新的需求包18checks/browser/B1/NFR/soak运行；CORE_FACTS_ONLY不是完整Runtime/ARC/STOP验收，Goal active。

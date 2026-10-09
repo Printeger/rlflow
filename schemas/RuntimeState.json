@@ -842,6 +842,10 @@
     "hybrid_controller_facts": {"type": "object"},
     "hybrid_controller_heads": {"type": "object"},
     "hybrid_admission_facts": {"type": "object"},
+    "hybrid_budget_entries": {"type": "object"},
+    "hybrid_budget_goal_heads": {"type": "object"},
+    "hybrid_budget_reservation_heads": {"type": "object"},
+    "hybrid_budget_project_heads": {"type": "object"},
     "tool_sources": {
       "type":"object","additionalProperties":{"$ref":"ToolLedger.json#/$defs/source"}
     },

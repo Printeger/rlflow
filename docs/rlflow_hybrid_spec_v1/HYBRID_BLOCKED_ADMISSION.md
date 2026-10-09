@@ -1,5 +1,9 @@
 # 实际 BLOCKED 准入观察
 
+Checkpoint37 最终终态：root/独立High九modules各383pass/1既有warning，158.84s/159.97s；中央full原87325 exit0 **1513passed/32既有外部H1skip/1既有warning488.35s**，18SHA一致、范围无剩余MUST、compileall/pipcheck/diff0，无live tests。实际累计预算/原proof/current heads/恢复与共用最终期限出口见HYBRID_BUDGET_LEDGER.md/evidence/checkpoint-37-final-tests.txt；下方旧candidate/LIVE是保留过程记录，不表示当前测试仍活跃。没有新browser/性能/B1/NFR06/24h/8h或离线18checks证据，不宣称可信UsageOwner/主机pool/runtime release/可靠STOP/T14/M1/完整M0–M5通过，Goal active。
+
+Checkpoint37 候选补充：Admission的owned transaction复用Controller最后UTC/mono出口，全部source/head/material proof之后，最终同sample核consent和material UTC，并轻量核actualWitness mono；新增最后owner/hash工作后材料UTC或独立mono到期两项全事务回滚。新增BudgetService不把Admission的UNVERIFIED budget gate自动改为可执行；事实仍不可变BLOCKED，release/candidate_write/execution始终false。root/High九modules各383pass/18SHA一致，full原87325仍LIVE，见checkpoint37阶段证据。
+
 Checkpoint36 增量，基于 checkpoint35 `b320daa`。root/独立 High 同六模块各263passed，中央全量1393passed/32既有skip/1warning；这不是 execution lease、workspace 排他权或 T11/T12 完成声明。
 
 ## 保护端与提交
