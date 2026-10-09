@@ -1,0 +1,30 @@
+Checkpoint55 actual results; parent54 25664f0. No live tests.
+DELIVERED actual original fixed candidate output → cold readonly authenticated API → existing Dashboard real Chrome. No owner/grant reconstruction; bounded source proofs not full audit/current authority.
+All Python commands use PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q -s <exact selector> --disable-warnings.
+tests/test_hybrid_candidate_output_reads.py::test_actual_original_output_cold_HTTP_no_writer_and_owner_closed
+original80730 terminal78b176 exit0 1pass/1warning19.79s actual baseline2→after3, original SHA, no GET execution/poll/write, original owners closed cold read.
+tests/test_hybrid_candidate_output_reads.py::test_auth_closed_query_dual_domain_corruption_and_final_auth
+r2 original8118 terminal4fbd9c exit1 1fail/1warning18.83s. Production Conflict inherits ValueError: corruption wrongly returned400. Narrow fix explicit Conflict503 before parameter catch.
+r3 original75173 terminal4106f7 exit0 1pass/1warning19.05s dual domains missing→503, projection drift→503, auth401/cross-origin403/defaultoff404/query400/POST405/final revoke401.
+tests/test_hybrid_candidate_output_reads.py::test_original_dependency_damage_large_key_and_final_epoch_cannot_be_success
+original84820 terminal1cbc8a exit0 1pass/1warning22.80s original result/intent/terminal/Prep pair/Controller projection damages→503, hostile key, post-read epoch→503; restored limit5 page/audit/owner closed read pass.
+Test insertion temporarily moved first case's final three owner-closure assertions into third; restored first case exactly as passed r1 after sole r4 terminal. Third retains same closure assertions, no deletion or production changes.
+Three distinct new cases individually passed, NOT final fresh3suite claim.
+node --test web_checks/candidate-output-panel.test.mjs web_checks/cpu-assessment-panel.test.mjs
+terminaldbae2d exit0 8pass67.715804ms; closed DTO, exact three actual tests, durable/offline/heartbeat/no-loop, original-id detail, identity/project/epoch/logout late result/error fencing.
+node --test web_checks/candidate-output-browser.test.mjs
+original49313 terminalefaddd exit0 1pass21.525140s. Actual fixed worker STOP/FREE/write evidence→Chrome3tests+differentbefore/afterSHA; one no-execution event refreshes selected detail; owner closes still reads, logout privateDOM empty, zero execution writes/pageerrors.
+Necessary old backend:
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q tests/test_web_api.py tests/test_web_auth.py tests/test_hybrid_cpu_assessment_reads.py --disable-warnings
+original1687 terminalb68f9b exit0 19pass/1warning62.74s.
+Necessary old frontend/browser app lifecycle + configured old CPU defaults:
+node --test --test-concurrency=1 web_checks/browser.test.mjs web_checks/hybrid-browser.test.mjs web_checks/fixture-runtime-browser.test.mjs web_checks/cpu-assessment-browser.test.mjs
+original19800 terminal06f30e exit0 4pass80.189663s.
+No parallel/restarted suites; no repeated54 full or new passed Chrome.
+282 finalSHA manifest2662894f6f70873314d345f71cf11241eb92d30fb5eea0a527184c68118ace45, during/after matches. Compileall rlflow/tests/web_checks, pipcheck, JSsyntax panel/app, git diff check exit0.
+High readonly narrow design+actualdiff no confirmedMUST; no tests/writes/repeated54 review. Bounded tip/count/event check is not all-ancestry/pbalanced-corruption audit; projection.version invalid as max accepted because recovery resets rows to globalversion.
+Nonblocking inherited404 assessment wording retained; no unnecessary repair loop.
+USER package-lock SHA becc7e2a36dfcad4ffe934b5ff2f0f68187611d6c0641bd63d81367651cfbf09 unchanged/untracked/not staged.
+Raw audit/hybrid-v1/checkpoint-55-*.log retained locally; actual fingerprints archived.
+HistoricalAuditOnly/current executionUNKNOWN/resourceNOTOBSERVED/costUNKNOWN/Goalfalse/reviewNOTPERFORMED/controlsfalse remain. No paidmodel/GPU/production/push.
+Next actual bounded machine acceptance/candidate disposition; general native/independent Reviewer/conditions/fullGoal/strictOS/arbitrary-tree STOP/invoice/install/soaks remain unverified. No new user-choice blocker.

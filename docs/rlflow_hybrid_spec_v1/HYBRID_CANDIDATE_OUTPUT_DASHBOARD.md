@@ -1,0 +1,19 @@
+# Checkpoint55 FINAL：真实工程产出的冷只读 API 与 Dashboard
+
+本切片最终本地验收通过，正在提交；parent54为25664f0。下方LIVE/WIP保留发生时记录，不覆盖本最终状态。三个新增Python case分别通过，不宣称最终单suite3pass。必要后端原1687终b68f9b exit0 19pass/1warning62.74s，四旧浏览器原19800终06f30e exit0 4pass80.189663s。282输入最终全部匹配，SHA2662894f6f70873314d345f71cf11241eb92d30fb5eea0a527184c68118ace45；Python编译/依赖、JSsyntax、diff通过，无live测试。未重跑原54全量或已通过新Chrome；证据见evidence/checkpoint-55-final-tests.txt/相关manifest/log SHA。
+
+下一实际有界机器验收与候选处置，仍不是产品独立Reviewer或全局条件完成。独立审查非阻塞观察：通用复用面板的404提示仍称“评估”，不影响authority或证据，未为文案开启新修复/复验。所有失败原记录保留；paid/GPU/生产/push零，USERlock原SHA未改未stage。
+
+Parent54实际25664f0。范围为固定工程产出→authenticated API→现有Dashboard真实浏览器读取与持久版本刷新；不是新执行入口、独立Reviewer或通用native。
+
+交付行为：原candidate result/INTENT、原terminal/Prep/Plan/Workspace/Controller和Goal来源在同一RO事务、累计ReadBudget中核完整事件与历史链接；双输出域COUNT/tip拒遗漏；默认off，viewer GET鉴权读前后并重新核scope/epoch/source版本。页面只公开allowlist相对target、前后文件/树SHA、baseline失败2/实际after通过3及原测试行、历史STOP与原写FD已关记录。host路径、nonce、producer/lease/privatecap和RW能力不出DTO、不重建owner。
+
+验收：原actual worker→可靠STOP/FREE→单次写入结果通过API一致读回，原Runtime/Pool owner关闭仍可冷读；损坏原来源/缺域/元数据漂移503而非假空/404；默认404、权限401/404、闭query400、POST405、读中撤销401。真实Chrome读取实际三个测试/hash，原owner关闭后读回、原持久事件只读刷新、logout私有DOM清空、页面无执行写与错误。旧CPU面板复用的刷新生命周期若改变，需要旧pure/browser回归，不因54已通过而重复完整执行suite。
+
+实际开发结果：原80730终78b176 exit0 1pass/1warning19.79s，实际产出冷API与owner关闭读回、无副作用。原8118终4fbd9c exit1 1fail/1warning18.83s，Conflict继承ValueError导致坏来源误400；生产窄修catch顺序先Conflict503，原75173终4106f7 exit0 1pass/1warning19.05s，双域缺失/漂移/权限/末端撤销/默认off通过。原84820终1cbc8a exit0 1pass/1warning22.80s：result/intent/terminal/两Prep/Controller原投影损坏拒503，巨大key与读后epoch切换拒503、restore后limit5请求合法/全audit与owner关闭读回通过。新增第三case插入时误将第一case最后三条owner关闭断言归入第三case，运行结束后恢复第一case原三条（与r1通过时完全相同）；第三case也保留同断言，不删或放宽验收，无生产变化。
+
+新panel与受影响原CPU纯8pass67.715804ms，终dbae2d exit0。唯一实际Chrome原49313终efaddd exit0：1pass21.525140s，真实工程原产出/前后SHA/3测试→页面，单个无执行event刷新原所选详情、owner关闭仍可读、logout清私有DOM，零执行写/页面错误。独立High只读差量确认新whole-source/捕获顺序/双域tipCOUNT/脱敏恒历史/前端旧默认及清理/限频接线，无新增确证MUST，未测试/写文件、不替代产品Reviewer。有界tip/数量证明不是所有远祖或平衡删换的全库audit；不以recover后统一global projection.version当accepted最大值。
+
+当前唯一必要后端回归原1687 LIVE：test_web_api.py、test_web_auth.py、test_hybrid_cpu_assessment_reads.py，web_api新增opt-in和新app鉴权/lifecycle接线及旧CPU面板配置化使这些路径受影响。之后串行既有实际browser/Hybrid controls/fixture STOP/CPU页必要回归，不重复已通过新Chrome或54完整执行suite。282输入最终冻结SHA2662894f6f70873314d345f71cf11241eb92d30fb5eea0a527184c68118ace45，源码不改、不并行/重启。55未最终验收/提交。
+
+状态始终HISTORICAL_AUDIT_ONLY/current execution UNKNOWN/current resources NOT_OBSERVED/actual cost UNKNOWN/controlsfalse/Goalfalse/reviewNOTPERFORMED；历史产出不能升级为当前grant、现文件hash或当前Pool状态。paid/GPU/生产/push与USERlock不动。后续仍需真正独立评审、条件决定与原完整Goal缺口；无新增需用户决定权限阻塞。
