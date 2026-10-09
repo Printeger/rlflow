@@ -86,6 +86,9 @@ def maintain(store,*,seconds=5,max_bytes=32*1024*1024,max_rows=100000,max_nodes=
                 budget_events={key:store._budget_event(db,key,max_bytes=max(0,min(budget[0],1024*1024)),_parse=source_parse,_decode=decode)
                                for key in state.get('hybrid_budget_entries',{})}
                 budget_summary=store._budget_summary(db,version)
+                workspace_events={key:store._workspace_event(db,key,max_bytes=max(0,min(budget[0],1024*1024)),_parse=source_parse,_decode=decode)
+                                  for key in state.get('hybrid_workspace_facts',{})}
+                workspace_summary=store._workspace_summary(db,version)
             check()
             from .contracts import validate_runtime_state
             validate_runtime_state(state);check()
@@ -101,6 +104,8 @@ def maintain(store,*,seconds=5,max_bytes=32*1024*1024,max_rows=100000,max_nodes=
             admission_complete(state,registration,admission_events.get,event_summary=admission_summary);check()
             from .hybrid_budget_ledger import validate_complete as budget_complete
             budget_complete(state,registration,budget_events.get,event_summary=budget_summary);check()
+            from .hybrid_workspace import validate_complete as workspace_complete
+            workspace_complete(state,registration,workspace_events.get,event_summary=workspace_summary);check()
             raw=canonical(state);check()
             if len(raw)>max_bytes:return False
             digest=hashlib.sha256(raw).hexdigest();check()

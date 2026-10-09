@@ -1,5 +1,9 @@
 # 当前实现到需求的差距矩阵
 
+Checkpoint38 最终终态：root/High同九modules各358pass（195.50s/195.74s），中央full原95667实际exit0，1621pass/32既有外部H1skip/1既有warning589.10s；21SHA一致、范围MUST关闭、compileall/pipcheck/diff0，无live测试。见HYBRID_WORKSPACE_HOLD.md/evidence/checkpoint-38-final-tests.txt；下方candidate/LIVE是历史阶段。服务renew仍拒绝，下一39仅设计见HYBRID_WORKSPACE_RENEWAL.md。无新browser/NFR06/B1/24h/8h/离线18checks证明，不关闭完整runtime/legacy/STOP/T12/M1/M0–M5，Goal active。
+
+Checkpoint38 当前增量：实际Linux协作目录hold、物理独立mutable working copy、原来源绑定WorkspaceService acquire、immutable claim与两阶段关闭、audit/replay/manual/periodic snapshot/recover已接线。root最终九modules358pass/1warning195.50s、21SHA匹配；High最终独立复验进行中，full尚未执行。服务renew拒绝，尚无runtime handoff、完整legacy/OS写隔离、共享资源pool/可信usage或可靠STOP，不能关闭完整T12/T14/T17/M1或M0–M5。详见HYBRID_WORKSPACE_HOLD.md/evidence/checkpoint-38-domain-service-tests.txt；下方37为历史证据。
+
 Checkpoint37 最终终态：root/独立High九modules各383pass/1既有warning，158.84s/159.97s；中央full原87325 exit0 **1513passed/32既有外部H1skip/1既有warning488.35s**，18SHA一致、范围无剩余MUST、compileall/pipcheck/diff0，无live tests。实际累计预算/原proof/current heads/恢复与共用最终期限出口见HYBRID_BUDGET_LEDGER.md/evidence/checkpoint-37-final-tests.txt；下方旧candidate/LIVE是保留过程记录，不表示当前测试仍活跃。没有新browser/性能/B1/NFR06/24h/8h或离线18checks证据，不宣称可信UsageOwner/主机pool/runtime release/可靠STOP/T14/M1/完整M0–M5通过，Goal active。
 
 Checkpoint37 当前候选：实际累计BudgetService/原metadata/三种indexed最新head/owned最终deadline guard和audit/snapshot/recover闭合已接线，root/High exact九modules各383pass（158.84s/159.97s）、18SHA一致/范围无MUST；中央full原87325仍LIVE、未commit。七维估计占额、UNKNOWN保留、核心exact PRE_RUNTIME取消tombstone、真实批准revision降限/多Goal合计/epoch连续已验证，不再把累计占额写作“尚无”。仍缺可信UsageOwner/父子usage范围去重/USED/adjustment、主机共享3session/GPU/OS资源池、runtime register/release及可靠STOP；project只有曝光aggregate无trustedcap，HELD不证明workload足额或hardtokens。见HYBRID_BUDGET_LEDGER.md/evidence/checkpoint-37-final-tests.txt。无新UI/B1/长期/安装/完整M0–M5证明，Goal active。

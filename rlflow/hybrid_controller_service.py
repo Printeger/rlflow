@@ -143,7 +143,7 @@ class ControllerService:
                     'authority_domain':'HYBRID_CORE_FACTS_ONLY','execution_enabled':False}
 
     @contextmanager
-    def token_transaction(self,token,*,read_bytes=READ_BYTES,_before_commit=None,_after_final_sample=None):
+    def token_transaction(self,token,*,read_bytes=READ_BYTES,_before_commit=None,_after_final_sample=None,_on_exit=None):
         """Mint a fresh fixed-Store writer, hold owner lock, recheck and commit.
 
         Never accepts a caller's connection/read snapshot. Internal owner API;
@@ -156,6 +156,8 @@ class ControllerService:
             raise TypeError('internal final-check callback required')
         if _after_final_sample is not None and not callable(_after_final_sample):
             raise TypeError('internal pure deadline callback required')
+        if _on_exit is not None and not callable(_on_exit):
+            raise TypeError('internal held-writer cleanup callback required')
         with self.store.lock(),self._lock,self.store.connect() as db:
             db.execute('BEGIN IMMEDIATE');budget=ReadBudget(db,read_bytes)
             if self.store._hybrid_controller_service is not self:
@@ -175,7 +177,12 @@ class ControllerService:
                 # expansion, file IO or new authority after this final sample.
                 if _after_final_sample is not None:_after_final_sample(now,mono)
                 db.commit()
-            finally:self._token_active=None
+            finally:
+                self._token_active=None
+                # Release service active context BEFORE writer/owner unlock,
+                # including rollback/uncertain-return paths. Internal cleanup
+                # only: this hook never supplies execution authority.
+                if _on_exit is not None:_on_exit()
 
     def _final_token_freshness(self,db,token,budget):
         active=self._token_active

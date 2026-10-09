@@ -1,5 +1,9 @@
 # 实施计划与依赖
 
+Checkpoint38 最终终态：root/High同九modules各358pass（195.50s/195.74s），中央full原95667实际exit0，1621pass/32既有外部H1skip/1既有warning589.10s；21SHA一致、范围MUST关闭、compileall/pipcheck/diff0，无live测试。见HYBRID_WORKSPACE_HOLD.md/evidence/checkpoint-38-final-tests.txt；下方candidate/LIVE是历史阶段。服务renew仍拒绝，下一39仅设计见HYBRID_WORKSPACE_RENEWAL.md。无新browser/NFR06/B1/24h/8h/离线18checks证明，不关闭完整runtime/legacy/STOP/T12/M1/M0–M5，Goal active。
+
+Checkpoint38 增量补充T12的实际协作目录hold、隔离working-copy、持久source-bound acquire与两阶段关闭/恢复；不改变原任务依赖或验收门槛。root最终九modules358pass/1warning195.50s、21SHA匹配，High独立复验进行中，中央full尚无结果。服务renew/完整legacy排斥/运行授权/可靠STOP仍未完成；下一先实现事务性pending renewal激活，再继续共享资源及实际runtime。见HYBRID_WORKSPACE_HOLD.md，Goal active。
+
 版本 1.0 · 与 `PRD.md` 同步。本文是执行拆解，不授予真实模型、训练、迁移或远程开放权限。
 
 Checkpoint37最终root/High九modules各383pass、中央full原87325终态1513pass/32既有skip/1warning488.35s、18SHA一致、范围MUST关闭，compileall/pipcheck/diff0，无live tests；见HYBRID_BUDGET_LEDGER.md/evidence/checkpoint-37-final-tests.txt。下方candidate是历史过程；本轮不改验收/任务依赖，不关闭完整T14/runtime/STOP/M1/B1/长期或M0–M5，Goal active并继续实际workspace排斥/lease与剩余安全门。

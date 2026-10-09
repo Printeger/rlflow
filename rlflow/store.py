@@ -73,7 +73,8 @@ PRIVATE_HOT_SECTIONS = frozenset(('tool_sources','tool_receipts','tool_scan',
     'hybrid_approval_facts','hybrid_approval_revocations','hybrid_approval_heads','hybrid_approval_commands',
     'hybrid_preparation_intents','hybrid_preparation_results',
     'hybrid_controller_facts','hybrid_controller_heads','hybrid_admission_facts',
-    'hybrid_budget_entries','hybrid_budget_goal_heads','hybrid_budget_reservation_heads','hybrid_budget_project_heads'))
+    'hybrid_budget_entries','hybrid_budget_goal_heads','hybrid_budget_reservation_heads','hybrid_budget_project_heads',
+    'hybrid_workspace_facts','hybrid_workspace_heads','hybrid_workspace_claims'))
 
 
 class ObjectMap(dict):
@@ -140,6 +141,7 @@ class Store:
         self._hybrid_controller_service = None
         self._hybrid_admission_service = None
         self._hybrid_budget_service = None
+        self._hybrid_workspace_service = None
         self._existing_identity = None
         self.root = Path(root).resolve()
         (self.root / "runtime").mkdir(parents=True, exist_ok=True)
@@ -229,7 +231,8 @@ class Store:
         store._existing_identity = (info.st_dev, info.st_ino)
         for name in ('_hybrid_auth_owner', '_hybrid_registry', '_hybrid_authority_service',
                      '_hybrid_draft_auth_owner', '_hybrid_draft_service', '_hybrid_preparation_service',
-                     '_hybrid_controller_service', '_hybrid_admission_service', '_hybrid_budget_service'):
+                     '_hybrid_controller_service', '_hybrid_admission_service', '_hybrid_budget_service',
+                     '_hybrid_workspace_service'):
             setattr(store, name, None)
         db = sqlite3.connect(store.db.as_uri() + '?mode=ro', uri=True, timeout=5)
         try:
@@ -403,6 +406,18 @@ class Store:
 
     def _apply(self, state, payload, db, event):
         preparation_decoded=False
+        from .hybrid_workspace import SECTIONS as workspace_sections, EVENT as workspace_event, validate_transition as workspace_transition
+        if (event['event_type']==workspace_event or any(s in workspace_sections for s,k,v in payload.get('put',[])) or
+                any(s in workspace_sections for s,k in payload.get('delete',[])) or set(payload.get('set',{})) & set(workspace_sections)):
+            from .hybrid_reads import ReadBudget
+            budget=ReadBudget(db,1024**2)
+            try:decoded={**payload,'put':[[s,k,budget.decode(v)] for s,k,v in payload.get('put',[])]}
+            except (ValueError,TypeError,KeyError,RecursionError):
+                raise Conflict('workspace replay decoding exceeds safe envelope') from None
+            workspace_transition(decoded,lambda s,k:({} if s in state else None) if k=='' else state.get(s,{}).get(k),
+                event_type=event['event_type'],key=event['idempotency_key'],object_id=event['object_id'],producer=event['producer'],
+                version=event['new_state_version'],registration=self._goal_registration(db))
+            payload=decoded;preparation_decoded=True
         from .hybrid_budget_ledger import SECTIONS as budget_sections, EVENT as budget_event, validate_transition as budget_transition
         if (event['event_type']==budget_event or any(s in budget_sections for s,k,v in payload.get('put',[])) or
                 any(s in budget_sections for s,k in payload.get('delete',[])) or set(payload.get('set',{})) & set(budget_sections)):
@@ -626,6 +641,16 @@ class Store:
 
     def _commit(self, db, event_type, key, payload, previous, object_id, producer, inputs, *, _authorization=None):
         ver = previous + 1
+        from .hybrid_workspace import SECTIONS as workspace_sections, EVENT as workspace_event, validate_transition as workspace_transition
+        if (event_type==workspace_event or any(s in workspace_sections for s,k,v in payload['put']) or
+                any(s in workspace_sections for s,k in payload['delete'])):
+            service=self._check_workspace_guard(db,_authorization)
+            def workspace_lookup(section,objkey):
+                if objkey=='':return {} if db.execute('SELECT 1 FROM projection WHERE section=? LIMIT 1',(section,)).fetchone() else None
+                return _authorization.lookup(section,objkey)
+            workspace_transition(payload,workspace_lookup,event_type=event_type,key=key,object_id=object_id,
+                producer=producer,version=ver,registration=self._goal_registration(db))
+            service.check_live_write(db,payload,inputs,_authorization)
         from .hybrid_budget_ledger import SECTIONS as budget_sections, EVENT as budget_event, validate_transition as budget_transition
         if (event_type==budget_event or any(s in budget_sections for s,k,v in payload['put']) or
                 any(s in budget_sections for s,k in payload['delete'])):
@@ -804,6 +829,9 @@ class Store:
         from .hybrid_budget_ledger import validate_complete as budget_complete
         budget_complete(state,self._goal_registration(db),lambda k:self._budget_event(db,k),
                         event_summary=self._budget_summary(db,state['version']))
+        from .hybrid_workspace import validate_complete as workspace_complete
+        workspace_complete(state,self._goal_registration(db),lambda k:self._workspace_event(db,k),
+                           event_summary=self._workspace_summary(db,state['version']))
 
     def _require_budget_indices(self, db):
         """Enabled owner requirement; RO attach never installs missing indexes."""
@@ -821,6 +849,71 @@ class Store:
             self._require_budget_indices(db)
             if self._hybrid_budget_service not in (None,service):raise Conflict('budget owner cannot be rebound in-place')
             self._hybrid_budget_service=service
+
+    def bind_hybrid_workspace(self, service):
+        from .hybrid_workspace_service import WorkspaceService
+        if type(service) is not WorkspaceService or service.store is not self:raise TypeError('invalid workspace owner')
+        with self.lock(),self.read_connection() as db:
+            self._require_budget_indices(db)
+            if self._hybrid_workspace_service not in (None,service):raise Conflict('workspace owner cannot be rebound in-place')
+            self._hybrid_workspace_service=service
+
+    def _check_workspace_guard(self, db, guard):
+        service=self._hybrid_workspace_service
+        if service is None:raise PermissionError('protected workspace owner required')
+        service.check_guard(db,guard)
+        return service
+
+    def _workspace_tip(self, db, version, *, reservation_id=None):
+        from .hybrid_workspace import EVENT
+        sql='SELECT CASE WHEN length(CAST(idempotency_key AS BLOB))<=128 THEN idempotency_key END AS idempotency_key,new_state_version FROM events WHERE event_type=? AND seq<=?'
+        values=[EVENT,version]
+        if reservation_id is not None:sql+=' AND object_id=?';values.append(reservation_id)
+        row=db.execute(sql+' ORDER BY seq DESC LIMIT 1',values).fetchone()
+        return tuple(row) if row is not None else None
+
+    def _workspace_summary(self, db, version):
+        from .hybrid_workspace import EVENT
+        return self._workspace_tip(db,version),db.execute('SELECT COUNT(*) FROM events WHERE event_type=? AND seq<=?',(EVENT,version)).fetchone()[0]
+
+    def _workspace_event(self, db, key, *, max_bytes=1024**2, _parse=None, _decode=None):
+        from .hybrid_workspace import (SECTIONS,validate_record,head,head_key,claim,claim_key,event_inputs,expected_objects)
+        if _parse is None and _decode is None:
+            from .hybrid_reads import ReadBudget
+            budget=ReadBudget(db,4*1024**2);_parse,_decode=budget.parse,budget.decode
+        row=db.execute('SELECT CASE WHEN length(CAST(event_type AS BLOB))<=64 THEN event_type END AS event_type,CASE WHEN length(CAST(producer AS BLOB))<=64 THEN producer END AS producer,CASE WHEN length(CAST(object_id AS BLOB))<=128 THEN object_id END AS object_id,new_state_version,CASE WHEN length(CAST(payload_sha256 AS BLOB))<=64 THEN payload_sha256 END AS payload_sha256,CASE WHEN length(CAST(input_versions AS BLOB))<=4096 THEN input_versions END AS input_versions,CASE WHEN length(CAST(payload AS BLOB))<=? THEN payload END AS payload FROM events WHERE idempotency_key=?',(max_bytes,key)).fetchone()
+        if row is None:return None
+        if row['payload'] is None:raise Conflict('workspace original source exceeds bound')
+        payload=_parse(row['payload'].encode())
+        if sha(payload)!=row['payload_sha256']:raise Conflict('workspace original source integrity differs')
+        if (type(payload) is not dict or set(payload)!={'format','put','delete','details'} or
+                type(payload['format']) is not int or payload['format']!=2 or payload['details'] is not None or
+                type(payload['put']) is not list or type(payload['delete']) is not list or payload['delete']):
+            raise Conflict('workspace original source shape differs')
+        objects={};markers={}
+        for item in payload['put']:
+            if type(item) is not list or len(item)!=3 or not all(type(v) is str for v in item[:2]):
+                raise Conflict('workspace original descriptor invalid')
+            section,objkey,value=item
+            if section not in SECTIONS or (section,objkey) in objects or not objkey and section in markers:
+                raise Conflict('workspace original extra or duplicate object')
+            value=_decode(value)
+            if not objkey:
+                if value!={}:raise Conflict('workspace original marker differs')
+                markers[section]=value
+            else:validate_record(section,objkey,value);objects[(section,objkey)]=value
+        facts=[(k,v) for (s,k),v in objects.items() if s==SECTIONS[0]]
+        if len(facts)!=1 or facts[0][0]!=key:raise Conflict('workspace original single fact differs')
+        value=facts[0][1];request=value['request'];expected={(SECTIONS[0],key):value,(SECTIONS[1],head_key(request)):head(value)}
+        if request['operation']=='acquire':expected[(SECTIONS[2],claim_key(request))]=claim(value)
+        previous=self._workspace_tip(db,row['new_state_version']-1)
+        if objects!=expected or markers!=({s:{} for s in SECTIONS} if previous is None else {}):
+            raise Conflict('workspace original derived objects/initial markers differ')
+        if row['input_versions']!=canonical(event_inputs(value)).decode():
+            raise Conflict('workspace original canonical inputs differ')
+        if _decode(_parse(row['input_versions'].encode()))!=event_inputs(value):
+            raise Conflict('workspace original decoded inputs differ')
+        return ((row['event_type'],row['producer'],row['object_id'],row['new_state_version']),expected_objects(value))
 
     def _check_budget_guard(self, db, guard):
         service=self._hybrid_budget_service
@@ -1106,7 +1199,8 @@ class Store:
             from .hybrid_controller import EVENT as controller_event
             from .hybrid_admission import EVENT as admission_event
             from .hybrid_budget_ledger import EVENT as budget_event
-            if event_type in (controller_event,admission_event,budget_event) or event_type in preparation_events or event_type in authority_events.values() or (event_type=='HYBRID_GOAL_DRAFTED' and self._hybrid_draft_auth_owner is not None):
+            from .hybrid_workspace import EVENT as workspace_event
+            if event_type in (controller_event,admission_event,budget_event,workspace_event) or event_type in preparation_events or event_type in authority_events.values() or (event_type=='HYBRID_GOAL_DRAFTED' and self._hybrid_draft_auth_owner is not None):
                 raise PermissionError('Hybrid service events require guarded object transactions')
             if self._existing(db,key,event_type,object_id):
                 db.commit()
@@ -1174,6 +1268,9 @@ class Store:
                 from .hybrid_controller import EVENT as controller_event
                 from .hybrid_admission import EVENT as admission_event
                 from .hybrid_budget_ledger import EVENT as budget_event, SECTIONS as budget_sections
+                from .hybrid_workspace import EVENT as workspace_event, SECTIONS as workspace_sections
+                if event_type==workspace_event or any(s in workspace_sections for s,k in objects):
+                    self._check_workspace_guard(db,authorization)
                 if event_type==budget_event or any(s in budget_sections for s,k in objects):
                     self._check_budget_guard(db,authorization)
                 if event_type==admission_event:self._check_admission_guard(db,authorization)

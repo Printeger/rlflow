@@ -1,0 +1,118 @@
+CHECKPOINT38 DOMAIN/SERVICE EVIDENCE — historical development runs
+Final root/High/full terminal validation is in checkpoint-38-final-tests.txt:
+358/358 targeted; full1621passed/32existing skips/1existing warning589.10s,
+all21 SHA match, scope MUST closed, compileall/pipcheck/diff0. No live suites.
+Pending statements below are historical, not current activity.
+Parent: 70249f4. USER package-lock.json untouched/excluded.
+All pytest prefixed PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q.
+All suites serial. ALL source/test/schema frozen during each actual live process.
+Historical intermediate results bind their historical source, never later changes.
+
+Actual terminal results (confirmed original exec/session exit, not tail alone):
+domain-r1 session3535 exit1: 32pass/5fixturefail/1existingwarn25.90s.
+  Second fixture TTL pop KeyError; actual terminal then fixed pop default None.
+  Historical negative summary corrected actual latestV9, not mistaken10.
+domain-r2 session59050 exit0: 37pass/1existingwarn26.18s.
+domain-r3 session8638 exit0: 40pass/1existingwarn28.33s.
+domain-close-r1 session69746 exit0: 146pass/1existingwarn30.05s, exact four modules:
+  test_hybrid_workspace.py, test_hybrid_working_copy.py,
+  test_hybrid_workspace_kernel.py, test_hybrid_snapshot.py.
+service-r1 session5097 exit0: 9pass/1existingwarn9.26s.
+service-r2 session14204 exit1: 13pass/7fixturefail/1teardownerror/1existingwarn21.32s.
+  Fixtures assumed nonexistent Store._held_thread, mistakenly required full
+  event audit to read damaged snapshot, and retained close fault at teardown.
+  Actual terminal then fixed real nonblocking writer-lock probe, exact final
+  Controller sampling hook, BLOB snapshot + projection corruption, original
+  audit remains valid while recover/maintenance reject copies, explicit undo.
+service-r3 session70484 exit0: 20pass/1existingwarn36.10s.
+service-r4 session29696 exit0: 22pass/1existingwarn25.12s.
+  Includes durable CLOSED then memory ACK fault before/after actual retirement:
+  original retained service slot/witness retry only, no historical adoption.
+
+Integration-r1 ORIGINAL session69583 actual terminal exit0:
+356pass/1existingwarn159.06s; 21-file manifest before==after.
+Subsequently ONLY appended two service tests (no production change): actual writer
+wait expires Controller while retaining FD, and 180000 literal legal prep source
+stage/acquire/duplicate/requestClose/actualClose/completion/audit/replay/manual +
+explicit64MiB periodic snapshot/recover closure (actual blob>16MiB, decoded<4MiB).
+capacity-r1 ORIGINAL12915 actual terminalexit0: 2pass/22deselected/1warn38.63s.
+This does not prove default32MiB maintenance, combined huge Registry/proposal+Role,
+hard RSS, filesystem IO timeout or runtime permission.
+
+Final integration-r2 ORIGINAL session89827 actual terminal exit0:
+358 passed, 1 existing warning in 195.50s. All21 frozen SHA match at terminal.
+High independent final9 ONCE now authorized; no parallel root suite/benchmark.
+ALL source/test/schema remain frozen through independent and central full.
+Exact nine argv modules in order:
+tests/test_hybrid_workspace_service.py
+tests/test_hybrid_workspace.py
+tests/test_hybrid_working_copy.py
+tests/test_hybrid_workspace_kernel.py
+tests/test_hybrid_snapshot.py
+tests/test_hybrid_budget_service.py
+tests/test_hybrid_controller_service.py
+tests/test_hybrid_preparation_service.py
+tests/test_snapshot_maintenance.py
+Logs: audit/hybrid-v1/checkpoint-38-integration-r1.log (terminal above),
+      audit/hybrid-v1/checkpoint-38-integration-r2.log (terminal exit0 above).
+No final independent integration/full/compileall/pipcheck/commit result yet.
+Earlier 102/102 independent component proof is in checkpoint-38-component-tests.txt;
+it is NOT evidence for newer domain/service/controller-hook changes.
+
+Integration-r1 21-file manifest (captured while frozen, unchanged at actual terminal):
+e6ec857988c8eebcc9b942aea925173864b68f285c90d57a81143d22ce7b18a4  rlflow/hybrid_workspace_kernel.py
+7f955aa1f6a767a8b3988d921112c34cf20bbf961fd2d2b9b3b4234b106359dc  rlflow/hybrid_working_copy.py
+00bf15ae0470742c1e4d2c82857c64d9e266e5aef1ed312d038ef253f11ad65d  rlflow/hybrid_workspace.py
+53163a8a33e1c7864d020e5df9144c11a105b46aef466af88d68165c7c4d956d  rlflow/hybrid_workspace_service.py
+9f47c01f7274b8e2ec3f6777614191f876bcc920e62ca3bf0f2f1c52e8489bdc  rlflow/store.py
+e33eca192af286212252d0e2ed18b519e5097801f75f69bccd4fb5fd3bde4fba  rlflow/contracts.py
+2324bfa267541d164d376a7e872c4afc78c5eebe2ef9c9f339ca76bc5a5935aa  rlflow/snapshot_maintenance.py
+eddcb925d11f8772bc74da6bd892a27f4a8da32c9c4ce1c89f9eff5baaa0a31d  rlflow/hybrid_controller_service.py
+29c09b6c18bbb66e53351109f388a9ae0a58c2095aa9298ce20d3b615d8b11d8  rlflow/hybrid_budget_service.py
+6aac15b2427378edd02ffd46e042c31d2153494669c1511368a0e5484b244369  rlflow/hybrid_preparation_service.py
+bf5b4561a1ddca214bf9cbb502fd308a277a1f3a59e5cb4c60850ec9f0243dc8  rlflow/hybrid_snapshot.py
+d8d1ec0d2fc3b41ec1a85088d647dc798816e95a4489a5cf20e671c7db71c015  schemas/RuntimeState.json
+d376cd9381cedc097e1880723757b1a6f1b141dc0edf299ae782d949cf04add8  tests/test_hybrid_workspace_service.py
+15e8670eae16fc04224ec8a8bef4ac89334f8839ca3d003b53ff2200b7b2c793  tests/test_hybrid_workspace.py
+ac295992785d2a01a6c263cc34c1c4541cdd9e396e6b145dbf470471c13cc482  tests/test_hybrid_working_copy.py
+b2254e0d4d6c30f6f36e36164aa908395cbfaed2e94daf15ea74b6b0c5acfaab  tests/test_hybrid_workspace_kernel.py
+e72c9d18070192b4ae4f9860a6179b67b646c8a52b714e7a42718118bbf9f509  tests/test_hybrid_snapshot.py
+4edf4740ed180e275b94c16f1598f8c78355c6f9b06adb06296e7b4d2b04da11  tests/test_hybrid_budget_service.py
+cb50af02fbb0c6525d4f34907955900e02c3c39342815e529bac49268150366c  tests/test_hybrid_controller_service.py
+90ec178292f3c25e7fc0b5ce6917fab0a824c8ca09fc5f8e7d3cd338cbea5972  tests/test_hybrid_preparation_service.py
+2e54daefca6f6c992b7389bb0b0123b23797f4b2f110d52c360569e4cf216549  tests/test_snapshot_maintenance.py
+
+Final integration-r2 current21 manifest differs ONLY in appended service test:
+f28e1c4c103df8d4e300430ece68252f3622a044a68f213c242258dc623eb202  tests/test_hybrid_workspace_service.py
+Remaining20 SHA exactly as r1. Frozen before root r2 and verified at actual terminal.
+
+Ignored local historical log SHA256:
+d10d145a7cba049efc86fa1840ccbe21b2be3d58b1e0885c56c280f0070b4e6b  checkpoint-38-workspace-domain-r1.log
+6ceb1e710a0bfd8e1b236fce984fc3af2421afd75b9458fcfe1c3ceb17e55b1c  checkpoint-38-workspace-domain-r2.log
+7b2483eebbd4c9ec84a7a9b50e6b10cd8657d6062517c8bedf5681034a87a46e  checkpoint-38-workspace-domain-r3.log
+9802397564db9eb3c6de8b7e4a120bc2f2f7eaeb1386b5906fa1d4c58a47b6b8  checkpoint-38-domain-close-r1.log
+6521db4c9cd118d8ca8a81d98412f50d2b245c3114fe3d22cd8ab4907015e59e  checkpoint-38-workspace-service-r1.log
+d5533211a85313f7d4ecba7b10cdad31f5511facb462cd62f1340d05ec99d2d6  checkpoint-38-workspace-service-r2.log
+3cc7c1ea0e6f2ea82acf217641843bc9278c9e82cc0ae8a99ebe26113b23edd5  checkpoint-38-workspace-service-r3.log
+990b575ed9cb6a623bda62c9f7896034c28aa45c24459b3123a86e961798abea  checkpoint-38-workspace-service-r4.log
+e440fa402d761329d3b6aa27ce86687a09a6d0e5cd33621cf1856751a9debbe9  checkpoint-38-integration-r1.log
+d05e5c4989d7876c38fb1a117254e02b0b032ac3aaae686cc1c522b0ac567fe3  checkpoint-38-integration-r2.log
+7b3a5e890f8df2fc6b1fc4bbc65d983b9debfb5073699d861b60e30ee915b542  checkpoint-38-workspace-capacity-r1.log
+
+Independent static High domain MUST fixed:
+- initial copy hash derived from original Prep snapshot rows (source_executable=false).
+- live Controller captured mono lies inside actual WorkingCopy observation window.
+- immutable workspace-id claim + reservationhead prohibit both directions of rebinding.
+- Budget original links and stable original sources crosschecked with original Prep/Workspace.
+Close completion stores original actual close-witness obs id/hash/Kernel binding;
+JSON alone cannot create actual guard or attest successful physical close.
+Latest static Store/Service no scope MUST, including actual retained ACK retry and
+short _issued lock, Controller _on_exit active cleanup BEFORE writer unlock.
+
+Scope: cooperating local directory hold + isolated mutable copy + pre-runtime
+original-source-bound guarded facts/close. Service renew deliberately refused until
+transactional observation activation is implemented. No runtime register/release,
+legacy exclusion/OS arbitrary-write sandbox, UsageOwner/refund, shared host pool,
+reliable STOP, browser/NFR/B1/long-soak or full M0-M5 acceptance claim.
+Only harmless finite isolated filesystem/Python/SQLite fixtures; no paidmodel/GPU,
+protected project writes, external publish, or development Goal self-dispatch.

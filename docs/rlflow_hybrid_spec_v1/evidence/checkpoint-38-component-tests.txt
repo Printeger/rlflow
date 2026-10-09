@@ -1,0 +1,58 @@
+CHECKPOINT38 COMPONENT EVIDENCE — WIP, not full checkpoint completion
+Parent commit: 70249f4
+No Store workspace facts/head, source/budget/controller commit fencing or runtime release yet.
+USER package-lock.json remains untouched/untracked and excluded.
+
+Root executions: ALL actual terminal exit0, not log-tail inferred completion.
+All pytest: PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q
+No overlapping suites/benchmarks or source/test/schema edits during live tests.
+
+kernel-r1: tests/test_hybrid_workspace_kernel.py; 8passed/0.07s (earlier source only).
+kernel-r2: same module; 10passed/0.07s (earlier source only).
+workspace-working-r1: kernel + working_copy; 31passed/0.24s (earlier source only).
+workspace-working-r2: kernel + working_copy + snapshot; 95passed/0.50s (earlier source only).
+workspace-working-r3: same three; 99passed/0.46s (earlier source only).
+workspace-working-r4: same three; 102passed/0.57s, final component source below.
+Independent High same three ONCE: actual direct terminal exit0 (chunk e80f46,
+no yielded session), 102passed/0.58s; sixSHA before==after==root frozen.
+No checkpoint38 full-suite, browser/NFR/B1/24h/8h or final commit result yet.
+
+Final component six-file SHA256 frozen before independent suite:
+e6ec857988c8eebcc9b942aea925173864b68f285c90d57a81143d22ce7b18a4  rlflow/hybrid_workspace_kernel.py
+ef4b579ac3eab994b76614f4712807acdc4c50272d5d228372eed242fa51cdca  rlflow/hybrid_working_copy.py
+bf5b4561a1ddca214bf9cbb502fd308a277a1f3a59e5cb4c60850ec9f0243dc8  rlflow/hybrid_snapshot.py
+b2254e0d4d6c30f6f36e36164aa908395cbfaed2e94daf15ea74b6b0c5acfaab  tests/test_hybrid_workspace_kernel.py
+4e2f5f33f73b002773b42592946478be81fadb39d844be34ee036a0d3b6b425c  tests/test_hybrid_working_copy.py
+e72c9d18070192b4ae4f9860a6179b67b646c8a52b714e7a42718118bbf9f509  tests/test_hybrid_snapshot.py
+
+These SHA bind ONLY the 102/102 component version. Subsequent WorkingCopy close
+witness + pure workspace facts/head/claims changes are NOT covered by them;
+new combined-suite results must supply their own source evidence.
+
+Ignored local logs SHA256 (audit/hybrid-v1/):
+3247c50c34e782db19f552455bce1f096e033aae5010deec64401bb0f5ec19c7  checkpoint-38-workspace-kernel-r1.log
+0324e48f941794371649adda93db948840056d0d818d5a18cf340c4a132fa198  checkpoint-38-workspace-kernel-r2.log
+7461ffcceff2edb50a25572d86952addd66da9d59c7b43f9b02899a8502f06d6  checkpoint-38-workspace-working-r1.log
+438b7d6dc80c69de26210993af51c13c77ae328abd8b19eb19d42430c7cd8216  checkpoint-38-workspace-working-r2.log
+1ab21c5e9e357395ad3c460386451534bd3eb5c0740d4f27eb42167960218c0e  checkpoint-38-workspace-working-r3.log
+c5c3c129896f1558e8bd0c1dfe32a51753b219b04ca64635890cf906752c0a03  checkpoint-38-workspace-working-r4.log
+3fec7aafcfa90e3882596c3035c395dcb8e0a0b5d04843f2eb5f0c2aa9daa6cb  checkpoint-38-component-independent-r1.log
+
+Independent static High scope MUST findings and fixes, no tests implied:
+1. Same inode is not actual FLOCK: bounded current FD lock record proof, never reacquire;
+   actual explicit LOCK_UN and same-number same-inode reopen negatives.
+2. First close failure skipped later cleanup: all FDs attempted, uncertain hold retained;
+   constructor-check+close fault and ancestor-close fault with explicit cleanup negatives.
+3. Lexical disjointness misses bind alias: physical dev/ino ancestry, fixed chain recheck,
+   subtree mount-root failclosed; root/child/ancestor alias simulation before copy IO.
+4. Exact-type forged raw parsed before identity: private <=128 actual slot identity first;
+   malformed, deeply nested and 1MiB forged bytes denied with parsing trapped.
+All four statically closed by High; independent ONCE component tests also passed.
+
+Actual finite processes: independent competition exactly one winner; SIGKILL actual
+kernel release; Python fork child invalidation without parent unlock; finite timeout.
+No actual privileged bind mount test; no networkFS/overlay support inference.
+Deadline tests: independent UTC/mono expiry and regression; expired FD still blocks
+second cooperating writer; same-hold renewal invalidates old/forged/foreign observation.
+Working copy mutable fixture write leaves original snapshot bytes/hash unchanged.
+No current-output immutable hash or execution authority is inferred from observation.

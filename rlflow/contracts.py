@@ -174,6 +174,8 @@ def validate_runtime_state(state: dict) -> None:
         validate_admission(state)
         from .hybrid_budget_ledger import validate_persisted as validate_budget
         validate_budget(state)
+        from .hybrid_workspace import validate_persisted as validate_workspace
+        validate_workspace(state)
     except (jsonschema.ValidationError, ValueError) as exc:
         raise ContractError('Invalid persisted runtime state: ' + str(exc)) from exc
 

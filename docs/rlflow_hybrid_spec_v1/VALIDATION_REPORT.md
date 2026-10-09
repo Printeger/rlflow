@@ -1,5 +1,9 @@
 # 需求包离线校验报告
 
+Checkpoint38 最终终态：root/High同九modules各358pass（195.50s/195.74s），中央full原95667实际exit0，1621pass/32既有外部H1skip/1既有warning589.10s；21SHA一致、范围MUST关闭、compileall/pipcheck/diff0，无live测试。见HYBRID_WORKSPACE_HOLD.md/evidence/checkpoint-38-final-tests.txt；下方candidate/LIVE是历史阶段。服务renew仍拒绝，下一39仅设计见HYBRID_WORKSPACE_RENEWAL.md。无新browser/NFR06/B1/24h/8h/离线18checks证明，不关闭完整runtime/legacy/STOP/T12/M1/M0–M5，Goal active。
+
+Checkpoint38 root最终九modules r2原89827实际exit0：358pass/1既有warning195.50s，21SHA匹配冻结版本；High独立final9原71641进行中，root不并行测试，中央full尚未执行。实际协作目录hold、隔离副本、原source-bound持久acquire与两阶段关闭/恢复证据见HYBRID_WORKSPACE_HOLD.md/evidence/checkpoint-38-domain-service-tests.txt。没有新离线18checks/browser/NFR/B1/长期验收，服务renew和全部runtime授权仍关闭，不宣称完整T12/M1/M0–M5完成。
+
 Checkpoint37 最终终态：root/独立High九modules各383pass/1既有warning，158.84s/159.97s；中央full原87325 exit0 **1513passed/32既有外部H1skip/1既有warning488.35s**，18SHA一致、范围无剩余MUST、compileall/pipcheck/diff0，无live tests。实际累计预算/原proof/current heads/恢复与共用最终期限出口见HYBRID_BUDGET_LEDGER.md/evidence/checkpoint-37-final-tests.txt；下方旧candidate/LIVE是保留过程记录，不表示当前测试仍活跃。没有新browser/性能/B1/NFR06/24h/8h或离线18checks证据，不宣称可信UsageOwner/主机pool/runtime release/可靠STOP/T14/M1/完整M0–M5通过，Goal active。
 
 Checkpoint37 系统候选：root/High exact九modules各383pass/1既有warning，158.84s/159.97s，18source/test/schema SHA一致、范围无MUST；中央full原87325仍LIVE未完成验收/commit。实际预算原proof/indexed当前heads/累计连续/恢复和Controller最终sample-domain deadline guard见HYBRID_BUDGET_LEDGER.md/evidence/checkpoint-37-final-tests.txt。不是本需求包离线18checks的新运行，也没有新browser/性能/B1/soak证明；无runtime release/可信usage/sharedpool/可靠STOP或完整M0–M5完成，Goal active。

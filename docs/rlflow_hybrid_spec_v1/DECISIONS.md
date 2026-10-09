@@ -1,5 +1,15 @@
 # 开发决策记录
 
+## Checkpoint38：实际协作目录持有与两阶段关闭，不从历史恢复能力
+
+固定私有、物理祖先不重叠的namespace，将原builder签发snapshot复制为独立mutable working copy；base、initial-copy、未来output hash分离。Linux目录FD持有actual exclusive flock，核当前FD锁记录、owner、mount namespace与全部祖先，check不重新加锁。Python fork子副本只close、不LOCK_UN父OFD。失败FD清理仍保留强registry或有界quarantine，期限到期只拒绝、不自动释放未知writer。0700与advisory flock不提供sameUID非协作写保护；全面legacy fencing/OS隔离仍是后续门。
+
+Workspace fact、per-reservation head与immutable workspace-id claim闭合原Prep/Budget/Controller来源；实际stage/copy在writer外，acquire在同owned writer中核当前source、actual MaterialWitness/WorkingCopyObservation、双TTL和最终COMMIT期限。历史回执可以重放审计，不能重建FD/token或授权worker。关闭采用先持久CLOSE_REQUESTED，再实际成功关闭全部FD并签发原owner witness，最后持久CLOSED_PRE_RUNTIME；任一步失败保留对应actual FD或witness。COMMIT后的memory ACK失败仅由原已知actual slot/witness明确幂等重试。
+
+服务renew目前明确拒绝：纯域和低层helper存在renew不代表持久事务可安全激活。下一阶段需先生成不替换旧obs的actual pending candidate，在COMMIT成功后激活；COMMIT结果未知必须核原事件后再ACK，不能误当rollback或从磁盘adopt。Controller内部_on_exit在writer unlock前清除active guard，避免前一事务finally清除后一事务guard。
+
+最终root/High同九modules各358pass（195.50s/195.74s），中央full原95667实际exit0，1621pass/32既有skip/1既有warning589.10s；21SHA一致、范围无MUST、compileall/pipcheck/diff0。阶段证据见HYBRID_WORKSPACE_HOLD.md与evidence/checkpoint-38-final-tests.txt。下一39设计见HYBRID_WORKSPACE_RENEWAL.md，尚未实施。没有runtime register/release、UsageOwner/refund、共享host pool、完整STOP/T12/M1或M0–M5完成声明。
+
 ## Checkpoint37 候选：累计占额与不可逆核心取消，不引入调用者自证结算
 
 账户固定project/mode/goal_ref，不含revision/adapter/controller或observation epoch；unknown是reserved子集。原批准合同的七维actual int64限额与明确finalization比例是唯一Goal预算来源；当前无项目总限额可信来源，所以项目对象只派生三类曝光，不把Goal限额相加伪造项目授权。实际API只接受EXECUTION规划桶，FINAL_VALIDATION/RECOVERY须未来可信TaskOwner；softtokens不承诺硬上界，HELD不证明prepared workload完整足额。
