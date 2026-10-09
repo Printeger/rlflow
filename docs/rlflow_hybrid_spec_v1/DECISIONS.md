@@ -1,5 +1,9 @@
 # 开发决策记录
 
+## Checkpoint43：来源观察不冒充执行或结算
+
+原 owner 从保护 startup 创建直接 stdout FD 的有限 producer，避免给 caller Path/FD 包一层就称可信来源。尚无 Task/Attempt/Lease/Runtime 原链，所以严格 SOURCE_ONLY/FIXTURE，不伪造字符串身份、不结算预算。尾锚只能检出局部变化，实时 receipt 仅 as-of；完整 producer 终态后分批全前缀最终 SHA 才 SEALED，旧前缀改写并追加不能冒充完整。独立增量审查的三生产 MUST 修复为唯一 Pool→Source fork coordinator、previous turn_lineage 去重、UnicodeError→Conflict 进入隔离回滚。有限 CPU producer 不等于 CLI/provider/真实模型或整树 STOP，下一必须实际贯通注册与执行闭环。官方 Codex 自定义 provider 配置仅只读核对，本切片不调用 CLI provider 或付费模型。
+
 ## Checkpoint42：原事实索引与原连接身份
 
 独立复核发现可变 SQL slot/action 辅助字段能隐藏非最新占用，12 项绿不能豁免。改为 raw JSON 表达式索引、固定完整 DDL 检查、bounded SQL headers 与 byte-exact derived head；非空 prior 必须存在。startup/explicit audit 有限全重放，hot 操作固定三 head/fixeddepth，不用全历史扫描替代热路径修复。SQLite 连接按实际新打开的原 native RW inode 绑定，路径换回不构成证明；不引入 APSW/custom VFS/私有 CPython 布局。Linux FD census 不确定则拒绝，不降级路径。原槽最终守卫及 UTC/mono 必须在所有 IO 后覆盖实际 COMMIT；UNKNOWN/CLOSE_INTENT 也有最终 member/head/slot 守卫。真实 fork/部分关闭保留原 FD 生命周期，未完成 cleanup 不签发 FREE witness。详情见 HYBRID_HOST_POOL.md；生产全主机隔离、Runtime handoff 与 UsageOwner/STOP 不在本切片完成范围。

@@ -1,5 +1,9 @@
 # Hybrid v1 开发进度
 
+Checkpoint43 收尾：原 SourceOwner/原直接 stdout FD/实际有限 CPU producer、有界完整 JSONL 增量观察与原 as-of receipt、累计/per-turn/父 inclusive 去重、分批稳定最终 SHA 审计、UNKNOWN 保留/有限 cleanup 已实现；FIXTURE/SOURCE_ONLY，不结算、不授权 Runtime。High 三项生产 MUST（joint fork order/old-ID lineage/Unicode rollback）已修，新增 test child reaped 后再 kill 的生命周期问题定向修复。唯一 r1 实际31pass/2fail29.47s：两项仅夹具先编码 surrogate，改原 escaped bytes 后定向2pass0.08s；不重复已通过套。42两实际fork已包含31pass。最终状态见 evidence/checkpoint-43-source-tests.txt，原失败保留。下一原 Task/Attempt/Lease 注册→最小端到端 fixture 执行及可靠 STOP；source-only 不能当该链完成，完整Goal继续，无新增需用户决策阻塞。
+
+42 已实际提交 634a36e5877b261d9d2579e470c27e5f1e647a63（9files1511+），最后 worktree 仅 USERpackage-lock未跟踪且未改。下方“正在提交”是历史。开始43：交付原 owner/source FD 的实际有界追加观察与原 receipt、明确 cumulative/per-turn/父 inclusive scope 去重，partial tail 不推进，缺 usage/损坏/错误保持 UNKNOWN；实际有限 CPU fixture producer 验证流而非模型计费。当前 Task/Attempt/ExecutionLease/Runtime producer 链尚缺，不伪造调用者 IDs，不让 source-only/fixture receipt 结算预算；实际 runtime/可靠STOP 是下一依赖切片，完整Goal继续。无付费模型/GPU/生产迁移，无新增需用户决策阻塞。
+
 Checkpoint42 最终：固定 managed fixture 应用下跨项目/实际进程共享三真实 FD 槽与持久占用，第四个拒绝；UNKNOWN/死亡/TTL/重启不返还；原 NO_HANDOFF 关闭事实→全部原 FD 关闭→FREE，复制/历史能力不接管，原 COMMIT 丢返回重试不重占已实现。High 原事实索引/SQL 限额/原连接/最终 COMMIT/fork 增量静态复核无剩余已确认 MUST。唯一直接依赖集成原86229实际117pass118.51s，17SHA一致，新增3文件编译/diff0；开发r2的1异常类型失败已修并单项1pass，原失败日志保留。证据 HYBRID_HOST_POOL.md/evidence/checkpoint-42-pool-tests.txt。没有重跑41或另开全量/重复独立suite；当前无live测试，正在提交42。全部运行授权false；不代表全主机强隔离/Runtime/UsageOwner/可靠STOP/原M1或完整Goal通过。下一可信用量来源→最小端到端执行与整树STOP；无新增需用户决策阻塞，USERpackage-lock未改未stage。下方LIVE为历史。
 
 Checkpoint41已实际提交3a7fec449028fb1d8cf086a3b82a4ca7f62bc28b（27files3999+/109-），最后worktree仅USERpackage-lock未跟踪且未改。下方“正在提交”是提交前历史。开始42：交付保护startup固定共享3槽池的实际占用/第四槽拒绝、持久UNKNOWN占额、原NO_HANDOFF两阶段关闭，覆盖跨项目/进程及fork/死亡/未知COMMIT；不增加运行许可DTO，不迁移production，不开模型/GPU。验收必须证明真实FD与持久head一致、重启/TTL/PID消失不自动释放、复制能力拒绝。之后可信用量来源与最小E2E执行/可靠STOP仍是明确依赖和缺口，避免把池组件宣称完整Runtime完成。

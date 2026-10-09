@@ -35,6 +35,7 @@ from .store import Store, Conflict, canonical, sha
 _owners = {}
 _registry_lock = threading.RLock()
 _fork_sql_quarantine = []  # Child must not invoke inherited SQLite cleanup.
+_fork_extensions = {}  # Trusted module lifecycle hooks; never request-selected.
 
 _SLOT_EXPR = "json_extract(raw,'$.slot')"
 _ACTION_EXPR = "json_extract(raw,'$.action')"
@@ -91,9 +92,13 @@ def _check_sql_fd(fd, expected):
 def _fork_prepare():
     _registry_lock.acquire()
     for owner in _owners.values(): owner._lock.acquire()
+    # Python runs before-fork callbacks in REVERSE registration order. Owned
+    # downstream components join this coordinator, not a later os callback.
+    for prepare, _, _ in _fork_extensions.values(): prepare()
 
 
 def _fork_parent():
+    for _, parent, _ in reversed(tuple(_fork_extensions.values())): parent()
     for owner in reversed(tuple(_owners.values())): owner._lock.release()
     _registry_lock.release()
 
@@ -120,6 +125,7 @@ def _fork_child():
             try: os.close(fd)
             except OSError: pass
         owner._lock = threading.RLock()
+    for _, _, child in _fork_extensions.values(): child()
     _owners.clear(); _registry_lock = threading.RLock()
 
 

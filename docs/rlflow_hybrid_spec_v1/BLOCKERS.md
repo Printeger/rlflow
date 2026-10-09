@@ -1,5 +1,7 @@
 # 阻塞与证据缺口
 
+43：原来源有限观察/最终封闭与实际 CPU producer 生命周期已交付，仍 FIXTURE/SOURCE_ONLY；不接受 caller path/usage JSON 作为结算。原 Task/Attempt/Lease 注册、跨 Pool/Project/Budget matching、实际 execution release/ACK/可信来源结算及整树 STOP 是下一开发缺口，不是已完成行为。无新增需用户决策的外部阻塞；严格 cgroup/硬 quota/真实模型与 GPU 等权限边界继续保留，未获授权不运行或迁移。41=3a7fec4，42=634a36e，下方旧进行中为历史。
+
 当前覆盖：41 已实际提交 3a7fec4；42 固定 managed fixture 应用共享三槽池正在必要最终复核/集成，暂无新增需用户决策的外部阻塞。原能力、真实占用与 NO_HANDOFF 全 FD 关闭已实现，仍非 Runtime 执行授权。可信 UsageOwner、Pool/Project/Budget 联合登记、最小工程与低成本科研执行闭环、整树可靠 STOP、生产安装/全主机 OS-model-data 门及原长期性能/UI 验收仍待依赖推进。用户权限边界不变；不调用付费模型/GPU，不迁移生产；USER package-lock.json 保留未改未 stage。下方旧 LIVE 为历史。
 
 Checkpoint40 最终验证全部实际终态：root/High同21modules各534pass/8既有外部H1skip/1既有Starlette warning（345.80s/344.19s）；中央full原14894 actual terminal exit0/chunkd5431d，**1818pass/32既有外部H1skip/1既有warning678.02s**。22source/test/schema SHA与冻结一致，范围无剩余MUST，compileall/pipcheck/diffcheck均exit0，当前无live测试。证据见HYBRID_RUNTIME_BOUNDARY.md及evidence/checkpoint-40-final-tests.txt。实际新private fixture非执行安装已实现，不代表旧namespace迁移/WorkingPlan/Runtime授权/UsageOwner/共享pool/可靠STOP或完整T12/M1/M0–M5验收；无新browser/NFR06/B1/24h/8h/离线18checks证明。下一41实现实际WorkingPlan，Goal active，USERpackage-lock保留未stage。下方candidate/LIVE均为保留历史阶段。

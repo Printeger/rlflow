@@ -1,0 +1,53 @@
+Checkpoint 43: original bounded SOURCE_ONLY/FIXTURE usage stream
+Date: 2026-10-09. Parent: 634a36e5877b261d9d2579e470c27e5f1e647a63
+No paid model/API/GPU, production migration, or Runtime release.
+
+SERIAL actual executions; no duplicate suites, no source edits while live.
+1. Original session 67296 / terminal chunk 50532e, exit 1:
+   env PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -B -m pytest -q
+     tests/test_hybrid_usage_source.py
+     tests/test_hybrid_host_pool.py::test_actual_fork_child_closes_original_fds_without_unlocking_parent
+     tests/test_hybrid_host_pool.py::test_actual_fork_inside_transaction_child_unwind_performs_zero_sql
+   31 passed, 2 failed in 29.47s.
+   Both failures: test feed used canonical ensure_ascii=False to encode lone
+   surrogate before reaching parser. Actual producer invalid-ID rollback passed.
+   Repair: literal escaped JSON bytes, not a weakened expected exception.
+2. Actual exec chunk 07ad7a, exit 0:
+   same pytest environment, only
+     tests/test_hybrid_usage_source.py::test_escaped_surrogate_backend_identity_has_contextual_denial
+   2 passed in 0.08s.
+3. High incremental static review closed three production MUSTs:
+   joint Pool->Source atfork lock order, old stable-ID completion lineage,
+   Unicode ID exception normalization into Conflict/rollback/quarantine.
+   New test-lifecycle MUST: never kill a PID after waitpid reaped it.
+   Repair: reaped marker set immediately after successful waitpid, before
+   asserting status; finally only kills/reaps the still-owned direct child.
+4. Original session 34948 / terminal chunk 24aa43, exit 0:
+   same pytest environment, only
+     tests/test_hybrid_usage_source.py::test_actual_fork_child_closes_source_and_pipe_but_preserves_parent_source
+   1 passed in 1.37s.
+5. py_compile new three modules and git diff --check: exit 0.
+No post-repair full-suite claim; unchanged production inputs retain r1 coverage.
+No repetition of 41 full/root/independent or 42 integration suites.
+
+Retained original logs (local audit/, ignored; not rewritten):
+ffeab9be185e46380d147ec0c9e57878202a4571dd144b699dc261c797075b4b  audit/checkpoint-43-source-r1.log
+19e95f03931508bcb63d5f1f276741db94fd3f8f0399d2690ed306a73c3ba6c7  audit/checkpoint-43-id-repair-r1.log
+21a96a691c92fe45e75034007f207c9a0cf98e14fff2d1e56a2a0ba5eff07377  audit/checkpoint-43-fork-cleanup-r1.log
+
+Production input SHA256 identical before/after r1 and both test-only repairs:
+eb9f0b026890358e5755cf406cec988fb6a885f5d6a63d6805ad962c0c81ebcf  rlflow/hybrid_host_pool.py
+40f44dd04658503d48c3393f4de5053179660bc22ea848b418766517788c3280  rlflow/hybrid_usage_source.py
+a88710dc289ca9c0eb4b6626d578d72f1f9555251659da87d448ff5d4f69b962  rlflow/hybrid_usage_stream.py
+f11b392c0e3b12b88c20e165cbd2481e3fcc16e2d20d41892ef50fcbdad349eb  rlflow/hybrid_usage_fixture.py
+Test revisions:
+b04b434a0ad0ff2bf7f580847218d3cebbd2cc50dc67a0d0dcfa7cf29f511bc2  tests/test_hybrid_usage_source.py r1
+a832db4312659db618fc44ad41651620b427602981574b65cc234a3f19308d6d  tests/test_hybrid_usage_source.py escaped-ID repair
+c26822f57a3dfae0f806a5e3909c4f8380a30e9a93db6eef7be9f4c5acaa6ec4  tests/test_hybrid_usage_source.py final fork cleanup repair
+
+Remaining: Task/Attempt/Lease/Runtime source origin, real CLI/provider protocol,
+trusted actual invoice and owner-only settle, matching Pool/Project/Budget CAS,
+minimal execution release/ACK and complete-tree STOP, strict OS/model/data gates,
+original M0-M5/long-duration/performance/engineering/research acceptance.
+Original USER package-lock.json unchanged and unstaged:
+becc7e2a36dfcad4ffe934b5ff2f0f68187611d6c0641bd63d81367651cfbf09
