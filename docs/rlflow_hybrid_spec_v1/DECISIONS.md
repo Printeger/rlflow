@@ -1,5 +1,13 @@
 # 开发决策记录
 
+Checkpoint54 FINAL：固定只读worker生成补丁→原STOP/reap/Source及输入FD关闭/PoolFREE→受保护core INTENT→原inode单次写入→实际after三用例/全库存→不可变AUDIT_ONLY产出及恢复已交付。新13case分别通过，必要旧全量原78787终d86812 exit0：2214pass/32既有外部H1skip/3warning2317.25s。全量输入276SHA在执行期间及结束后均匹配；结束后仅新54domain关闭见证关联与对应测试两文件改变，另外274完全一致，最后定向原84886终30c723 exit0 1pass31.45s。独立High九项MUST静态闭合，编译/依赖/diff通过，无live测试，正在归档提交54。详HYBRID_ENGINEERING_OUTPUT.md及evidence/checkpoint-54-final-tests.txt。下一55将真实工程产出接入authenticated冷只读API及现有Dashboard，并验证原owner关闭/断线刷新不执行。独立Reviewer、通用Engineer/native、全局条件/完整Goal、严格OS/任意树/invoice/安装及长期缺口仍在；无新增需用户决定阻塞，paid/GPU/生产边界和USERlock不动。下方WIP与“正在提交”均历史。
+
+54 WIP（53 parent 3a4b4e3）：固定工程 worker 只持原readonly BEFORE FD生成精确补丁，原G/PlanWitness完整保留。STOP/reap/Source及输入FDclose/PoolFREE后，独立受保护core applier用当前Controller/完整Goal审批/Registry/原Working Kernel与全图、首durable INTENT，单次pwrite原inode并实测actual AFTER；原snapshot/Plan/initial-copy descriptor不回填，输出单独append-only双域。原允许module/及非空protected路径合同保留，零模型/GPU/实验启动/自动重试；不冒充通用native、独立Reviewer或条件完成。
+
+写入flag在syscall前，丢返回/部分写/关闭或COMMIT失败保留原cap和UNKNOWN，不重写/不重跑worker；只有原durable INTENT+actual已进入write+RWFD实际close可做receipt读回。receipt沿用原合法授权sample，允许过期后的AUDIT_ONLY事实收尾，不刷新写权限；完整历史闭包必须含原Controller因果/UTC/mono及Goal/批准/源事件/tipCOUNT。新RWFD加入原fork协调器，child关闭继承且永久失效；末pwrite前用原Controller final_token_freshness核STOP/实际token/期限，后无新SQL/file IO。请求CAS只在完整guard通过、首真实INTENT提交尝试前绑定，防前置stale请求毒化。
+
+必要回归依据：本切片变更Store核心写入/replay/完整恢复/周期snapshot和封闭RuntimeState schema，故运行一次旧全Python suite（排除已独立实测通过的54新module），276源码/测试/schema/web输入冻结、串行唯一原78787。不以passed旧代码无变化为由无限复审，也不重启原41复验。新12case分别通过、High8MUST/strict/存储差量静态关闭；最终回归/归档/commit尚待。r4 HANDOFF_UNKNOWN误期待FREE与cold attach漏scope仅修夹具，原恢复/退款规则未放宽。
+
 Checkpoint53 FINAL：原raw384点独立机器冷复算→原plain appraisal/terminal/result/规则绑定→持久机器核验和保守next已交付；不冒充独立Reviewer，条件覆盖空/Goalfalse/dispatchfalse保持。5新case分别通过，必要唯一原48427终fa5fd1 exit0 47pass/1warning182.40s，最终实际CPU decision与UTC因果负例通过。270SHA/编译/依赖/diff通过，High窄MUST闭合，无live测试，正在提交53。52实际37e18c5，详HYBRID_CPU_COLD_DECISION.md/evidence/checkpoint-53-final-tests.txt。下一真正工程candidate受控输出/接收与可靠STOP闭环，再接独立只读评审；真正native/完整科研review/条件决定/严格OS/任意树/invoice/安装/长期缺口仍待，无新增外部决策阻塞，不扩paid/GPU/生产权限。USERlock未改未stage；下方WIP历史。
 
 53 WIP：52实际37e18c5。原384点独立机器冷复算→原plain appraisal/terminal/批准/规则绑定→持久MACHINE_VERIFIED/UNAVAILABLE与有限next已交付；不调用49evaluator，不声称独立Reviewer/条件完成/Goal完成。复用50append-only事实可选扩展，旧bytes不回填；High历史源码身份/JSON类型/None降级MUST已关闭，新边界COMMIT丢回执/周期snapshot/历史禁sourceIO/源码换pin/末TTL/非法ID分别1pass23.56s+1pass11.80s；首轮3pass42.48s。唯一必要原48427仍LIVE，270输入冻结，源码不改，无并行；最终53未提交。详HYBRID_CPU_COLD_DECISION.md。下一真正工程candidate/native及独立科研条件/decisions完整缺口仍待；没有新增外部决策阻塞，原付费/GPU/生产边界、USERlock不动。下方历史。

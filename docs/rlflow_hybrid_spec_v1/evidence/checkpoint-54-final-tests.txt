@@ -1,0 +1,29 @@
+Checkpoint54 actual results; parent53 3a4b4e3. All tests terminal; no restart or parallel suite.
+Environment .venv Python3.12; PYTEST_DISABLE_PLUGIN_AUTOLOAD=1; private finite CPU/SQLite fixture only.
+DELIVERED fixed readonly worker proposal, original STOP/reap/all source+input FD close/PoolFREE, protected core INTENT, one original-inode pwrite, actual AFTER three tests/full inventory, immutable AUDIT_ONLY result, original-cap uncertain-return reconciliation without reexecution.
+Development argv prefix:
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q -s tests/test_hybrid_engineering_output.py --disable-warnings
+r1 original37328 terminal0a95dc exit1 1error1.34s before worker: protected_paths empty violated existing Goal schema; retained original two protected paths, no schema weakening.
+r2 original58043 terminalf06f1a exit0 exact test_actual_fixed_engineering_candidate_write_stop_output_and_recovery: 1pass27.25s.
+r3 original63062 terminal3ed24e exit0 then-existing 10 cases: 10pass193.33s.
+r4 original86736 terminal714443 exit1 two added cases: 2fail+1teardown error37.89s. Wrong HANDOFF_UNKNOWN→FREE test expectation and omitted attach_existing project/mode. Read old ledger first; preserve occupied UNKNOWN, request_stop+shutdown_safety physical cleanup only.
+r5 original19547 terminal081c10 exit0 same two added cases after fixture-only fixes: 2pass33.62s.
+Unique necessary old full:
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q --tb=short --ignore=tests/test_hybrid_engineering_output.py
+original78787 terminald86812 exit0 2214passed/32existing externalH1skipped/3warnings2317.25s.
+276 frozen inputs manifest f59ae63dfd0268dfa2fde7b7581de52357e466a945e7b4957e84a58458ed499a; during and after full all match. Excluded independently passed new module to avoid duplicate suite.
+Only AFTER full terminal: new domain close-witness hash linkage and its new test changed; remaining274 inputs unchanged. Not a post-patch full-suite claim.
+Final targeted exact argv:
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q -s tests/test_hybrid_engineering_output.py::test_original_pool_close_hash_cross_link_rejects_rehashed_history --disable-warnings
+r6 original81498 terminal488706 exit1 1fail21.73s; append-only trigger blocks intentional private corruption fixture. Restore identical trigger before any reader check; production unchanged.
+r7 original85291 terminald06ebb exit1 1fail22.83s; audit correctly rejects, replay compatibility read intentionally not validator. Inspect Store semantics, change test to actual snapshot/recover gates.
+r8 original84886 terminal30c723 exit0 1pass31.45s: actual full output positive; valid-shaped wrong closehash INTENT/RESULT rejected; consistent rehashed event accepted by header decoder but audit/snapshot/recover reject semantic corruption; restore original bytes then positive audit/replay/snapshot/recover.
+13 distinct new parametrized cases individually passed, NOT a final fresh13suite claim.
+Final276manifest d6f4e44ee03cff02d7512490a89122c0d7fca860ffbe9f9b88c01ce546877f52; original-full and final manifests archived separately.
+compileall rlflow/tests exit0; pipcheck no broken requirements exit0; git diff --check exit0.
+High readonly nineMUST static closed, no test/write; no product-independent Reviewer claim.
+USER package-lock SHA becc7e2a36dfcad4ffe934b5ff2f0f68187611d6c0641bd63d81367651cfbf09 unchanged/untracked/not staged.
+Raw logs audit/hybrid-v1/checkpoint-54-*.log retained locally; their actual SHA archived.
+No paid model/GPU/production/push. ReviewNOTPERFORMED/Goalfalse/dispatchfalse remain.
+Next55 actual authenticated cold output API+existing Dashboard acceptance, not preparing more execution components.
+Remaining general Engineer/native/independent Reviewer/conditions/full Goal/strict OS/arbitrary-tree STOP/invoice/install/soaks; no new user-choice blocker.

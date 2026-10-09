@@ -76,7 +76,8 @@ PRIVATE_HOT_SECTIONS = frozenset(('tool_sources','tool_receipts','tool_scan',
     'hybrid_budget_entries','hybrid_budget_goal_heads','hybrid_budget_reservation_heads','hybrid_budget_project_heads',
     'hybrid_workspace_facts','hybrid_workspace_heads','hybrid_workspace_claims',
     'hybrid_runtime_installation_intents','hybrid_runtime_installation_publications',
-    'hybrid_working_plan_intents','hybrid_working_plan_results','hybrid_cpu_trial_assessments'))
+    'hybrid_working_plan_intents','hybrid_working_plan_results','hybrid_cpu_trial_assessments',
+    'hybrid_candidate_output_intents','hybrid_candidate_output_results'))
 
 
 class ObjectMap(dict):
@@ -147,6 +148,7 @@ class Store:
         self._hybrid_installation_service = None
         self._hybrid_working_plan_service = None
         self._hybrid_cpu_assessment_service = None
+        self._hybrid_candidate_output_service = None
         self._existing_identity = None
         self.root = Path(root).resolve()
         (self.root / "runtime").mkdir(parents=True, exist_ok=True)
@@ -238,7 +240,7 @@ class Store:
                      '_hybrid_draft_auth_owner', '_hybrid_draft_service', '_hybrid_preparation_service',
                      '_hybrid_controller_service', '_hybrid_admission_service', '_hybrid_budget_service',
                      '_hybrid_workspace_service', '_hybrid_installation_service', '_hybrid_working_plan_service',
-                     '_hybrid_cpu_assessment_service'):
+                     '_hybrid_cpu_assessment_service','_hybrid_candidate_output_service'):
             setattr(store, name, None)
         db = sqlite3.connect(store.db.as_uri() + '?mode=ro', uri=True, timeout=5)
         try:
@@ -413,6 +415,19 @@ class Store:
 
     def _apply(self, state, payload, db, event):
         preparation_decoded=False
+        from .hybrid_candidate_output import SECTIONS as output_sections,EVENTS as output_events,validate_transition as output_transition
+        if (event['event_type'] in output_events or any(s in output_sections for s,k,v in payload.get('put',[])) or
+                any(s in output_sections for s,k in payload.get('delete',[])) or set(payload.get('set',{})) & set(output_sections)):
+            from .hybrid_reads import ReadBudget
+            read=ReadBudget(db,PREPARATION_READ_BYTES)
+            decoded={**payload,'put':[[s,k,read.decode(v)] for s,k,v in payload.get('put',[])]}
+            output_transition(decoded,lambda s,k:({} if s in state else None) if k=='' else state.get(s,{}).get(k),
+                event_type=event['event_type'],key=event['idempotency_key'],object_id=event['object_id'],producer=event['producer'],
+                version=event['new_state_version'],registration=self._goal_registration(db))
+            from .hybrid_candidate_output import event_inputs
+            value=next(v for s,k,v in decoded['put'] if k)
+            if event['input_versions']!=canonical(event_inputs(value)).decode():raise Conflict('candidate output canonical inputs differ')
+            payload=decoded;preparation_decoded=True
         from .hybrid_cpu_assessment import SECTION as cpu_section, EVENT as cpu_event, validate_transition as cpu_transition
         if (event['event_type']==cpu_event or any(s==cpu_section for s,k,v in payload.get('put',[])) or
                 any(s==cpu_section for s,k in payload.get('delete',[])) or cpu_section in payload.get('set',{})):
@@ -686,6 +701,13 @@ class Store:
 
     def _commit(self, db, event_type, key, payload, previous, object_id, producer, inputs, *, _authorization=None):
         ver = previous + 1
+        from .hybrid_candidate_output import SECTIONS as output_sections,EVENTS as output_events,validate_transition as output_transition
+        if (event_type in output_events or any(s in output_sections for s,k,v in payload['put']) or
+                any(s in output_sections for s,k in payload['delete'])):
+            service=self._check_candidate_output_guard(db,_authorization)
+            output_transition(payload,_authorization.lookup,event_type=event_type,key=key,object_id=object_id,
+                producer=producer,version=ver,registration=self._goal_registration(db))
+            service.check_live_write(db,payload,inputs,_authorization)
         from .hybrid_cpu_assessment import SECTION as cpu_section, EVENT as cpu_event, validate_transition as cpu_transition
         if (event_type==cpu_event or any(s==cpu_section for s,k,v in payload['put']) or
                 any(s==cpu_section for s,k in payload['delete'])):
@@ -887,6 +909,9 @@ class Store:
         return service
 
     def _preparation_complete(self, db, state):
+        from .hybrid_candidate_output import validate_complete as output_complete
+        output_complete(state,self._goal_registration(db),lambda k:self._candidate_output_event(db,k),
+            lambda s,v:self._candidate_output_summary(db,s,v))
         from .hybrid_cpu_assessment import validate_complete as cpu_complete
         cpu_complete(state,self._goal_registration(db),lambda k:self._cpu_assessment_event(db,k),
             self._cpu_assessment_summary(db,state['version']))
@@ -1168,6 +1193,59 @@ class Store:
         if _decode(_parse(row['input_versions'].encode()))!=event_inputs(value):
             raise Conflict('budget original decoded scope inputs differ')
         return ((row['event_type'],row['producer'],row['object_id'],row['new_state_version']),expected_objects(value))
+
+    def bind_hybrid_candidate_output(self,service):
+        from .hybrid_candidate_output_service import CandidateOutputService
+        if type(service) is not CandidateOutputService or service.store is not self:
+            raise TypeError('invalid original candidate output service')
+        with self.lock():
+            if self._hybrid_candidate_output_service not in (None,service):raise Conflict('candidate output owner cannot be rebound')
+            self._hybrid_candidate_output_service=service
+
+    def _check_candidate_output_guard(self,db,guard):
+        service=self._hybrid_candidate_output_service
+        if service is None:raise PermissionError('protected candidate output service required')
+        service.check_guard(db,guard);return service
+
+    def _candidate_output_summary(self,db,section,version):
+        from .hybrid_candidate_output import SECTIONS,EVENTS
+        if section not in SECTIONS:raise Conflict('unknown candidate output domain')
+        event=EVENTS[SECTIONS.index(section)]
+        row=db.execute("SELECT CASE WHEN typeof(idempotency_key)='text' AND length(CAST(idempotency_key AS BLOB))<=160 THEN idempotency_key END,new_state_version FROM events WHERE event_type=? AND seq<=? ORDER BY seq DESC LIMIT 1",(event,version)).fetchone()
+        count=db.execute('SELECT COUNT(*) FROM events WHERE event_type=? AND seq<=?',(event,version)).fetchone()[0]
+        if row is not None and (row[0] is None or type(row[1]) is not int):raise Conflict('candidate output bounded tip differs')
+        return (tuple(row) if row is not None else None),count
+
+    def _candidate_output_event(self,db,key,*,max_bytes=4*1024**2,_parse=None,_decode=None):
+        from .hybrid_candidate_output import SECTIONS,EVENTS,validate_record,event_inputs
+        from .hybrid_goals import digest
+        if _parse is None and _decode is None:
+            from .hybrid_reads import ReadBudget
+            read=ReadBudget(db,PREPARATION_READ_BYTES);_parse,_decode=read.parse,read.decode
+        row=db.execute("SELECT seq,previous_state_version,new_state_version,object_version,CASE WHEN typeof(event_type)='text' AND length(CAST(event_type AS BLOB))<=64 THEN event_type END AS event_type,CASE WHEN typeof(producer)='text' AND length(CAST(producer AS BLOB))<=64 THEN producer END AS producer,CASE WHEN typeof(object_id)='text' AND length(CAST(object_id AS BLOB))<=128 THEN object_id END AS object_id,CASE WHEN typeof(payload_sha256)='text' AND length(CAST(payload_sha256 AS BLOB))<=64 THEN payload_sha256 END AS payload_sha256,CASE WHEN typeof(input_versions)='text' AND length(CAST(input_versions AS BLOB))<=4096 THEN input_versions END AS input_versions,CASE WHEN typeof(payload)='text' AND length(CAST(payload AS BLOB))<=? THEN payload END AS payload FROM events WHERE idempotency_key=?",(max_bytes,key)).fetchone()
+        if row is None:return None
+        if (any(row[n] is None for n in ('event_type','producer','object_id','payload_sha256','input_versions','payload')) or
+                row['event_type'] not in EVENTS or any(type(row[n]) is not int for n in ('seq','previous_state_version','new_state_version','object_version'))):
+            raise Conflict('candidate output original bounded header differs')
+        payload=_parse(row['payload'].encode())
+        if (type(payload) is not dict or sha(payload)!=row['payload_sha256'] or canonical(payload).decode()!=row['payload'] or
+                set(payload)!={'format','put','delete','details'} or type(payload['format']) is not int or payload['format']!=2 or
+                type(payload['delete']) is not list or payload['delete']!=[] or payload['details'] is not None or type(payload['put']) is not list):
+            raise Conflict('candidate output original integrity/shape differs')
+        section=SECTIONS[EVENTS.index(row['event_type'])];rows=[];markers=[];seen=set()
+        for item in payload['put']:
+            if type(item) is not list or len(item)!=3 or item[0]!=section or type(item[1]) is not str or item[1] in seen:
+                raise Conflict('candidate output original descriptor differs')
+            seen.add(item[1]);value=_decode(item[2])
+            if item[1]:validate_record(section,item[1],value);rows.append((item[1],value))
+            else:markers.append(value)
+        tip,_=self._candidate_output_summary(db,section,row['new_state_version']-1)
+        if len(rows)!=1 or rows[0][0]!=key or markers!=([{}] if tip is None else []):raise Conflict('candidate output original fact/marker differs')
+        value=rows[0][1];version=value['accepted_state_version']
+        if (any(row[n]!=version for n in ('seq','new_state_version','object_version')) or row['previous_state_version']!=version-1 or
+                row['object_id']!=digest(value) or row['producer']!='hybrid-core' or
+                row['input_versions']!=canonical(event_inputs(value)).decode()):raise Conflict('candidate output original metadata/inputs differ')
+        return ((row['event_type'],row['producer'],row['object_id'],version),[(section,key,digest(value))])
 
     def bind_hybrid_cpu_assessment(self, service):
         from .hybrid_cpu_assessment_service import CpuAssessmentService
@@ -1452,6 +1530,8 @@ class Store:
             from .hybrid_runtime_installation import EVENTS as installation_events
             from .hybrid_working_plan import EVENTS as working_plan_events
             from .hybrid_cpu_assessment import EVENT as cpu_event
+            from .hybrid_candidate_output import EVENTS as output_events
+            if event_type in output_events:raise PermissionError('candidate output requires actual guarded object writer')
             if event_type==cpu_event or event_type in working_plan_events or event_type in installation_events or event_type in (controller_event,admission_event,budget_event,workspace_event) or event_type in preparation_events or event_type in authority_events.values() or (event_type=='HYBRID_GOAL_DRAFTED' and self._hybrid_draft_auth_owner is not None):
                 raise PermissionError('Hybrid service events require guarded object transactions')
             if self._existing(db,key,event_type,object_id):
@@ -1524,6 +1604,9 @@ class Store:
                 from .hybrid_runtime_installation import EVENTS as installation_events, SECTIONS as installation_sections
                 from .hybrid_working_plan import EVENTS as working_plan_events, SECTIONS as working_plan_sections
                 from .hybrid_cpu_assessment import EVENT as cpu_event, SECTION as cpu_section
+                from .hybrid_candidate_output import EVENTS as output_events,SECTIONS as output_sections
+                if event_type in output_events or any(s in output_sections for s,k in objects):
+                    self._check_candidate_output_guard(db,authorization)
                 if event_type==cpu_event or any(s==cpu_section for s,k in objects):
                     self._check_cpu_assessment_guard(db,authorization)
                 if event_type in working_plan_events or any(s in working_plan_sections for s,k in objects):

@@ -239,7 +239,9 @@ class FixtureUsageSourceOwner:
             try:
                 attempt = self._allocate(owner.membership, claim, 'runtime.' + runtime['scenario'], member)
                 attempt['runtime'] = runtime
-                _write_new(attempt['path'] / 'program.py', owner.program_raw)
+                program_raw=(owner._engineering_grants[id(runtime['engineering_grant'])]['program_raw']
+                    if runtime.get('engineering_grant') is not None else owner.program_raw)
+                _write_new(attempt['path'] / 'program.py', program_raw)
                 fd = os.open(attempt['path'] / 'program.py', os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK | os.O_CLOEXEC)
                 attempt['fds']['program'] = fd; info = os.fstat(fd)
                 attempt['identities']['program.py'] = [info.st_dev, info.st_ino]
@@ -257,16 +259,17 @@ class FixtureUsageSourceOwner:
                 raise PermissionError('actual original runtime producer source required')
             if attempt['launch_entered']: return attempt['producer_identity']
             self._physical(attempt)
-            if hashlib.sha256(os.pread(attempt['fds']['program'], 16385, 0)).hexdigest() != owner.program_hash.removeprefix('sha256:'):
+            if hashlib.sha256(os.pread(attempt['fds']['program'], 16385, 0)).hexdigest() != runtime['origin']['program_sha256'].removeprefix('sha256:'):
                 raise Conflict('fixed original CPU program changed before handoff')
+            extra=() if runtime.get('engineering_grant') is None else (owner._engineering_input(runtime),)
             owner._check_spawn_gate(runtime)
             attempt['launch_entered'] = True; attempt['status'] = 'START_UNKNOWN'
             runtime['spawn_entered'] = True; runtime['spawn_monotonic'] = time.monotonic()
             try:
                 process = subprocess.Popen([sys.executable, '-B', '-I', '-S', '/proc/self/fd/' + str(attempt['fds']['program']),
-                    str(self.process['pid']), runtime['origin']['nonce'], runtime['scenario']], stdin=subprocess.PIPE,
+                    str(self.process['pid']), runtime['origin']['nonce'], runtime['scenario'],*[str(fd) for fd in extra]], stdin=subprocess.PIPE,
                     stdout=attempt['fds']['write'], stderr=attempt['fds']['stderr'],
-                    env={'PATH': '/usr/bin:/bin'}, close_fds=True, pass_fds=(attempt['fds']['program'],), start_new_session=True)
+                    env={'PATH': '/usr/bin:/bin'}, close_fds=True, pass_fds=(attempt['fds']['program'],*extra), start_new_session=True)
                 attempt['producer'] = process
                 pipe = os.fstat(process.stdin.fileno()); attempt['stdin_identity'] = [pipe.st_dev, pipe.st_ino]
                 attempt['producer_identity'] = identity(process.pid)
@@ -351,7 +354,7 @@ class FixtureUsageSourceOwner:
                         runtime = attempt['runtime']
                         expected = {'type': 'runtime.started', 'nonce': runtime['origin']['nonce'],
                                     'pid': attempt['producer_identity']['pid'],
-                                    'program': 'FIXED_CPU_PI_TRIAL_V1' if runtime['scenario'] == 'cpu_trial' else 'FIXED_CPU_PROTOCOL_V1'}
+                                    'program': 'FIXED_CPU_ADD_PATCH_V1' if runtime['scenario']=='engineering_patch' else 'FIXED_CPU_PI_TRIAL_V1' if runtime['scenario'] == 'cpu_trial' else 'FIXED_CPU_PROTOCOL_V1'}
                         if event != expected or runtime_ack is not None or not runtime['release_entered']:
                             raise Conflict('original gated fixture started ACK differs')
                         runtime_ack = _RuntimeStartedObservation(source, canonical({'source_id': source.id,

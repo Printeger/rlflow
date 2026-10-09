@@ -5,8 +5,9 @@ module supplies deterministic arithmetic/links, not caller attestations.
 """
 from .hybrid_protocol import ID, HASH, obj, enum, validate_schema
 from .hybrid_goals import digest
-from .store import Conflict
+from .store import Conflict,canonical
 from .hybrid_cpu_trial import BINDING as CPU_BINDING, KIND as CPU_KIND, AUTHORIZATION as CPU_AUTHORIZATION
+from .hybrid_engineering_patch import BINDING as ENGINEERING_BINDING,KIND as ENGINEERING_KIND,AUTHORIZATION as ENGINEERING_AUTHORIZATION
 
 PHASES = ('REGISTER_NO_HANDOFF', 'HANDOFF_UNKNOWN', 'PROCESS_REGISTERED',
           'RELEASE_INTENT', 'STARTED_AS_OBSERVED', 'STOP_REQUESTED',
@@ -28,9 +29,12 @@ PROTOCOL_ORIGIN = obj({'task_id': ID, 'attempt_id': ID, 'lease_id': ID,
 CPU_ORIGIN = obj({**PROTOCOL_ORIGIN['properties'], 'kind': {'const': CPU_KIND},
     'authorization': {'const': CPU_AUTHORIZATION}, 'scenario': {'const': 'cpu_trial'},
     'cpu_trial': CPU_BINDING})
-ORIGIN = {'type': 'object', 'if': {'properties': {'kind': {'const': 'PROTOCOL_CONFORMANCE'}},
-                                 'required': ['kind']},
-          'then': PROTOCOL_ORIGIN, 'else': CPU_ORIGIN}
+ENGINEERING_ORIGIN=obj({**PROTOCOL_ORIGIN['properties'],'kind':{'const':ENGINEERING_KIND},
+    'authorization':{'const':ENGINEERING_AUTHORIZATION},'scenario':{'const':'engineering_patch'},
+    'engineering_patch':ENGINEERING_BINDING})
+ORIGIN={'type':'object','if':{'properties':{'kind':{'const':'PROTOCOL_CONFORMANCE'}},'required':['kind']},
+    'then':PROTOCOL_ORIGIN,'else':{'if':{'properties':{'kind':{'const':CPU_KIND}},'required':['kind']},
+    'then':CPU_ORIGIN,'else':ENGINEERING_ORIGIN}}
 nullable = lambda schema: {'oneOf': [schema, {'type': 'null'}]}
 CONTROL_BODY = obj({'action': enum('START_FIXED_CPU', 'STOP_FIXED_SCOPE'),
     'task_id': ID, 'expected_state_version': COUNT})
@@ -45,6 +49,8 @@ RUNTIME = obj({'phase': enum(*PHASES), 'origin': ORIGIN,
 RUNTIME['properties'].update(start_command=CONTROL_COMMAND, stop_command=CONTROL_COMMAND)
 RUNTIME['properties'].update(cpu_trial_release_attempted={'type': 'boolean'},
                              cpu_trial_result=nullable({'type': 'object'}))
+RUNTIME['properties'].update(engineering_release_attempted={'type':'boolean'},
+                            engineering_patch_result=nullable({'type':'object'}))
 
 
 def control_command_id(request, actor_id, client_key):
@@ -97,6 +103,18 @@ def validate_runtime(request, prior):
         if value['cpu_trial_result'] is not None: validate_result(value['cpu_trial_result'], value['origin'], value['producer'])
     elif any(name in value for name in ('cpu_trial_release_attempted', 'cpu_trial_result')):
         raise Conflict('protocol capability cannot acquire CPU trial fields')
+    engineering=value['origin']['kind']==ENGINEERING_KIND
+    if engineering:
+        from .hybrid_engineering_patch import validate_result
+        if (type(value.get('engineering_release_attempted')) is not bool or 'engineering_patch_result' not in value or
+                (current=='STARTED_AS_OBSERVED' or value['started_ack_sha256'] is not None) and not value['engineering_release_attempted'] or
+                value['engineering_release_attempted'] and current not in PHASES[4:] or
+                old is not None and old['engineering_release_attempted'] and not value['engineering_release_attempted'] or
+                value['engineering_patch_result'] is not None and (current!='FIXTURE_SCOPE_STOPPED' or not value['engineering_release_attempted'])):
+            raise Conflict('engineering patch original release/result phase differs')
+        if value['engineering_patch_result'] is not None:validate_result(value['engineering_patch_result'],value['origin'],value['producer'])
+    elif any(k in value for k in ('engineering_release_attempted','engineering_patch_result')):
+        raise Conflict('another profile cannot acquire engineering result fields')
     _control_links(request, old)
     if value['phase'] != current: raise Conflict('fixture runtime action/phase differs')
     if request['data_mode'] != 'fixture': raise Conflict('fixed CPU runtime is fixture only')
@@ -155,6 +173,17 @@ def validate_original_links(value, lookup):
     from .hybrid_working_plan import SECTIONS, validate_record, validate_links
     from .hybrid_budget_ledger import SECTIONS as BUDGET
     request = value['request']; runtime = request['fixture_runtime']; origin = runtime['origin']
+    if origin['kind']==ENGINEERING_KIND:
+        from .hybrid_engineering_patch import approved_binding
+        from .hybrid_goals import SECTIONS as GOALS
+        from .hybrid_authority import SECTIONS as AUTHORITY
+        sources=value['policy_source'];record=lookup(GOALS[0],sources['contract_key']);approval=lookup(AUTHORITY[0],sources['approval_key'])
+        if record is None or approval is None:raise Conflict('engineering original approval missing')
+        binding=approved_binding(record['contract']['proposal'],approval['registry_witness'],
+            origin['program_sha256'],origin['engineering_patch']['evaluator_sha256'])
+        binding.update(grant_id=origin['engineering_patch']['grant_id'],
+            **{k:sources[k] for k in ('proposal_hash','approval_hash','config_hash','scope_hash')})
+        if canonical(binding)!=canonical(origin['engineering_patch']):raise Conflict('engineering original approved profile binding differs')
     if origin['kind'] == CPU_KIND:
         from .hybrid_cpu_trial import approved_binding
         from .hybrid_goals import SECTIONS as GOALS

@@ -1,0 +1,31 @@
+# Checkpoint54 FINAL：固定只读补丁生成与可信core应用
+
+本地交付已验收，正在提交；parent53为3a4b4e3。下方WIP记录按发生时保留，不覆盖本最终状态。实际行为为固定三个用例的 add 缺陷修复，不声称通用Engineer/native或独立Reviewer。
+
+唯一必要旧全量原78787终d86812 exit0：2214passed、32既有外部H1skipped、3warnings、2317.25s。全量执行期间/结束后276输入全部匹配原冻结manifest f59ae63dfd0268dfa2fde7b7581de52357e466a945e7b4957e84a58458ed499a，未重启、未并行。全量结束后仅 hybrid_candidate_output.py 新域close_witness_hash关联与新测试文件两项变化，274项保持原bytes；新关闭见证正负例定向验收原84886终30c723 exit0 1pass31.45s，最终manifest d6f4e44ee03cff02d7512490a89122c0d7fca860ffbe9f9b88c01ce546877f52。不能宣称旧全量执行于最后两文件版本。
+
+最后定向r6原81498终488706 exit1：1fail21.73s，私有损坏夹具忘了append-only触发器；仅夹具调整为在同事务暂移并恢复完全相同触发器，生产防护不变。r7原85291终d06ebb exit1：1fail22.83s，audit已正确拒绝，但测试误把明文兼容投影read replay当审计入口。先读取Store语义，改诊断到实际snapshot/recover，保留旧API、不扩生产改动。r8实际通过audit/snapshot/recover拒合法hash替换及重算事件后损坏；finally恢复原投影与事件后audit/replay/snapshot/recover正例。失败均保留原日志，新13case分别通过，不虚称最终单suite13pass。
+
+High只读确认九项MUST静态闭合，未测试/写入且不替代产品独立Reviewer。compileall/pipcheck/diff通过，USERpackage-lock原SHA不变未stage。完整命令/终态/原日志指纹/两份输入manifest见evidence/checkpoint-54-final-tests.txt与相关证据。无live测试；模型/GPU/生产/push均零。
+
+下一55交付真实原candidate产出的authenticated冷只读API＋现有Dashboard，验收原owner关闭仍可读、完整原来源证明、历史与当前权限分层、真实浏览器刷新/鉴权且零执行写。再继续独立Reviewer/条件与native原缺口；完整Goal未完成，无新增外部权限阻塞。
+
+53已实际提交3a4b4e3，52为37e18c5。54尚未最终验收/提交，不将新profile或准备组件当成果checkpoint。
+
+本切片必须完成实际小文件 baseline失败→固定只读worker生成精确补丁并测试→原STOP/reap/Source及输入FD全闭/PoolFREE→独立受保护core Writer INTENT→原inode有限应用→从实际after文件测试、验证全库存→独立输出candidate不可变事实。原snapshot/Plan/initial-copy hashes不改，非目标文件/目录/祖先/Kernel全部保留检查。模型/GPU/native/任意脚本/生产状态不调用。
+
+独立High架构窄设计确认：不能去掉旧PlanWitness，不能让G后child立即写使合法输出撞旧base检查，不能STOP后复用Workspace._plan_sources的HELD/NOT_AUTHORIZED上下文。选择较小的worker只读proposal＋core applier；core输出服务要自己的实际current授权/Controller/Working guard。写后仅原target before→after可变；来源损坏、部分写/失COMMIT、FD关闭失败保持UNKNOWN/原cap显式收尾，不重写、不重新跑worker。历史不能重建写权限。
+
+已新增固定程序/profile、原readonly FD Runtime/Source/ledger，以及 CandidateOutputService、有限实际材料核验、append-only双域、Store保护接线/历史事件/恢复和周期快照。写入要求当前Controller/Goal审批/原Working Kernel与全图，不复用已SETTLED的HELD预算源；原保护路径非空要求保留。receipt继承原合法授权样本，仅在actual原pwrite已进入、原RWFD关闭后做审计读回，过期亦不新发写权限。
+
+六项独立窄MUST已修：新RWFD加入原fork协调器；Controller历史闭包与UTC/mono因果；终态实际profile hash；安全读取bytes复用无第二次FIFO open；工程输入IO移到最终启动门之前；delete严格空list。后续新增最后STOP核验改用原Controller final_token_freshness、首真实INTENT尝试前才绑定request，防stale CAS毒化。Workspace双方pending/closed/原durablehead核验及事务锁覆盖effect/COMMIT。
+
+开发r1终0a95dc exit1：1error1.34s，原protected_paths=[]违反既有schema，未启动worker，修profile保留原保护路径；没有放宽schema。开发r2原58043终f06f1a exit0：1pass27.25s，真实baseline2失败→原worker只读proposal→STOP/FREE→单次原inodepwrite→实际3用例通过→audit/replay/snapshot/recover。后续安全差量后开发r3原63062终3ed24e exit0：10pass193.33s，单次写入、失pwrite返回后过期receipt、INTENT/RESULT COMMIT丢返回、最终STOP/TTL、stale CAS不毒化、原fork FD清理、部分write UNKNOWN不重写、NoG无输出等通过。
+
+新增2case开发r4原86736终714443 exit1：2fail+1teardown error37.89s。最后工程input IO已实际拒Popen；测试却在durable HANDOFF_UNKNOWN后错误期待无PID就能NO_HANDOFF/FREE，正文及teardown同因失败。先读原ledger与HYBRID_FIXTURE_RUNTIME.md定位，并改变诊断/收尾为request_stop+shutdown_safety，UNKNOWN占用1、不伪造退款/终态，生产原规则未放宽。另cold test漏attach_existing必需project/mode，测试补scope。r5原19547终081c10 exit0：2pass33.62s，最新完整实际输出、strict CAS/来源/Controller JSONfloat反例、cold无writer，以及最后input IO推进期限拒spawn/原安全物理清理通过。新12case分别已有真实通过记录，不宣称全12在同一最终suite通过。
+
+High只读差量确认原8项边界、strict整数、原Store事件/双域tipCOUNT遗漏检测、manual/full/recovery和同事务周期snapshot接线静态闭合；High未运行测试/写文件，不替代实测或科研独立Reviewer。后续主agent发现并交High判定一个新增确证MUST：54 pure历史闭包还须将PoolFREE.close_witness_hash与原lease/claim/terminal proof/实际all-pool-FDclosed所构造digest严格相等；live service._original已有actual核验，缺的是可推导历史cross-link，不是扩OS/签名scope。等唯一旧回归78787真终态后，仅修新54 domain及实际正例/closehash负例，不重开旧50，不重跑旧全套。
+
+当前唯一必要旧全Python回归原78787 LIVE，完整旧suite排除已完成54新module：`PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q --tb=short --ignore=tests/test_hybrid_engineering_output.py`。Store核心写入/replay/恢复/快照与RuntimeState封闭schema变更使旧全域受影响；不是重跑原41或另开重复复验。276 rlflow/tests/schemas/web_checks输入冻结manifest SHA f59ae63dfd0268dfa2fde7b7581de52357e466a945e7b4957e84a58458ed499a，源码/测试不改，无并行/重启。54无最终验收/commit。
+
+下一收尾新54边界实测/差量独立复核与必要回归，归档提交后再推进原产出只读接受/独立Reviewer。真正独立Reviewer/通用Engineer-native/全局条件/完整Goal、严格OS/任意树/invoice/安装长期仍缺；没有新增需用户决定的权限阻塞。USERpackage-lock不改不stage，旧已通过53/52不重跑，54改动的Runtime依赖须必要回归。

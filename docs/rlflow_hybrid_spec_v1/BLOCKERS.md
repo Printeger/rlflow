@@ -1,5 +1,11 @@
 # 阻塞与证据缺口
 
+Checkpoint54 FINAL：固定只读worker生成补丁→原STOP/reap/Source及输入FD关闭/PoolFREE→受保护core INTENT→原inode单次写入→实际after三用例/全库存→不可变AUDIT_ONLY产出及恢复已交付。新13case分别通过，必要旧全量原78787终d86812 exit0：2214pass/32既有外部H1skip/3warning2317.25s。全量输入276SHA在执行期间及结束后均匹配；结束后仅新54domain关闭见证关联与对应测试两文件改变，另外274完全一致，最后定向原84886终30c723 exit0 1pass31.45s。独立High九项MUST静态闭合，编译/依赖/diff通过，无live测试，正在归档提交54。详HYBRID_ENGINEERING_OUTPUT.md及evidence/checkpoint-54-final-tests.txt。下一55将真实工程产出接入authenticated冷只读API及现有Dashboard，并验证原owner关闭/断线刷新不执行。独立Reviewer、通用Engineer/native、全局条件/完整Goal、严格OS/任意树/invoice/安装及长期缺口仍在；无新增需用户决定阻塞，paid/GPU/生产边界和USERlock不动。下方WIP与“正在提交”均历史。
+
+54最新WIP：真实固定工程单次写入产出/STOP/FREE/恢复等12新case分别通过；原8MUST/strict/Store差量静态闭合后新增一项确证历史Pool关闭hash关联，等唯一旧全Python回归78787真终态再局部修/正负定向（live关闭已核）。276输入冻结、不重启不并行，不重跑旧全套/旧50；尚无最终54归档/commit。HANDOFF_UNKNOWN无PID仍不能refund/FREE，原安全物理关闭不洗成NO_HANDOFF；r4夹具错误已定位并修正。下一收尾后推进原输出只读接受/独立评审。没有新增需要用户决定的权限阻塞。固定core修复不等于通用native/独立Reviewer/全局条件完成；严格OS/任意树/真实invoice/安装长期与完整Goal缺口仍在。原付费/GPU/生产边界、USERlock不动；下方旧WIP为历史。
+
+54 WIP：53实际3a4b4e3；当前无live测试。选择固定worker只读补丁proposal→原STOP/FREE→可信core实际写入/验证candidate，不放宽旧G/PlanWitness，不把STOP后HELD上下文偷作输出授权。新固定程序/profile和独立readonly原FD Runtime/Source/ledger开始接线，仅compile/diff静态通过，尚无54实测/验收/commit；CandidateOutput ownedwriter/INTENT→有限pwrite→actualafter/fullinventory/APPLIED及恢复仍待，不能仅准备组件收尾。详HYBRID_ENGINEERING_OUTPUT.md。原paid/GPU/native/生产边界保持，USERlock未改未stage，无新增外部决策阻塞；下方FINAL53已实际提交。
+
 Checkpoint53 FINAL：原raw384点独立机器冷复算→原plain appraisal/terminal/result/规则绑定→持久机器核验和保守next已交付；不冒充独立Reviewer，条件覆盖空/Goalfalse/dispatchfalse保持。5新case分别通过，必要唯一原48427终fa5fd1 exit0 47pass/1warning182.40s，最终实际CPU decision与UTC因果负例通过。270SHA/编译/依赖/diff通过，High窄MUST闭合，无live测试，正在提交53。52实际37e18c5，详HYBRID_CPU_COLD_DECISION.md/evidence/checkpoint-53-final-tests.txt。下一真正工程candidate受控输出/接收与可靠STOP闭环，再接独立只读评审；真正native/完整科研review/条件决定/严格OS/任意树/invoice/安装/长期缺口仍待，无新增外部决策阻塞，不扩paid/GPU/生产权限。USERlock未改未stage；下方WIP历史。
 
 53 WIP：52实际37e18c5。原384点独立机器冷复算→原plain appraisal/terminal/批准/规则绑定→持久MACHINE_VERIFIED/UNAVAILABLE与有限next已交付；不调用49evaluator，不声称独立Reviewer/条件完成/Goal完成。复用50append-only事实可选扩展，旧bytes不回填；High历史源码身份/JSON类型/None降级MUST已关闭，新边界COMMIT丢回执/周期snapshot/历史禁sourceIO/源码换pin/末TTL/非法ID分别1pass23.56s+1pass11.80s；首轮3pass42.48s。唯一必要原48427仍LIVE，270输入冻结，源码不改，无并行；最终53未提交。详HYBRID_CPU_COLD_DECISION.md。下一真正工程candidate/native及独立科研条件/decisions完整缺口仍待；没有新增外部决策阻塞，原付费/GPU/生产边界、USERlock不动。下方历史。

@@ -6,6 +6,7 @@ historical facts never reconstruct the original task/attempt/lease capability.
 from contextlib import contextmanager, ExitStack
 from dataclasses import dataclass
 import hashlib
+import fcntl
 import json
 import math
 import os
@@ -51,6 +52,16 @@ def _fork_parent():
 def _fork_child():
     global _registry
     for owner in _owners.values():
+        for material in owner._candidate_materials.values():
+            if material.fd is not None:
+                try:os.close(material.fd)
+                except OSError:pass
+                material.fd=None
+        for row in owner._engineering_grants.values():
+            if row['fd'] is not None:
+                try:os.close(row['fd'])
+                except OSError:pass
+                row['fd']=None
         owner._live = False; owner._active = None; owner._lock = threading.RLock()
     _owners.clear(); _registry = threading.RLock()
 
@@ -108,6 +119,8 @@ class FixtureRuntimeOwner:
             self._control_service = None
             self._safety_freeze = False
             self._cpu_grants = {}; self._cpu_results = {}
+            self._engineering_grants = {}; self._engineering_results = {}
+            self._candidate_materials = {}
             self.program = Path(__file__).with_name('hybrid_runtime_fixture.py')
             # Exact protected program, not any caller command or plan rewriting.
             raw = _read_bounded(self.program, 16384)
@@ -165,6 +178,60 @@ class FixtureRuntimeOwner:
     def _ready_for_bundle(self, bundle):
         return json.loads(self.plans._ready_attempts[bundle.id]['raw'])
 
+    def _engineering_binding(self,loaded):
+        from .hybrid_engineering_patch import approved_binding
+        program=Path(__file__).with_name('hybrid_engineering_fixture.py')
+        evaluator=Path(__file__).with_name('hybrid_engineering_patch.py')
+        return approved_binding(loaded['record']['contract']['proposal'],json.loads(self.plans.registry._raw),
+            'sha256:'+hashlib.sha256(_read_bounded(program,16384)).hexdigest(),
+            'sha256:'+hashlib.sha256(_read_bounded(evaluator,16384)).hexdigest())
+
+    def issue_engineering_patch_grant(self,bundle,token,observation):
+        """Only original readonly base FD; this grant never allows candidate writes."""
+        from .hybrid_engineering_patch import EngineeringPatchGrant,TARGET,BEFORE
+        from .files import stamp
+        self._actual();self.controller._issued(token);self._plan_original(bundle,token,observation)
+        with self.pool._lock,self.plans.builder._witness(bundle) as witness,self.store.read_connection() as db:
+            db.execute('BEGIN');read=ReadBudget(db,PREPARATION_READ_BYTES)
+            ready=self._ready_for_bundle(bundle);loaded=self.budget._load(db,ready['request']['goal_ref'],read)
+            binding=self._engineering_binding(loaded)
+            binding.update({k:loaded[k] for k in ('proposal_hash','approval_hash','config_hash','scope_hash')})
+            if len(self._engineering_grants)>=32:raise Conflict('finite engineering grant capacity reached')
+            item=witness.candidate_inventory[0].get(TARGET)
+            if item is None:raise Conflict('original fixed patch base target missing')
+            fd=os.open(item['path'].name,os.O_RDONLY|os.O_NOFOLLOW|os.O_NONBLOCK|os.O_CLOEXEC,dir_fd=item['parent_fd'])
+            try:
+                if stamp(os.fstat(fd))!=item['stamp'] or os.pread(fd,len(BEFORE)+1,0)!=BEFORE:
+                    raise Conflict('original fixed patch base bytes differ')
+                witness.check();self.workspace.working.check(observation)
+                key='engineering_grant_'+uuid.uuid4().hex;binding['grant_id']=key
+                grant=EngineeringPatchGrant(key,canonical(binding))
+                self._engineering_grants[id(grant)]={'grant':grant,'bundle':bundle,'token':token,
+                    'observation':observation,'attempt':None,'fd':fd,'stamp':item['stamp'],'path':item['path'],
+                    'program_raw':_read_bounded(Path(__file__).with_name('hybrid_engineering_fixture.py'),16384)}
+                return grant
+            except BaseException:os.close(fd);raise
+
+    def _issued_engineering_grant(self,grant,bundle,token,observation):
+        from .hybrid_engineering_patch import EngineeringPatchGrant
+        row=self._engineering_grants.get(id(grant))
+        if (type(grant) is not EngineeringPatchGrant or row is None or row['grant'] is not grant or
+                any(row[k] is not v for k,v in (('bundle',bundle),('token',token),('observation',observation)))):
+            raise PermissionError('actual original readonly engineering grant required')
+        return row
+
+    def _engineering_input(self,attempt):
+        from .files import stamp
+        from .hybrid_engineering_patch import BEFORE
+        row=self._issued_engineering_grant(attempt['engineering_grant'],attempt['bundle'],attempt['token'],attempt['observation'])
+        fd=row['fd']
+        if (row['attempt'] is not attempt or fd is None or
+                fcntl.fcntl(fd,fcntl.F_GETFL)&os.O_ACCMODE!=os.O_RDONLY or
+                stamp(os.fstat(fd))!=row['stamp'] or stamp(row['path'].lstat())!=row['stamp'] or
+                os.pread(fd,len(BEFORE)+1,0)!=BEFORE):
+            raise Conflict('original readonly engineering base FD changed')
+        return fd
+
     def _issued_cpu_grant(self, grant, bundle, token, observation):
         from .hybrid_cpu_trial import CpuTrialGrant
         row = self._cpu_grants.get(id(grant))
@@ -174,7 +241,7 @@ class FixtureRuntimeOwner:
             raise PermissionError('actual original same-plan CPU trial grant required')
         return row
 
-    def register(self, bundle, token, observation, claim, *, request_key, scenario='complete', cpu_grant=None):
+    def register(self, bundle, token, observation, claim, *, request_key, scenario='complete', cpu_grant=None,engineering_grant=None):
         """REGISTER/CANCEL compete on the ONE original ReservationHEAD CAS."""
         from .hybrid_protocol import ID, validate_schema
         from .hybrid_runtime_fixture import SCENARIOS
@@ -182,20 +249,23 @@ class FixtureRuntimeOwner:
         if self._safety_freeze: raise Conflict('fixture runtime permanently frozen for physical cleanup')
         self.controller._issued(token); original_claim = self.pool._issued_claim(claim)
         validate_schema(ID, request_key)
-        if type(scenario) is not str or scenario not in SCENARIOS: raise Conflict('fixed CPU protocol scenario required')
+        if type(scenario) is not str or scenario not in SCENARIOS|{'engineering_patch'}: raise Conflict('fixed CPU protocol scenario required')
         cpu_row = self._issued_cpu_grant(cpu_grant, bundle, token, observation) if scenario == 'cpu_trial' else None
         if scenario != 'cpu_trial' and cpu_grant is not None:
             raise PermissionError('CPU trial grant cannot upgrade a protocol capability')
+        engineering_row=self._issued_engineering_grant(engineering_grant,bundle,token,observation) if scenario=='engineering_patch' else None
+        if scenario!='engineering_patch' and engineering_grant is not None:raise PermissionError('engineering grant cannot upgrade another profile')
         with self.pool._lock, self._lock:
             previous = self._attempts.get(request_key)
             if previous is not None:
                 if any(previous[name] is not value for name, value in
-                       (('bundle', bundle), ('token', token), ('observation', observation), ('claim', claim))) or previous['scenario'] != scenario or previous.get('cpu_grant') is not cpu_grant:
+                       (('bundle', bundle), ('token', token), ('observation', observation), ('claim', claim))) or previous['scenario'] != scenario or previous.get('cpu_grant') is not cpu_grant or previous.get('engineering_grant') is not engineering_grant:
                     raise Conflict('original fixture runtime request key reused')
                 attempt = previous
             else:
                 if cpu_row is not None and cpu_row['attempt'] is not None:
                     raise Conflict('original CPU trial grant already belongs to another attempt')
+                if engineering_row is not None and engineering_row['attempt'] is not None:raise Conflict('original engineering grant already used')
                 if len(self._attempts) >= 32: raise Conflict('finite original fixture runtime attempts exceeded')
                 if original_claim['payload']['member_id'] != self.membership.id:
                     raise PermissionError('fixture runtime original Pool claim membership differs')
@@ -213,15 +283,20 @@ class FixtureRuntimeOwner:
                 if cpu_row is not None:
                     from .hybrid_cpu_trial import KIND, AUTHORIZATION
                     origin.update(kind=KIND, authorization=AUTHORIZATION, cpu_trial=json.loads(cpu_grant.raw))
+                if engineering_row is not None:
+                    from .hybrid_engineering_patch import KIND,AUTHORIZATION
+                    binding=json.loads(engineering_grant.raw)
+                    origin.update(kind=KIND,authorization=AUTHORIZATION,program_sha256=binding['program_sha256'],engineering_patch=binding)
                 lease = FixtureExecutionLease(origin['lease_id'], canonical(origin))
                 attempt = {'lease': lease, 'origin': origin, 'bundle': bundle, 'token': token,
                     'observation': observation, 'claim': claim, 'scenario': scenario,
                     'intent': intent, 'ready': ready, 'claim_value': original_claim, 'entries': {}, 'source': None,
                     'spawn_entered': False, 'release_entered': False, 'started_ack': None,
                     'producer_identity': None, 'terminal': None, 'spawn_monotonic': None,
-                    'cpu_grant': cpu_grant}
+                    'cpu_grant': cpu_grant,'engineering_grant':engineering_grant}
                 self._attempts[request_key] = attempt; self._leases[id(lease)] = attempt
                 if cpu_row is not None: cpu_row['attempt'] = attempt
+                if engineering_row is not None:engineering_row['attempt']=attempt
             # Strong original attempt retained BEFORE all cross-database writes.
         # Runtime owner lock must NOT precede Store/Controller/Workspace locks.
         with self.pool._lock:
@@ -274,6 +349,13 @@ class FixtureRuntimeOwner:
                 raise Conflict('CPU trial current approved grant differs')
             if 'sha256:' + hashlib.sha256(_read_bounded(self._cpu_evaluator, 16384)).hexdigest() != self._cpu_evaluator_hash:
                 raise Conflict('protected CPU trial evaluator changed')
+        if attempt['engineering_grant'] is not None:
+            row=self._issued_engineering_grant(attempt['engineering_grant'],attempt['bundle'],attempt['token'],attempt['observation'])
+            expected=self._engineering_binding(loaded)
+            expected.update(grant_id=attempt['engineering_grant'].id,**{k:loaded[k] for k in ('proposal_hash','approval_hash','config_hash','scope_hash')})
+            if canonical(expected)!=attempt['engineering_grant'].raw or row['attempt'] is not attempt:
+                raise Conflict('current approved engineering profile changed')
+            self._engineering_input(attempt)
         if any(sources[name] != value for name, value in captured['sources'].items()
                if name not in ('source_version', 'evaluated_at')):
             raise Conflict('fixture runtime current original Goal/approval/Registry changed')
@@ -409,6 +491,10 @@ class FixtureRuntimeOwner:
                 result = self._cpu_results.get(id(attempt['lease']))
                 runtime.update(cpu_trial_release_attempted=attempt['release_entered'],
                     cpu_trial_result=json.loads(result.raw) if phase == 'FIXTURE_SCOPE_STOPPED' and result is not None else None)
+            if attempt['engineering_grant'] is not None:
+                result=self._engineering_results.get(id(attempt['lease']))
+                runtime.update(engineering_release_attempted=attempt['release_entered'],
+                    engineering_patch_result=json.loads(result.raw) if phase=='FIXTURE_SCOPE_STOPPED' and result is not None else None)
             for name in ('start_command', 'stop_command'):
                 if prior is not None and name in prior: runtime[name] = prior[name]
             if command is not None:
@@ -677,7 +763,9 @@ class FixtureRuntimeOwner:
 
     def _check_terminal(self, attempt):
         proof = attempt['terminal']
-        if proof is None or proof['lease_id'] != attempt['lease'].id or proof['scope'] != 'FIXED_CPU_SINGLE_PARTICIPANT':
+        if (proof is None or proof['lease_id'] != attempt['lease'].id or
+                proof['scope'] != 'FIXED_CPU_SINGLE_PARTICIPANT' or
+                proof['program_sha256'] != attempt['origin']['program_sha256']):
             raise PermissionError('original fixed fixture terminal proof required')
         if attempt['source'] is not None:
             source = self.sources._issued(attempt['source'])
@@ -693,6 +781,64 @@ class FixtureRuntimeOwner:
             from .hybrid_cpu_trial import validate_result
             result = self._cpu_results.get(id(attempt['lease']))
             if result is not None: validate_result(json.loads(result.raw), attempt['origin'], attempt['producer_identity'])
+        if attempt['engineering_grant'] is not None:
+            from .hybrid_engineering_patch import validate_result
+            if self._engineering_grants[id(attempt['engineering_grant'])]['fd'] is not None:
+                raise Conflict('engineering readonly input FD not closed')
+            result=self._engineering_results.get(id(attempt['lease']))
+            if result is not None:validate_result(json.loads(result.raw),attempt['origin'],attempt['producer_identity'])
+
+    def _close_engineering_input(self,row):
+        fd=row['fd']
+        if fd is None:return
+        info=os.fstat(fd)
+        if (info.st_dev,info.st_ino)!=row['stamp'][:2]:
+            raise Conflict('engineering input FD identity uncertain; retain UNKNOWN')
+        os.close(fd);row['fd']=None
+
+    def collect_engineering_patch(self,lease):
+        """Sealed source only, no caller patch/claim or candidate mutation."""
+        from .hybrid_engineering_patch import EngineeringPatchResult,evaluate,validate_result
+        attempt=self._issued(lease)
+        if attempt['engineering_grant'] is None:raise PermissionError('original engineering lease required')
+        with self.pool._lock,self._lock:
+            original=self._engineering_results.get(id(lease))
+            if original is not None:return original
+            self._engineering_input(attempt);source=self.sources._issued(attempt['source'])
+            with self.sources._lock:
+                if (source['runtime'] is not attempt or source['status']!='SEALED' or source['producer'] is None or
+                        source['producer'].poll()!=0 or self.sources._runtime_started(self,lease) is None):
+                    raise Conflict('complete original engineering source and exit0 required')
+                stamp=self.sources._physical(source)
+                if stamp!=source['seen'] or stamp[0]>16384:raise Conflict('engineering sealed source differs')
+                raw=os.pread(source['fds']['read'],stamp[0]+1,0)
+                if (len(raw)!=stamp[0] or self.sources._physical(source)!=stamp or
+                        hashlib.sha256(raw).hexdigest()!=source['hash'].hexdigest()):
+                    raise Conflict('engineering original sealed prefix changed')
+                value=evaluate(raw,nonce=attempt['origin']['nonce'],pid=attempt['producer_identity']['pid'])
+                value.update(source_id=attempt['source'].id,lease_id=lease.id,task_id=attempt['origin']['task_id'],
+                    attempt_id=attempt['origin']['attempt_id'],grant_id=attempt['engineering_grant'].id,producer=attempt['producer_identity'])
+                validate_result(value,attempt['origin'],attempt['producer_identity'])
+                result=EngineeringPatchResult(canonical(value));self._engineering_results[id(lease)]=result
+                return result
+
+    def run_engineering_patch(self,lease):
+        """Finite read-only proposal/fixed tests; trusted core apply is separate."""
+        attempt=self._issued(lease)
+        if attempt['engineering_grant'] is None:raise PermissionError('original engineering lease required')
+        if self._current(attempt)['fixture_runtime']['phase'] in ('STOP_REQUESTED','FIXTURE_SCOPE_STOPPED'):
+            self.stop_to_terminal(lease);result=self._engineering_results.get(id(lease))
+            if result is None:raise Conflict('stopped engineering proposal has no complete result')
+            return result
+        try:
+            self.start(lease);deadline=time.monotonic()+4
+            while time.monotonic()<deadline:
+                self.poll(lease,seal=True);source=self.sources._issued(attempt['source'])
+                if source['status']=='SEALED':return self.collect_engineering_patch(lease)
+                if source['status'] in ('UNKNOWN','QUARANTINED','CLOSED'):raise Conflict('engineering original result UNKNOWN')
+                time.sleep(.01)
+            raise Conflict('finite engineering result observation deadline exceeded')
+        finally:self.stop_to_terminal(lease)
 
     def collect_cpu_trial(self, lease):
         """Collect only original sealed FD bytes; never caller JSON/path/receipt."""
@@ -766,8 +912,9 @@ class FixtureRuntimeOwner:
                 if attempt['spawn_entered'] and attempt['producer_identity'] is None:
                     raise Conflict('fixture STOP unknown handoff retains Pool/Budget exposure')
                 wall = 0 if attempt['spawn_monotonic'] is None else math.ceil(time.monotonic() - attempt['spawn_monotonic'])
+                if attempt['engineering_grant'] is not None:self._close_engineering_input(self._engineering_grants[id(attempt['engineering_grant'])])
                 attempt['terminal'] = {'scope': 'FIXED_CPU_SINGLE_PARTICIPANT', 'lease_id': lease.id,
-                    'program_sha256': self.program_hash, 'producer': attempt['producer_identity'],
+                    'program_sha256': attempt['origin']['program_sha256'], 'producer': attempt['producer_identity'],
                     'all_original_source_fds_closed': True, 'original_participant_reaped': True,
                     'no_descendants_in_fixed_program': True, 'arbitrary_tree_stop': False,
                     'wall_seconds': wall, 'synthetic_tokens_settled': False}
@@ -793,7 +940,11 @@ class FixtureRuntimeOwner:
             if 'REGISTER_NO_HANDOFF' in attempt['entries'] and self._confirm_entry(attempt, attempt['entries']['REGISTER_NO_HANDOFF']) is not None:
                 self.stop_to_terminal(attempt['lease'])
         with self.pool._lock, _registry, self._lock:
-            self.sources.shutdown(); self._live = False; _owners.pop(id(self), None)
+            self.sources.shutdown()
+            for row in self._engineering_grants.values():self._close_engineering_input(row)
+            for material in self._candidate_materials.values():
+                if material.fd is not None:material.close_fd()
+            self._live = False; _owners.pop(id(self), None)
 
     def shutdown_safety(self):
         """Irreversible original-cap cleanup; UNKNOWN exposure is NOT refunded.
@@ -812,6 +963,9 @@ class FixtureRuntimeOwner:
                     registered.append(attempt)
             with _registry, self._lock:
                 if self.sources._live: self.sources.shutdown()
+                for row in self._engineering_grants.values():self._close_engineering_input(row)
+                for material in self._candidate_materials.values():
+                    if material.fd is not None:material.close_fd()
                 for attempt in registered:
                     slot = self.pool._claim_slots[id(attempt['claim'])]
                     slot.close()
