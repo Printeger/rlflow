@@ -1,0 +1,84 @@
+Checkpoint64 development acceptance; baseline039c774; original M0–M5 Goal active.
+Python3.12.3 .venv / Node18.19.1; private fixed CPU/SQLite/loopback sandboxed Chrome.
+No paid model/GPU/production migration/push. USER package-lock unchanged, never staged.
+All suites sequential; no live source/test edits, duplicate suites or restarted tests.
+Python commands use PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest.
+
+r1: -q -s tests/test_hybrid_finite_host_stop.py --disable-warnings (then one SDK case).
+stop-r1.log; original92671 terminal66db71 exit0; 1passed/1warning21.50s.
+r2 same module (then positive + partial Engineering cleanup cases).
+stop-r2.log; original38803 terminal236624 exit0; 2passed/1warning39.94s.
+Actual original CPU pre-G STOP, all original latches before cleanup, two original
+STOP facts, Pool0, normal retry no cleanup; injected unknown Engineering cleanup
+retains occupied1, reply JSON mutation cannot change private cache; explicit same
+key resume cleans only unknown scope, never repeats known CPU cleanup/STOP fact.
+r1/r2 frozen322 end checks matched before subsequent fixes.
+
+r3: -q -s tests/test_hybrid_finite_host_stop.py::test_actual_reverse_unknown_resume_interruption_preserves_known_later_scope --disable-warnings
+reverse-interrupt-r3.log; original22264 terminald7f98b exit0; 1passed18.62s.
+Known later item preserved when first unknown resume submission is interrupted.
+r4: -q -s tests/test_hybrid_finite_host_stop.py::test_actual_HTTP_independent_whole_scope_STOP_during_original_CPU_Run --disable-warnings
+http-stop-r4.log; original12828 terminal09b1b8 exit0; 1passed21.60s.
+Actual HTTP independent of Run: two scoped acceptances, pre-G child reap/FD close,
+Pool0, original receipt/key retry without Store version change.
+r5: -q -s tests/test_hybrid_finite_host_stop.py::test_actual_HTTP_zero_submission_refusal_still_cleans_original_scopes_without_STOP_facts --disable-warnings
+http-refusal-r5.log; original46894 terminal6978f5 exit0; 1passed20.33s.
+Injected zero-submission 429 still latches/cleans two original caps/Pool0; no human
+STOP facts or fabricated 202. r3/r4/r5 frozen322 end checks each matched.
+
+r6: -q -s tests/test_hybrid_finite_host_stop.py::test_actual_two_live_original_producers_STOP_before_both_G --disable-warnings
+two-live-r6.log; original13591 terminal90b267 exit1; 1failed25.17s.
+BrokenBarrierError. Frozen308 end match before diagnostic/UI fixes.
+r8 same then-existing case with added per-worker entry time and terminal diagnostics.
+two-live-diagnostic-r8.log; original53129 terminale4808a exit1; 1failed/1warning25.16s.
+Two register entries differ ~4.26s; both original HANDOFF receipts UNKNOWN.
+Root cause: original start holds shared Pool lock across spawn/register/G; first
+pre-G barrier prevents second spawn. Did NOT enlarge watchdog, release authority
+locks or claim simultaneous two-live pre-G evidence. Both failures retained.
+r8 frozen308 (same r7 source) end match; unchanged root schemas18 checked against r5.
+
+r7: node --test web_checks/finite-stop-panel.test.mjs web_checks/finite-stop-browser.test.mjs
+ui-r7.log; original54058 terminalcecf53 exit0; 5passed19.246562s.
+4 Node contracts/manual retries/late private reply/UNKNOWN lost-resume tests and
+1 actual Chrome case19.051426s: human whole original two unstarted scopes STOP,
+original per-project facts + actual Pool0, no producer or candidate write,
+project/logout private clear, no auto POST or pageerrors.
+High UI review MUSTs fixed: actual selectProject clear; lost resume result clears
+current receipt to expose ordinary no-resume same-body/key retry. Static closed.
+Chrome is NOT evidence of two live worker STOP. Frozen308 end matched.
+
+r9: -q -s tests/test_hybrid_finite_host_stop.py::test_actual_two_original_Runs_one_live_one_Pool_wait_STOP_before_both_G --disable-warnings
+two-runs-r9.log; original96206 terminal225da7 exit0; 1passed21.54s.
+Two actual original Runs, one real pre-G producer + other original Pool waiter;
+all-latch cancels both before G; started child reaped/all FDs closed/Pool0.
+Frozen308 end matched. Then only tightened second Run exception to exact Conflict.
+
+r10: -q -s tests/test_hybrid_finite_host_stop.py::test_actual_whole_auth_and_conflict_before_any_latch_capacity_after_all_latches tests/test_hybrid_finite_host_stop.py::test_actual_pending_future_waiter_interrupt_retains_capacity_and_resumes_only_unknown tests/test_hybrid_finite_host_stop.py::test_actual_partial_executor_submission_refusal_still_cleans_every_scope --disable-warnings
+boundaries-r10.log; original73393 terminald4176e exit0; 3passed/1warning55.35s.
+Real invalid Auth/CSRF/origin and original key conflict before ANY latch;
+32-command capacity refusal still cleans original caps, no fake STOP acceptance;
+pending actual future + SDK interruption retains active/running until terminal,
+known scope not re-cleaned; partial executor submission failure uses bounded
+inline original fallback and waits actual submitted future; Pool0.
+Frozen308 end matched.
+
+r11: -q -s tests/test_hybrid_cpu_unit_control.py tests/test_hybrid_engineering_unit_control.py tests/test_hybrid_finite_host_stop.py::test_actual_two_original_Runs_one_live_one_Pool_wait_STOP_before_both_G tests/test_hybrid_finite_host_stop.py::test_actual_whole_scope_latch_before_IO_single_preG_worker_and_receipt_only_retry tests/test_hybrid_finite_host_stop.py::test_actual_reverse_unknown_resume_interruption_preserves_known_later_scope tests/test_hybrid_finite_host_stop.py::test_actual_partial_cleanup_mutated_reply_cannot_hide_unknown_and_explicit_original_resume --disable-warnings
+regression-r11.log; original52939 terminal6be001 exit0.
+20passed/1warning338.20s. Necessary entire old CPU/engineering control modules for
+shared execute_prepared private STOP-details change: real CPU384/one Engineering
+pwrite/AST21, final human Auth at G/PWRITE/machine COMMIT, cleanup after expiry,
+STOP before IO/key conflicts/capacity/fork and source-denial boundaries. Four SDK
+cases cover final app assembly, canonical unknown resume and exact waiter Conflict.
+No central Store/schema change: no redundant full repository suite or old reviews.
+Not a repeat of unchanged r4/r5/r7/r10 passes. Frozen308 end matched.
+
+Final checks:326 source/test/web/root+hybrid schema pins all matched; compileall
+rlflow/tests/web_checks, pip check (No broken requirements), new panel/app/browser
+JS syntax and git diff --check passed. Manifest SHA
+f9e481ae873b00fc4ba8f2b5bc45a6a7ae048674681b59698f873bcf21c0e247.
+USER package-lock SHA becc7e2a36dfcad4ffe934b5ff2f0f68187611d6c0641bd63d81367651cfbf09.
+Raw local logs/freeze/end checks in ignored audit/hybrid-v1; hashes archived here.
+Independent High incremental backend/HTTP/UI review fixes closed, no reviewer
+writes or tests. Development review does NOT satisfy independent product Review.
+No live suites at checkpoint handoff. NOT full Goal/native/strict OS/arbitrary-tree
+STOP/invoice/new-install/B1/24h fixture/8h UI acceptance. Original gaps maintained.

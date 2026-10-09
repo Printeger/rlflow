@@ -71,7 +71,15 @@ def create_finite_host_app(host,controls,auth,*,origin,observers=(),max_streams=
         project_id=key,store_epoch=s.store_epoch) for key,s in engineering.items()}
     for reader in (*cpu_readers.values(),*engineering_readers.values()):
         with reader.snapshot(): pass
-    return create_app(projects,auth,origin=origin,max_streams=max_streams,max_control_jobs=max_control_jobs,
-        cpu_unit_services=cpu,engineering_unit_services=engineering,
-        cpu_assessment_readers=cpu_readers,candidate_output_readers=engineering_readers,
-        fixed_unit_telemetry=telemetry)
+    from .hybrid_finite_host_stop import FiniteHostStop,install
+    coordinator=FiniteHostStop(host,controls,auth,origin=origin)
+    try:
+        app=create_app(projects,auth,origin=origin,max_streams=max_streams,max_control_jobs=max_control_jobs,
+            cpu_unit_services=cpu,engineering_unit_services=engineering,
+            cpu_assessment_readers=cpu_readers,candidate_output_readers=engineering_readers,
+            fixed_unit_telemetry=telemetry)
+        install(app,coordinator)
+        return app
+    except BaseException:
+        coordinator.close()
+        raise

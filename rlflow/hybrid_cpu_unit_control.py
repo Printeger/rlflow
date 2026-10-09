@@ -279,7 +279,7 @@ class _OriginalUnitControl(FixtureRuntimeControlService):
         with self._intent_lock:
             self._issued.pop(id(operation),None);self._operation_raw.pop(id(operation),None)
 
-    def execute_prepared(self,operation):
+    def execute_prepared(self,operation,*,_stop_details=False):
         self._pure()
         if (self._issued.get(id(operation)) is not operation or
                 self._operation_raw.get(id(operation))!=canonical(operation.command)):
@@ -288,9 +288,19 @@ class _OriginalUnitControl(FixtureRuntimeControlService):
         if self._operation() is not None:raise Conflict('nested CPU command refused')
         self._local.operation=operation;command=operation.command
         try:
+            if type(_stop_details) is not bool or (_stop_details and command['action']!=self._stop_action):
+                raise ValueError('original STOP details only')
             if command['action']==self._stop_action:
                 receipt=self._accept_stop(command,operation.token,operation.csrf)
                 operation.accepted=True
+                if _stop_details:
+                    cleanup=None;error=None
+                    try:
+                        cleanup=self.unit.cancel()
+                        self._after_stop_cleanup()
+                    except Exception as exc:error=type(exc).__name__
+                    return {'receipt':receipt,'cleanup':cleanup,'post_cleanup_status':'UNKNOWN' if error else 'RETURNED',
+                        'error_type':error}
                 self.unit.cancel()  # Strong original scoped cleanup, never global shutdown.
                 self._after_stop_cleanup()
                 return receipt

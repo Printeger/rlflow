@@ -1,5 +1,7 @@
 # 阻塞与证据缺口
 
+Checkpoint64：本片无新增用户决定或权限阻塞。原有限全集STOP的真实SDK/HTTP/UI、UNKNOWN续原收尾与有界中断/容量拒绝通过，必要回归20pass，开发High MUST关闭；见HYBRID_FINITE_HOST_STOP.md。双preG屏障失败已定位原共享Pool start持锁，不改watchdog/权限锁，不称同时双preG生产者已证明。完整Goal仍缺native/产品独立Reviewer/ConditionEvidence最终门、严格OS/任意树/invoice、T22 B1/24hfixture8hUI及依赖后的T23/M5。继续最高已满足依赖的产品结果Review/条件门纵向切片；真实付费模型/GPU/生产状态仍需另行授权，未调用或迁移。USERlock未动，下方历史不替代本状态。
+
 Checkpoint63：本片无新增用户决定或权限阻塞；实际共享认证应用执行、scope STOP和来源用量展示已交付，测试及三High MUST关闭见HYBRID_FINITE_HOST_APP.md。测量原值CPU0保留，账单UNKNOWN；不等于模型费用或整树硬资源保证。下一64多项目紧急STOP；原native/独立产品Reviewer/条件最终门/严格OS/invoice/B1/24hfixture8hUI/T23安装迁移及M5仍未证明。无paid/GPU/生产迁移或USERlock改动，完整Goal active。下方旧正在运行/正在提交记录为历史。
 
 Checkpoint62 FINAL：61已提交84a5341。原工程Unit认证Dashboard实际onePopen/onepwrite/AST21→机器待独立评审，独立STOP与原body/key恢复、最后Auth/纯取消、已enteredwrite原只读收尾已交付。必要唯一11旧module加工程正例维护闭包原93681终c5cc95 exit0：206pass/2warning948.81s；5新增边界92.53s、Node28pass83.911543ms、微秒因果定向4pass70.100278ms、新工程Chrome1pass31.889864s、受影响CPU Chrome1pass22.898169s。首Chrome候选详情失败及根因保留：Date.parse毫秒误拒合法+1µs，修微秒严格因果、不改fixture掩盖。316最终输入SHA498c63f486317db959186eaa07c257e4312a97a02b2ee9ee2ba60f371b20e911全匹配，编译/依赖/JS语法/diff通过；High两个末门MUST及UI精度差量静态关闭，无live测试，62进入提交。详HYBRID_ENGINEERING_UNIT_DASHBOARD.md/evidence/checkpoint-62-final-tests.txt；非全库重跑/产品Reviewer/完整Goal完成。下一63交付同一认证应用中两个独立项目的原共享Pool实际执行与互不越界STOP/用量来源整合，不另起Supervisor或仅叠准备组件。无新增用户决定阻塞；native/独立产品科研Reviewer/完整条件/严格OS任意树/invoice/新安装B1/24hfixture8hUI等原缺口保留，paid/GPU/生产与USERlock边界不变。下方WIP为历史。

@@ -8,6 +8,7 @@ import {CpuAssessmentPanel} from './cpu-assessment-panel.mjs';
 import {CandidateOutputPanel} from './candidate-output-panel.mjs';
 import {CpuUnitPanel} from './cpu-unit-panel.mjs';
 import {EngineeringUnitPanel} from './engineering-unit-panel.mjs';
+import {FiniteStopPanel} from './finite-stop-panel.mjs';
 
 const $ = id => document.getElementById(id);
 const motionPreference = matchMedia('(prefers-reduced-motion: reduce)');
@@ -32,6 +33,8 @@ const cpuUnits=new CpuUnitPanel({context:()=>session && state && project && stat
   {session,authGeneration,project:state.project,mode:state.mode,epoch:state.epoch,version:state.sourceVersion}:null,request});
 const engineeringUnits=new EngineeringUnitPanel({context:()=>session && state && project && state.project===project.id ?
   {session,authGeneration,project:state.project,mode:state.mode,epoch:state.epoch,version:state.sourceVersion}:null,request});
+const finiteStops=new FiniteStopPanel({context:()=>session && state && project && state.project===project.id ?
+  {session,authGeneration,project:state.project,mode:state.mode,epoch:state.epoch}:null,request});
 let logSerial = 0, logDetailSerial = 0, logPage = null, logNext = null, logPending = 0;
 const logList = new VirtualList($('logs'),logNode,row => row.id);
 function clearLogs() {
@@ -78,6 +81,7 @@ function updateLogPending() {
   $('log-new').textContent = `${logPending} 次新提交（可能不匹配筛选）；读取最新日志`;
 }
 function beginAuth() {
+  finiteStops.clear();
   cpuUnits.clear();engineeringUnits.clear();
   cpuAssessments.clear();candidateOutputs.clear();
   goals.clear();
@@ -86,6 +90,7 @@ function beginAuth() {
   return {ticket:++authGeneration, signal:authController.signal};
 }
 function clearObservation() {
+  finiteStops.clear();
   cpuUnits.clear();engineeringUnits.clear();
   cpuAssessments.clear();candidateOutputs.clear();
   goals.clear();
@@ -140,7 +145,7 @@ async function request(url, options = {}) {
   const requestAuth=authGeneration,requestGeneration=generation;
   const response = await fetch(url, {credentials:'same-origin', cache:'no-store', ...options});
   if (!response.ok) {
-    if(response.status===401 && requestAuth===authGeneration && requestGeneration===generation) {cpuUnits.clear();engineeringUnits.clear();goals.clear();fixtures.clear();cpuAssessments.clear();candidateOutputs.clear();session=null;$('login-panel').hidden=false;closeStream();}
+    if(response.status===401 && requestAuth===authGeneration && requestGeneration===generation) {finiteStops.clear();cpuUnits.clear();engineeringUnits.clear();goals.clear();fixtures.clear();cpuAssessments.clear();candidateOutputs.clear();session=null;$('login-panel').hidden=false;closeStream();}
     const error = new Error(response.status === 401 ? '登录已到期，请重新登录；最后快照保留。' : `读取失败 (${response.status})；最后快照保留。`);
     error.status = response.status; throw error;
   }
@@ -338,6 +343,7 @@ function failStream(error, selected) {
   if (error.incompatible) setConnection('INCOMPATIBLE'); else selectProject();
 }
 async function selectProject() {
+  finiteStops.clear();
   cpuUnits.clear();engineeringUnits.clear();
   cpuAssessments.clear();candidateOutputs.clear();
   goals.clear();
@@ -361,7 +367,7 @@ async function selectProject() {
     $('mode-note').className = 'notice ' + (project.data_mode === 'fixture' ? 'fixture' : '');
     $('mode-note').textContent = project.data_mode === 'fixture' ? 'FIXTURE / 隔离测试数据，不证明供应商模型或生产运行。' : 'LIVE / 真实公共投影。连接正常不代表模型运行，观察不足会明确显示。';
     problem(''); render(); openStream(selected);
-    await Promise.allSettled([loadPage(), loadOverview('execution',30), loadOverview('stage',10),loadLogs(),goals.load(),fixtures.load(),cpuUnits.load(),engineeringUnits.load(),cpuAssessments.load(),candidateOutputs.load()]);
+    await Promise.allSettled([loadPage(), loadOverview('execution',30), loadOverview('stage',10),loadLogs(),goals.load(),fixtures.load(),cpuUnits.load(),engineeringUnits.load(),cpuAssessments.load(),candidateOutputs.load(),finiteStops.load()]);
   } catch (error) { if (selected === generation) { setConnection(error.incompatible ? 'INCOMPATIBLE' : 'OFFLINE'); problem(error.message); if (error.status === 401) $('login-panel').hidden = false; } }
 }
 async function loadOverview(kind, limit) {
