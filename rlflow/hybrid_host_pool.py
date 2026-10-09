@@ -281,6 +281,7 @@ All model, child process and native delegation handoff remain denied.
         owner.process = identity(os.getpid()); owner._namespace = os.stat('/proc/thread-self/ns/mnt').st_ino
         if owner.process is None: raise Conflict('actual original pool startup process unavailable')
         owner._lock = threading.RLock(); owner._live = True; owner._pins = {}; owner._slots = {}; owner._sql_active = {}
+        owner._runtime_source_proofs = {}
         owner._members = {}; owner._claims = {}; owner._claim_slots = {}; owner._attempts = {}; owner._closings = {}; owner._witnesses = {}
         with _registry_lock:
             if len(_owners) >= 32: raise Conflict('fixture pool owner capacity reached')
@@ -328,7 +329,8 @@ All model, child process and native delegation handoff remain denied.
             if _raw_hash(raw) != self.descriptor_sha256: raise Conflict('original pool descriptor changed')
 
     @contextmanager
-    def _transaction(self, final=None, source=None, witness=None, slot_guard=None, clock=None, audit=False):
+    def _transaction(self, final=None, source=None, witness=None, slot_guard=None, clock=None, audit=False,
+                     state_final=None):
         with self._lock:
             if self._sql_active: raise Conflict('original SQLite transaction cleanup remains uncertain')
             self._physical(); fd = self._pins['writer.lock']
@@ -340,6 +342,7 @@ All model, child process and native delegation handoff remain denied.
                 db = sqlite3.connect((self.root / 'pool.db').as_uri() + '?mode=rw', uri=True, timeout=1)
                 native_fd = _native_sql_fd(db, before, self.binding['database_identity'])
                 self._sql_active[id(db)] = (db, native_fd)
+                self._runtime_source_proofs[id(db)] = (db, threading.get_ident(), {})
                 db.row_factory = sqlite3.Row
                 if db.execute('PRAGMA journal_mode').fetchone()[0] != 'delete':
                     raise Conflict('fixed pool journal mode differs')
@@ -350,8 +353,9 @@ All model, child process and native delegation handoff remain denied.
                     stack.enter_context(source._lock); stack.enter_context(source.builder._lock)
                 yield db
                 self._actual()  # Forked child must never touch inherited SQLite.
-                self._state(db)
+                checked_state = self._state(db)
                 if final is not None: final(db)
+                if state_final is not None: state_final(db, checked_state)
                 if source is not None:
                     with source.store.read_connection() as original_db:
                         original_db.execute('BEGIN')
@@ -372,6 +376,7 @@ All model, child process and native delegation handoff remain denied.
                 if os.getpid() == self.process['pid']:
                     stack.close()
                     if db is not None:
+                        self._runtime_source_proofs.pop(id(db), None)
                         db.close(); self._sql_active.pop(id(db), None)
                     fcntl.flock(fd, fcntl.LOCK_UN)
 
@@ -512,9 +517,27 @@ All model, child process and native delegation handoff remain denied.
             key = value['payload']['project_fact_key']; fact = read.object(BUDGET[0], key)
             if fact is None or digest(fact) != value['payload']['project_fact_hash']:
                 raise Conflict('fixture pool original Project phase source differs')
-            validate_record(BUDGET[0], key, fact)
+            # Reuse ONLY schema/derived expansion of exact immutable bytes in
+            # this one held original Pool transaction/thread. Always reopen
+            # original project physical identity and reread its fact, metadata
+            # and whole event above/below; current heads/permission never cache.
+            context = self._runtime_source_proofs.get(id(db))
+            memo = None
+            if (context is not None and context[0] is db and context[1] == threading.get_ident()
+                    and db.in_transaction and self._sql_active.get(id(db), (None,))[0] is db):
+                memo = context[2]
+            memo_key = canonical(value); fact_raw = canonical(fact)
+            cached = None if memo is None else memo.get(memo_key)
+            if cached is not None and cached[0] != fact_raw:
+                raise Conflict('fixture pool immutable Project proof changed inside transaction')
+            if cached is None:
+                validate_record(BUDGET[0], key, fact)
+                expected_proof = canonical(((EVENT, 'hybrid-core', account_key(scope(fact['request'])),
+                                             fact['accepted_state_version']), expected_objects(fact)))
+            else:
+                expected_proof = cached[1]
             proof = store._budget_event(project_db, key, _parse=read.parse, _decode=read.decode)
-            if proof != ((EVENT, 'hybrid-core', account_key(scope(fact['request'])), fact['accepted_state_version']), expected_objects(fact)):
+            if canonical(proof) != expected_proof:
                 raise Conflict('fixture pool original Project event differs')
             runtime = fact['request'].get('fixture_runtime'); origin = runtime['origin'] if runtime else {}
             expected_phase = {'FIXTURE_LINKED':'REGISTER_NO_HANDOFF', 'FIXTURE_HANDOFF_UNKNOWN':'HANDOFF_UNKNOWN',
@@ -527,6 +550,10 @@ All model, child process and native delegation handoff remain denied.
                     (fact['request']['project_id'],fact['request']['data_mode'],fact['request']['store_epoch']) !=
                     (member_value['project_id'],'fixture',member_value['store_epoch'])):
                 raise Conflict('fixture pool original Project runtime scope differs')
+            if (memo is not None and cached is None and len(memo) < CAPACITY and
+                    sum(len(k) + len(v[0]) + len(v[1]) for k, v in memo.items()) +
+                    len(memo_key) + len(fact_raw) + len(expected_proof) <= 1024**2):
+                memo[memo_key] = (fact_raw, expected_proof)
 
     def _append(self, db, value):
         validate(value); previous = self._point(db, value['key'])
@@ -670,10 +697,11 @@ All model, child process and native delegation handoff remain denied.
             raise PermissionError('actual original process-issued pool claim required')
         return parse(claim.raw.decode())
 
-    def _claim_current(self, db, claim, *, deadline=True, closing=False):
+    def _claim_current(self, db, claim, *, deadline=True, closing=False, _checked_state=None):
         value = self._issued_claim(claim); slot = value['slot']
         if self._point(db, value['key']) != value: raise Conflict('original durable pool claim missing')
-        _, heads = self._state(db); current = heads[slot]
+        _, heads = self._state(db) if _checked_state is None else _checked_state
+        current = heads[slot]
         allowed = ({'CLAIM', 'UNKNOWN', 'CLOSE_INTENT', 'FIXTURE_LINKED', 'FIXTURE_HANDOFF_UNKNOWN',
                     'FIXTURE_STOP_REQUESTED', 'FIXTURE_STOPPED'} if closing else
                    {'CLAIM', 'UNKNOWN', 'FIXTURE_LINKED', 'FIXTURE_HANDOFF_UNKNOWN'})
@@ -737,12 +765,21 @@ All model, child process and native delegation handoff remain denied.
 
     def check(self, claim):
         self._issued_claim(claim)
-        with self._transaction(final=lambda db: self._claim_current(db, claim),
+        result = None
+        def finish(db, checked_state):
+            nonlocal result
+            value, current = self._claim_current(db, claim, _checked_state=checked_state)
+            result = {'claim_id': claim.id, 'slot': value['slot'], 'state': current['state'],
+                      'execution_enabled': False, 'release_enabled': False}
+        # This transaction body is EMPTY/read-only. The one complete fresh
+        # global state/source closure is consumed immediately at its final
+        # boundary, not recomputed three times without any intervening write.
+        # No result escapes before original physical/slot/FD/clock/COMMIT checks.
+        with self._transaction(state_final=finish,
                 slot_guard=lambda: self._claim_slots[id(claim)].check(),
-                clock=lambda: self._claim_clocks(self._issued_claim(claim))) as db:
-            value, current = self._claim_current(db, claim)
-            return {'claim_id': claim.id, 'slot': value['slot'], 'state': current['state'],
-                    'execution_enabled': False, 'release_enabled': False}
+                clock=lambda: self._claim_clocks(self._issued_claim(claim))):
+            pass
+        return result
 
     def _change(self, claim, action, expected_version, extra=None):
         original = self._issued_claim(claim); count(expected_version)

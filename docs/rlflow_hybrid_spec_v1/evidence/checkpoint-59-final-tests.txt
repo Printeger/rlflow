@@ -1,0 +1,106 @@
+Checkpoint 59 final evidence, 2026-10-10. Base e527ed0 (Checkpoint 58).
+One actual shared pool, two independently approved private fixed profiles.
+No paid model, GPU, production state, new Supervisor, HTTP/UI schema or push.
+USER untracked package-lock.json never edited/staged; SHA256 unchanged:
+becc7e2a36dfcad4ffe934b5ff2f0f68187611d6c0641bd63d81367651cfbf09.
+
+All commands run at /home/mint/rl_dev/rlflow_standalone with .venv Python3.12.
+No parallel pytest/browser suite, test restart, source/test edit during live test.
+All raw stdout/stderr including failures retained in audit/hybrid-v1/.
+
+1. Two actual project positive: same argv for positive-r1 through positive-r6:
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q -s tests/test_hybrid_host_execution.py::test_actual_two_projects_cpu384_engineering_one_write_same_pool_STOP_FREE --disable-warnings > audit/hybrid-v1/checkpoint-59-positive-rN.log 2>&1
+r1 session53802 terminalcce304 exit1: 1error1.86s, before execution. Fixture
+proposal kept old project ID; correct only new fixture proposal identity.
+r2 session1118 terminal137432 exit1: 1fail31.70s, both G-before BrokenPipe.
+r3 session7932 terminalff84c1 exit1: 1fail31.83s; changed diagnosis to actual
+register/release timings: gate ends3.74/3.82s > fixed3s watchdog, raw files empty.
+r4 session16719 terminal90d425 exit1: 1fail30.72s, same-transaction immutable
+schema/derived memo reduces gate ends3.44/3.49s but still fails. No TTL extension.
+r5 session47224 terminalc23c90 exit1: 1fail29.88s; same-start original retained
+material graphs reduce gate ends3.18/3.22s but still fail. Stop worker reruns;
+use no-worker HANDOFF profile below to find6Poolcheck/18state/36source.
+r6 session3440 terminal35042d exit0: 1pass60.94s; readonly Pool.check empty
+transaction now checks one complete global state at final boundary, all original
+claim/slot/physical/nativeFD/lock/finalclock/COMMIT checks retained. Gate ends
+2.5077/2.5299s, fixed3s unchanged. Actual shared pool:
+pool_7eaa234e69d843a2be5f4b9934f61ae3, original distinct nonces
+7eebc19921cd4aed976c48c694563420 / 460844522f194cada4dccec1c0504226.
+CPU raw384/count96,101,104/consumed experiment1; actual sourceSHA256:
+51ae377ee2cffa4ae28f335e6a6df7ffd2a856e222083d14f9ab90454552dba5.
+Engineering one actual pwrite/AFTER/AST21; both original processes exit0/allFDs
+closed/Pool occupied0. Original witness issued once perstart; both physical gates
+borrow same tuple/original graph deadlines; finally no retained contexts.
+Each Store audit/snapshot/recover passes; cold original scoped Readers cannot
+Popen/pwrite/Pool.check, cross-project keys returnNone, ASOF/controlsFalse/
+current executionUNKNOWN/resourcesNOT_OBSERVED/GoalFalse stay explicit.
+
+2. No-worker required memo and batch-cancel tests (first batch argv):
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q -s tests/test_hybrid_host_execution.py::test_one_pool_transaction_memo_rereads_whole_source_and_never_crosses_transaction tests/test_hybrid_host_execution.py::test_cancel_all_latches_every_original_before_pool_cleanup_and_invalid_batch_zero_submit --disable-warnings > audit/hybrid-v1/checkpoint-59-no-worker-r1.log 2>&1
+r1 session66285 terminal42bf3a exit1: 2fail34.19s. Test counted nested mandatory
+whole-event validators, not just memo-owned expansion; overflow rejected with
+existing ProtocolError rather than only Conflict/PermissionError expected.
+r2 same argv/log no-worker-r2: session22547 terminal5f8ce5 exit1:
+1pass1fail37.36s. Overflow negative assertion fixed. Batch whole preflight
+zeroExecutor/copy/token/extra/overflow/duplicates denies; real cancel_all while
+Pool held latches both units first then scoped STOP/FREE passes. Do not repeat it.
+Memo count still included independently reread whole-event validation (22->36).
+After second same count failure change diagnosis: count caller-owned expansion
+only; do not weaken necessary event verification.
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q -s tests/test_hybrid_host_execution.py::test_one_pool_transaction_memo_rereads_whole_source_and_never_crosses_transaction --disable-warnings > audit/hybrid-v1/checkpoint-59-no-worker-r3.log 2>&1
+session98875 terminal1df758 exit0: 1pass17.34s. Exactly2 memo expansions,
+same transaction hits; whole-event mutation still rejects; new transaction
+revalidates; all memo cleanup verified. Zero Popen.
+
+3. Changed diagnostic, no worker HANDOFF profile:
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q -s tests/test_hybrid_host_execution.py::test_no_worker_original_HANDOFF_writer_diagnostic_and_unknown_parent_retirement --disable-warnings > audit/hybrid-v1/checkpoint-59-profile-no-worker-r1.log 2>&1
+session96222 terminal68bfc3 exit0: 1pass19.05s. Actual original HANDOFF writer
+without Popen:11708638 calls3.084s;6_fresh/6Poolcheck/18state/36source.
+Private original owner parent-FD safety retirement keeps UNKNOWN/noFREE.
+This older-code profile is a diagnostic, not final-code performance acceptance.
+
+4. Required readonly check consolidation and final-deadline rejection:
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q -s tests/test_hybrid_host_execution.py::test_readonly_pool_check_full_fresh_global_closure_once_and_last_deadline --disable-warnings > audit/hybrid-v1/checkpoint-59-readonly-check-r1.log 2>&1
+session20349 terminal64f0c8 exit0: 1pass16.94s. Exactly1 complete global state;
+last claim clock expiration rejects before return/COMMIT; native/memo clean.
+
+5. Only four remaining new actual boundaries:
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q -s tests/test_hybrid_host_execution.py::test_cancel_one_before_G_does_not_touch_other_original_scope_which_finishes tests/test_hybrid_host_execution.py::test_actual_fourth_claim_foreign_copied_fork_capabilities_have_no_submission tests/test_hybrid_host_execution.py::test_unknown_start_only_original_scope_retains_exposure_other_scope_completes tests/test_hybrid_host_execution.py::test_borrowed_original_candidate_graph_change_rejected_before_G_and_context_released --disable-warnings > audit/hybrid-v1/checkpoint-59-boundary-r1.log 2>&1
+session20974 terminal838ea5 exit0:4pass114.30s. Original CPU beforeG scoped
+cancel leaves other original FDs/grant/ledger unchanged, engineering then
+actually completes. Third actual claim occupied3/fourth rejects. Foreign/copy/
+fork caps denied; fork failure cleanup reaps only original unreaped child.
+Unknown CPU Popen only its scope keeps occupied1/experiment unknown_exposure1/
+consumed0; other actual engineering completes, cancel_all never fakesFREE.
+Borrowed candidate graph change rejected beforeG, original child reaped and
+all material contexts retired; other original occupied claim untouched.
+
+6. Unique necessary shared regression, no new test duplication:
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q tests/test_hybrid_host_pool.py tests/test_hybrid_fixture_runtime.py tests/test_hybrid_fixture_runtime_control.py tests/test_hybrid_engineering_execution_unit.py tests/test_hybrid_cpu_execution_unit.py tests/test_hybrid_working_plan_service.py::test_new_fixture_current_original_sources_observed_without_plan_or_runtime tests/test_hybrid_working_plan_service.py::test_large_legal_literal_schema_actual_working_plan_material_and_source_context --disable-warnings > audit/hybrid-v1/checkpoint-59-regression-r1.log 2>&1
+session35877 terminal7e1df2 exit0:103pass2warnings1056.72s. All292 r12 inputs
+match during and after actual terminal. No claims of new2214full/UI/Chrome.
+
+7. Only afterward two confirmed Host mutable-input TOCTOU MUSTs fixed.
+dict snapshot before all body validation; bounded4-prefix tuple before len1..3
+and full batch validation. Only Host/newtest changed; other290 inputs retain
+exact r12 bytes, no repeating shared regression or actual passed positive.
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q -s tests/test_hybrid_host_execution.py::test_body_validation_uses_its_captured_snapshot_not_caller_mutation tests/test_hybrid_host_execution.py::test_batch_snapshot_ignores_later_mutation_and_captured_four_rejects_without_executor --disable-warnings > audit/hybrid-v1/checkpoint-59-snapshot-r1.log 2>&1
+session95604 terminalf0326d exit0:2pass39.43s. Mutation hooks keep validated
+capturedbody/2requests intact; captured4 zeroExecutor; no StoreV/spawn changes.
+Unit.run mocks explicitly NONEXECUTING routing, not actual worker evidence.
+
+Composite10 distinct new functional cases plus1 diagnostic, from respective
+unchanged/final-effect-relevant runs above; not a fresh all-new-module run.
+High independent incremental development review: CAS overflow, fork failure
+reap and mutable-input two MUSTs closed; no remaining confirmed MUST. Review
+is NOT product/scientific independent Reviewer or wholeGoal acceptance.
+
+Final input list292 SHA256 fb3715e9b9403adb2a40ac7156e27e5617c9d6c6fcece349a2d1d282451fcbea.
+Original final input list/check/log in audit; committed copied evidence manifest.
+Final checks terminal2c7bcc exit0: all292 hashes match, compileall(rlflow/tests/
+web_checks), pipcheck(No broken requirements), gitdiff--check; USERsha unchanged,
+no live pytest/browser worker. No push/production/GPU/model invocation.
+Remaining original M0-M5/native/Reviewer/globalconditions/strictOS/arbitrary
+process tree/invoice/install/migration/24h8h gaps kept; Goal active, no new user
+decision blocker. Delivery is finite actual shared-pool SDK behavior, not merely
+preparation components or more tests. See HYBRID_HOST_EXECUTION.md.

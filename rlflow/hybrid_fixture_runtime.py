@@ -122,6 +122,7 @@ class FixtureRuntimeOwner:
             self._engineering_grants = {}; self._engineering_results = {}
             self._candidate_materials = {}
             self._execution_units = {}
+            self._start_materials = None
             self._engineering_units = self._execution_units  # Original SDK compatibility, same registry.
             self.program = Path(__file__).with_name('hybrid_runtime_fixture.py')
             # Exact protected program, not any caller command or plan rewriting.
@@ -402,6 +403,27 @@ class FixtureRuntimeOwner:
     def _new_entry(self, attempt, phase, *, cleanup):
         return self._new_entries(attempt, (phase,), cleanup=cleanup)
 
+    @contextmanager
+    def _material_context(self, attempt):
+        """Borrow graphs, not authority, within one original start operation.
+
+        All owned writers/gates still validate current sources, these original
+        graph identities/stamps and the SAME original total deadlines.
+        """
+        self._actual()
+        original = self._start_materials
+        if original is not None:
+            if (original[0] is not attempt or original[1] != threading.get_ident()
+                    or not self.pool._lock._is_owned()):
+                raise PermissionError('actual same original start material context required')
+            yield original[2]
+            return
+        captured = attempt['ready']['source_context']
+        preparation = self.workspace.preparation.issue_material_witness(captured['preparation']['intent_key'])
+        with self.plans.builder._witness(attempt['bundle']) as plan, \
+                self.plans.installation._bootstrap_witness(self.plans.material) as bootstrap:
+            yield preparation, plan, bootstrap
+
     def _new_entries(self, attempt, phases, *, cleanup):
         """One held transaction; each phase retains its own original CAS/event."""
         self._actual()
@@ -414,9 +436,7 @@ class FixtureRuntimeOwner:
         captured = attempt['ready']['source_context']
         with ExitStack() as witnesses:
             if not cleanup:
-                preparation = self.workspace.preparation.issue_material_witness(captured['preparation']['intent_key'])
-                plan_witness = witnesses.enter_context(self.plans.builder._witness(attempt['bundle']))
-                bootstrap = witnesses.enter_context(self.plans.installation._bootstrap_witness(self.plans.material))
+                preparation, plan_witness, bootstrap = witnesses.enter_context(self._material_context(attempt))
             else:
                 preparation = plan_witness = bootstrap = None
 
@@ -657,8 +677,7 @@ class FixtureRuntimeOwner:
     def _gate(self, attempt, phase):
         """Borrow current original sources under the writer for ONE side effect."""
         captured = attempt['ready']['source_context']
-        preparation = self.workspace.preparation.issue_material_witness(captured['preparation']['intent_key'])
-        with self.plans.builder._witness(attempt['bundle']) as witness, self.plans.installation._bootstrap_witness(self.plans.material) as bootstrap:
+        with self._material_context(attempt) as (preparation, witness, bootstrap):
             def final(): self._active.check()
             def deadlines(now, mono): self._final_deadlines(self._active, now, mono)
             try:
@@ -744,17 +763,24 @@ class FixtureRuntimeOwner:
             current = self._current(attempt)['fixture_runtime']['phase']
             if current in ('STOP_REQUESTED', 'FIXTURE_SCOPE_STOPPED'):
                 raise Conflict('fixture STOP prohibits any later spawn or release')
-            if not attempt['spawn_entered']:
-                value = self._write_phase(attempt, 'HANDOFF_UNKNOWN')
-                self.pool._fixture_runtime_change(self, lease, 'FIXTURE_HANDOFF_UNKNOWN', value)
-                with self._gate(attempt, 'HANDOFF_UNKNOWN'):
-                    attempt['producer_identity'] = self.sources._runtime_spawn(self, lease)
-            if attempt['producer_identity'] is None:
-                raise Conflict('fixture original spawn outcome UNKNOWN; never relaunch/adopt')
-            self._register_release(attempt)
-            if not attempt['release_entered']:
-                with self._gate(attempt, 'RELEASE_INTENT'):
-                    self.sources._runtime_release(self, lease)
+            if self._start_materials is not None:
+                raise Conflict('nested original start material borrowing refused')
+            with self._material_context(attempt) as materials:
+                self._start_materials = (attempt, threading.get_ident(), materials)
+                try:
+                    if not attempt['spawn_entered']:
+                        value = self._write_phase(attempt, 'HANDOFF_UNKNOWN')
+                        self.pool._fixture_runtime_change(self, lease, 'FIXTURE_HANDOFF_UNKNOWN', value)
+                        with self._gate(attempt, 'HANDOFF_UNKNOWN'):
+                            attempt['producer_identity'] = self.sources._runtime_spawn(self, lease)
+                    if attempt['producer_identity'] is None:
+                        raise Conflict('fixture original spawn outcome UNKNOWN; never relaunch/adopt')
+                    self._register_release(attempt)
+                    if not attempt['release_entered']:
+                        with self._gate(attempt, 'RELEASE_INTENT'):
+                            self.sources._runtime_release(self, lease)
+                finally:
+                    self._start_materials = None
         # Sending G is NOT started. Only original child ACK can advance phase.
         return self.poll(lease)
 

@@ -40,13 +40,15 @@ def plans(tmp_path, native_setup, request, monkeypatch):
     # stub. This fixture creates a NEW actual guarded Store/epoch/namespace;
     # it never edits or migrates any existing namespace or historical fixture.
     parent=tmp_path/'installation-parent';parent.mkdir(mode=0o700)
-    builder=FixtureMaterialBuilder(parent,project_id='project_fixture')
+    options = request.param if type(getattr(request, 'param', None)) is dict else {}
+    project_id = options.get('project_id', 'project_fixture')
+    builder=FixtureMaterialBuilder(parent,project_id=project_id)
     installation=FixtureInstallationService(builder);material=builder.prepare()
     installation.persist_intent(material);installation.publish(material)
-    store=builder.store;registry,proposal=bound(native_config())
+    store=builder.store;registry,proposal=options.get('bound', bound)(options.get('config', native_config)())
     proposal['scope']['writable_paths']=['module/']
     utc=[datetime(2026,10,9,tzinfo=timezone.utc)];mono=[100*10**9]
-    human=Principal('fixture_human','human',{'operator','approver'},{'project_fixture'})
+    human=Principal('fixture_human','human',{'operator','approver'},{project_id})
     phrase='Working plan isolated synthetic fixture passphrase'
     auth=AuthStore([Credential.create(human,phrase)],ttl=100)
     session,access=auth.login(human.id,phrase);origin='http://127.0.0.1:8765'
@@ -57,7 +59,7 @@ def plans(tmp_path, native_setup, request, monkeypatch):
     confirmation=approvals.prepare(**args,goal_id=proposal['goal_id'],ttl_seconds=60)['confirmation']
     approvals.approve(confirmation,**args,idempotency_key='approve')
     source=builder._roots['source'];(source/'module').mkdir(mode=0o700)
-    (source/'module/source.py').write_text('print(42)\n')
+    (source/'module/source.py').write_text(options.get('source', 'print(42)\n'))
     control=builder._roots['bootstrap']/'preparation';control.mkdir(mode=0o700)
     adapter=CodexExecAdapter(registry,control)
     snapshots=SnapshotBuilder(source,['module/source.py'],builder._roots['snapshots'])
@@ -66,7 +68,7 @@ def plans(tmp_path, native_setup, request, monkeypatch):
     goal=head_key(builder.project_id,'fixture',proposal['goal_id'])
     preparation={'project_id':builder.project_id,'data_mode':'fixture','goal_ref':goal,
         'idempotency_key':'prepare','role':'Engineer','context':{'text':proposal['objective']}}
-    if getattr(request,'param',False):
+    if getattr(request,'param',False) and not options:
         schema={'type':'object','description':'Working plan literal capacity fixture',
                 'examples':[{'$rlflow_blob':0} for _ in range(180000)]}
         from rlflow.store import canonical
@@ -79,7 +81,7 @@ def plans(tmp_path, native_setup, request, monkeypatch):
     budget=BudgetService(store,registry,controller,prep)
     reserve={'project_id':builder.project_id,'data_mode':'fixture','goal_ref':goal,'store_epoch':builder.store_epoch,
         'idempotency_key':'reserve','expected_state_version':store.version(),'action':'RESERVE',
-        'preparation_intent_key':intent_key(preparation),'amount':{**zero(),'wall_seconds':1},'purpose':'EXECUTION'}
+        'preparation_intent_key':intent_key(preparation),'amount':{**zero(),**options.get('amount', {'wall_seconds':1})},'purpose':'EXECUTION'}
     budget.record(reserve,token)
     working=WorkingCopyOwner(snapshots,builder._roots['working'],clock=lambda:utc[0],monotonic_ns=lambda:mono[0])
     workspace=WorkspaceService(store,registry,controller,prep,budget,working)
