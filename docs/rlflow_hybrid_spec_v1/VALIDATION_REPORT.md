@@ -1,5 +1,9 @@
 # 需求包离线校验报告
 
+Checkpoint53 FINAL：原raw384点独立机器冷复算→原plain appraisal/terminal/result/规则绑定→持久机器核验和保守next已交付；不冒充独立Reviewer，条件覆盖空/Goalfalse/dispatchfalse保持。5新case分别通过，必要唯一原48427终fa5fd1 exit0 47pass/1warning182.40s，最终实际CPU decision与UTC因果负例通过。270SHA/编译/依赖/diff通过，High窄MUST闭合，无live测试，正在提交53。52实际37e18c5，详HYBRID_CPU_COLD_DECISION.md/evidence/checkpoint-53-final-tests.txt。下一真正工程candidate受控输出/接收与可靠STOP闭环，再接独立只读评审；真正native/完整科研review/条件决定/严格OS/任意树/invoice/安装/长期缺口仍待，无新增外部决策阻塞，不扩paid/GPU/生产权限。USERlock未改未stage；下方WIP历史。
+
+53 WIP：52实际37e18c5。原384点独立机器冷复算→原plain appraisal/terminal/批准/规则绑定→持久MACHINE_VERIFIED/UNAVAILABLE与有限next已交付；不调用49evaluator，不声称独立Reviewer/条件完成/Goal完成。复用50append-only事实可选扩展，旧bytes不回填；High历史源码身份/JSON类型/None降级MUST已关闭，新边界COMMIT丢回执/周期snapshot/历史禁sourceIO/源码换pin/末TTL/非法ID分别1pass23.56s+1pass11.80s；首轮3pass42.48s。唯一必要原48427仍LIVE，270输入冻结，源码不改，无并行；最终53未提交。详HYBRID_CPU_COLD_DECISION.md。下一真正工程candidate/native及独立科研条件/decisions完整缺口仍待；没有新增外部决策阻塞，原付费/GPU/生产边界、USERlock不动。下方历史。
+
 Checkpoint52 FINAL：原CPU384点/指标/SHA和三轴评估已在现有Dashboard实际显示；持久domain限频只读刷新原所选详情，owner关闭可读、logout清空，零执行写。新5pure case分别通过；实际Chrome原6369终1bd280 exit0 1pass19.803s；必要三既有browser原53887终da140c exit0 3pass60.360s。268SHA/JS syntax/Python compile/pipcheck/diff通过，独立窄MUST关闭，无live测试，正在提交52。失败完整保留，详见HYBRID_CPU_ASSESSMENT_DASHBOARD.md/evidence/checkpoint-52-final-tests.txt。51实际a3b17ff2cf5cd16e1d865f0703e0509c9f683d44；下一真正原证据独立验证/有限决定，条件覆盖空/独立review未做/Goalfalse保持。工程candidate/native、严格OS/任意树/invoice/安装迁移/24h8h缺口仍待，无新增需用户决定阻塞，不扩付费/GPU/生产权限。USERlock未改未stage；下方历史。
 
 Checkpoint51 FINAL：必要五模块原36076终79d0fe exit0：129pass/2warning98.67s；264冻结SHA7426d4fc…8435d前后匹配，compileall/pipcheck/diff各exit0。真实rawHTTP/cold owner-free/owner关闭/鉴权读中revoke/keyset/坏源503/实际loopback原4pass49.71s、新projection/source/event版本guard定向1pass10.06s；未重复旧rawpositive/browser/前端/独立suite，不宣称最终fresh五新case套。r1全部新fixture错接口3fail保留。原证据与日志SHA见evidence/checkpoint-51-final-tests.txt，High窄MUST关闭，无live测试，正在提交。当前三轴与Goal/独立review严格分开，后者仍未验收；下方WIP均历史。

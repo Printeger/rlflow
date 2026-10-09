@@ -36,7 +36,10 @@ class CpuAssessmentService:
         if type(runtime) is not FixtureRuntimeOwner: raise TypeError('original fixed CPU runtime owner required')
         runtime._actual(); self.runtime=runtime;self.store=runtime.store;self.controller=runtime.controller
         self.budget=runtime.budget;self.registry=runtime.plans.registry
-        self._active=None;self._lock=threading.RLock();self.store.bind_hybrid_cpu_assessment(self)
+        self._active=None;self._lock=threading.RLock()
+        from .hybrid_cpu_cold_verifier import implementation_hash
+        self._cold_verifier_hash=implementation_hash()
+        self.store.bind_hybrid_cpu_assessment(self)
 
     def _actual(self):
         self.runtime._actual()
@@ -68,6 +71,13 @@ class CpuAssessmentService:
         return attempt,terminal,free
 
     def _dependencies(self,db,value,read):
+        if 'prior_assessment_key' in value['request']:
+            raw_prior=read.object(SECTION,value['request']['prior_assessment_key'])
+            if raw_prior is None or 'prior_assessment_key' in raw_prior.get('request',{}):
+                raise Conflict('CPU decision requires plain original appraisal')
+            prior=self._point(db,value['request']['prior_assessment_key'],read)
+            if 'prior_assessment_key' in prior['request']:
+                raise Conflict('CPU decision requires plain original appraisal')
         terminal=self.budget._point(db,value['request']['terminal_key'],read)
         self.budget._dependencies(db,terminal,read)
         historical_sources(self.store,db,value['sources'],read)
@@ -94,6 +104,11 @@ class CpuAssessmentService:
                 guard.db is not db or guard.read.db is not db or guard.thread!=threading.get_ident() or not db.in_transaction):
             raise PermissionError('actual active CPU appraisal guard required')
         attempt,terminal,free=self._original_trial(guard.lease); value=json.loads(guard.raw)
+        if 'machine_verification' in value:
+            from .hybrid_cpu_cold_verifier import implementation_hash
+            if (implementation_hash()!=self._cold_verifier_hash or
+                    value['machine_verification']['verifier_sha256']!=self._cold_verifier_hash):
+                raise Conflict('CPU decision protected verifier implementation changed')
         if (terminal['request']['goal_ref']!=value['request']['goal_ref'] or
                 entry_key(terminal['request'])!=value['request']['terminal_key'] or digest(terminal)!=value['terminal_hash'] or
                 value['pool_free']!=free):
@@ -145,11 +160,22 @@ class CpuAssessmentService:
 
     def assess(self,lease,token,*,idempotency_key,expected_state_version):
         """Commit finite-trial state, never dispatch or satisfy arbitrary conditions."""
+        return self._record(lease,token,idempotency_key=idempotency_key,expected_state_version=expected_state_version)
+
+    def decide(self,lease,token,*,assessment_key,idempotency_key,expected_state_version):
+        """Cold raw recomputation → immutable machine fact and conservative next step."""
+        from .hybrid_protocol import ID
+        validate_schema(ID,assessment_key)
+        return self._record(lease,token,idempotency_key=idempotency_key,
+            expected_state_version=expected_state_version,assessment_key=assessment_key)
+
+    def _record(self,lease,token,*,idempotency_key,expected_state_version,assessment_key=None):
         self._actual();self.controller._refuse_nested_writer();self.controller._issued(token)
         attempt,terminal,free=self._original_trial(lease)
         request={n:terminal['request'][n] for n in ('project_id','data_mode','store_epoch','goal_ref')}
         request.update(idempotency_key=idempotency_key,expected_state_version=expected_state_version,
             terminal_key=entry_key(terminal['request']))
+        if assessment_key is not None:request['prior_assessment_key']=assessment_key
         check_bytes(request,4096);validate_schema(REQUEST,request);key=fact_key(request)
         with self.runtime.pool._lock,self._lock:
             with self.store.read_connection() as db:
@@ -170,6 +196,11 @@ class CpuAssessmentService:
                     'recorded_at':sources['evaluated_at'],'controller_checked_monotonic_ns':mono,
                     'accepted_state_version':version+1,'assessment':appraisal(terminal),
                     'evidence_activation':'EXPERIMENT_CURRENT_AS_OF'}
+                if assessment_key is not None:
+                    prior=self._point(db,assessment_key,read)
+                    if 'prior_assessment_key' in prior['request']:raise Conflict('CPU decision requires plain original appraisal')
+                    from .hybrid_cpu_cold_verifier import verify
+                    value.update(prior_assessment_hash=digest(prior),machine_verification=verify(result))
                 validate_record(key,value);self._dependencies(db,value,read)
                 payload={'format':2,'put':[[SECTION,key,value]],'delete':[],'details':None}
                 present=read.object(SECTION,'') is not None

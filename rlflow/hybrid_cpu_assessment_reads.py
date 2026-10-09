@@ -44,6 +44,12 @@ class CpuAssessmentReader(HybridReader):
         if (any(request[n]!=v for n,v in (('project_id',self.project_id),('data_mode',self.data_mode),('store_epoch',self.store_epoch))) or
                 value['accepted_state_version']>version):
             raise Conflict('CPU appraisal readonly scope/version differs')
+        prior=None
+        if 'prior_assessment_key' in request:
+            pk=request['prior_assessment_key'];raw_prior=read.object(SECTION,pk)
+            if raw_prior is None or 'prior_assessment_key' in raw_prior.get('request',{}):
+                raise Conflict('CPU decision readonly plain original appraisal missing')
+            prior=self._point(db,read,pk,version)[0]
         proof=self.store._cpu_assessment_event(db,key,max_bytes=min(read.remaining,256*1024),_parse=read.parse,_decode=read.decode)
         if proof!=((EVENT,'hybrid-core',digest(value),value['accepted_state_version']),[(SECTION,key,digest(value))]):
             raise Conflict('CPU appraisal readonly original event differs')
@@ -54,6 +60,7 @@ class CpuAssessmentReader(HybridReader):
         if proof!=((BUDGET_EVENT,'hybrid-core',account_key(scope(terminal['request'])),terminal['accepted_state_version']),expected_objects(terminal)):
             raise Conflict('CPU appraisal readonly whole terminal event differs')
         state=historical_sources(self.store,db,terminal['policy_source'],read)
+        if prior is not None:state.setdefault(SECTION,{})[request['prior_assessment_key']]=prior
         state.setdefault(BUDGET[0],{})[terminal_key]=terminal
         for section,field in zip(PREPARATION,('intent_key','result_key')):
             pk=terminal['preparation'][field];original=read.object(section,pk)

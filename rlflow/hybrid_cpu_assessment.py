@@ -1,5 +1,6 @@
 """Immutable finite-trial appraisal, not Goal completion or dispatch authority."""
 from .hybrid_protocol import ID, HASH, TIME, obj, enum, validate_schema
+from .store import canonical
 from .hybrid_goals import digest, check_bytes
 from .hybrid_preparation import SOURCES, _references
 from .hybrid_admission import CONTROLLER_REF
@@ -28,6 +29,22 @@ FACT = obj({'schema_version':{'const':'1.0'},'request':REQUEST,'request_hash':HA
     'sources':SOURCES,'controller':CONTROLLER_REF,'recorded_at':TIME,
     'controller_checked_monotonic_ns':COUNT,'accepted_state_version':{**COUNT,'minimum':1},
     'assessment':ASSESSMENT,'evidence_activation':{'const':'EXPERIMENT_CURRENT_AS_OF'}})
+# Optional append-only extension: old requests/facts/hashes remain byte exact.
+# A decision references an earlier plain appraisal, never another decision.
+REQUEST['properties']['prior_assessment_key']=ID
+DERIVED=obj({'raw_sha256':HASH,'spec_sha256':HASH,
+    'inside_counts':{'type':'array','minItems':3,'maxItems':3,'items':{'type':'integer','minimum':0,'maximum':128}},
+    'estimates':{'type':'array','minItems':3,'maxItems':3,'items':{'type':'number','minimum':0,'maximum':4}},
+    'mean_absolute_error':{'type':'number','minimum':0,'maximum':4},'baseline':{'const':3},
+    'baseline_absolute_error':{'type':'number','minimum':0,'maximum':4},'hypothesis_supported':{'type':'boolean'}})
+MACHINE=obj({'verifier_version':{'const':'FIXED_PI_RAW_COLD_CHECK_V1'},'verifier_sha256':HASH,
+    'status':enum('UNAVAILABLE','MACHINE_VERIFIED'),'derived':{'oneOf':[DERIVED,{'type':'null'}]},
+    'source_sha256':{'oneOf':[HASH,{'type':'null'}]},
+    'next_action':enum('NO_AUTOMATIC_RETRY','REQUEST_INDEPENDENT_REVIEW'),
+    'independent_review_status':{'const':'NOT_PERFORMED'},'condition_coverage':{'type':'array','maxItems':0},
+    'goal_completed':{'const':False},'dispatch_enabled':{'const':False}})
+FACT['properties']['machine_verification']=MACHINE
+FACT['properties']['prior_assessment_hash']=HASH
 
 
 def fact_key(request):
@@ -63,6 +80,15 @@ def validate_record(key,value):
             value['recorded_at']!=sources['evaluated_at'] or
             not timestamp(value['recorded_at'])<timestamp(sources['expires_at'])):
         raise Conflict('CPU appraisal immutable request/source identity differs')
+    selected='prior_assessment_key' in request
+    if selected!=('machine_verification' in value) or selected!=('prior_assessment_hash' in value):
+        raise Conflict('CPU decision requires original appraisal and machine verification pair')
+    if selected:
+        machine=value['machine_verification']
+        if (type(machine['goal_completed']) is not bool or type(machine['dispatch_enabled']) is not bool or
+                machine['derived'] is not None and (type(machine['derived']['hypothesis_supported']) is not bool or
+                any(type(n) is not int for n in machine['derived']['inside_counts']))):
+            raise Conflict('CPU decision actual JSON types required')
 
 
 def validate_links(value,lookup,*,current=False):
@@ -70,6 +96,23 @@ def validate_links(value,lookup,*,current=False):
     if terminal is None: raise Conflict('CPU appraisal original terminal missing')
     budget_record(BUDGET[0],request['terminal_key'],terminal); budget_links(terminal,lookup)
     runtime=terminal['request']['fixture_runtime']; result=runtime.get('cpu_trial_result')
+    if 'prior_assessment_key' in request:
+        prior=lookup(SECTION,request['prior_assessment_key'])
+        if (prior is None or 'prior_assessment_key' in prior['request'] or
+                digest(prior)!=value['prior_assessment_hash'] or
+                prior['accepted_state_version']>=value['accepted_state_version'] or
+                timestamp(prior['recorded_at'])>timestamp(value['recorded_at']) or
+                prior['request']['terminal_key']!=request['terminal_key'] or
+                any(prior['request'][n]!=request[n] for n in ('project_id','data_mode','store_epoch','goal_ref')) or
+                prior['terminal_hash']!=value['terminal_hash'] or prior['result_hash']!=value['result_hash'] or
+                any(prior['sources'][n]!=v for n,v in value['sources'].items() if n not in ('source_version','evaluated_at'))):
+            raise Conflict('CPU decision original plain appraisal binding differs')
+        validate_record(request['prior_assessment_key'],prior)
+        from .hybrid_cpu_cold_verifier import verify
+        # Historical validation uses the recorded identity and V1 algorithm,
+        # never today's filesystem. The actual writer separately pins source.
+        if canonical(value['machine_verification'])!=canonical(verify(result,implementation=value['machine_verification']['verifier_sha256'])):
+            raise Conflict('CPU decision original cold verification differs')
     from .hybrid_host_pool_ledger import validate as pool_validate
     free=pool_validate(value['pool_free']); origin=runtime['origin']; fp=free['payload']
     if (free['action']!='FIXTURE_FREE' or free['pool_id']!=origin['pool_id'] or
@@ -100,8 +143,12 @@ def validate_links(value,lookup,*,current=False):
 
 
 def event_inputs(value):
-    return {'terminal_key':value['request']['terminal_key'],'terminal_hash':value['terminal_hash'],
+    inputs={'terminal_key':value['request']['terminal_key'],'terminal_hash':value['terminal_hash'],
         'proposal_hash':value['sources']['proposal_hash'],'result_hash':value['result_hash']}
+    if 'prior_assessment_key' in value['request']:
+        inputs.update(prior_assessment_key=value['request']['prior_assessment_key'],
+            prior_assessment_hash=value['prior_assessment_hash'])
+    return inputs
 
 
 def validate_transition(payload,lookup,*,event_type,key,object_id,producer,version,registration):

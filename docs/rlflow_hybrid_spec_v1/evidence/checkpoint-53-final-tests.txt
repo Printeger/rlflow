@@ -1,0 +1,17 @@
+Checkpoint53 actual results; parent52 37e18c5. No live tests.
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q tests/test_hybrid_cpu_cold_verifier.py --disable-warnings
+orig74456 terminal0199aa exit0 3pass42.48s initial actual CPU and NoG cold decision/proofs/recovery.
+Same environment, exact new test_decision_lost_COMMIT_snapshot_historical_code_identity_types_and_final_TTL
+orig11674 terminala8e101 exit0 1pass23.56s actual COMMIT lost-return/periodic snapshot/history-no-current-source-IO/changed source/finalTTL.
+Exact new test_decide_rejects_missing_original_and_closed_machine_integer_float_confusion
+orig41607 terminalc766e2 exit0 1pass11.80s illegalID/bool/float rejection.
+Necessary final unchanged-input regression:
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q tests/test_hybrid_cpu_assessment.py tests/test_hybrid_cpu_assessment_reads.py tests/test_snapshot_maintenance.py tests/test_hybrid_cpu_cold_verifier.py::test_actual_CPU_cold_decision_persist_original_proofs_recovery_and_no_repeat --disable-warnings
+orig48427 terminalfa5fd1 exit0 47pass/1warning182.40s; final actual CPU newdecision and original UTC causal negative verified.
+Five distinct new cases individually passed, not claimed final fresh five-suite. No unchanged52 browser/backendfull repeat.
+270finalSHA manifest2144df2db1f9b3cdeb001721e1a206270fbf0fc6dc49a3b6f41a78bc0e411330 all matched.
+compileall rlflow/tests empty errors; pipcheck no broken requirements; git diff check pass.
+High readonly confirmedMUST historyfileidentity/JSONtype/decideNone closed, no tests/writes.
+USERpackage-lock SHA becc7e2a36dfcad4ffe934b5ff2f0f68187611d6c0641bd63d81367651cfbf09 unchanged/untracked/unstaged.
+No new experiments/models/GPU/production/push. Machine verifier is not independent Reviewer; reviewNOTPERFORMED/coverageempty/Goalfalse/dispatchfalse remain.
+Next actual controlled engineering candidate output/acceptance and STOP; independent review/native/strict OS/tree/invoice/install/soaks still incomplete.
