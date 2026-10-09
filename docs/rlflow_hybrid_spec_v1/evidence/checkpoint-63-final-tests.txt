@@ -1,0 +1,42 @@
+Checkpoint63 final development evidence; baseline816eef3; Goal remains active.
+Python3.12.3 .venv / Node18.19.1 / private finite CPU+SQLite+loopback sandboxed Chrome.
+No paid model/GPU/production migration/push; USER package-lock SHA unchanged.
+
+Every Python test used PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest.
+All suites sequential, no live input edits/restarts/parallel duplicate suites.
+
+r1 -q -s tests/test_hybrid_finite_host_app.py --disable-warnings
+stdout/stderr audit/hybrid-v1/checkpoint-63-shared-http-r1.log
+original39252 terminala1b20f exit1; 2 failed/1warning62.86s.
+Wrong original CPU STOP action + test requiring positive CPU instead of sealed integer0..3e9.
+r1 frozen318 paths; post-r1-input-diff.log was taken AFTER fixes and intentionally shows modified factory/test, NOT a claim of pre-fix end-input match.
+
+r2 same argv; shared-http-r2.log; original19338 terminal1357e3 exit1.
+1passed/1failed/1warning83.77s. Actual CPU G-before STOP isolation passed.
+Both actual tasks/results/measurement passed; last scoped bearer test failed because fixture API returns tuple.
+Frozen318 paths checked before further edit, all matched. Fixed only unpacking and added two new Chrome fixture files.
+
+r3 -q -s tests/test_hybrid_finite_host_app.py::test_actual_shared_app_both_original_results_scoped_reads_and_preflight --disable-warnings
+results-http-r3.log; original45118 terminal14e190 exit0; 1passed/1warning46.32s.
+Actual two Popen, one AFTER pwrite, CPU machine disposition, engineering AST21, receipt-only retry, source CPU0, billingUNKNOWN, scoped bearer deny.
+Composite backend evidence is r2 STOP pass + r3 failed-case pass; NOT a fresh two-case green run. No changed runtime/factory between r2 and r3.
+
+node --test web_checks/candidate-output-panel.test.mjs web_checks/cpu-unit-panel.test.mjs web_checks/engineering-unit-panel.test.mjs
+node-r1.log; 12passed73.702814ms.
+Then (same sequential shell &&) node --test web_checks/finite-host-browser.test.mjs
+browser-r1.log; original50241 terminaled7ec2 exit0; 1passed56.854524s (case56.652374s).
+Actual Chrome same Auth/project switch CPU384, engineeringAST21, one candidate write, scope STOP isolation, private DOM clear/logout; no pageerrors.
+Browser CPU STOP occurred AFTER its worker completed. Backend r2 separately proves actual live child STOP before G; do not conflate.
+
+-q tests/test_hybrid_candidate_output_reads.py tests/test_web_api.py --disable-warnings
+regression-r1.log; original13023 terminal532c0c exit0; 13passed/1warning63.39s.
+Necessary affected evidence DTO + app/API composition regression; no central Store/runtime/protocol change, no redundant full suite.
+
+Final checks839c49 exit0: sha256sum -c audit/hybrid-v1/checkpoint-63-inputs-r3.sha256;
+.venv/bin/python -m compileall -q rlflow tests web_checks/finite_host_server.py;
+.venv/bin/python -m pip check (No broken requirements);
+node --check rlflow/static/candidate-output-panel.mjs; node --check web_checks/finite-host-browser.test.mjs; git diff --check.
+320 final source/test/web/schema pins all match. Manifest SHA2d8884a329382bfd873d8c01653b3845515adde9ccafbf193f4abbe5319e9786.
+Final input check and all raw/freeze logs pinned by checkpoint-63-log-sha256.txt; raw logs ignored audit/hybrid-v1 retained locally.
+Independent High new composition review threeMUST repaired and static closed; no additional MUST; no test runs by reviewer.
+Not native/product independent Review/full Goal/billing/strict OS/all-tree STOP/install/soak acceptance.

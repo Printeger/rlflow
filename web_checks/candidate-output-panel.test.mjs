@@ -18,6 +18,10 @@ test('closed actual-output DTO rejects invented current authority and inconsiste
   assert.equal(checkOutput(page,scope).items.length,1);assert.deepEqual(checkOutput(detail,scope,row).candidate.evidence.actual_tests,evidence.actual_tests);
   for(const bad of [{...page,store_epoch:'wrong'},{...page,extra:'hostpath'},{...page,next_after:'other'},{...page,items:[{...row,goal_completed:true}]},{...page,items:[{...row,current_activation:'CURRENT'}]},{...page,items:[{...row,actual_passed_cases:2}]},{...page,items:[{...row,after_sha256:row.before_sha256}]},{...page,items:[{...row,recorded_at_state_version:2**53}]}])assert.throws(()=>checkOutput(bad,scope));
   assert.throws(()=>checkOutput(detail,scope,{...row,attempt_id:'other'}));
+  const measured={...evidence,cpu_ns:42,worker_wall_ns:84,cpu_measurement_scope:'ORIGINAL_FIXED_PROGRAM_KERNEL_REPORTED_AS_OF_EMIT'};
+  assert.equal(checkOutput({...detail,candidate:{...row,evidence:measured}},scope,row).candidate.evidence.cpu_ns,42);
+  for(const e of [{...evidence,cpu_ns:42},{...measured,cpu_ns:true},{...measured,cpu_ns:3e9+1},{...measured,worker_wall_ns:-1},{...measured,cpu_measurement_scope:'INVOICE'}])
+    assert.throws(()=>checkOutput({...detail,candidate:{...row,evidence:e}},scope,row));
   for(const e of [{...evidence,candidate_write_fd_closed:false},{...evidence,historical_pool_release:'CURRENT_FREE'},{...evidence,actual_tests:evidence.actual_tests.map((t,i)=>i? t:{...t,actual:4})}])assert.throws(()=>checkOutput({...meta,candidate:{...row,evidence:e}},scope,row));
 });
 test('optional original machine disposition preserves legacy/null and rejects fake independent review or cases',()=>{

@@ -121,6 +121,8 @@ class CandidateOutputReader(HybridReader):
                 'historical_pool_release':'FIXTURE_FREE','result_sha256':value['result_hash'],
                 'intent_sha256':value['request']['intent_hash'],'source_sha256':result['source_sha256'],
                 'program_sha256':origin['program_sha256'],'resource_enforcement':'partial'}
+            dto['evidence'].update(cpu_ns=result['patch']['cpu_ns'],worker_wall_ns=result['patch']['wall_ns'],
+                cpu_measurement_scope='ORIGINAL_FIXED_PROGRAM_KERNEL_REPORTED_AS_OF_EMIT')
         return dto
 
     def outputs(self,*,after='',limit=2):
