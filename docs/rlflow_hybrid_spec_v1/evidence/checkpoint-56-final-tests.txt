@@ -1,0 +1,27 @@
+Checkpoint56 actual results; parent55 529eb30. No live tests.
+DELIVERED original stopped/free/written candidate → original-cap readonly actual AFTER → bounded independent AST/21 signed cases → immutable MACHINE_ACCEPTED_PENDING_REVIEW → cold indexed API and actual Chrome.
+Not independent Reviewer/session, not global conditions or Goal completion. No new worker, candidate write, authority renewal, model/GPU.
+Python prefix PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q -s <selector> --disable-warnings.
+tests/test_hybrid_engineering_acceptance.py
+r1 original15968 terminale27638 exit1 2fail14.46s same startup code-identity check. Diagnostic31c38c no worker: source/SPEC equal, marshal initial/later serialization differs despite same code. Changed diagnosis and implementation to original function + immutable code-object identity, retaining sourceSHA/SPEC. Diagnostic656d89 three stable hashes/actual AST21.
+r2 original36756 terminal1eb9ea exit0 2pass43.54s actual 21 cases, original pwrite onlyonce, no rerun, original bytes, duplicate original request, copiedcap/differentrequest/derivedchain denial, full recovery/cold original owner closure; pure AST/code/canonical machine/float rejection.
+tests/test_hybrid_engineering_acceptance.py::test_expired_audit_lost_commit_original_receipt_corrupt_history_and_periodic_snapshot
+r3 original66029 terminalfa144b exit1 1fail45.82s all required actual boundary assertions passed then erroneous insertion of previous purecase float loop referenced undefined machine. Test-only restore original purecase exactly as passed r2 and remove misplaced loop from boundary, no acceptance assertion deletion/production change.
+r4 original79599 terminal1830af exit0 1pass45.18s actual algorithmpin denial, expired audit no renewed eval/controller, actual COMMIT-lost-return same original duplicate/no newwrite, semantically wrong prior hash with consistent recomputed event/object/input hashes rejected audit/snapshot/recover, restored original event/projection, periodic snapshot and history no current code reads.
+Three distinct new cases individually passed, NOT final fresh3suite claim.
+node --test web_checks/candidate-output-panel.test.mjs
+terminalc943b0 exit0 4pass68.925319ms, legacy missing/null machine and exact21 row/status/no-authority DTO, original lifecycle fencing.
+node --test web_checks/candidate-output-browser.test.mjs
+original29722 terminal788b3a exit0 1pass28.472377s actual fixed worker/write→readonly machine21→cold API→Chrome pending-review, original detail durable refresh, owner closes still readable, logout privateDOM clear, no execution writes/pageerrors.
+Necessary old regression, changed optional RESULT schema/receipt service/cold reader/panel/history+safety paths:
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q tests/test_hybrid_engineering_output.py tests/test_hybrid_candidate_output_reads.py tests/test_snapshot_maintenance.py --disable-warnings
+original56545 terminal9a548a exit0 51pass/1warning326.24s.
+No parallel/restarted suites, no unchanged whole full-suite/new passed browser rerun.
+284 inputSHA097c2475036628e47dd2c60925578062725bf05c31046e28450ed11c34e61185 during/after allmatch.
+compileall rlflow/tests/web_checks, pipcheck, JSsyntax new panel, git diff check exit0.
+High readonly design+actualdelta no confirmedMUST; no tests/writes/repeated55 review. Future crossPython AST digest compatibility not proven; current fixedPython3.12.
+One V1 disposition key per plain original output alreadyscope-bound, exact client/CAS/body, no derived chains; original source eval/Controller/mono retained, latest receipt does not renew execution.
+USER package-lock SHA becc7e2a36dfcad4ffe934b5ff2f0f68187611d6c0641bd63d81367651cfbf09 unchanged/untracked/not staged.
+Raw audit/hybrid-v1/checkpoint-56-*.log retained; actual fingerprints archived.
+Next57 finite orchestration original execution/STOP/application/machine receipt with in-flight cancellation/original-cap resume; still not native/fullGoal.
+General native/independent Reviewer/condition mapping/strictOS/arbitrary-tree STOP/invoice/install/soaks remain; no new user-choice blocker. Paidmodel/GPU/production/push zero.

@@ -1,7 +1,7 @@
 """Bounded cold original engineering output evidence, never writer authority."""
 import json
 from contextlib import contextmanager
-from .hybrid_candidate_output import SECTIONS,EVENTS,validate_record,validate_links
+from .hybrid_candidate_output import SECTIONS,EVENTS,acceptance_key,validate_record,validate_links
 from .hybrid_budget_ledger import SECTIONS as BUDGET,validate_record as budget_record
 from .hybrid_fixture_runtime_ledger import dependency_lookup
 from .hybrid_preparation import SECTIONS as PREPARATION,EVENTS as PREPARATION_EVENTS,validate_record as preparation_record
@@ -82,7 +82,23 @@ class CandidateOutputReader(HybridReader):
         for s,rows in historical_sources(self.store,db,value['sources'],read).items():state.setdefault(s,{}).update(rows)
         state.setdefault(SECTIONS[0],{})[pk]=prior
         validate_links(SECTIONS[1],value,lookup)
-        return value,terminal
+        return value,terminal,state
+
+    def _acceptance(self,db,read,key,value,version,state):
+        ak=acceptance_key(key);accepted=read.object(SECTIONS[1],ak)
+        if accepted is None:
+            if db.execute('SELECT 1 FROM events WHERE idempotency_key=? AND event_type=?',(ak,EVENTS[1])).fetchone():
+                raise Conflict('candidate machine acceptance readonly original missing')
+            return None
+        validate_record(SECTIONS[1],ak,accepted);self._event(db,read,SECTIONS[1],ak,accepted)
+        if accepted['accepted_state_version']>version or accepted['request'].get('prior_output_key')!=key:
+            raise Conflict('candidate machine acceptance readonly original scope/version differs')
+        state.setdefault(SECTIONS[1],{})[key]=value  # _point already proved this original.
+        # Only verified immutable memo from this exact transaction. Links prove
+        # identical original sources; no current activation or renewed consent.
+        validate_links(SECTIONS[1],accepted,dependency_lookup(self.store,db,read,state))
+        return {'id':ak,'recorded_at':accepted['recorded_at'],'recorded_at_state_version':accepted['accepted_state_version'],
+            **accepted['machine_verification']}
 
     @staticmethod
     def _dto(key,value,terminal,*,detail=False):
@@ -113,23 +129,27 @@ class CandidateOutputReader(HybridReader):
         with self.snapshot() as (db,meta):
             read=ReadBudget(db,PREPARATION_READ_BYTES);version=meta['as_of_state_version']
             self._domains(db,read,version)
-            rows=db.execute("SELECT CASE WHEN typeof(object_key)='text' AND length(CAST(object_key AS BLOB))<=160 THEN object_key END FROM projection WHERE section=? AND object_key>? AND object_key!='' ORDER BY object_key LIMIT ?",(SECTIONS[1],after,limit+1)).fetchall()
+            rows=db.execute("SELECT CASE WHEN typeof(object_key)='text' AND length(CAST(object_key AS BLOB))<=160 THEN object_key END FROM projection WHERE section=? AND object_key>? AND substr(object_key,1,24)='candidate_output_result_' ORDER BY object_key LIMIT ?",(SECTIONS[1],after,limit+1)).fetchall()
             keys=[]
             for row in rows:
                 validate_schema(ID,row[0]);keys.append(row[0])
             items=[]
             for key in keys[:limit]:
-                value,terminal=self._point(db,read,key,version);items.append(self._dto(key,value,terminal))
+                value,terminal,_=self._point(db,read,key,version);items.append(self._dto(key,value,terminal))
             return self.output({**meta,'items':items,'next_after':keys[limit-1] if len(keys)>limit else None},64*1024)
 
     def output_detail(self,key):
         validate_schema(ID,key)
         with self.snapshot() as (db,meta):
             read=ReadBudget(db,PREPARATION_READ_BYTES);version=meta['as_of_state_version']
-            self._domains(db,read,version);pair=self._point(db,read,key,version)
+            self._domains(db,read,version)
+            if not key.startswith('candidate_output_result_'):return None
+            pair=self._point(db,read,key,version)
             if pair is None:return None
-            value,terminal=pair
-            return self.output({**meta,'candidate':self._dto(key,value,terminal,detail=True)},64*1024)
+            value,terminal,state=pair
+            dto=self._dto(key,value,terminal,detail=True)
+            dto['machine_acceptance']=self._acceptance(db,read,key,value,version,state)
+            return self.output({**meta,'candidate':dto},64*1024)
 
 
 def install(app,readers,projects,auth):

@@ -25,6 +25,7 @@ test('actual engineer output → cold viewer Chrome; durable refresh, owner clos
     const detail=JSON.parse(await page.locator('#candidate-output-detail').textContent()),row=detail.candidate;
     assert.deepEqual(row.evidence.actual_tests.map(r=>r.actual),[5,-2,0]);assert.notEqual(row.before_sha256,row.after_sha256);assert.notEqual(row.base_tree_sha256,row.output_tree_sha256);
     assert.equal(row.current_activation,'HISTORICAL_AUDIT_ONLY');assert.equal(row.resource_release_status,'NOT_OBSERVED');assert.equal(row.goal_completed,false);assert.equal(row.independent_review_status,'NOT_PERFORMED');
+    assert.equal(row.machine_acceptance.status,'MACHINE_ACCEPTED_PENDING_REVIEW');assert.equal(row.machine_acceptance.derived.passed_cases,21);assert.equal(row.machine_acceptance.derived.actual_tests.length,21);assert.equal(row.machine_acceptance.independent_review_status,'NOT_PERFORMED');assert.deepEqual(row.machine_acceptance.condition_coverage,[]);
     const before=await control('inspect');assert.equal(before.version,before.initial_version);assert.equal(before.occupied,0);assert.equal(before.candidate_write_closed,true);
     const updated=await control('append_readonly_event');assert.equal(updated.version,before.version+1);
     await page.waitForFunction(v=>{const text=document.querySelector('#candidate-output-detail').textContent;return text && JSON.parse(text).as_of_state_version===v;},updated.version);

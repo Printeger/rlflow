@@ -18,6 +18,8 @@ SCOPE=obj({'project_id':ID,'data_mode':{'const':'fixture'},'store_epoch':ID,'goa
     'idempotency_key':ID,'expected_state_version':COUNT,'terminal_key':ID,'terminal_hash':HASH})
 SCOPE['properties']['intent_key']=ID
 SCOPE['properties']['intent_hash']=HASH
+SCOPE['properties']['prior_output_key']=ID
+SCOPE['properties']['prior_output_hash']=HASH
 COMMON={'schema_version':{'const':'1.0'},'request':SCOPE,'request_hash':HASH,
     'accepted_state_version':{**COUNT,'minimum':1},'recorded_at':TIME,'sources':SOURCES,
     'controller':CONTROLLER_REF,'controller_checked_monotonic_ns':COUNT,
@@ -32,13 +34,31 @@ RESULT=obj({**COMMON,'state':{'const':'OUTPUT_CAPTURED_AUDIT_ONLY'},'output_tree
     'actual_tests':{'type':'array','minItems':3,'maxItems':3,'items':obj({
         'left':{'type':'integer'},'right':{'type':'integer'},'expected':{'type':'integer'},'actual':{'type':'integer'}})},
     'candidate_write_performed':{'const':True},'candidate_write_fd_closed':{'const':True}})
+# Optional immutable audit-only extension; old request/fact/input bytes remain.
+RESULT['properties']['machine_verification']=obj({'verifier_version':{'const':'FIXED_ADD_RAW_AST_CHECK_V1'},
+    'verifier_sha256':HASH,'status':{'const':'MACHINE_ACCEPTED_PENDING_REVIEW'},
+    'derived':obj({'source_sha256':HASH,'spec_sha256':HASH,'syntax_sha256':HASH,
+        'actual_tests':{'type':'array','minItems':21,'maxItems':21,'items':obj({
+            'left':{'type':'integer'},'right':{'type':'integer'},'expected':{'type':'integer'},'actual':{'type':'integer'}})},
+        'passed_cases':{'const':21}}),'interpretation_scope':{'const':'FIXED_ADD_FUNCTION_ONLY'},
+    'candidate_read_only':{'const':True},'condition_coverage':{'type':'array','maxItems':0},
+    'independent_review_status':{'const':'NOT_PERFORMED'},'goal_completed':{'const':False},'dispatch_enabled':{'const':False}})
 
 
 def intent_key(request):
     return 'candidate_output_'+sha([request['project_id'],request['data_mode'],request['store_epoch'],request['idempotency_key']])
 
 
-def result_key(request):return 'candidate_output_result_'+sha(request['intent_key'])
+def result_key(request):
+    if 'prior_output_key' in request:
+        return acceptance_key(request['prior_output_key'])
+    return 'candidate_output_result_'+sha(request['intent_key'])
+
+
+def acceptance_key(output_key):
+    # One V1 machine disposition per original immutable output. The original
+    # output key already binds project/mode/epoch/client write identity.
+    return 'candidate_output_acceptance_'+sha(output_key)
 
 
 def validate_record(section,key,value):
@@ -65,6 +85,12 @@ def validate_record(section,key,value):
     pair='intent_key' in request and 'intent_hash' in request
     if ('intent_key' in request)!=('intent_hash' in request) or pair!=(section==SECTIONS[1]):
         raise Conflict('candidate output original intent pair differs')
+    selected='prior_output_key' in request
+    if (selected!=('prior_output_hash' in request) or selected!=('machine_verification' in value) or
+            selected and section!=SECTIONS[1]):raise Conflict('candidate machine acceptance original output pair differs')
+    if selected:
+        from .hybrid_engineering_cold_verifier import validate
+        validate(value['machine_verification'])
     if section==SECTIONS[1]:
         _tree(value['output_tree'])
         expected=[{'left':a,'right':b,'expected':a+b,'actual':a+b} for a,b in ((2,3),(-4,2),(0,0))]
@@ -73,6 +99,18 @@ def validate_record(section,key,value):
 
 
 def validate_links(section,value,lookup,*,current=False):
+    if 'machine_verification' in value:
+        request=value['request'];prior=lookup(SECTIONS[1],request['prior_output_key'])
+        if prior is None or 'machine_verification' in prior or 'prior_output_key' in prior.get('request',{}):
+            raise Conflict('candidate acceptance requires plain original output')
+        validate_record(SECTIONS[1],request['prior_output_key'],prior)
+        validate_links(SECTIONS[1],prior,lookup)
+        if (digest(prior)!=request['prior_output_hash'] or prior['accepted_state_version']>=value['accepted_state_version'] or
+                timestamp(prior['recorded_at'])>=timestamp(value['recorded_at']) or
+                any(prior[k]!=v for k,v in value.items() if k not in ('request','request_hash','sources','recorded_at','accepted_state_version','machine_verification')) or
+                any(prior['sources'][k]!=v for k,v in value['sources'].items() if k!='source_version') or
+                any(prior['request'][k]!=v for k,v in request.items() if k not in ('expected_state_version','idempotency_key','prior_output_key','prior_output_hash'))):
+            raise Conflict('candidate machine acceptance original output linkage differs')
     request=value['request'];terminal=lookup(BUDGET[0],request['terminal_key'])
     if terminal is None:raise Conflict('candidate output original terminal missing')
     budget_record(BUDGET[0],request['terminal_key'],terminal);budget_links(terminal,lookup)
@@ -139,6 +177,7 @@ def event_inputs(value):
     request=value['request'];result={'terminal_key':request['terminal_key'],'terminal_hash':request['terminal_hash'],
         'result_hash':value['result_hash'],'base_tree_hash':value['base_tree']['tree_hash'],'proposal_hash':value['sources']['proposal_hash']}
     if 'intent_key' in request:result.update(intent_key=request['intent_key'],intent_hash=request['intent_hash'])
+    if 'prior_output_key' in request:result.update(prior_output_key=request['prior_output_key'],prior_output_hash=request['prior_output_hash'])
     return result
 
 

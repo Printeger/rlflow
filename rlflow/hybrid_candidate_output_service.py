@@ -11,7 +11,7 @@ from .hybrid_budget_ledger import entry_key
 from .hybrid_controller import fact_key as control_key
 from .hybrid_preparation import source_binding
 from .hybrid_preparation_sources import historical_sources
-from .hybrid_protocol import validate_schema
+from .hybrid_protocol import ID,validate_schema
 from .hybrid_reads import ReadBudget
 from .hybrid_goals import digest
 from .hybrid_engineering_patch import BEFORE,AFTER,TARGET,hash_bytes
@@ -44,6 +44,8 @@ class CandidateOutputService:
         runtime._actual();self.runtime=runtime;self.store=runtime.store
         self.controller=runtime.controller;self.budget=runtime.budget
         self._rows={};self._active=None;self._lock=threading.RLock()
+        from .hybrid_engineering_cold_verifier import implementation_hash
+        self._cold_verifier_hash=implementation_hash()
         self.store.bind_hybrid_candidate_output(self)
 
     def _actual(self):
@@ -73,6 +75,10 @@ class CandidateOutputService:
         return attempt,terminal,free
 
     def _dependencies(self,db,section,value,read):
+        if 'machine_verification' in value:
+            pk=value['request']['prior_output_key'];prior=read.object(SECTIONS[1],pk)
+            if prior is None or 'machine_verification' in prior:raise Conflict('candidate acceptance requires plain original output')
+            self._point(db,SECTIONS[1],pk,read)
         terminal=self.budget._point(db,value['request']['terminal_key'],read)
         self.budget._dependencies(db,terminal,read)
         historical_sources(self.store,db,value['sources'],read)
@@ -121,6 +127,11 @@ class CandidateOutputService:
             if row['intent'] is None or digest(row['intent'])!=value['request']['intent_hash']:
                 raise PermissionError('receipt requires actual original durable write intent')
             row['material'].check_hold(receipt=True)
+            if 'machine_verification' in value:
+                from .hybrid_engineering_cold_verifier import implementation_hash
+                if (implementation_hash()!=self._cold_verifier_hash or
+                        value['machine_verification']['verifier_sha256']!=self._cold_verifier_hash):
+                    raise Conflict('candidate acceptance protected AST verifier changed')
         else:
             control=self.controller.check_token_in_transaction(db,guard.token,guard.read)
             if value['controller']!=self._control_ref(control):raise Conflict('candidate output current controller changed')
@@ -287,6 +298,50 @@ class CandidateOutputService:
                             sources={**prior['sources'],'source_version':request['expected_state_version']},
                             state='OUTPUT_CAPTURED_AUDIT_ONLY',output_tree=tree,actual_tests=tests,
                             candidate_write_performed=True,candidate_write_fd_closed=True)
+                        guard=self._put(db,read,SECTIONS[1],value,row,receipt=True)
+                        guard.check();db.commit()
+                        return {'fact':value,'duplicate':False,'execution_authority':'NONE'}
+                finally:self._active=None
+
+    def accept_machine(self,lease,*,output_key,idempotency_key,expected_state_version):
+        """Original-cap read-only disposition, not current Goal acceptance.
+
+        Does not rewrite, launch, renew consent, or replace independent review.
+        Explicit CAS/client key binds the original derived receipt permanently.
+        """
+        self._actual();self.controller._refuse_nested_writer()
+        from .hybrid_engineering_cold_verifier import verify,implementation_hash
+        validate_schema(ID,output_key);validate_schema(ID,idempotency_key)
+        with self.runtime.pool._lock,self._lock:
+            row=self._rows.get(id(lease))
+            if row is None or row['lease'] is not lease or row['intent'] is None:
+                raise PermissionError('actual original candidate output required; no cold acceptance capability')
+            material=row['material'];material.check_hold(receipt=True)
+            with material.witness(after=True) as witness:
+                row['witness']=witness
+                try:
+                    with self.store.lock(),self.store.connect() as db,self._held():
+                        db.execute('BEGIN IMMEDIATE');read=ReadBudget(db,PREPARATION_READ_BYTES)
+                        prior=self._point(db,SECTIONS[1],output_key,read)
+                        if 'machine_verification' in prior:raise Conflict('candidate acceptance requires plain original output')
+                        if prior['request']['intent_key']!=intent_key(row['request']):raise Conflict('candidate acceptance original cap/output differs')
+                        request={**prior['request'],'idempotency_key':idempotency_key,'expected_state_version':expected_state_version,
+                            'prior_output_key':output_key,'prior_output_hash':digest(prior)}
+                        validate_schema(SCOPE,request)
+                        if type(expected_state_version) is not int:raise Conflict('candidate acceptance actual CAS integer required')
+                        key=result_key(request)
+                        existing=read.object(SECTIONS[1],key)
+                        if existing is not None:
+                            existing=self._point(db,SECTIONS[1],key,read)
+                            if existing['request']!=request:raise Conflict('candidate acceptance idempotency request changed')
+                            return {'fact':existing,'duplicate':True,'execution_authority':'NONE'}
+                        if self.budget._metadata(db)!=expected_state_version:raise Conflict('candidate acceptance stale writer version')
+                        if implementation_hash()!=self._cold_verifier_hash:raise Conflict('candidate acceptance protected AST verifier changed')
+                        actual=material._read_target(witness[1],AFTER,witness[2]);machine=verify(actual,implementation=self._cold_verifier_hash)
+                        now,_=self.controller._sample()
+                        value={**prior,'request':request,'request_hash':digest(request),
+                            'accepted_state_version':expected_state_version+1,'recorded_at':now.isoformat().replace('+00:00','Z'),
+                            'sources':{**prior['sources'],'source_version':expected_state_version},'machine_verification':machine}
                         guard=self._put(db,read,SECTIONS[1],value,row,receipt=True)
                         guard.check();db.commit()
                         return {'fact':value,'duplicate':False,'execution_authority':'NONE'}

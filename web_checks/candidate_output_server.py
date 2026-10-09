@@ -4,6 +4,7 @@ from pathlib import Path
 import socket
 import sys
 import threading
+from datetime import timedelta
 from types import SimpleNamespace
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
 import pytest
@@ -19,6 +20,8 @@ def main():
     patch=pytest.MonkeyPatch();native=native_setup.__wrapped__(root,patch)
     fixture=engineering_runtime.__wrapped__(root,native,SimpleNamespace(),patch);context=next(fixture)
     owner,lease,service,reader,app,auth,_,_,key=setup(context,origin=origin)
+    context[6][0]+=timedelta(seconds=1);context[7][0]+=10**9
+    service.accept_machine(lease,output_key=key,idempotency_key='browser_machine_acceptance',expected_state_version=owner.store.version())
     initial=owner.store.version();attempt=owner._issued(lease)
     server=uvicorn.Server(uvicorn.Config(app,log_level='error',access_log=False,proxy_headers=False))
     def inspect():
