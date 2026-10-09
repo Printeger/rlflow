@@ -21,9 +21,9 @@ export function checkCpuUnitReceipt(v,body,actor){
     v.actor_id!==actor || v.task_id!==body.task_id || v.recorded_phase!=='STOP_INTENT_ACCEPTED' || v.execution_status!=='UNKNOWN' ||
     v.native_execution_enabled!==false || v.arbitrary_tree_stop!==false || typeof v.duplicate!=='boolean')fail();return v;
 }
-export class CpuUnitPanel{
-  constructor({context,request,schedule=(f,n)=>setTimeout(f,n),cancel=id=>clearTimeout(id)}){
-    Object.assign(this,{context,request,schedule,cancel,serial:0});this.$=id=>document.getElementById('cpu-unit-'+id);
+export class OriginalUnitPanel{
+  constructor({context,request,schedule=(f,n)=>setTimeout(f,n),cancel=id=>clearTimeout(id)},profile){
+    Object.assign(this,{context,request,schedule,cancel,serial:0,unitProfile:profile});this.$=id=>document.getElementById(profile.path+'-'+id);
     this.$('refresh').addEventListener('click',()=>this.load());
     for(const kind of ['run','stop']){
       this.$(kind).addEventListener('click',()=>this.command(kind));
@@ -35,7 +35,7 @@ export class CpuUnitPanel{
   scope(){const c=this.context();return c?{project:c.project,mode:c.mode,epoch:c.epoch,identity:c.session.principal_id,authGeneration:c.authGeneration}:null;}
   ticket(){return {serial:this.serial,scope:this.scope()};}
   current(t){return t.serial===this.serial && JSON.stringify(t.scope)===JSON.stringify(this.scope());}
-  base(){return `/api/v1/projects/${encodeURIComponent(this.scope().project)}/cpu-unit`;}
+  base(){return `/api/v1/projects/${encodeURIComponent(this.scope().project)}/${this.unitProfile.path}`;}
   note(v){this.$('note').textContent=v;}
   clear(){
     ++this.serial;this.cancel(this.timer);this.timer=null;this.reading=false;this.profile=null;this.floor=0;this.boundScope=null;this.blocked=false;this.connectionState='UNKNOWN';
@@ -63,26 +63,32 @@ export class CpuUnitPanel{
     if(this.reading)return;if(!this.scope() || this.scope().mode!=='fixture'){this.clear();return;}
     this.cancel(this.timer);this.timer=null;if(!automatic)this.blocked=false;
     const t=this.ticket();this.reading=true;this.buttons();
-    try{const v=await this.request(this.base());if(!this.current(t))return;checkCpuUnit(v,t.scope);if(this.profile && v.as_of_state_version<this.profile.as_of_state_version)fail();this.profile=v;this.floor=Math.max(this.floor,v.as_of_state_version);this.$('detail').textContent=JSON.stringify(v,null,2);this.note(`原事件验证 · ${v.last_sdk_status || '尚无机器验收'} · 独立 Review NOT_PERFORMED · Goal 未完成。`);}
-    catch(e){if(this.current(t)){this.blocked=true;this.note(e.status===404?'此项目未安装原 CPU Unit 控制。':`来源不可用 (${e.message})；保留 as-of，不推断当前运行。`);}}
+    try{const v=await this.request(this.base());if(!this.current(t))return;this.unitProfile.check(v,t.scope);if(this.profile && v.as_of_state_version<this.profile.as_of_state_version)fail();this.profile=v;this.floor=Math.max(this.floor,v.as_of_state_version);this.$('detail').textContent=JSON.stringify(v,null,2);this.note(`原事件验证 · ${v.last_sdk_status || '尚无机器验收'} · 独立 Review NOT_PERFORMED · Goal 未完成。`);}
+    catch(e){if(this.current(t)){this.blocked=true;this.note(e.status===404?this.unitProfile.notInstalled:`来源不可用 (${e.message})；保留 as-of，不推断当前运行。`);}}
     finally{if(this.current(t)){this.reading=false;this.buttons();this.queue();}}
   }
   command(kind){
     this.buttons();if(this.$(kind).disabled)return;
-    const body={action:kind==='run'?'START_FIXED_CPU':'CANCEL_FIXED_CPU_TRIAL',task_id:this.profile.task.id};
+    const body={action:kind==='run'?this.unitProfile.start:this.unitProfile.stop,task_id:this.profile.task.id};
     if(kind==='run')body.expected_state_version=this.profile.as_of_state_version;
-    this[kind]=new PendingCommand(this.scope(),body,'cpu_web_'+crypto.randomUUID());this.send(kind);
+    this[kind]=new PendingCommand(this.scope(),body,this.unitProfile.path+'_web_'+crypto.randomUUID());this.send(kind);
   }
   async send(kind){
     const p=this[kind],t=this.ticket();if(!p || !p.matches(t.scope))return;let intent;try{intent=p.begin(t.scope);}catch{return;}
-    this.buttons();this.note(kind==='stop'?'提交本范围紧急 STOP；接收不等于 FREE。':'提交已批准 CPU 实验一次执行；不会调用模型/GPU。');
+    this.buttons();this.note(kind==='stop'?'提交本范围紧急 STOP；接收不等于 FREE。':this.unitProfile.runNote);
     try{
       const v=await this.request(this.base()+'/commands',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':this.context().session.csrf_token,'Idempotency-Key':intent.key},body:intent.body});
-      if(!this.current(t) || this[kind]!==p)return;checkCpuUnitReceipt(v,JSON.parse(intent.body),t.scope.identity);
+      if(!this.current(t) || this[kind]!==p)return;this.unitProfile.receipt(v,JSON.parse(intent.body),t.scope.identity);
       this.floor=Math.max(this.floor,v.accepted_state_version);
       this.$(kind+'-receipt').textContent=JSON.stringify(v,null,2);
       if(kind==='stop'){p.unknown();p.acceptedStop=true;}else{p.finish();this[kind]=null;}
       this.note('原意图 ACCEPTED；不是当前执行或资源 FREE 证明。');this.buttons();await this.load();
     }catch(e){if(!this.current(t) || this[kind]!==p)return;p.unknown();this.note('结果 UNKNOWN；仅手动重试原 body/key。Run 不重新派发，STOP 继续原 scope 清理。');this.buttons();}
   }
+}
+
+export class CpuUnitPanel extends OriginalUnitPanel{
+  constructor(options){super(options,{path:'cpu-unit',start:'START_FIXED_CPU',stop:'CANCEL_FIXED_CPU_TRIAL',
+    check:checkCpuUnit,receipt:checkCpuUnitReceipt,notInstalled:'此项目未安装原 CPU Unit 控制。',
+    runNote:'提交已批准 CPU 实验一次执行；不会调用模型/GPU。'});}
 }

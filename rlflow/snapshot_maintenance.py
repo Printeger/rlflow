@@ -75,6 +75,9 @@ def maintain(store,*,seconds=5,max_bytes=32*1024*1024,max_rows=100000,max_nodes=
                 from .hybrid_cpu_unit_stop import SECTION as stop_section, EVENT as stop_event
                 stop_events={key:store._cpu_unit_stop_event(db,key,_read=read) for key in state.get(stop_section,{}) if key}
                 stop_count=db.execute('SELECT COUNT(*) FROM events WHERE event_type=? AND seq<=?',(stop_event,version)).fetchone()[0]
+                from .hybrid_engineering_unit_stop import SECTION as engineering_stop_section, EVENT as engineering_stop_event
+                engineering_stop_events={key:store._engineering_unit_stop_event(db,key,_read=read) for key in state.get(engineering_stop_section,{}) if key}
+                engineering_stop_count=db.execute('SELECT COUNT(*) FROM events WHERE event_type=? AND seq<=?',(engineering_stop_event,version)).fetchone()[0]
                 from .hybrid_candidate_output import SECTIONS as output_sections
                 output_events={key:store._candidate_output_event(db,key,max_bytes=max(0,min(read.remaining,4*1024**2)),_parse=source_parse,_decode=decode)
                     for section in output_sections for key in state.get(section,{})}
@@ -100,6 +103,8 @@ def maintain(store,*,seconds=5,max_bytes=32*1024*1024,max_rows=100000,max_nodes=
             cpu_complete(state,registration,cpu_events.get,cpu_summary);check()
             from .hybrid_cpu_unit_stop import validate_complete as stop_complete
             stop_complete(state,registration,stop_events.get,stop_count);check()
+            from .hybrid_engineering_unit_stop import validate_complete as engineering_stop_complete
+            engineering_stop_complete(state,registration,engineering_stop_events.get,engineering_stop_count);check()
             from .hybrid_candidate_output import validate_complete as output_complete
             output_complete(state,registration,output_events.get,lambda s,v:output_summary[s]);check()
             from .hybrid_goals import validate_complete

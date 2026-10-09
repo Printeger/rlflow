@@ -40,13 +40,17 @@ CONTROL_BODY = obj({'action': enum('START_FIXED_CPU', 'STOP_FIXED_SCOPE'),
     'task_id': ID, 'expected_state_version': COUNT})
 CONTROL_COMMAND = obj({**CONTROL_BODY['properties'], 'actor_id': ID,
     'idempotency_key': ID, 'command_id': ID, 'request_hash': HASH})
+ENGINEERING_CONTROL_BODY = obj({'action':{'const':'START_FIXED_ENGINEERING'},
+    'task_id':ID,'expected_state_version':COUNT})
+ENGINEERING_CONTROL_COMMAND = obj({**ENGINEERING_CONTROL_BODY['properties'],'actor_id':ID,
+    'idempotency_key':ID,'command_id':ID,'request_hash':HASH})
 RUNTIME = obj({'phase': enum(*PHASES), 'origin': ORIGIN,
     'registration': nullable(REFERENCE), 'previous': nullable(REFERENCE),
     'producer': nullable(PROCESS), 'started_ack_sha256': nullable(HASH),
     'terminal_proof_sha256': nullable(HASH), 'wall_seconds': COUNT})
 # Optional only for compatibility with already persisted44 facts. A new
 # command appears only at its actual accepting phase, then remains immutable.
-RUNTIME['properties'].update(start_command=CONTROL_COMMAND, stop_command=CONTROL_COMMAND)
+RUNTIME['properties'].update(start_command={'oneOf':[CONTROL_COMMAND,ENGINEERING_CONTROL_COMMAND]}, stop_command=CONTROL_COMMAND)
 RUNTIME['properties'].update(cpu_trial_release_attempted={'type': 'boolean'},
                              cpu_trial_result=nullable({'type': 'object'}))
 RUNTIME['properties'].update(engineering_release_attempted={'type':'boolean'},
@@ -69,7 +73,9 @@ def _control_links(request, old):
             continue
         if command is None: continue
         body = {key: command[key] for key in CONTROL_BODY['properties']}
-        if (runtime['phase'] != acceptance or command['action'] != action or
+        allowed_action = ('START_FIXED_ENGINEERING' if name=='start_command' and
+            runtime['origin']['kind']==ENGINEERING_KIND else action)
+        if (runtime['phase'] != acceptance or command['action'] != allowed_action or
                 command['task_id'] != runtime['origin']['task_id'] or
                 command['expected_state_version'] != request['expected_state_version'] or
                 command['request_hash'] != digest(body) or

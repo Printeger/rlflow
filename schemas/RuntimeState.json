@@ -844,6 +844,7 @@
     "hybrid_admission_facts": {"type": "object"},
     "hybrid_cpu_trial_assessments": {"type": "object"},
     "hybrid_cpu_unit_stops": {"type": "object"},
+    "hybrid_engineering_unit_stops": {"type": "object"},
     "hybrid_candidate_output_intents": {"type": "object"},
     "hybrid_candidate_output_results": {"type": "object"},
     "hybrid_budget_entries": {"type": "object"},

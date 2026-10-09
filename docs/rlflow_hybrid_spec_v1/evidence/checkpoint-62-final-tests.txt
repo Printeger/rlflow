@@ -1,0 +1,108 @@
+Checkpoint62 / STANDARD / FINAL development slice
+Base hybrid-v1 / 84a5341 (Checkpoint61 committed). No live tests remain.
+No paid model/API, GPU, production migration, public hosting, push or Goal rescheduling.
+Original M0-M5/PRD acceptance and protected paths remain unchanged.
+
+Delivery: original approved EngineeringExecutionUnit -> authenticated human RUN
+-> actual readonly worker -> STOP/reap/Source/inputFD close/PoolFREE -> original
+inode one pwrite -> actual AFTER tests and AST21 -> pending independent review.
+STOP is independent of held Run/GET/CAS and has separate immutable intent domain.
+RUN/HANDOFF and STOP use same actor/project/epoch/clientkey identity; immutable
+original Run key/body retries read receipt only, never another dispatch/write.
+Last issued Auth check is memory-only, then pure cancellation fence; no Runtime,
+source/SQL/procfs IO follows Controller final sample. INTENT/pwrite owned COMMIT
+and new machine COMMIT both guard current Auth/cancel. Audit reconcile remains
+original entered-write readback, permits accepted STOP after session expiry,
+does not renew grant/Controller, repeat pwrite or mint machine acceptance.
+Domain generic early-deny, exact writer, whole source/inputs, replay, count,
+same-RO snapshot maintenance and recovery are closed. Old CPU facts unchanged.
+
+Environment: existing .venv Python3.12.3, Node18.19.1, existing sandboxed Chrome;
+finite private fixture SQLite/loopback/CPU. Tests run sequentially, sources frozen.
+Backend prefix: PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest
+Positive and boundaries: -q -s TARGET [SELECTION] --disable-warnings
+Regression: -q --disable-warnings TARGETS
+All stdout/stderr -> audit/hybrid-v1/checkpoint-62-NAME.log.
+
+positive-r1 target:
+tests/test_hybrid_engineering_unit_control.py::test_actual_HTTP_single_write_AST21_receipt_retry_STOP_and_recovery
+original99958 / terminalee4971 exit0: 1passed/1warning37.64s.
+Actual onePopen/onepwrite/AST21, retry, STOP, audit/snapshot/recover passed.
+r1 frozen313 inputs matched after terminal before edits.
+
+Readonly review then confirmed final cancellation-before-Auth identity IO race
+and missing last owned-transaction Auth/cancel callback. Fixed final-only issued
+Auth path and final pure cancellation; no source edits during original test.
+
+boundaries-r1 target: tests/test_hybrid_engineering_unit_control.py -k 'not actual_HTTP'
+original8902 / terminal1684b1 exit0: 5passed/1deselected/1warning92.53s.
+G/PWRITE/MACHINE_COMMIT Auth expiry, cancel during finalAuth no-pwrite,
+entered write lost return -> STOP acceptance -> expiry -> one plain audit capture.
+r2 frozen313 inputs matched at terminal. Afterward added pure parentPID check,
+covered by necessary existing fork/control regression, and browser/pure fixtures.
+
+node-r1 argv:
+node --test web_checks/engineering-unit-panel.test.mjs web_checks/cpu-unit-panel.test.mjs web_checks/fixture-panel.test.mjs web_checks/candidate-output-panel.test.mjs
+terminal476b41 exit0: 28passed83.911543ms.
+browser-r1 argv: node --test web_checks/engineering-unit-browser.test.mjs
+original12820 / terminal780900 exit1: 1failed60576.77831ms.
+Failure after actual RUN(onePopen/onepwrite), held Run reply STOP and lost reply
+same-body/key retry passed. Candidate detail wait line38 timed out because
+existing Date.parse millisecond comparison rejected legitimate +1 microsecond
+machine acceptance. No fixture clock enlargement to hide actual behavior.
+Original raw failure retained; corrected source precision and diagnostics before
+rerun, not an identical blind retry. r3 frozen316 input paths matched at terminal.
+
+node-precision-r1 argv: node --test web_checks/candidate-output-panel.test.mjs
+Sequential original81050 first command exit0: 4passed70.100278ms.
+Expanded existing case: +1us valid, same UTC represented with different precision
+and reversed order within same millisecond rejected. BigInt microsecond compare.
+browser-r2 argv: node --test web_checks/engineering-unit-browser.test.mjs
+Sequential original81050 / terminalaa83c8 exit0: 1passed31889.86357ms.
+Actual shared UI pipeline reads original candidate/evidence/AST21; one pwrite,
+one launch, original Run/STOP body-key retries, owner closure and logout clear.
+Chrome STOP happens after worker/write finished while Run reply held, not a
+claim of killing a still-running child. Backend final-effect cases prove cancel.
+Independent readonly High precision review: no confirmed MUST, no tests/writes.
+
+cpu-browser-r1 argv: node --test web_checks/cpu-unit-browser.test.mjs
+original39725 / terminalacff7a exit0: 1passed22898.169371ms.
+Necessary once because private common control/UI and final authority gate changed;
+actual384 and original retry/independentSTOP/closure/logout behavior preserved.
+r4 input316 matched; no repeat of already-passed engineering Chrome or Node28.
+
+After browser terminal only engineering test added actual maintain() assertion;
+source and browser bytes unchanged. r5 includes all316 paths, frozen for regression.
+regression-r1 full argv:
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q --disable-warnings tests/test_hybrid_engineering_unit_control.py::test_actual_HTTP_single_write_AST21_receipt_retry_STOP_and_recovery tests/test_contracts.py tests/test_store_policy.py tests/test_hybrid_snapshot.py tests/test_snapshot_maintenance.py tests/test_web_api.py tests/test_hybrid_fixture_runtime_control.py tests/test_hybrid_cpu_unit_control.py tests/test_hybrid_engineering_execution_unit.py tests/test_hybrid_engineering_output.py tests/test_hybrid_engineering_acceptance.py tests/test_hybrid_candidate_output_reads.py > audit/hybrid-v1/checkpoint-62-regression-r1.log 2>&1
+original93681 / terminalc5cc95 exit0: 206passed/2warnings948.81s (0:15:48).
+Necessary selected11 existing modules plus new positive maintenance closure:
+central Store/schema/whole source/count/RO maintenance, common controls/last
+fences, candidate live/machine/audit transactions, read-only HTTP and recovery.
+This is NOT the entire Python repository suite; unaffected61 full evidence not
+rerun/relabelled. Five already-passed new boundaries not repeated without need.
+Warnings hidden by --disable-warnings; no skips reported in this selected run.
+
+Final316 input manifest checkpoint-62-final-inputs.sha256:
+498c63f486317db959186eaa07c257e4312a97a02b2ee9ee2ba60f371b20e911
+All matched while regression live and after its actual terminal; final check0.
+Final compileall rlflow tests web_checks/engineering_unit_server.py / pip check /
+node --check app,cpu-unit,engineering-unit,candidate-output panels and engineering
+browser / git diff --check all exit0, terminalf06782 && chain.
+14 raw artifacts (8 logs, five freezes, finalSHA check) pinned in
+checkpoint-62-log-sha256.txt; originals preserved under ignored audit/hybrid-v1.
+Temporary development project state/artifacts are not formal scientific releases.
+USER package-lock.json remains untracked/unstaged and unchanged SHA:
+becc7e2a36dfcad4ffe934b5ff2f0f68187611d6c0641bd63d81367651cfbf09.
+
+Independent readonly High: exact wrapper/Unit/Store bindings, action-kind scope,
+new machine Auth, entered-write audit STOP, double protected domains reviewed.
+Two final-fence MUSTs closed; precise time delta separately closed. No repeated
+unaffected61 review, no tests by reviewer; not product/scientific Reviewer.
+
+Next63: one authenticated application, two independently approved projects,
+one original shared pool; actual cross-project execution, STOP isolation and
+trusted usage/resource source integration. No second Supervisor or new grants.
+No new user decision blocker. Remaining full Goal gates: native/model/runtime,
+product/scientific independent Reviewer, whole conditions/Goal, strict OS/tree,
+trusted billing, new install/B1, 24h fixture and 8h UI. Not claimed complete.

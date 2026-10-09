@@ -152,9 +152,12 @@ class FixtureRuntimeOwner:
         # Pure memory check AFTER the last source/SQL/Controller fence.
         unit = self._execution_units.get(id(attempt['lease']))
         if unit is not None:
-            unit._check_final()
             if self._control_service is not None:
-                self._control_service._check_authority(cleanup=False, attempt=attempt)
+                self._control_service._check_final_authority(cleanup=False, attempt=attempt)
+            # Auth may sample clocks / original identity. Cancellation must
+            # be the final pure fence AFTER those checks, immediately before
+            # physical G/pwrite or a new machine COMMIT.
+            unit._check_final()
 
     def _plan_original(self, bundle, token, observation):
         entry = self.plans.builder._slot(bundle); seed = entry['seed']
@@ -711,7 +714,7 @@ class FixtureRuntimeOwner:
             raise Conflict('fixture runtime sources expired at final actual boundary')
         _deadline(guard.bootstrap.inventory.deadline); _deadline(guard.plan_witness.deadline)
         self.pool._claim_clocks(attempt['claim_value'])
-        if self._control_service is not None: self._control_service._check_authority(cleanup=False)
+        if self._control_service is not None: self._control_service._check_final_authority(cleanup=False)
 
     def _final_effect_gate(self, guard):
         # Controller actual process/STOP IO is LAST, then one exact final sample.

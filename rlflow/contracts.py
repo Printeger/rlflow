@@ -176,6 +176,8 @@ def validate_runtime_state(state: dict) -> None:
         validate_cpu_assessment(state)
         from .hybrid_cpu_unit_stop import validate_persisted as validate_cpu_unit_stop
         validate_cpu_unit_stop(state)
+        from .hybrid_engineering_unit_stop import validate_persisted as validate_engineering_unit_stop
+        validate_engineering_unit_stop(state)
         from .hybrid_candidate_output import validate_persisted as validate_candidate_output
         validate_candidate_output(state)
         from .hybrid_budget_ledger import validate_persisted as validate_budget

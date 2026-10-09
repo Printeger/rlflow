@@ -25,6 +25,11 @@ test('optional original machine disposition preserves legacy/null and rejects fa
   assert.equal(checkOutput({...detail,candidate:{...detail.candidate,machine_acceptance:null}},scope,row).candidate.machine_acceptance,null);
   const body={...detail,as_of_state_version:5,candidate:{...detail.candidate,machine_acceptance:machine}};
   assert.equal(checkOutput(body,scope,row).candidate.machine_acceptance.derived.passed_cases,21);
+  const micro={...body,candidate:{...body.candidate,machine_acceptance:{...machine,recorded_at:'2026-10-09T00:00:00.000001Z'}}};
+  assert.equal(checkOutput(micro,scope,row).candidate.machine_acceptance.derived.passed_cases,21);
+  for(const recorded_at of ['2026-10-09T00:00:00.000000Z','2026-10-08T23:59:59.999999Z'])
+    assert.throws(()=>checkOutput({...micro,candidate:{...micro.candidate,machine_acceptance:{...micro.candidate.machine_acceptance,recorded_at}}},scope,row));
+  assert.throws(()=>checkOutput({...micro,candidate:{...micro.candidate,recorded_at:'2026-10-09T00:00:00.000002Z'}},scope,row));
   for(const m of [{...machine,status:'ACCEPTED_GOAL'},{...machine,independent_review_status:'PERFORMED'},{...machine,goal_completed:true},{...machine,recorded_at_state_version:4},{...machine,recorded_at:row.recorded_at},{...machine,derived:{...machine.derived,source_sha256:row.before_sha256}},{...machine,derived:{...machine.derived,actual_tests:machine.derived.actual_tests.map((t,i)=>i?t:{...t,actual:123})}}])assert.throws(()=>checkOutput({...body,candidate:{...body.candidate,machine_acceptance:m}},scope,row));
 });
 test('original selected id refreshes only on durable version; offline/heartbeat/failure do not loop',async()=>{

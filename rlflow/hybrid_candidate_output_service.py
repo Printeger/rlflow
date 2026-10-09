@@ -148,6 +148,8 @@ class CandidateOutputService:
         after=row['material'].write_entered
         row['material'].check_graph(plan,row['material'].after_inventory(candidate) if after else candidate,deadline,after=after)
         if not guard.receipt:self._last_effect(guard)
+        elif 'machine_verification' in value and self.runtime._control_service is not None:
+            self.runtime._unit_effect_check(attempt)
 
     @staticmethod
     def _control_ref(control):
@@ -192,13 +194,31 @@ class CandidateOutputService:
             yield
 
     @contextmanager
+    def _live_held(self):
+        # Controller's actual Store writer is already held. Borrow only fresh
+        # human new-effect authority; audit-only reconcile never enters here.
+        with self._held(),self.runtime._held():
+            yield
+
+    @contextmanager
+    def _machine_held(self,db):
+        service=self.runtime._control_service
+        if service is None:
+            yield
+        else:
+            with service._borrow(db,cleanup=False):yield
+
+    @contextmanager
     def _live_transaction(self,token):
         if self._active is not None:raise Conflict('nested candidate output writer refused')
+        def final(now,mono):
+            self._deadlines(self._active,now,mono)
+            self.runtime._unit_effect_check(self.runtime._leases[id(self._active.row['lease'])])
         try:
             with self.controller.token_transaction(token,read_bytes=PREPARATION_READ_BYTES,
-                    _commit_context=self._held,
+                    _commit_context=self._live_held,
                     _before_commit=lambda:self._active.check(),
-                    _after_final_sample=lambda now,mono:self._deadlines(self._active,now,mono)) as context:
+                    _after_final_sample=final) as context:
                 yield context
         finally:self._active=None
 
@@ -324,30 +344,31 @@ class CandidateOutputService:
                 try:
                     with self.store.lock(),self.store.connect() as db,self._held():
                         db.execute('BEGIN IMMEDIATE');read=ReadBudget(db,PREPARATION_READ_BYTES)
-                        prior=self._point(db,SECTIONS[1],output_key,read)
-                        if 'machine_verification' in prior:raise Conflict('candidate acceptance requires plain original output')
-                        if prior['request']['intent_key']!=intent_key(row['request']):raise Conflict('candidate acceptance original cap/output differs')
-                        request={**prior['request'],'idempotency_key':idempotency_key,'expected_state_version':expected_state_version,
-                            'prior_output_key':output_key,'prior_output_hash':digest(prior)}
-                        validate_schema(SCOPE,request)
-                        if type(expected_state_version) is not int:raise Conflict('candidate acceptance actual CAS integer required')
-                        key=result_key(request)
-                        existing=read.object(SECTIONS[1],key)
-                        if existing is not None:
-                            existing=self._point(db,SECTIONS[1],key,read)
-                            if existing['request']!=request:raise Conflict('candidate acceptance idempotency request changed')
-                            return {'fact':existing,'duplicate':True,'execution_authority':'NONE'}
-                        self.runtime._unit_check(self.runtime._issued(lease))
-                        if self.budget._metadata(db)!=expected_state_version:raise Conflict('candidate acceptance stale writer version')
-                        if implementation_hash()!=self._cold_verifier_hash:raise Conflict('candidate acceptance protected AST verifier changed')
-                        actual=material._read_target(witness[1],AFTER,witness[2]);machine=verify(actual,implementation=self._cold_verifier_hash)
-                        now,_=self.controller._sample()
-                        value={**prior,'request':request,'request_hash':digest(request),
-                            'accepted_state_version':expected_state_version+1,'recorded_at':now.isoformat().replace('+00:00','Z'),
-                            'sources':{**prior['sources'],'source_version':expected_state_version},'machine_verification':machine}
-                        guard=self._put(db,read,SECTIONS[1],value,row,receipt=True)
-                        guard.check()
-                        self.runtime._unit_effect_check(self.runtime._leases[id(lease)])
-                        db.commit()
-                        return {'fact':value,'duplicate':False,'execution_authority':'NONE'}
+                        with self._machine_held(db):
+                            prior=self._point(db,SECTIONS[1],output_key,read)
+                            if 'machine_verification' in prior:raise Conflict('candidate acceptance requires plain original output')
+                            if prior['request']['intent_key']!=intent_key(row['request']):raise Conflict('candidate acceptance original cap/output differs')
+                            request={**prior['request'],'idempotency_key':idempotency_key,'expected_state_version':expected_state_version,
+                                'prior_output_key':output_key,'prior_output_hash':digest(prior)}
+                            validate_schema(SCOPE,request)
+                            if type(expected_state_version) is not int:raise Conflict('candidate acceptance actual CAS integer required')
+                            key=result_key(request)
+                            existing=read.object(SECTIONS[1],key)
+                            if existing is not None:
+                                existing=self._point(db,SECTIONS[1],key,read)
+                                if existing['request']!=request:raise Conflict('candidate acceptance idempotency request changed')
+                                return {'fact':existing,'duplicate':True,'execution_authority':'NONE'}
+                            self.runtime._unit_check(self.runtime._issued(lease))
+                            if self.budget._metadata(db)!=expected_state_version:raise Conflict('candidate acceptance stale writer version')
+                            if implementation_hash()!=self._cold_verifier_hash:raise Conflict('candidate acceptance protected AST verifier changed')
+                            actual=material._read_target(witness[1],AFTER,witness[2]);machine=verify(actual,implementation=self._cold_verifier_hash)
+                            now,_=self.controller._sample()
+                            value={**prior,'request':request,'request_hash':digest(request),
+                                'accepted_state_version':expected_state_version+1,'recorded_at':now.isoformat().replace('+00:00','Z'),
+                                'sources':{**prior['sources'],'source_version':expected_state_version},'machine_verification':machine}
+                            guard=self._put(db,read,SECTIONS[1],value,row,receipt=True)
+                            guard.check()
+                            self.runtime._unit_effect_check(self.runtime._leases[id(lease)])
+                            db.commit()
+                            return {'fact':value,'duplicate':False,'execution_authority':'NONE'}
                 finally:self._active=None

@@ -7,6 +7,7 @@ from contextlib import contextmanager, asynccontextmanager
 from dataclasses import dataclass
 import hmac
 import json
+import os
 import threading
 import time
 from urllib.parse import urlsplit
@@ -106,6 +107,24 @@ class FixtureRuntimeControlService:
         access = self.auth.check_operator_guard(operation.guard, project_id=self.project_id)
         if access.principal.id != operation.command['actor_id']:
             raise PermissionError('actual command actor differs')
+
+    def _check_final_authority(self, *, cleanup, attempt=None):
+        # Final-only issued memory guard: no Runtime/source/SQL/procfs read.
+        # The ordinary authority path has already proved the full source.
+        operation=getattr(self._local,'operation',None)
+        required=not cleanup or (operation is not None and
+            operation.command['action']=='STOP_FIXED_SCOPE' and not operation.accepted)
+        if not required:return
+        if (os.getpid()!=self.runtime.process['pid'] or not self.runtime._live or
+                self.runtime.budget._fixture_runtime is not self.runtime or
+                operation is None or self._issued.get(id(operation)) is not operation or
+                operation.thread!=threading.get_ident() or self.runtime._control_service is not self or
+                not operation.borrowed or operation.db is None or not operation.db.in_transaction or
+                attempt is not None and operation.lease is not attempt['lease']):
+            raise PermissionError('actual final issued human writer required')
+        access=self.auth.check_operator_guard(operation.guard,project_id=self.project_id)
+        if access.principal.id!=operation.command['actor_id']:
+            raise PermissionError('actual final command actor differs')
 
     def _accepting_command(self, attempt, phase, version):
         operation = self._operation()

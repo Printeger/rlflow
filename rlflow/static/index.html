@@ -113,6 +113,13 @@
         <div class="controls"><button id="fixture-start" type="button" disabled>明确启动固定 CPU Task</button><button id="fixture-stop" type="button" disabled>明确 STOP 原固定范围</button><button id="fixture-retry" type="button" hidden>手动重试原 body / 原 key</button><button id="fixture-abandon" type="button" hidden>清除本地意图（不取消执行）</button></div>
         <pre id="fixture-receipt" aria-label="原接收回执，不是当前执行状态"></pre>
       </section>
+      <section class="panel" aria-labelledby="engineering-unit-title">
+        <div class="panel-heading"><h2 id="engineering-unit-title">已批准固定工程修复 · 一次执行 / 本范围 STOP</h2><button id="engineering-unit-refresh" type="button">读取原工程 Unit</button></div>
+        <p class="muted">只执行原已批准 add 修复，原 inode 单次写入及21项机器检查。不是独立 Review / Goal 完成；不调用模型/GPU，不接收任意命令或路径。</p>
+        <p id="engineering-unit-note" role="status"></p><p id="engineering-unit-live" class="muted"></p><pre id="engineering-unit-detail"></pre>
+        <div class="controls"><button id="engineering-unit-run" disabled>明确执行已批准修复一次</button><button id="engineering-unit-stop" disabled>紧急 STOP 本范围</button><button id="engineering-unit-run-retry" hidden>手动重试原 Run body/key</button><button id="engineering-unit-run-abandon" hidden>清除本地 Run 意图</button><button id="engineering-unit-stop-retry" hidden>手动继续原 STOP 清理</button><button id="engineering-unit-stop-abandon" hidden>清除本地 STOP 意图</button></div>
+        <pre id="engineering-unit-run-receipt" aria-label="工程 Run 接收事实"></pre><pre id="engineering-unit-stop-receipt" aria-label="工程 STOP 意图接收事实，不是 FREE"></pre>
+      </section>
       <section class="panel" aria-labelledby="cpu-unit-title">
         <div class="panel-heading"><h2 id="cpu-unit-title">已批准 CPU 实验 · 一次执行 / 本范围 STOP</h2><button id="cpu-unit-refresh" type="button">读取原 Unit</button></div>
         <p class="muted">只使用原已批准固定 384 点实验；不新建授权、不调用模型/GPU、不接管冷 owner。STOP 独立于 Run 在途请求，无版本要求。</p>

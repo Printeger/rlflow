@@ -14,8 +14,7 @@ from urllib.parse import urlsplit
 from .hybrid_budget_ledger import SECTIONS as BUDGET, entry_key
 from .hybrid_cpu_execution_unit import CpuTrialExecutionUnit
 from .hybrid_cpu_trial import KIND, AUTHORIZATION
-from .hybrid_cpu_unit_stop import (SECTION,EVENT,BODY,validate_record,validate_links,
-    fact_key,event_inputs)
+from . import hybrid_cpu_unit_stop as cpu_stop
 from .hybrid_fixture_runtime_control import FixtureRuntimeControlService, _Operation
 from .hybrid_fixture_runtime_ledger import CONTROL_BODY, control_command_id
 from .hybrid_fixture_runtime_reads import FixtureTaskReader
@@ -50,12 +49,23 @@ class _StopGuard:
         return value
 
 
-class CpuUnitControlService(FixtureRuntimeControlService):
+class _OriginalUnitControl(FixtureRuntimeControlService):
+    _start_body = CONTROL_BODY
+    _unit_type = CpuTrialExecutionUnit
+    _reader_type = CpuUnitTaskReader
+    _stop_domain = cpu_stop
+    _start_action = 'START_FIXED_CPU'
+    _stop_action = 'CANCEL_FIXED_CPU_TRIAL'
+    _profile = 'FIXED_CPU_PI_TRIAL_UNIT'
+    _store_slot = '_hybrid_cpu_unit_control_service'
+    _store_bind = 'bind_hybrid_cpu_unit_control'
+    _store_proof = '_cpu_unit_stop_event'
+
     def __init__(self,host,lease,auth,*,origin):
         if type(host) is not HostExecutionService or type(auth) is not AuthStore:
             raise TypeError('original finite Host and same AuthStore required')
         unit=host._unit(lease)
-        if type(unit) is not CpuTrialExecutionUnit:raise TypeError('original CPU trial Unit required')
+        if type(unit) is not self._unit_type:raise TypeError('original CPU trial Unit required')
         runtime=unit.runtime;parsed=urlsplit(origin)
         if (parsed.scheme not in ('http','https') or not parsed.netloc or parsed.username or
                 parsed.path or parsed.query or parsed.fragment):raise ValueError('canonical control origin required')
@@ -64,11 +74,11 @@ class CpuUnitControlService(FixtureRuntimeControlService):
             if (runtime._control_service is not None or runtime.store._hybrid_auth_owner is not auth or
                     unit._request is not None or unit._cancelled.is_set() or
                     runtime._current(attempt)['fixture_runtime']['phase']!='REGISTER_NO_HANDOFF' or
-                    runtime.store._hybrid_cpu_unit_control_service is not None):
+                    getattr(runtime.store,self._store_slot) is not None):
                 raise Conflict('one original undispatched CPU Unit control binding required')
             self.host,self.unit,self.runtime,self.auth,self.origin=host,unit,runtime,auth,origin
             self.store=runtime.store;self.project_id=runtime.workspace.project_id;self.store_epoch=runtime.workspace.store_epoch
-            self.reader=CpuUnitTaskReader(self.store,project_id=self.project_id,store_epoch=self.store_epoch)
+            self.reader=self._reader_type(self.store,project_id=self.project_id,store_epoch=self.store_epoch)
             self._local=threading.local();self._issued={};self._operation_raw={};self._stop_guards={};self._pending_stops={}
             self._intents={};self._intent_lock=threading.Lock();self._start_intent=None
             self._registration=attempt['entries']['REGISTER_NO_HANDOFF']
@@ -85,13 +95,13 @@ class CpuUnitControlService(FixtureRuntimeControlService):
                 if receipt is None:raise Conflict('original command namespace source unavailable')
                 self._intents[row[0]]={'hash':receipt['request_hash'],'actor':receipt['actor_id'],
                     'task':receipt['task_id'],'dispatch_entered':True}
-            self.store.bind_hybrid_cpu_unit_control(self)
+            getattr(self.store,self._store_bind)(self)
             runtime._control_service=self
 
     def _pure(self):
         self.host._pure_identity();self.unit._pure_identity()
         if (self.host._unit(self.unit.lease) is not self.unit or self.runtime._control_service is not self or
-                self.store._hybrid_cpu_unit_control_service is not self):
+                getattr(self.store,self._store_slot) is not self):
             raise PermissionError('actual original CPU control required')
 
     def _operation(self):
@@ -100,9 +110,16 @@ class CpuUnitControlService(FixtureRuntimeControlService):
             raise PermissionError('original immutable CPU control operation required')
         return operation
 
+    def _check_final_authority(self,*,cleanup,attempt=None):
+        self._pure()
+        operation=getattr(self._local,'operation',None)
+        if operation is not None and self._operation_raw.get(id(operation))!=canonical(operation.command):
+            raise PermissionError('final immutable original Unit command required')
+        return super()._check_final_authority(cleanup=cleanup,attempt=attempt)
+
     def _unit_handoff(self,unit,version):
         self._pure();operation=self._operation()
-        if (unit is not self.unit or operation is None or operation.command['action']!='START_FIXED_CPU' or
+        if (unit is not self.unit or operation is None or operation.command['action']!=self._start_action or
                 operation.command['task_id']!=self.task_id or operation.lease is not unit.lease or
                 unit._request!={'idempotency_key':operation.command['command_id'],'expected_state_version':version} or
                 operation.command['expected_state_version']!=version):
@@ -110,15 +127,28 @@ class CpuUnitControlService(FixtureRuntimeControlService):
         self._check_authority(cleanup=False,attempt=self.runtime._leases[id(unit.lease)])
         return operation.command['command_id']
 
+    def _dispatch_entry(self,lease):
+        operation=self._operation()
+        if operation is None or operation.lease is not lease or operation.command['action']!=self._start_action:
+            raise PermissionError('actual issued original Unit Start required')
+
     def _accepting_command(self,attempt,phase,version):
         operation=self._operation()
-        if operation is not None and operation.command['action']=='CANCEL_FIXED_CPU_TRIAL':return None
-        return super()._accepting_command(attempt,phase,version)
+        if operation is not None and operation.command['action']==self._stop_action:return None
+        if operation is None or phase!='HANDOFF_UNKNOWN':return None
+        if (operation.lease is not attempt['lease'] or operation.command['task_id']!=attempt['origin']['task_id'] or
+                operation.command['action']!=self._start_action):
+            raise PermissionError('original Unit accepting command scope differs')
+        if operation.command['expected_state_version']!=version:raise Conflict('Unit command stale expected version')
+        self._check_authority(cleanup=False,attempt=attempt)
+        return operation.command
 
     def _check_fact(self,attempt,value):
         operation=self._operation()
-        if operation is not None and operation.command['action']=='CANCEL_FIXED_CPU_TRIAL':return
-        return super()._check_fact(attempt,value)
+        if operation is not None and operation.command['action']==self._stop_action:return
+        if operation is not None and (operation.lease is not attempt['lease'] or
+                value['request']['fixture_runtime'].get('start_command')!=operation.command):
+            raise Conflict('Unit original command retained phase differs')
 
     @contextmanager
     def _source_errors(self):
@@ -129,21 +159,21 @@ class CpuUnitControlService(FixtureRuntimeControlService):
     def receipt(self,command_id):
         validate_schema(ID,command_id)
         with self._source_errors(),self.reader.snapshot() as (db,meta):
-            read=ReadBudget(db,16*1024**2);value=read.object(SECTION,command_id)
+            read=ReadBudget(db,16*1024**2);value=read.object(self._stop_domain.SECTION,command_id)
             source=db.execute('SELECT event_type FROM events WHERE idempotency_key=?',(command_id,)).fetchone()
             if value is None and source is not None:
                 from .hybrid_budget_ledger import EVENT as budget_event
-                if (source[0]==EVENT or source[0]!=budget_event or
+                if (source[0]==self._stop_domain.EVENT or source[0]!=budget_event or
                         read.object(BUDGET[0],self._source_key(command_id)) is None):
                     raise Conflict('CPU command original projection/source missing or differs')
             if value is not None:
-                validate_record(command_id,value)
+                self._stop_domain.validate_record(command_id,value)
                 original=self.reader._point(db,read,value['registration_key'],meta['as_of_state_version'])
-                validate_links(value,lambda s,k:original if (s,k)==(BUDGET[0],value['registration_key']) else None)
+                self._stop_domain.validate_links(value,lambda s,k:original if (s,k)==(BUDGET[0],value['registration_key']) else None)
                 if (any(value['request'][k]!=meta[k] for k in ('project_id','data_mode','store_epoch')) or
                         value['accepted_state_version']>meta['as_of_state_version'] or
-                        self.store._cpu_unit_stop_event(db,command_id,_read=read)!=
-                        ((EVENT,'hybrid-core',digest(value),value['accepted_state_version']),[(SECTION,command_id,digest(value))])):
+                        getattr(self.store,self._store_proof)(db,command_id,_read=read)!=
+                        ((self._stop_domain.EVENT,'hybrid-core',digest(value),value['accepted_state_version']),[(self._stop_domain.SECTION,command_id,digest(value))])):
                     raise Conflict('CPU stop intent whole original source differs')
                 request=value['request']
                 return {'schema_version':'1.1','command_id':command_id,'action':request['action'],'status':'ACCEPTED',
@@ -169,8 +199,8 @@ class CpuUnitControlService(FixtureRuntimeControlService):
         registration=self.reader._point(db,guard.read,value['registration_key'],value['acceptance_expected_state_version'])
         if canonical(registration)!=canonical(self._registration):
             raise Conflict('CPU stop original whole registration changed')
-        if ([(s,k,v) for s,k,v in payload['put'] if k]!=[(SECTION,fact_key(value['request']),value)] or
-                inputs!=event_inputs(value) or db.execute('SELECT version FROM projection_meta WHERE singleton=1').fetchone()[0]!=
+        if ([(s,k,v) for s,k,v in payload['put'] if k]!=[(self._stop_domain.SECTION,self._stop_domain.fact_key(value['request']),value)] or
+                inputs!=self._stop_domain.event_inputs(value) or db.execute('SELECT version FROM projection_meta WHERE singleton=1').fetchone()[0]!=
                 value['acceptance_expected_state_version']):
             raise Conflict('CPU stop exact accepting mutation required')
 
@@ -200,9 +230,9 @@ class CpuUnitControlService(FixtureRuntimeControlService):
                 guard=_StopGuard(self,db,read,auth_guard,value);self._stop_guards[id(guard)]=guard
                 commit_entered=False
                 try:
-                    payload={'format':2,'put':([[SECTION,'',{}]] if guard.lookup(SECTION,'') is None else [])+
-                        [[SECTION,key,value]],'delete':[],'details':None}
-                    self.store._commit(db,EVENT,key,payload,version,digest(value),'hybrid-core',event_inputs(value),_authorization=guard)
+                    payload={'format':2,'put':([[self._stop_domain.SECTION,'',{}]] if guard.lookup(self._stop_domain.SECTION,'') is None else [])+
+                        [[self._stop_domain.SECTION,key,value]],'delete':[],'details':None}
+                    self.store._commit(db,self._stop_domain.EVENT,key,payload,version,digest(value),'hybrid-core',self._stop_domain.event_inputs(value),_authorization=guard)
                     guard.check();commit_entered=True;db.commit()
                 except BaseException:
                     if not commit_entered:
@@ -217,8 +247,8 @@ class CpuUnitControlService(FixtureRuntimeControlService):
         # locks or IO precede the accepted emergency memory latch.
         self._pure();check_bytes(body,4096);body=json.loads(canonical(body))
         if type(body) is not dict:raise ValueError('closed CPU command object required')
-        validate_schema(BODY if body.get('action')=='CANCEL_FIXED_CPU_TRIAL' else CONTROL_BODY,body)
-        if body['action'] not in ('START_FIXED_CPU','CANCEL_FIXED_CPU_TRIAL'):
+        validate_schema(self._stop_domain.BODY if body.get('action')==self._stop_action else self._start_body,body)
+        if body['action'] not in (self._start_action,self._stop_action):
             raise Conflict('fixed CPU trial action required')
         validate_schema(ID,idempotency_key)
         if origin!=self.origin:raise PermissionError('same-origin CPU command required')
@@ -233,7 +263,7 @@ class CpuUnitControlService(FixtureRuntimeControlService):
                 entry=self._intents.get(key)
                 if entry is not None and (entry['hash'],entry['actor'],entry['task'])!=(command['request_hash'],access.principal.id,self.task_id):
                     raise Conflict('CPU command idempotency key reused')
-                if body['action']=='CANCEL_FIXED_CPU_TRIAL':self.unit._cancelled.set()
+                if body['action']==self._stop_action:self.unit._cancelled.set()
                 if entry is None:
                     if len(self._intents)>=32:raise Conflict('finite CPU command capacity reached')
                     self._intents[key]={'hash':command['request_hash'],'actor':access.principal.id,
@@ -258,10 +288,11 @@ class CpuUnitControlService(FixtureRuntimeControlService):
         if self._operation() is not None:raise Conflict('nested CPU command refused')
         self._local.operation=operation;command=operation.command
         try:
-            if command['action']=='CANCEL_FIXED_CPU_TRIAL':
+            if command['action']==self._stop_action:
                 receipt=self._accept_stop(command,operation.token,operation.csrf)
                 operation.accepted=True
                 self.unit.cancel()  # Strong original scoped cleanup, never global shutdown.
+                self._after_stop_cleanup()
                 return receipt
             self._session(operation.token,operation.csrf)
             existing=self.receipt(command['command_id'])
@@ -292,6 +323,9 @@ class CpuUnitControlService(FixtureRuntimeControlService):
         finally:
             self._local.operation=None;self._issued.pop(id(operation),None);self._operation_raw.pop(id(operation),None)
 
+    def _after_stop_cleanup(self):
+        pass
+
     def execute(self,body,*,token,csrf,origin,idempotency_key):
         return self.execute_prepared(self.prepare(body,token=token,csrf=csrf,origin=origin,idempotency_key=idempotency_key))
 
@@ -301,14 +335,18 @@ class CpuUnitControlService(FixtureRuntimeControlService):
         try:self._pure();available=True
         except PermissionError:available=False
         last=self.unit._last
-        status=(last['status'] if last is not None and last['fact']['accepted_state_version']<=value['as_of_state_version'] else None)
+        status=(last['status'] if last is not None and last.get('fact') is not None and last['fact']['accepted_state_version']<=value['as_of_state_version'] else None)
         return {**value,'control_api_installed':True,'original_owner_available':available,
-            'profile':'FIXED_CPU_PI_TRIAL_UNIT','last_sdk_status':status,
+            'profile':self._profile,'last_sdk_status':status,
             'cancel_requested':self.unit._cancelled.is_set(),'goal_completed':False,
             'independent_review_status':'NOT_PERFORMED'}
 
 
-def install(app,services,projects,auth,*,origin,max_jobs):
+class CpuUnitControlService(_OriginalUnitControl):
+    """Exact registered CPU profile; original persisted domain is unchanged."""
+
+
+def _install_units(app,services,projects,auth,*,origin,max_jobs,service_type,path,start_action,stop_action,state_prefix):
     from pathlib import Path
     from fastapi import Request
     from fastapi.responses import JSONResponse
@@ -318,14 +356,14 @@ def install(app,services,projects,auth,*,origin,max_jobs):
     if len(services)>128:raise ValueError('too many CPU unit controls')
     for key,service in services.items():
         project=projects.get(key)
-        if (type(service) is not CpuUnitControlService or project is None or service.auth is not auth or
+        if (type(service) is not service_type or project is None or service.auth is not auth or
                 service.origin!=origin or (key,project.data_mode)!=(service.project_id,'fixture') or
                 service.store.root!=Path(project.root).resolve(strict=True)):
             raise ValueError('original CPU unit startup control binding required')
         service._pure()
         with service.reader.snapshot():pass
     starts,stops=ControlPool(max_jobs),ControlPool(2)
-    app.state.cpu_unit_start_pool,app.state.cpu_unit_stop_pool=starts,stops
+    setattr(app.state,state_prefix+'_start_pool',starts);setattr(app.state,state_prefix+'_stop_pool',stops)
     original_lifespan=app.router.lifespan_context
     @asynccontextmanager
     async def lifespan(current):
@@ -362,7 +400,7 @@ def install(app,services,projects,auth,*,origin,max_jobs):
         if isinstance(exc,(ValueError,ProtocolError)):return error_response(ControlError(400,'VALIDATION_ERROR','closed CPU unit request required'))
         return error_response(ControlError(503,'UNKNOWN_EXECUTION','CPU command outcome unavailable',True))
 
-    @app.get('/api/v1/projects/{project_id}/cpu-unit')
+    @app.get('/api/v1/projects/{project_id}/'+path)
     async def profile(request:Request,project_id:str):
         try:
             if request.query_params:raise ValueError('closed CPU unit query required')
@@ -372,7 +410,7 @@ def install(app,services,projects,auth,*,origin,max_jobs):
             return JSONResponse(result)
         except Exception as exc:return failure(exc)
 
-    @app.get('/api/v1/projects/{project_id}/cpu-unit/commands/{command_id}')
+    @app.get('/api/v1/projects/{project_id}/'+path+'/commands/{command_id}')
     async def receipt(request:Request,project_id:str,command_id:str):
         try:
             if request.query_params:raise ValueError('closed CPU receipt query required')
@@ -383,7 +421,7 @@ def install(app,services,projects,auth,*,origin,max_jobs):
             return JSONResponse(result)
         except Exception as exc:return failure(exc)
 
-    @app.post('/api/v1/projects/{project_id}/cpu-unit/commands')
+    @app.post('/api/v1/projects/{project_id}/'+path+'/commands')
     async def commands(request:Request,project_id:str):
         try:
             if project_id in services:services[project_id]._pure()  # BEFORE inherited Auth/executor locks.
@@ -398,9 +436,15 @@ def install(app,services,projects,auth,*,origin,max_jobs):
             service,token=authorize(request,project_id,write=True)
             operation=service.prepare(payload,token=token,csrf=request.headers['x-csrf-token'],origin=origin,
                                       idempotency_key=request.headers.get('idempotency-key'))
-            pool=stops if operation.command['action']=='CANCEL_FIXED_CPU_TRIAL' else starts
+            pool=stops if operation.command['action']==stop_action else starts
             try:result=await pool.run(lambda:service.execute_prepared(operation))
             except ControlError:
                 service.discard_unsubmitted(operation);raise
             return JSONResponse(result,status_code=202)
         except Exception as exc:return failure(exc)
+
+
+def install(app,services,projects,auth,*,origin,max_jobs):
+    return _install_units(app,services,projects,auth,origin=origin,max_jobs=max_jobs,
+        service_type=CpuUnitControlService,path='cpu-unit',start_action='START_FIXED_CPU',
+        stop_action='CANCEL_FIXED_CPU_TRIAL',state_prefix='cpu_unit')
