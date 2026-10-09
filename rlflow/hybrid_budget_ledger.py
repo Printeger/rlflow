@@ -274,7 +274,11 @@ def validate_links(value,lookup,*,current=False):
     cr=value['controller'];control=lookup(CONTROLLER[0],cr['fact_key'])
     if control is None:raise Conflict('budget original controller missing')
     controller_record(CONTROLLER[0],cr['fact_key'],control);control_request=control['request']
-    cleanup=request['action'] in ('FIXTURE_RUNTIME_STOP_REQUESTED','FIXTURE_RUNTIME_FIXTURE_SCOPE_STOPPED')
+    # ACK is an original observation of an already durably released fixed
+    # participant, not a new execution grant. Its actual Source/nonce witness
+    # is mandatory in the protected writer even after permission TTL expires.
+    cleanup=request['action'] in ('FIXTURE_RUNTIME_STOP_REQUESTED','FIXTURE_RUNTIME_FIXTURE_SCOPE_STOPPED',
+                                 'FIXTURE_RUNTIME_STARTED_AS_OBSERVED')
     if (cr!={'fact_key':controller_key(control_request),'fact_hash':digest(control),
              'controller_epoch':control['controller_epoch'],'head_revision':control['head_revision']} or
             any(control_request[name]!=request[name] for name in ('project_id','data_mode','store_epoch')) or

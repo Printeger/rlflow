@@ -1,0 +1,114 @@
+Checkpoint46 — original human authorized fixed CPU execution/STOP HTTP slice
+Base06e24e8592107df0deb695d1ffab1cd6cb081159 (45 actual committed).
+Root sole writer; existing High independent agent readonly incremental review.
+No paid model/GPU/native execution/candidate/delegation/production migration/push.
+No whole-Goal, arbitrary-tree, general PRD commands or full UI completion claim.
+
+Actual delivery:
+Original HANDOFF_UNKNOWN/STOP_REQUESTED phase CAS + closed command in ONE COMMIT;
+same fixture epoch/actor/client-key idempotency, original whole source receipt;
+Start retry only receipt, never resumes UNKNOWN Popen/G; Stop original-cap safety
+continuation after known durable lost-return, no new command or copied capability.
+Issued operator guard at actual Store BEGIN/writer/final COMMIT/Popen/G; STOP after
+acceptance independent of later session expiry; original post-G ACK observation
+not a new grant. Bound original owner cannot bypass command via direct start.
+Real loopback disconnect -> original retry -> ONE Popen -> human Stop/reap/FD/free.
+Actual Stop reserved capacity and original Pool lock wait exercised.
+UNKNOWN/runtime/current and invoice/native/general-tree gaps remain explicit.
+
+Every suite serial, PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest.
+No source/test edits during each live suite; actual original session terminal
+checked, not inferred from log tail. No duplicate Full44/independent suite.
+
+smoke r1 argv: -q tests/test_hybrid_fixture_runtime_control.py --disable-warnings
+original77616 terminal1545bf exit0: 1pass1warning17.28s.
+audit/checkpoint-46-control-smoke-r1.log
+sha256 38cb7def2dc6ab1c8fd64deeeff69349a41afba5ae9e0bb61f6698eca17489ba
+
+boundaries r1 argv: -q tests/test_hybrid_fixture_runtime_control.py -k 'not actual_human' --disable-warnings
+original84745 terminal95674b exit1: 6pass2fail1des1warning90.08s.
+Failure1 test bearer defaultTTL300 incompatible with actual fixture AuthTTL100;
+fixed explicit60 (test only). Failure2 bound direct already-released start took
+observation-only shortcut; added exact issued Start entry requirement, no bypass.
+audit/checkpoint-46-control-boundaries-r1.log
+sha256 5f36fdd7a40558fca07652fa4e83a5257deccdce101255baaaf289acc3b5d209
+
+High production MUST1: retained failed acceptance raw must match actual original
+command/actor/key, not committed by another operation. Fixed retained/raw guard
+exact binding, no raw overwrite, original rightful retry only.
+High production MUST2: original accepted STOP lost-return must have reachable
+original-cap safety continuation via same key, not permanently receipt-only.
+Fixed whole acceptance proof + actual retained lease/current stop_command, then
+finite cleanup only; current unknown identity cannot imply terminal/refund.
+
+acceptance repair r1 argv: -q tests/test_hybrid_fixture_runtime_control.py -k 'scope_auth or post_g or retained_failed or original_http_stop' --disable-warnings
+original84037 terminalbc6f12 exit1: 2pass3fail7des1warning3teardownerrors56.10s.
+Root patch wrongly inserted variable command before its definition in _write_phase;
+same root cause in retained retry and terminal retry teardown. Waited actual end;
+fixed exact placement in _append_phase + _write_phase original _check_fact, no
+blind unchanged rerun and no production permission/TTL increase.
+audit/checkpoint-46-acceptance-repair-r1.log
+sha256 9049a5ff44c2ed1277b0b411d3500e97a726073fea7b69e788483e0a8bf80878
+
+acceptance repair r2 argv: -q tests/test_hybrid_fixture_runtime_control.py -k 'post_g or retained_failed or original_http_stop' --disable-warnings
+original43645 terminal4982b1 exit0: 4pass8des1warning59.74s.
+Actual original post-G ACK after session/controller expiry; differentkey/actor
+failed raw deny then rightful retry; project STOP COMMIT and Pool STOP COMMIT lost
+return each recovered through same HTTP key to actual reap/FD/FREE.
+audit/checkpoint-46-acceptance-repair-r2.log
+sha256 7eee6e0ec7f31ba3555115063146087a2486c20a818b46a0d0e2ba4ad15ee2bf
+
+commit/capacity argv: -q tests/test_hybrid_fixture_runtime_control.py -k 'final_actual_accept or stop_reserved_lane' --disable-warnings
+original86160 terminal3c7594 exit0: 2pass12des1warning24.34s.
+Real final COMMIT session expiry rollback and STOP reserved lane while Start
+capacity fully occupied and actual Pool lock held, then original cleanup/free.
+audit/checkpoint-46-commit-capacity-r1.log
+sha256 309a604b3cf0047f857744bc65362ce3213c4c06b1a25bd376af9c027898a41f
+
+UNIQUE necessary eight-module integration argv:
+-q tests/test_hybrid_fixture_runtime_control.py tests/test_hybrid_fixture_runtime.py tests/test_hybrid_fixture_runtime_reads.py tests/test_hybrid_budget.py tests/test_hybrid_budget_ledger.py tests/test_hybrid_budget_service.py tests/test_hybrid_control_api.py tests/test_web_api.py --disable-warnings
+original47628 terminalf9ee2f exit0: 214pass2warning648.99s (10:48).
+218source/test inputs frozen; all SHA matched before any later lifecycle edit.
+audit/checkpoint-46-integration-r1.log
+sha256 587725b7a1850ae4c24da86991765d0b174e17f94780bcc28a1ca62438c78a65
+evidence/checkpoint-46-integration-inputs.sha256
+sha256 455811378709e704f8392adf5754d6db763b247dc658ffa7b8666bfe740dd82a
+
+Necessary lifecycle increment AFTER integration actual terminal, not during run:
+original invalid fork Runtime must deny BEFORE inherited Auth locks; known write
+HTTP route must deny BEFORE inherited warm executor queue, not only inside worker.
+Early checks supplement, never replace existing actual writer/effect checks.
+Only changed control.py and its test; other216integration inputs verified unchanged.
+Known fixture write boundary only; not claiming all Web/Auth fork-safe.
+
+cold fork r1 argv: -q tests/test_hybrid_fixture_runtime_control.py -k actual_fork --disable-warnings
+original72235 terminal9d0aea exit0: 1pass14des2warning14.62s.
+Direct Auth-before-runtime hang fixed; High found HTTP check still after queue.
+Added async route entry early deny + same case actual executor warm, no Full repeat.
+audit/checkpoint-46-fork-boundary-r1.log
+sha256 a1aad8073d7fa6ba3cb6f2742a7ba4793adc06124a0ef07bc6bfb54e476701df
+
+warm fork r2 SAME argv; original28798 terminal479cd0 exit0:
+1pass14des2warning14.71s. Actual another thread holds AuthLock, actual warm
+executor before os.fork; child direct and HTTP bounded deny, no SQL/Popen/G;
+actual waitpid -> reaped flag before status assertion; parent executor + actual
+Start/Stop/FREE still work. High fork narrow increment static no remaining MUST.
+audit/checkpoint-46-fork-boundary-r2.log
+sha256 de91c871104ba3e98916dd4d9fe4fed0194b73f0d78fe4487eb7966ff3ac144d
+
+Final218inputs evidence/checkpoint-46-final-inputs.sha256
+sha256 38fb064ab0901955b547a7dca23d2cdcbe662a5138dd7f61f7c239f95b48a384
+Delta final SHA:
+341effd4d691d1f77b6989d4ef92f3ea7aab24b385e91017764d0a9a5be37c15 rlflow/hybrid_fixture_runtime_control.py
+2d0cac4a1cd156c5574a737ca0a204cc89ff0bf191f1fe790b4818f3c1a1f22e tests/test_hybrid_fixture_runtime_control.py
+compileall rlflow/tests12ee9d exit0; pip checkc2836f exit0; diff5a912c exit0.
+15unique new control cases covered14in integration + final fork; not claiming
+post-fork fresh214full. Warnings retained, no new skip/suppression-based passing.
+
+USER lock unchanged/untracked/unstaged sha256
+becc7e2a36dfcad4ffe934b5ff2f0f68187611d6c0641bd63d81367651cfbf09
+Nonblocking explicit behavior gap: accepted START exception returns immediately
+and does not guarantee automatic later ACK observation; UNKNOWN remains truthful.
+Next: real frontend Task/API connection, truthful fixture controls/current/history
+and browser E2E, then remaining native/model/engineering/research/strict/long gates.
+No new external user decision blocker in current CPU/loopback scope.

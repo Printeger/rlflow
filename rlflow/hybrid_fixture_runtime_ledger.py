@@ -25,10 +25,42 @@ ORIGIN = obj({'task_id': ID, 'attempt_id': ID, 'lease_id': ID,
     'model_enabled': {'const': False}, 'candidate_write_enabled': {'const': False},
     'delegation_enabled': {'const': False}})
 nullable = lambda schema: {'oneOf': [schema, {'type': 'null'}]}
+CONTROL_BODY = obj({'action': enum('START_FIXED_CPU', 'STOP_FIXED_SCOPE'),
+    'task_id': ID, 'expected_state_version': COUNT})
+CONTROL_COMMAND = obj({**CONTROL_BODY['properties'], 'actor_id': ID,
+    'idempotency_key': ID, 'command_id': ID, 'request_hash': HASH})
 RUNTIME = obj({'phase': enum(*PHASES), 'origin': ORIGIN,
     'registration': nullable(REFERENCE), 'previous': nullable(REFERENCE),
     'producer': nullable(PROCESS), 'started_ack_sha256': nullable(HASH),
     'terminal_proof_sha256': nullable(HASH), 'wall_seconds': COUNT})
+# Optional only for compatibility with already persisted44 facts. A new
+# command appears only at its actual accepting phase, then remains immutable.
+RUNTIME['properties'].update(start_command=CONTROL_COMMAND, stop_command=CONTROL_COMMAND)
+
+
+def control_command_id(request, actor_id, client_key):
+    from .store import sha
+    return 'fixture_command_' + sha([request['project_id'], request['data_mode'],
+                                   request['store_epoch'], actor_id, client_key])
+
+
+def _control_links(request, old):
+    runtime = request['fixture_runtime']
+    for name, action, acceptance in (('start_command', 'START_FIXED_CPU', 'HANDOFF_UNKNOWN'),
+                                     ('stop_command', 'STOP_FIXED_SCOPE', 'STOP_REQUESTED')):
+        command = runtime.get(name); previous = None if old is None else old.get(name)
+        if previous is not None:
+            if command != previous: raise Conflict('fixture original control command changed')
+            continue
+        if command is None: continue
+        body = {key: command[key] for key in CONTROL_BODY['properties']}
+        if (runtime['phase'] != acceptance or command['action'] != action or
+                command['task_id'] != runtime['origin']['task_id'] or
+                command['expected_state_version'] != request['expected_state_version'] or
+                command['request_hash'] != digest(body) or
+                command['command_id'] != control_command_id(request, command['actor_id'], command['idempotency_key']) or
+                request['idempotency_key'] != command['command_id']):
+            raise Conflict('fixture control acceptance original CAS or scope differs')
 
 
 def phase(request):
@@ -41,6 +73,8 @@ def validate_runtime(request, prior):
     """Local one-way transition; live original provenance is a separate gate."""
     value = request['fixture_runtime']; validate_schema(RUNTIME, value)
     current = phase(request)
+    old = prior.get('fixture_runtime') if prior is not None else None
+    _control_links(request, old)
     if value['phase'] != current: raise Conflict('fixture runtime action/phase differs')
     if request['data_mode'] != 'fixture': raise Conflict('fixed CPU runtime is fixture only')
     if current == 'REGISTER_NO_HANDOFF':
@@ -55,7 +89,6 @@ def validate_runtime(request, prior):
         if amount['wall_seconds'] < 4 or any(n for k, n in amount.items() if k != 'wall_seconds'):
             raise Conflict('fixed CPU runtime requires wall-only finite reservation')
         return value
-    old = prior.get('fixture_runtime') if prior is not None else None
     if old is None or old['origin'] != value['origin']:
         raise Conflict('fixture runtime original task/attempt/lease differs')
     expected = {'key': prior['last_entry_key'], 'hash': prior['last_entry_hash']}

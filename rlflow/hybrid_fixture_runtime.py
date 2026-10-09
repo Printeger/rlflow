@@ -105,6 +105,7 @@ class FixtureRuntimeOwner:
             self.store, self.controller = plans.store, plans.controller
             self.process = dict(pool.process); self._live = True; self._lock = threading.RLock()
             self._attempts = {}; self._leases = {}; self._active = None
+            self._control_service = None
             self._safety_freeze = False
             self.program = Path(__file__).with_name('hybrid_runtime_fixture.py')
             # Exact protected program, not any caller command or plan rewriting.
@@ -182,14 +183,21 @@ class FixtureRuntimeOwner:
             return attempt['lease']
 
     @contextmanager
-    def _held(self):
+    def _held(self, db=None, *, cleanup=False):
         with (self.workspace._lock, self.workspace.working._lock, self.plans._lock,
               self.plans.installation._lock, self.plans.installation.builder._lock, self._lock):
-            yield
+            if db is None:
+                active = self.controller._token_active
+                db = None if active is None else active[0]
+            if self._control_service is None:
+                yield
+            else:
+                with self._control_service._borrow(db, cleanup=cleanup): yield
 
     def _fresh(self, db, read, attempt):
         """Independent post-registration guard; NEVER skip old PlanGuard."""
         self._actual(); self.pool.check(attempt['claim'])
+        if self._control_service is not None: self._control_service._check_authority(cleanup=False, attempt=attempt)
         if self._safety_freeze: raise Conflict('fixture runtime permanently frozen for physical cleanup')
         self.controller.check_token_in_transaction(db, attempt['token'], read)
         slot, record = self.workspace._issued(attempt['observation'])
@@ -224,6 +232,7 @@ class FixtureRuntimeOwner:
         if phase not in PHASES: raise Conflict('fixed fixture runtime phase required')
         original = attempt['entries'].get(phase)
         if original is not None:
+            if self._control_service is not None: self._control_service._check_fact(attempt, original)
             confirmed = self._confirm_entry(attempt, original)
             if confirmed is not None: return confirmed
         return self._new_entry(attempt, phase, cleanup=cleanup)
@@ -247,7 +256,8 @@ class FixtureRuntimeOwner:
         self._actual()
         if (type(phases) is not tuple or
                 not (len(phases) == 1 and phases[0] in PHASES or
-                     phases == ('PROCESS_REGISTERED', 'RELEASE_INTENT') and not cleanup)):
+                     phases == ('PROCESS_REGISTERED', 'RELEASE_INTENT') and not cleanup) or
+                cleanup and phases[0] not in ('STARTED_AS_OBSERVED', 'STOP_REQUESTED', 'FIXTURE_SCOPE_STOPPED')):
             raise PermissionError('only original single phase or fixed identity/release batch allowed')
         if self._active is not None: raise Conflict('nested fixture runtime writer refused')
         captured = attempt['ready']['source_context']
@@ -277,6 +287,8 @@ class FixtureRuntimeOwner:
                     raise Conflict('fixture runtime original clock regressed')
                 if not cleanup:
                     self._final_deadlines(self._active, now, mono)
+                elif self._control_service is not None:
+                    self._control_service._check_authority(cleanup=True)
 
             @contextmanager
             def transaction():
@@ -287,11 +299,14 @@ class FixtureRuntimeOwner:
                 else:
                     # Safety-only original cleanup cannot authorize new work;
                     # it remains possible after Controller/consent TTL expires.
-                    with self.store.lock(), self._held(), self.store.connect() as db:
+                    with self.store.lock(), self.store.connect() as db:
                         db.execute('BEGIN IMMEDIATE'); read = ReadBudget(db, PREPARATION_READ_BYTES)
-                        control = self.controller._original(db, captured['controller']['fact_key'], read)
-                        yield db, read, control
-                        final(); now, mono = self.controller._sample(); deadlines(now, mono); db.commit()
+                        with self._held(db, cleanup=True):
+                            control = self.controller._original(db, captured['controller']['fact_key'], read)
+                            yield db, read, control
+                            final(); now, mono = self.controller._sample(); deadlines(now, mono); db.commit()
+                            if self._control_service is not None:
+                                self._control_service._committed(attempt['entries'][phases[-1]])
             try:
                 with transaction() as (db, read, control):
                     for phase in phases:
@@ -313,7 +328,14 @@ class FixtureRuntimeOwner:
             reservation_id=captured['budget_reservation']['reservation_id'])
         goal, reservation, project = self.budget._heads(db, request, read, version)
         if reservation is None: raise Conflict('fixture runtime original Budget reservation missing')
+        command = (None if self._control_service is None else
+                   self._control_service._accepting_command(attempt, phase, version))
+        if command is not None: request['idempotency_key'] = command['command_id']
         original = attempt['entries'].get(phase)
+        if original is not None and command is not None:
+            name = 'start_command' if phase == 'HANDOFF_UNKNOWN' else 'stop_command'
+            if original['request']['fixture_runtime'].get(name) != command:
+                raise Conflict('fixture command idempotency differs from retained original acceptance')
         if original is None:
             prior = reservation.get('fixture_runtime')
             registration = (None if phase == 'REGISTER_NO_HANDOFF' else
@@ -326,6 +348,10 @@ class FixtureRuntimeOwner:
                 'started_ack_sha256': None if attempt['started_ack'] is None else digest(json.loads(attempt['started_ack'].raw)),
                 'terminal_proof_sha256': None if attempt['terminal'] is None else digest(attempt['terminal']),
                 'wall_seconds': 0 if attempt['terminal'] is None else attempt['terminal']['wall_seconds']}
+            for name in ('start_command', 'stop_command'):
+                if prior is not None and name in prior: runtime[name] = prior[name]
+            if command is not None:
+                runtime['start_command' if phase == 'HANDOFF_UNKNOWN' else 'stop_command'] = command
             request['fixture_runtime'] = runtime
             now, mono = self.controller._sample()
             if phase == 'REGISTER_NO_HANDOFF': decision, reason = 'HELD', 'FIXTURE_REGISTERED_NO_HANDOFF'
@@ -387,6 +413,8 @@ class FixtureRuntimeOwner:
                 not db.in_transaction or self._leases.get(id(guard.attempt['lease'])) is not guard.attempt):
             raise PermissionError('actual active original fixture runtime writer required')
         self._actual(); value = json.loads(guard.raw); request = value['request']
+        if guard.cleanup and request['fixture_runtime']['phase'] not in ('STARTED_AS_OBSERVED', 'STOP_REQUESTED', 'FIXTURE_SCOPE_STOPPED'):
+            raise PermissionError('only original ACK observation or safety cleanup may bypass new-work authority')
         if guard.attempt['entries'].get(request['fixture_runtime']['phase']) != value:
             raise Conflict('fixture runtime original retained phase differs')
         if request['fixture_runtime']['origin'] != guard.attempt['origin']:
@@ -422,6 +450,8 @@ class FixtureRuntimeOwner:
             if ack is None or ack is not attempt['started_ack'] or not attempt['release_entered']:
                 raise PermissionError('actual original gated child started observation required')
         if phase == 'FIXTURE_SCOPE_STOPPED': self._check_terminal(attempt)
+        if self._control_service is not None: self._control_service._check_authority(cleanup=guard.cleanup, attempt=attempt)
+        if self._control_service is not None: self._control_service._check_fact(attempt, value)
 
     def check_live_write(self, db, payload, inputs, guard):
         self.check_guard(db, guard); value = json.loads(guard.raw)
@@ -494,6 +524,7 @@ class FixtureRuntimeOwner:
             raise Conflict('fixture runtime sources expired at final actual boundary')
         _deadline(guard.bootstrap.inventory.deadline); _deadline(guard.plan_witness.deadline)
         self.pool._claim_clocks(attempt['claim_value'])
+        if self._control_service is not None: self._control_service._check_authority(cleanup=False)
 
     def _final_effect_gate(self, guard):
         # Controller actual process/STOP IO is LAST, then one exact final sample.
@@ -541,6 +572,7 @@ class FixtureRuntimeOwner:
 
     def start(self, lease):
         attempt = self._issued(lease)
+        if self._control_service is not None: self._control_service._dispatch_entry(lease)
         with self.pool._lock:
             current = self._current(attempt)['fixture_runtime']['phase']
             if current in ('STOP_REQUESTED', 'FIXTURE_SCOPE_STOPPED'):
@@ -567,7 +599,7 @@ class FixtureRuntimeOwner:
             current = self._current(attempt)['fixture_runtime']['phase']
             if ack is not None and current == 'RELEASE_INTENT':
                 attempt['started_ack'] = ack
-                self._write_phase(attempt, 'STARTED_AS_OBSERVED')
+                self._write_phase(attempt, 'STARTED_AS_OBSERVED', cleanup=True)
                 current = 'STARTED_AS_OBSERVED'
         return {'lease_id': lease.id, 'phase': current, 'source': json.loads(receipt.raw),
                 'fixed_cpu_scope_only': True, 'native_execution_enabled': False,

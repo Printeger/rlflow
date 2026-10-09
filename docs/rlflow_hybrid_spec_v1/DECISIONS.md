@@ -1,5 +1,13 @@
 # 开发决策记录
 
+## Checkpoint46：命令接受与原 phase 同CAS，Start/Stop恢复策略不同
+
+不追加第二准备队列账本。保护fixture命令在原HANDOFF/STOP记录closedactor/key/bodyhash，首次phase同实际COMMIT，后续保持存在性和值不变；确定的Budget entry索引核whole原接受事实。fixture epoch命名空间明确独立于PRD通用commands，action/task/version不拆命名空间；202只ACCEPTED。retained raw失败不换actor/key重写或被新guard借用。
+
+Auth在实际StoreBEGIN/原Ownerlocks后借用，持有至COMMIT，Popen/G最后检查，不能HTTP预鉴权一次带过。已接受Stop仅凭原wholeSTOP+实际retainedlease/currentcommand继续安全收尾，允许期限后清理；Start重试只读原receipt，不继续UNKNOWN。ACK是原durableRelease/真实G/nonce/source观察，不是许可续期；例外phase限定三种，protected安全shutdown不伪造humancommand。
+
+断线worker容量跟actualFuture，STOP独立lane但遵守真实Pool锁，实际测试等待后释放，不声称无锁SLA。fork最小早拒在直接调用Auth前和已知POST异步入口队列前，原后检保留；cold测试暴露warmexecutor不足后只补该增量，没有再跑214集成。异常acceptedStart路径不保证自动观察ACK，UNKNOWN边界如实保留。
+
 ## Checkpoint45：先交付真实只读 Task 行为，控制独立保持 writer 权限边界
 
 不把历史Task移入legacy tasks/sessions，也不让GET调用poll产生STARTED事实。可信startup绑定registered fixture Store/epoch；索引reservation作为selector，输出真实owner生成Task/Attempt身份。whole原Budget event+derivedHEAD验证，最多七阶段历史时间线，无owner重建、PID采纳或执行cap。

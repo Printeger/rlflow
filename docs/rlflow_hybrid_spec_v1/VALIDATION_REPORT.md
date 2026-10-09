@@ -1,5 +1,7 @@
 # 需求包离线校验报告
 
+Checkpoint46 FINAL：实际HTTP人工Start/ACK/Stop/回收/FD关闭/wall/PoolFREE、原命令同phase/CAS、断线onePopen、末COMMIT/Popen/G权限、过期ACK观察/STOP清理、原Stop丢返回安全收尾及满Start容量/实际Pool锁等待均有可执行证据。唯一必要8模块集成原47628终态214pass2warning648.99s，218SHA aftermatch；之后仅两文件必要fork增量，原72235cold1pass14.62s、原28798warm1pass14.71s，其余216SHA未变、final218SHA和编译/依赖/diff0。High两生产MUST与fork残余静态关闭。首次6pass2fail和补丁位置2pass3fail+3error全部归档，未删测试/放宽TTL/权限/重复已过full或独立suite。见HYBRID_FIXTURE_CONTROL_API.md/evidence/checkpoint-46-final-tests.txt；不是post-forkfresh214full或完整Goal/native/任意树验收。下一实际前端/API/browser切片，正在提交46。
+
 Checkpoint45 FINAL：可调用实际fixture Task读取（列表/详情/原事件7阶段有限时间线），当前UNKNOWN/controlsfalse、不poll/不写/不接管，真实CPU运行/停止和自有loopback socket验证。首轮5pass/3夹具fail+2teardownerror68.70s保留，定向受影响3pass24.33s；High SQL单key字节/Conflict错误分类MUST修复后ONLY5pass40.96s。唯一六web模块必要回归158pass/1warning33.77s、216SHA全部一致、编译/依赖/diff通过，无重复44 full/独立测试。见HYBRID_FIXTURE_TASK_API.md与evidence/checkpoint-45-final-tests.txt。44已提交2b06d34；45正在提交。人工Start/Stop下一46，不能把只读交付当控制或完整Goal验收。
 
 Checkpoint44 FINAL：唯一full原61478实际exit0/chunk19e380，2160pass/32既有外部H1skip/1既有warning1751.73s，214冻结SHA after匹配；compileall/pipcheck/diff0。真实固定CPU scope的登记/进程身份/原ACK/可靠STOP及FD关闭/资源返还已验收，模型/native/候选写/任意执行树仍禁；实际wall-only消费不代表synthetic token或invoice结算。开发失败、High原MUST关闭与batch增量、完整来源SHA及唯一full证据见evidence/checkpoint-44-final-tests.txt。正在提交，完整Goal继续；下方LIVE为历史。
