@@ -1,5 +1,7 @@
 # 需求包离线校验报告
 
+Checkpoint45 FINAL：可调用实际fixture Task读取（列表/详情/原事件7阶段有限时间线），当前UNKNOWN/controlsfalse、不poll/不写/不接管，真实CPU运行/停止和自有loopback socket验证。首轮5pass/3夹具fail+2teardownerror68.70s保留，定向受影响3pass24.33s；High SQL单key字节/Conflict错误分类MUST修复后ONLY5pass40.96s。唯一六web模块必要回归158pass/1warning33.77s、216SHA全部一致、编译/依赖/diff通过，无重复44 full/独立测试。见HYBRID_FIXTURE_TASK_API.md与evidence/checkpoint-45-final-tests.txt。44已提交2b06d34；45正在提交。人工Start/Stop下一46，不能把只读交付当控制或完整Goal验收。
+
 Checkpoint44 FINAL：唯一full原61478实际exit0/chunk19e380，2160pass/32既有外部H1skip/1既有warning1751.73s，214冻结SHA after匹配；compileall/pipcheck/diff0。真实固定CPU scope的登记/进程身份/原ACK/可靠STOP及FD关闭/资源返还已验收，模型/native/候选写/任意执行树仍禁；实际wall-only消费不代表synthetic token或invoice结算。开发失败、High原MUST关闭与batch增量、完整来源SHA及唯一full证据见evidence/checkpoint-44-final-tests.txt。正在提交，完整Goal继续；下方LIVE为历史。
 
 Checkpoint44：27个新增本地用例逐项实际通过，首次真实原保护 Task/Attempt/FixtureLease→两库matching→固定gated CPU子进程→两事件原子identity/release→原nonce ACK→durable STOP/回收/FD完整关闭→wall-only结算/PoolFREE；不执行native/model/candidate write，任意进程树STOP=false。High来源/期限及新batch静态范围无剩余已确认MUST；唯一全量61478正在运行，全部214代码/测试输入冻结，尚无最终full结果或commit。完整失败/修复、实际session与证据见HYBRID_FIXTURE_RUNTIME.md/evidence/checkpoint-44-development-tests.txt。不是工程/科研/真实模型计费/M1/完整Goal完成。

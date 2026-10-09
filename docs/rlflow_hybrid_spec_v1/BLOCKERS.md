@@ -1,5 +1,7 @@
 # 阻塞与证据缺口
 
+45 FINAL：实际fixture Task只读API与源证明/有限时间线/真实loopback已交付，影响web回归158pass、216SHA/静态检查通过，High新增两MUST关闭。44 commit2b06d34；45正在提交，无live测试/新增外部决策阻塞。控制端到端尚待46（实际末边界human auth、durable CAS/idempotency、disconnect/STOP闭环），不是已完成。native/模型实际用量invoice/严格OS-data-network-candidate/任意树STOP、工程科研、UI长期与安装迁移的原缺口/权限保持；完整Goal继续。下方“正在提交44”及LIVE是历史。
+
 44 FINAL：固定CPU单参与者scope全量实际2160pass/32既有skip/1warning1751.73s，214SHA/静态/依赖检查通过，正在归档提交。无新增需要用户决定的外部阻塞。下一实际Task读桥与受权端到端Start/Stop API；native模型/可信真实token与invoice、严格OS/data/candidate/network和任意树STOP、工程科研闭环/安装迁移/长期/UI完整验收仍未完成，现有付费/GPU/系统配置/生产权限不变。下方LIVE是历史。
 
 44：固定CPU scope已经有真实原能力登记/两库matching/进程身份/原ACK/实际STOP回收/全部FD关闭与资源返还的27项本地证据；唯一full61478尚LIVE，未提交或宣称最终验收。它只执行PROTOCOL_CONFORMANCE，无native/model/candidate/delegation；SOURCE_ONLY synthetic token不结算，真实wall-only终态消费不代表模型invoice可信。下一缺口是实际Task读桥与受权端到端Start/Stop入口，仍未接Dashboard/通用调度。完整native严格OS/model/data、任意执行树STOP、工程科研任务、长期/浏览器/生产安装迁移验收仍欠缺，无新增需用户决策的外部阻塞；不擅自用paid/GPU/系统配置/生产状态。下方43“注册尚缺”为历史，不能覆盖44最新状态。

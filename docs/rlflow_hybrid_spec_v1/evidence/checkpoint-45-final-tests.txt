@@ -1,0 +1,62 @@
+Checkpoint 45 — actual fixture Task read API, not execution controls
+Base: 2b06d34b9082b67868f5b9ed8b2a7e5f07c56497 (Checkpoint44 committed).
+Single writer root; High existing independent agent readonly narrow safety review.
+No paid model, GPU, native CLI, production migration, push, or USER lock change.
+
+Actual delivery: opt-in fixture Task list/detail/bounded original-event timeline;
+same-project/epoch, original whole Budget events + indexed latest HEAD proof;
+current execution UNKNOWN and controls false; no GET poll/writes/owner adoption.
+Actual fixed CPU running/ACK/STOP facts and an owned loopback HTTP socket exercised.
+No frontend/native/engineering/research/general-tree/full-Goal completion claim.
+
+Serial suite environment: PYTEST_DISABLE_PLUGIN_AUTOLOAD=1, .venv/bin/python -m pytest.
+No duplicate original test/full suite or independent rerun. Source/test frozen in
+each live execution; source change only after prior session actual terminal.
+
+Development r1:
+argv: -q tests/test_hybrid_fixture_runtime_reads.py --disable-warnings
+original session 67404, actual terminal chunk 5a2871 exit1.
+5 passed, 3 failed, 2 warnings, 2 teardown errors, 68.70s.
+Failures: newly written test INSERT expected old 3-column projection; real table
+has5 columns. head/missing-head negative reader rejection was correct; restore
+fixture failed causing teardown errors. Fixed explicit columns and exact original
+SELECT * restoration, not production changes or trigger weakening.
+audit/checkpoint-45-reads-r1.log
+sha256 7889bdcf98cb990da47143a22358f664f659b35d102c4b143daa3343241753c2
+
+Test-only repair:
+argv: -q tests/test_hybrid_fixture_runtime_reads.py -k 'sparse or (corruption and not event)' --disable-warnings
+original session38180 actual terminal chunk bd0f40 exit0.
+3 passed, 5 deselected, 1 warning, 24.33s. Only affected cases rerun.
+audit/checkpoint-45-reads-repair-r1.log
+sha256 a51b638beae89ce70a47e4b5e317980bdf0e419c3201027b40bb97ce0185fbdf
+
+Independent incremental review MUSTs closed in source:
+Conflict(ValueError subclass) must become sanitized503 before bad-query400;
+SQL scan/peek keys limited to text/160 UTF8 bytes before fetching/ID validation.
+New route bad-source negative cases + 2MiB key and post-read revoke cover fixes.
+No independent test execution and no repeat review of unchanged Runtime44.
+argv: -q tests/test_hybrid_fixture_runtime_reads.py -k 'corruption or sql_key or sparse' --disable-warnings
+original session45249 actual terminal chunk 3cca44 exit0.
+5 passed, 4 deselected, 1 warning, 40.96s. Nine unique new cases covered by
+development+affected repair/boundary runs; not claiming a fresh nine-case full.
+audit/checkpoint-45-source-boundaries-r1.log
+sha256 8579a6ed5fe10ecd11fc58b88bfa4ca6677284ff56b5c8b9fb2d06af0ad05f9e
+
+Necessary affected web/auth/read/control/config regression ONCE:
+argv: -q tests/test_web_api.py tests/test_web_auth.py tests/test_web_local.py tests/test_hybrid_reads.py tests/test_hybrid_control_api.py tests/test_web_control_config.py --disable-warnings
+original session66189 actual terminal chunk da615d exit0.
+158 passed, 1 existing warning, 33.77s. No new skip/full44 repeat.
+audit/checkpoint-45-web-regression-r1.log
+sha256 95283a899c79dd9b63a4b97952d032366130407c5fc82d73f862cbb2d4640d25
+
+216 source/test inputs frozen before regression; after sha256sum -c all match.
+evidence/checkpoint-45-inputs.sha256 identical to audit/checkpoint-45-inputs.sha256
+sha256 814062c097171cf88afa4f351a7386a557a7dbaf5ffc2ebc32c7dedf12dd37bb
+compileall rlflow tests, pip check, git diff --check successful.
+USER package-lock.json remains untracked/unstaged/unchanged:
+sha256 becc7e2a36dfcad4ffe934b5ff2f0f68187611d6c0641bd63d81367651cfbf09
+
+Next46: actual human-authorized Start/Stop, durable CAS/idempotency/receipt,
+live-session checks at real COMMIT/Popen/G, accepted STOP safety continuation,
+disconnect/race/UNKNOWN/no-adoption boundaries. No external decision blocker yet.

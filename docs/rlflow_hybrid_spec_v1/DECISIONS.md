@@ -1,5 +1,11 @@
 # 开发决策记录
 
+## Checkpoint45：先交付真实只读 Task 行为，控制独立保持 writer 权限边界
+
+不把历史Task移入legacy tasks/sessions，也不让GET调用poll产生STARTED事实。可信startup绑定registered fixture Store/epoch；索引reservation作为selector，输出真实owner生成Task/Attempt身份。whole原Budget event+derivedHEAD验证，最多七阶段历史时间线，无owner重建、PID采纳或执行cap。
+
+只读项目事实不能证明当前进程/PoolFREE，因此display recorded_phase但current UNKNOWN、controlsfalse、resource_release NOT_OBSERVED。source_coverage只指原Budget事件核验，不冒充全量audit/current authority。列表按扫描reservation游标前进，SQL侧限制单key字节且验证peek；坏来源与坏用户查询分别503/400。45已经是可实际调用、具有loopback证据的读取交付，不是仅增加准备组件。Start/Stop拆到46，必须在真实writer/COMMIT/Popen/G核人工会话，保留durable命令receipt与UNKNOWN边界，不能用HTTP预鉴权代替；验收标准未缩减。
+
 ## Checkpoint44：固定真实执行 scope，不改写 native 计划
 
 原 WorkingPlan READY 提供来源上下文，不把它的 argv 偷换成 CPU 程序然后称 native 执行。保护 startup 固定独立 PROTOCOL_CONFORMANCE profile/program SHA；原 owner 派生并持久化Task/Attempt/FixtureLease，所有模型/候选写/native delegation继续禁。只结算真实owner mono wall；fixture tokens及invoice保持UNKNOWN。
