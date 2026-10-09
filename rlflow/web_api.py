@@ -62,7 +62,8 @@ class Project:
 
 def create_app(projects, auth, *, origin="http://127.0.0.1:8765", max_streams=8, stream_options=None,
                control_services=None, max_control_jobs=4, fixture_task_readers=None,
-               fixture_runtime_services=None,cpu_assessment_readers=None,candidate_output_readers=None):
+               fixture_runtime_services=None,cpu_assessment_readers=None,candidate_output_readers=None,
+               fixed_unit_telemetry=None):
     parsed = urlsplit(origin)
     if parsed.scheme not in {"http", "https"} or not parsed.netloc or parsed.path or parsed.query or parsed.fragment or parsed.username:
         raise ValueError("origin must be a canonical HTTP origin")
@@ -73,6 +74,15 @@ def create_app(projects, auth, *, origin="http://127.0.0.1:8765", max_streams=8,
     if len(registry) != len(projects) or len(registry) > 128 or any(p.data_mode not in {"live", "fixture"} for p in projects):
         raise ValueError("invalid project registry")
     app = FastAPI(docs_url=None, redoc_url=None, openapi_url=None)
+    from .hybrid_resource_telemetry import FixedUnitTelemetry
+    fixed_unit_telemetry = dict(fixed_unit_telemetry or {})
+    for key, observer in fixed_unit_telemetry.items():
+        project = registry.get(key)
+        if (type(observer) is not FixedUnitTelemetry or project is None or
+                (observer.project_id,observer.data_mode,str(observer.root)) !=
+                (key,project.data_mode,str(Path(project.root).resolve(strict=True)))):
+            raise ValueError('original telemetry startup project binding required')
+        observer._original()
     active_streams = 0
 
     app.add_middleware(SameOriginBoundary, origin=origin, host=parsed.netloc,
@@ -103,6 +113,9 @@ def create_app(projects, auth, *, origin="http://127.0.0.1:8765", max_streams=8,
             raise HTTPException(503, "observation source unavailable") from None
         if head["project_id"] != project_id or head["data_mode"] != project.data_mode:
             raise HTTPException(503, "observation identity mismatch")
+        if (project_id in fixed_unit_telemetry and
+                head['cursor'].rsplit(':',1)[0] != fixed_unit_telemetry[project_id].store_epoch):
+            raise HTTPException(503, 'observation identity mismatch')
         return reader
 
     async def read(call, **kwargs):
@@ -180,6 +193,12 @@ def create_app(projects, auth, *, origin="http://127.0.0.1:8765", max_streams=8,
     @app.get("/api/v1/projects/{project_id}/telemetry")
     async def telemetry(request: Request, project_id: str):
         reader = await reader_for(request, project_id)
+        if project_id in fixed_unit_telemetry:
+            value = await read(fixed_unit_telemetry[project_id].latest)
+            _, _, current = access(request)  # Recheck after optional source IO.
+            if not current.principal.allows(project_id):
+                raise HTTPException(404, 'project not found')
+            return value
         return await read(reader.telemetry)
 
     @app.get("/api/v1/projects/{project_id}/domain-events/{event_id}")
@@ -216,6 +235,8 @@ def create_app(projects, auth, *, origin="http://127.0.0.1:8765", max_streams=8,
             active_streams -= 1
 
         response = LiveStream(reader, request.headers.get("last-event-id", after), authorized, release,
+                              telemetry_query=(fixed_unit_telemetry[project_id].latest
+                                               if project_id in fixed_unit_telemetry else None),
                               **(stream_options or {}))
         active_streams += 1
         return response

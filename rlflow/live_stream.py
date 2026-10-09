@@ -34,7 +34,8 @@ class LiveStream(Response):
     media_type = "text/event-stream"
 
     def __init__(self, reader, cursor, authorized, release_slot, *, poll=0.25,
-                 heartbeat=5.0, send_timeout=2.0, max_frames=32, max_bytes=4 * 1024 * 1024, telemetry_interval=1.0):
+                 heartbeat=5.0, send_timeout=2.0, max_frames=32, max_bytes=4 * 1024 * 1024, telemetry_interval=1.0,
+                 telemetry_query=None):
         if (type(max_frames) is not int or not 1 <= max_frames <= 32 or type(max_bytes) is not int
                 or not 1 <= max_bytes <= 4 * 1024 * 1024
                 or any(type(v) not in (int, float) or not math.isfinite(v) or v <= 0 for v in (poll, heartbeat, send_timeout))
@@ -47,6 +48,7 @@ class LiveStream(Response):
         self.poll, self.heartbeat, self.send_timeout = poll, heartbeat, send_timeout
         self.max_frames, self.max_bytes = max_frames, max_bytes
         self.telemetry_interval = telemetry_interval
+        self.telemetry_query = telemetry_query
 
     async def __call__(self, scope, receive, send):
         queue = asyncio.Queue(self.max_frames)
@@ -123,6 +125,12 @@ class LiveStream(Response):
                     value, issued, _ = pending_sample
                     pending_sample = None
                     try:
+                        if self.telemetry_query is not None:
+                            # Original memory-only provider can retire queued
+                            # observations after owner closure/cancellation.
+                            value = self.telemetry_query()
+                            issued = time.monotonic()
+                            if value is None: continue
                         data, closing = aged_sample(value,time.monotonic()-issued), False
                         if len(data)>min(65536,self.max_bytes):continue
                     except Exception:
@@ -146,7 +154,7 @@ class LiveStream(Response):
 
         async def samples():
             sample_id = None
-            query = getattr(self.reader,'telemetry',None)
+            query = self.telemetry_query or getattr(self.reader,'telemetry',None)
             if query is None:return
             while self.authorized():
                 try:

@@ -205,7 +205,7 @@ OBJECTS['LogBody']['allOf'] = [{
 
 
 MEASURE = nullable({'type':'number','minimum':0})
-RESOURCE_PROCESS = obj({'scope':{'const':'SUPERVISOR_PROCESS'},'status':enum('KNOWN','UNKNOWN'),
+RESOURCE_PROCESS = obj({'scope':enum('SUPERVISOR_PROCESS','FIXED_WORKER_PROCESS'),'status':enum('KNOWN','UNKNOWN'),
                         'cpu_seconds':MEASURE,'rss_bytes':nullable(COUNT)})
 RESOURCE_HEARTBEAT = obj({'status':enum('FRESH','STALE','UNKNOWN'),'counter':nullable(COUNT),'age_seconds':MEASURE})
 OBJECTS['Telemetry'] = obj({

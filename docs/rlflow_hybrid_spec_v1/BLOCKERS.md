@@ -1,5 +1,7 @@
 # 阻塞与证据缺口
 
+Checkpoint60 FINAL：实际HOST/原固定worker遥测已接入现有Dashboard；原owner关闭、STOP、样本到期/时钟退回均UNKNOWN，原slot单调退休不能复活。必要63 Python/15 Node/1 actualChrome和窄退休2case已实际终态通过，High无剩余确证MUST，证据见HYBRID_RESOURCE_TELEMETRY.md/evidence/checkpoint-60-final-tests.txt；59已提交5b1a305，60正在提交。没有新增需用户决定的权限或外部阻塞；下一本地认证原Unit执行/STOP接线可继续。仍不代表通用native/独立产品Reviewer、invoice、严格OS/全主机或任意树STOP、新安装迁移/B1/24hfixture/8hUI或完整Goal完成。用户paid/GPU/生产/锁文件边界保持，下方WIP均历史。
+
 59 FINAL：原3秒startup失败以无workerprofile定位重复Pool读闭包，在不延长任何watchdog/TTL下闭合，实际双项目与四边界通过。必要共享103pass/2warning1056.72s后，仅Host/test两file修两个已确认输入TOCTOU，另290inputs未变，定向2pass39.43s；最终292SHA/compile/pip/diff全通过，High增量无剩余确证MUST，无live tests，正在归档提交59。没有新增用户决定阻塞；actual SDK仍fixed scopes/受管fixture，仅STANDARD开发验证而非正式科研封存/产品Reviewer/通用native/全Goal/strictOS/任意树/invoice/安装迁移/24h8h验收。USERlock不改未stage，paid/GPU/生产边界保持；详HYBRID_HOST_EXECUTION.md，58已e527ed0。
 
 59 WIP：原共享池双项目放行超过固定3秒的开发失败已定位（一次writer6Poolcheck→18state/36runtime-source），不是外部权限阻塞。未延长看门狗/TTL，去除同只读事务重复完整校验、同start原物料图借用后，实际双项目正例原3440终35042d exit0 1pass60.94s通过；remaining boundary原20974 LIVE，必要回归/commit仍待，无新增需用户决定事项。该Host仅受管fixture fixed engineering/CPU原cap SDK，非调度器/全主机OS隔离/通用native/独立产品Reviewer/科研条件完成/invoice，原M0–M5、安装/迁移和24h/8h长期缺口保留。58实际e527ed0；paid/GPU/生产/USERlock边界不变。

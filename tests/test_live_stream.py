@@ -138,6 +138,35 @@ def test_queue_residence_recomputes_age_before_serializing(observed):
     assert parsed['workers'][0]['heartbeat']['age_seconds']==21
 
 
+def test_original_memory_provider_retires_queued_sample_before_actual_send(observed):
+    store,reader=observed;assert telemetry.sample(store);value=reader.telemetry()
+    value['workers']=[dict(execution_id='ref_'+'a'*64,process=dict(scope='FIXED_WORKER_PROCESS',status='KNOWN',cpu_seconds=.1,rss_bytes=4096),
+        heartbeat=dict(status='UNKNOWN',counter=None,age_seconds=None))]
+    closed=[False];reads=[]
+    def query():
+        reads.append(1);result=copy.deepcopy(value)
+        if closed[0]:
+            result['sample_seq']+=1;result['sample_id']=result['sampler_epoch']+':'+str(result['sample_seq'])
+            result['workers'][0]['process'].update(status='UNKNOWN',cpu_seconds=None,rss_bytes=None)
+        return result
+    async def run():
+        ended=asyncio.Event();messages=[]
+        async def receive():await ended.wait();return {'type':'http.disconnect'}
+        async def send(message):
+            if message['type']=='http.response.start':
+                await asyncio.sleep(.12);closed[0]=True
+            messages.append(message)
+            if b'event: telemetry' in message.get('body',b''):ended.set()
+        await asyncio.wait_for(LiveStream(Reader(0),'store_test:0',lambda:True,lambda:None,
+            telemetry_query=query,heartbeat=5,poll=.01,telemetry_interval=.1)({},receive,send),2)
+        return b''.join(m.get('body',b'') for m in messages)
+    body=asyncio.run(run());assert len(reads)>=2
+    frame=[f for f in body.split(b'\n\n') if b'event: telemetry' in f][0]
+    assert b'id:' not in frame
+    actual=json.loads(frame.split(b'data: ')[1]);assert actual['workers'][0]['process']['status']=='UNKNOWN'
+    assert actual['observed_at']==value['observed_at']
+
+
 def test_optional_send_serialization_failure_keeps_following_domain(observed,monkeypatch):
     from rlflow import live_stream
     from rlflow.hybrid_protocol import ProtocolError

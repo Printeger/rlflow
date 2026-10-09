@@ -26,7 +26,8 @@ export function checkTelemetry(v,scope) {
   const seen = new Set();
   for (const w of v.workers) {
     need(closed(w,['execution_id','process','heartbeat']) && opaque(w.execution_id) && !seen.has(w.execution_id));seen.add(w.execution_id);
-    metric(w.process,'SUPERVISOR_PROCESS',['cpu_seconds','rss_bytes']);
+    need(['SUPERVISOR_PROCESS','FIXED_WORKER_PROCESS'].includes(w.process.scope));
+    metric(w.process,w.process.scope,['cpu_seconds','rss_bytes']);
     const h = w.heartbeat;
     need(closed(h,['status','counter','age_seconds']) && ['FRESH','STALE','UNKNOWN'].includes(h.status));
     need(h.status==='UNKNOWN' ? h.counter===null && h.age_seconds===null : count(h.counter) && h.counter>0 && finite(h.age_seconds) && (h.status==='FRESH')===(h.age_seconds<=15));
@@ -34,7 +35,7 @@ export function checkTelemetry(v,scope) {
   return v;
 }
 export class TelemetryView {
-  constructor(scope) {this.scope=scope;this.value=null;this.received=null;this.retired=new Set();this.barrier=scope.sourceVersion || 0;need(count(this.barrier));}
+  constructor(scope) {this.scope=scope;this.value=null;this.received=null;this.retired=new Set();this.barrier=scope.sourceVersion || 0;this.fixedBarrier=this.barrier;need(count(this.barrier));}
   accept(value,now) {
     need(finite(now));checkTelemetry(value,this.scope);
     const old = this.value;
@@ -56,13 +57,18 @@ export class TelemetryView {
     // late frames may introduce workers absent from the previous batch.
     if (ids.length) this.barrier=Math.max(this.barrier,version);
   }
+  invalidateFixedWorkers(version) {need(count(version));this.fixedBarrier=Math.max(this.fixedBarrier,version);}
   current(now) {
     if (!this.value) return null;
     need(finite(now) && now>=this.received);
     const v=structuredClone(this.value), elapsed=(now-this.received)/1000;
     v.sample_age_seconds+=elapsed;v.freshness=v.sample_age_seconds<=15?'FRESH':'STALE';
+    if (v.freshness==='STALE') for (const metric of Object.values(v.host)) {
+      metric.status='UNKNOWN';for (const key of Object.keys(metric)) if (!['scope','status'].includes(key)) metric[key]=null;
+    }
     for (const w of v.workers) {
-      if (v.source_state_version===null || v.source_state_version<this.barrier) {w.process.status='UNKNOWN';w.process.cpu_seconds=null;w.process.rss_bytes=null;w.heartbeat={status:'UNKNOWN',counter:null,age_seconds:null};}
+      if (v.freshness==='STALE') {w.process.status='UNKNOWN';w.process.cpu_seconds=null;w.process.rss_bytes=null;}
+      if (v.source_state_version===null || v.source_state_version<(w.process.scope==='FIXED_WORKER_PROCESS'?this.fixedBarrier:this.barrier)) {w.process.status='UNKNOWN';w.process.cpu_seconds=null;w.process.rss_bytes=null;w.heartbeat={status:'UNKNOWN',counter:null,age_seconds:null};}
       else if (w.heartbeat.status!=='UNKNOWN') {w.heartbeat.age_seconds+=elapsed;w.heartbeat.status=w.heartbeat.age_seconds<=15?'FRESH':'STALE';}
     }
     return v;

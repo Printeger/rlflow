@@ -1,5 +1,7 @@
 # 开发决策记录
 
+Checkpoint60：复用既有Telemetry/OS sources/SSE/资源UI，原Host+Unit强能力显式采样，不另起后台Supervisor；HTTP/SSE只读原内存slot，不采样/Pool.check/poll/collect/写domain。单observer/原项目root/epoch启动匹配；FIXED_WORKER_PROCESS兼容旧SUPERVISOR_PROCESS，实际进程资源不冒充ACK/计费/整树。Pool→Runtime→Source非等待采样锁，独立短_read_lock只保护内存年龄高水位与退休0→1→2。4n实际sample/+1进程撤回/+2全owner撤回保留原UTC/version/年龄，不冒充新采样或续鲜。High旧slot时钟回退复活MUST已闭合；仅actual新OS采样可重置。固定worker对所有新project domain版本保守失效；15s stale数值置UNKNOWN。Browser shutdown写STOP是显式动作，不是GET副作用，测试基线区分，失败原日志保留。采样as-of不能证明未被owner发现的当前生存或OS硬限额，原验收与权限边界不变；详HYBRID_RESOURCE_TELEMETRY.md。
+
 59 FINAL：上述有限同Pool原cap路由与最后门安全语义已通过实际闭环。补关闭SDK mutable-input竞态：exactdict先snapshot再所有keys/ID/actual-int/COUNT验证；exacttuple/list捕获≤4项tuple后校验1–3、只遍历此快照，防校验后caller修改/追加；两非执行routing hook定向通过，明确不当实际worker证据。必要共享原35877实际103pass/2warning；后仅Host/test变动且290其余inputs不变，故不重复共享回归；最后292SHA/compile/pip/diff通过/High无剩余确证MUST。原物理worker和跨项目实际证据取positive-r6与boundary-r1，不靠线程数或mock计数冒充。59正在归档提交，原完整M0–M5与所有权限边界不缩。
 
 59：有限Host只绑定同actual Pool中已发行原Engineering/Cpu Unit，强singleton和原lease对象查找，closed批次≤3全量preflight（含原int64 CAS上界）后才submit，不跨效果/等待持Host/Pool锁。cancel_all取消immutable有限绑定快照：先对全部live原cap纯PID/registry检查+latch，再逐scope清理；随后绑定的新Unit不属于本次快照，未把此SDK冒充全Goal STOP/新授权域。启动性能修复依无worker1170万call剖析，不放宽期限：Pool.check只读空body在原BEGIN IMMEDIATE退出处一次fresh全局_state，原claim/占槽/物理/FD/末双clock/COMMIT后才返回，mutation/audit默认不变；Pool单事务≤3/≤1MiB exact-byte memo仅省schema/derived展开，原wholeevent每次读回；同start借原Prep/Plan/Bootstrap retained图，不缓存当前权限，各writer仍完整guard/原30秒总deadline，finally释放。实际正例已通过，边界及必要回归/归档仍待。

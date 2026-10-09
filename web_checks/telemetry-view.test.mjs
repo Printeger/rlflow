@@ -50,3 +50,17 @@ test('closed scope/status/bounds and malformed data are rejected without private
   const value=sample();value.host.memory.status='UNKNOWN';value.host.memory.total_bytes=null;value.host.memory.available_bytes=null;
   assert.equal(checkTelemetry(value,scope).host.memory.available_bytes,null);
 });
+test('fixed worker scope, all-domain barrier, retirement identity and sample expiry',()=>{
+  const value=sample();value.workers[0].process={scope:'FIXED_WORKER_PROCESS',status:'KNOWN',cpu_seconds:.2,rss_bytes:4096};
+  value.workers[0].heartbeat={status:'UNKNOWN',counter:null,age_seconds:null};
+  const view=new TelemetryView(scope);assert.ok(view.accept(value,0));
+  assert.equal(view.current(0).workers[0].process.status,'KNOWN');
+  view.invalidateFixedWorkers(2);assert.equal(view.current(1).workers[0].process.status,'UNKNOWN');
+  const newer=structuredClone(value);newer.sample_seq=2;newer.sample_id='sampler_test:2';newer.source_state_version=2;
+  assert.ok(view.accept(newer,2));assert.equal(view.current(2).workers[0].process.status,'KNOWN');
+  const old=view.current(16000);assert.equal(old.workers[0].process.status,'UNKNOWN');assert.equal(old.host.memory.status,'UNKNOWN');
+  const retired=structuredClone(newer);retired.sample_seq=3;retired.sample_id='sampler_test:3';
+  Object.assign(retired.workers[0].process,{status:'UNKNOWN',cpu_seconds:null,rss_bytes:null});
+  assert.ok(view.accept(retired,16001));assert.equal(view.current(16001).workers[0].process.status,'UNKNOWN');
+  assert.equal(view.accept(newer,16002),false);
+});

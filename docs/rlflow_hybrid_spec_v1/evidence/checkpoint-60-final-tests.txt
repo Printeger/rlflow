@@ -1,0 +1,99 @@
+Checkpoint60 FINAL development evidence (STANDARD, not full Goal acceptance)
+Base: 5b1a305 / hybrid-v1 / Python .venv 3.12 / Node18 / actual loopback Chrome.
+USER untracked package-lock.json unchanged and unstaged:
+becc7e2a36dfcad4ffe934b5ff2f0f68187611d6c0641bd63d81367651cfbf09
+
+Delivery: original Host/Unit-only explicit OS sampling → latest-only memory →
+authenticated existing telemetry GET/SSE → actual Dashboard resource area.
+Actual fixed CPU Popen before G had RSS11833344, HOST real CPU delta6.55892044563%,
+then one original CPU384 experiment finished; STOP/reap/source FD-close removes
+worker KNOWN; original owner shutdown removes HOST KNOWN. No invoice/enforcement
+claim; GPU/heartbeat UNKNOWN; no private path/PID/nonce/lease/token in DTO.
+HTTP sample/poll/collect/Pool.check/Store._commit/Popen.poll forbidden by test,
+wrong-project404, unauth401, revoke-during-read401, detached sample preserved.
+Per-slot age highwater and retirement0→1→2 never regress; only a new actual
+sample resets them. Read-side short memory lock contains no control locks/IO.
+
+All runs sequential, no duplicate live tests, edits only after actual terminals.
+Raw argv/stdout/stderr retained in audit/hybrid-v1/checkpoint-60-*.log; hashes
+archived in checkpoint-60-log-sha256.txt. No old CPU/engineering/regression
+or 2214/full54 evidence relabeled as fresh60.
+
+1. PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q -s
+   tests/test_hybrid_resource_telemetry.py --disable-warnings
+   > audit/hybrid-v1/checkpoint-60-resource-r1.log 2>&1
+   Original73959 terminalaa69a5 exit0: 2passed,1existingStarlettewarning44.02s.
+   Actual worker/HTTP/STOP; nonwaiting Pool lock/copy/scope/expiry/cancel.
+   Inputs-r1 all284 paths matched. Later Runtime/Source locks and retirement
+   changes are covered separately below, not claimed as a fresh full module.
+
+2. After original1 terminal only: nonblocking Pool→Runtime→Source sampling
+   coordination and HTTP final principal scope recheck added.
+   PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q -s
+   tests/test_hybrid_resource_telemetry.py::test_original_actual_cpu_worker_sample_HTTP_then_STOP_retirement
+   tests/test_telemetry.py tests/test_live_stream.py tests/test_web_api.py
+   tests/test_hybrid_protocol.py --disable-warnings
+   > audit/hybrid-v1/checkpoint-60-regression-r1.log 2>&1
+   Original18481 terminal8fc9ae exit0: 63passed,1existingwarning32.69s.
+   Inputs-r2 all284 paths matched during/after; includes queued original
+   memory-source retirement before actual SSE send, optional-source isolation,
+   old supervisor scope, telemetry/domain cursor and auth compatibility.
+
+3. node --test web_checks/telemetry-view.test.mjs web_checks/reducer.test.mjs
+   > audit/hybrid-v1/checkpoint-60-node-r1.log 2>&1
+   Terminaldc15b7 exit0: 15passed,112.903349ms.
+   Fixed-worker scope, all-domain causal barrier, stale HOST/process redaction,
+   retirement sequence, duplicate/late sample and old scope compatibility.
+
+4. node --test web_checks/resource-telemetry-browser.test.mjs
+   > audit/hybrid-v1/checkpoint-60-browser-r1.log 2>&1
+   Original5116 terminal3781af exit1: 1failed19.487579728s.
+   Failure at final version equality: expected[12,12], actual[14,12]. Explicit
+   private owner.shutdown correctly writes two STOP facts; incorrect test
+   compared post-shutdown GET to pre-shutdown baseline. Actual OS UI/SSE/close/
+   other project/refresh had reached this assertion; failure retained.
+   Fix ONLY browser assertion: sample versions equal pre-shutdown; shutdown
+   advances only first project; subsequent GET versions equal post-shutdown.
+   Same argv > audit/hybrid-v1/checkpoint-60-browser-r2.log 2>&1
+   Original85671 terminal2e35ad exit0: 1passed19.45583914s.
+   Inputs-r3 all284 matched. Real Chromium sandbox/headless/disable-gpu;
+   finite private two-project SDK fixture, HOST OS samples displayed via SSE,
+   new explicit sample update, owner-close UNKNOWN, other project unaffected,
+   reload cannot revive closed project, scope switch, logout clears resources;
+   no unauthorized HTTP writes/pageerrors. Browser fixture starts no worker;
+   actual KNOWN worker is proven in Python2, not fabricated for browser.
+
+5. Read-only independent High found old sample could revive after monotonic
+   issued+16→issued+1 because retirement wasn't retained. Only after4 actual
+   terminal: new short _read_lock/per-slot monotonic age+retirement state.
+   PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q -s
+   tests/test_hybrid_resource_telemetry.py::test_original_busy_expiry_copy_scope_and_cancel_latch_are_fail_closed
+   tests/test_hybrid_resource_telemetry.py::test_uncancelled_clock_regression_cannot_revive_retired_sample
+   --disable-warnings > audit/hybrid-v1/checkpoint-60-retirement-r1.log 2>&1
+   Original41522 terminal8396dd exit0: 2passed,1existingwarning33.65s.
+   Uncancelled16→1 and negative→positive never revive old id/KNOWN/age;
+   actual new OS sample restores newer4n; Pool/Runtime/Source busy acquire
+   drops immediately, cached reads/cancel latch never wait for those locks.
+   Inputs-r4 all284 matched. Only resource/test twofiles changed after2–4;
+   no repeat63/Node/Chrome unchanged areas. Composite3 new cases, not a fresh
+   full3-case module claim. Reviewer final same hashes and no confirmedMUST:
+   resource310b079466b7609dc870aa09072867d191db556c0f95f80aeecbd9f6e077821d
+   test883c0b708e5412b3df631a43cf87ac40f5689c4479fe9227f0a72c2037d3bddf
+   High review is development safety review, not product/scientific Reviewer.
+
+Final302 input paths union original59 dependency pins and60 freezes all match;
+manifestSHA7d46aa55341c10cf46a4432ace7d15eb3eebc3fe34bea9cb39347f36bc97b5d2.
+Original59 extra dependency paths unchanged; duplicate physical schema aliases
+are paths, not claimed as302 distinct physical files. Current freeze initially
+284 paths; all final affected source/tests covered in their relevant runs.
+compileall rlflow/tests/web_checks, pipcheck No broken requirements, JS syntax
+app/telemetry-view, gitdiffcheck all exit0 terminald66fed; final hashes checked.
+No live tests. No push, paid models, GPU, production changes or USER lock edits.
+No extra whole-suite/browser reruns absent affected changes.
+
+Remaining: common native runtime, independent product Reviewer, billing-source
+coverage, strict delegated OS limits/arbitrary process-tree STOP, host-wide
+legacy exclusion, installation/migration, B1/24h fixture/8h UI/full M0–M5.
+Next: connect original finite engineering/CPU once-only SDK execution and
+scope STOP to existing authenticated UI, without cold adoption/new grants or
+new Supervisor. No new user decision required for the current local slice.
