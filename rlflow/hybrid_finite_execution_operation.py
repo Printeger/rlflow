@@ -87,6 +87,7 @@ class _FiniteExecutionOperation:
 
     def _cleanup(self):
         """Only this lease's STOP/FDs; UNKNOWN never frees an unproved slot."""
+        self._disk_cleanup_complete = False
         attempt = self._actual()
         local_error = None
         try:
@@ -102,6 +103,7 @@ class _FiniteExecutionOperation:
             try: self._close_local_output(attempt)
             except Exception as exc: local_error = type(exc).__name__ + ': ' + str(exc)
         self.cleanup_error = local_error
+        self._disk_cleanup_complete = local_error is None
         return {'complete': local_error is None, 'error': local_error}
 
     def cancel(self):
@@ -123,6 +125,9 @@ class _FiniteExecutionOperation:
             if self._request is not None:
                 if self._request != request: raise Conflict('original execution unit request changed')
                 return self._resume()
+            self._check_operation()
+            from .hybrid_disk_admission import check_effect
+            check_effect(self.runtime, attempt)
             self._check_operation(); self._request = request
             try:
                 self.runtime.start(self.lease)

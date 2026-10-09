@@ -1,0 +1,99 @@
+Checkpoint 67 development acceptance, baseline d3ab5e2; full Goal ACTIVE.
+Status FINAL: original necessary regression and last delta terminal; no live tests.
+Only original finite CPU/engineering units, shared Pool/Auth. No model/GPU,
+system permissions, production migration, push or protected evidence deletion.
+USER package-lock SHA becc7e2a36dfcad4ffe934b5ff2f0f68187611d6c0641bd63d81367651cfbf09
+unchanged/never staged. Sequential tests; no live source/test edits or restart.
+
+Prefix for every Python test: PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest
+Logs: audit/hybrid-v1/checkpoint-67-*. Each round has 333 inputs and an
+end-check after actual terminal. r1's initial manifest was captured during the
+frozen live run, not claimed as a pre-launch timestamp. r2-r5 pinned pre-launch.
+
+r1: -q -s tests/test_hybrid_disk_admission.py (then four cases).
+Original63674 terminal8dcbe7 exit0; 4passed/1oldwarning99.04s.
+Actual two-project same-FS promises2; one-credit space refuses SDK RUN with no
+HANDOFF/Popen/pwrite/Store version advance; original key succeeds after heal.
+HTTP inode0 refuses503; other original STOP202/occupied1; same body/key heal202
+with original CPU machine status and occupied0. Real engineering STOP/FREE
+then last core fence disk0 denies pwrite, retains both promises, no second RUN.
+Actual new unbound durable third claim rejects RUN, not original STOP; no refund.
+333 frozen inputs matched at actual terminal before source edits.
+
+r2: -q -s tests/test_hybrid_disk_admission.py -k 'CANCEL_latch or health_reauth'
+Original78548 terminal5177f0 exit0; 2passed/4deselected/1oldwarning36.87s.
+Source delta: explicit original cleanup-complete marker; diagnostic re-auth
+after blocking health and Conflict503 before ValueError400. Actual PoolFREE
+plus cancellation latch/default errorNone alone retains promise; actual
+cancel cleanup then retires credit. Diagnostic test initially injected resolve
+revocation, then replaced with actual AuthStore.revoke in r3; source unchanged.
+333 frozen inputs matched at actual terminal.
+
+r3: -q -s tests/test_hybrid_disk_admission.py -k 'health_reauth or final_worker_fence'
+Original3015 terminal4d5f9c exit1; 3passed/5deselected/1teardown-error/1oldwarning59.04s.
+Real AuthStore.revoke during original health: returned401/no capacity body;
+re-login/sourceConflict503/closedquery400/Store versions unchanged.
+Actual late spawn/G low-space checks rejected before last authority fence;
+no G/second spawn, same key only resumes UNKNOWN_RESULT_UNAVAILABLE.
+G branch reaped participant/all sourceFDs closed, occupied1/other CPU untouched.
+Spawn branch correctly retained occupied2 but fixture's normal Runtime.shutdown
+attempted no-producer terminal after durable HANDOFF. Ledger correctly rejects
+this with 'fixture no-producer terminal requires original NO_HANDOFF lineage'.
+Test teardown corrected to original shutdown_safety parent-FD retirement only,
+not a product change or fake FREE. Do not repeat passing G/Auth cases.
+333 frozen inputs matched before that test-only correction.
+
+r4: -q -s tests/test_hybrid_disk_admission.py -k 'final_worker_fence and spawn'
+Original26401 terminal64e3c2 exit0; 1passed/7deselected/1oldwarning19.46s.
+Only failed spawn case: actual gate denial, no redispatch, original parent FD
+retirement reports pool_slots_freedFalse, occupied2 preserved. All333 matched.
+
+Eight final logical new cases use explicit composite evidence, NOT a final
+whole-new-module run. Source unchanged after r2; test-only r3/r4 strengthened
+actual auth and late effects, without changing passed test bodies.
+Independent GPT6.1Sol High readonly incremental review: three MUST closed
+(post-read auth, Conflict503, explicit cancelled-cleanup proof). Final root
+inspection found default asyncio.to_thread diagnostic submission is unbounded;
+High confirmed one new MUST. AFTER original r5 terminal/333end-match, fixed
+only finite-host route/pool lifecycle plus new test; separate ControlPool(1),
+never STOP slots. Last targeted r6 actual future/capacity/auth checks passed.
+Final narrow High review closed QUEUE MUST; no remaining MUST.
+Review is development security review, NOT independent product Reviewer.
+
+r5 ONLY necessary affected regression, original33809/PID1555114 terminal52b044 exit0:
+-q tests/test_hybrid_host_execution.py tests/test_hybrid_finite_host_app.py
+tests/test_hybrid_finite_host_stop.py
+tests/test_hybrid_stop_storage_failure.py::test_actual_preG_storage_failure_still_reaps_retains_exposure_and_original_retry
+tests/test_hybrid_stop_storage_failure.py::test_actual_HTTP_stop_intent_commit_failure_still_cleans_then_same_key_recovers
+tests/test_hybrid_stop_storage_failure.py::test_actual_whole_STOP_failed_acceptance_cleanup_exactly_once
+Frozen input: audit/hybrid-v1/checkpoint-67-regression-r5-inputs.sha256.
+Raw log: audit/hybrid-v1/checkpoint-67-regression-r5.log.
+Actual27passed/1oldwarning661.52s; all333 frozen inputs matched5499bd BEFORE
+changing route/test. No restart, parallel run or source edits during r5.
+No unchanged bare-runtime eight-module, UI/Node or whole-library repeat.
+
+r6: -q -s tests/test_hybrid_disk_admission.py -k 'health_reauth or worker_capacity'
+Original67141 terminal5a01a9 exit0; 2passed/7deselected/1oldwarning35.77s.
+ONLY finite_host_stop.py + new test changed after r5, other331 paths unchanged.
+Actual reauth/real AuthStore.revoke + source503/closedquery400 still passed.
+Actual diagnostic worker barrier BEFORE Poollock: second GET429; cancelled
+HTTP waiter pending1, third GET429; separate original projectSTOP202/occupied1;
+release/actual future terminal→pending0/GET200, actual app lifespan closes pool.
+Not an additional whole-scopeSTOP or hung-filesystem kernel-deadline claim.
+All333 r6 frozen inputs matched951bf0 after real terminal.
+
+Final nine logical new cases: four r1 bodies, r2 cancelled-proof, r6 actual
+health-auth, r3 G fence, r4 corrected spawn fence, r6 actual queue lifecycle.
+Explicit composite, not a final full-new-module run or whole-library green.
+Final333 input SHA0703d679e4586c5f86e47250ce50d6199d68a30241d0ed98ac7cc6dbcd4a8a24.
+Compileall rlflow/newtest, pipcheck(No broken requirements), diffcheck passed.
+Final manifest and19 raw log/input/end-check/live-check items archived and
+read back via SHA. No live tests; ready to commit after final staged audit.
+
+Behavior scope: PROCESS_LOCAL_FS_AVAILABLE_NOT_QUOTA; actual available blocks
+and inodes, same-FS conservative promises, no cold UNKNOWN credit adoption.
+128MiB+16MiB/unfinishedclaim and16+8inode/claim are policy headroom, NOT proven
+SQLite STOP envelope or contract Budget dimension. STOP not gated.
+No actual emergency allocation or Dashboard disk presentation yet; next68.
+RES07/A26/fullT21, hardquota/arbitrarytree, native/productReview/invoice,
+installation/B1/long soaks/T23/M5/fullGoal remain NOT PROVEN.

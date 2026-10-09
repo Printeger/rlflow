@@ -276,8 +276,10 @@ def install(app,coordinator):
     from .hybrid_protocol import ProtocolError
     coordinator._pure()
     jobs=ControlPool(2)
+    disk_jobs=ControlPool(1)
     app.state.finite_host_stop=coordinator
     app.state.finite_host_stop_pool=jobs
+    app.state.finite_host_disk_pool=disk_jobs
     original=app.router.lifespan_context
     @asynccontextmanager
     async def lifespan(current):
@@ -285,6 +287,7 @@ def install(app,coordinator):
             try:yield
             finally:
                 await jobs.close()
+                await disk_jobs.close()
                 await asyncio.to_thread(coordinator.close)
     app.router.lifespan_context=lifespan
 
@@ -326,6 +329,21 @@ def install(app,coordinator):
                     all(access.principal.allows(row[0],'operator') for row in coordinator._signature),
                 'items':[{'project_id':r[0],'store_epoch':r[1],'task_id':r[2],'stop_action':r[3]} for r in coordinator._signature],
                 'goal_completed':False,'independent_review_status':'NOT_PERFORMED'})
+        except Exception as exc:return failure(exc)
+
+    @app.get('/api/v1/finite-host/disk-admission')
+    async def disk_admission(request:Request):
+        try:
+            if request.query_params:raise ValueError('closed original scope query required')
+            authorize(request)
+            coordinator._pure()
+            # Explicit current diagnostic, not cached telemetry or authority.
+            value=await disk_jobs.run(coordinator.host._disk.health)
+            authorize(request)
+            coordinator._pure()
+            return JSONResponse(value)
+        except Conflict:
+            return error_response(ControlError(503,'UNKNOWN_EXECUTION','original disk observation unavailable',True))
         except Exception as exc:return failure(exc)
 
     @app.get('/api/v1/finite-host/commands/{command_id}')

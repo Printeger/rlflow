@@ -748,6 +748,8 @@ class FixtureRuntimeOwner:
         if self._control_service is not None: self._control_service._check_final_authority(cleanup=False)
 
     def _final_effect_gate(self, guard):
+        from .hybrid_disk_admission import check_effect
+        check_effect(self, guard.attempt)
         # Controller actual process/STOP IO is LAST, then one exact final sample.
         now, mono = self.controller._final_token_freshness(guard.db, guard.attempt['token'], guard.read)
         self._final_deadlines(guard, now, mono)

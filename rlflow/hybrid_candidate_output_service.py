@@ -160,6 +160,8 @@ class CandidateOutputService:
         if self._active is not guard or guard.receipt:raise PermissionError('original live write boundary required')
         self.runtime._actual()
         if self.runtime._safety_freeze:raise Conflict('candidate output permanently frozen for cleanup')
+        from .hybrid_disk_admission import check_effect
+        check_effect(self.runtime,self.runtime._leases[id(guard.row['lease'])])
         now,mono=self.controller._final_token_freshness(guard.db,guard.token,guard.read)
         self._deadlines(guard,now,mono)
         self.runtime._unit_effect_check(self.runtime._leases[id(guard.row['lease'])])

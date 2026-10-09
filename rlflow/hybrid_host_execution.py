@@ -26,6 +26,8 @@ class HostExecutionService:
             self.pool = pool
             self._bindings = ()
             pool._finite_execution_host = self
+            from .hybrid_disk_admission import _DiskAdmission
+            self._disk = _DiskAdmission(self)
 
     def _pure_identity(self):
         if (os.getpid() != self.pool.process['pid'] or not self.pool._live or
@@ -58,6 +60,7 @@ class HostExecutionService:
                 return unit.lease
             if len(self._bindings) >= 32:
                 raise Conflict('finite host binding capacity reached')
+            self._disk.bind(unit, attempt)
             self._bindings = (*self._bindings, unit)
         return unit.lease
 

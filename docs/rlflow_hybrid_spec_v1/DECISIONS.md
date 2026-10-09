@@ -1,5 +1,7 @@
 # 开发决策记录
 
+Checkpoint67 FINAL：实际可用空间准入与真实应急预留分开，先交付拒绝实际RUN。原FS合并保守占额/最多3FS，floor128MiB+16MiB每claim不是Budget账单或SQLite保证；UNKNOWN/unbound failclosed。FREE后须真实_last或原取消明确cleanupComplete才退，资源IO在原最后Auth/TTL前，STOP无准入门。新诊断读取后重新认证/Conflict503；最终读取发现default executor无界提交，原27case终态后仅route/新test改独立ControlPool1，不共享STOP槽，真实future才释放，末2case通过，High四MUST关闭。r3 spawn teardown用既有原FD safety retirement不伪FREE；不改产品放宽门。文档技能校准仓库格式及证据强度，未创建外部Page，不重复未改bare/UI/Node全套。
+
 Checkpoint66 FINAL：原durable STOP→interrupt顺序保持；账本失败只原cap/pidfd物理安全收尾、UNKNOWN不FREE。FD独立尝试及部分原owner重试、operation首次cancel结果复用避免双清理。A回滚见证在新实际写attempt前消费，只有本次实际成功rollback再重签；前置CAS/读取拒绝未写不消费，未知COMMIT/rollback失败不重链。正常工程terminal失败不新增永久freeze；真实失败STOP已有freeze覆盖恢复后的apply。原126回归终态后仅两路径差量/3新组合，不重跑未变pass。文档技能校准仓库格式与证据强度，不创建外部Page；无模型/GPU/生产/USERlock权限扩展。
 
 Checkpoint66：正常durable STOP→interrupt顺序不变；失败路径只凭原强cap/pidfd收尾并纯内存冻结，错误不伪终态/FREE。FD独立尝试、部分失败保留原owner，全集coordinator复用operation首次清理避免重复cancel。仅当前cleanup实际成功rollback且精确guard/write_attempted/raw、原event/projection双缺失允许原key当前CAS重链；已COMMIT lost-return、rollback失败或新增control接受不重建。participant停止只封spawn/G，不误封正常工程STOP后的apply；真正失败STOP安全freeze覆盖新效果。唯一必要回归运行期间冻结源/测试，不扩功能；文档技能用于仓库证据范围与既有格式，未创建外部Page。
