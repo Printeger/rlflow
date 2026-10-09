@@ -128,7 +128,7 @@ def validate_persisted(state):
         for key, value in state.get(section, {}).items():validate_record(section, key, value)
 
 
-def _validate_approval(fact, lookup):
+def _approval_binding(fact, lookup):
     request = fact['request'];confirm = request['confirmation']
     hk = head_key(request['project_id'], request['data_mode'], confirm['goal_id'])
     # Revision identity is deterministic and independently checked by draft validators.
@@ -152,7 +152,14 @@ def _validate_approval(fact, lookup):
             'execution_status': 'LEASE_VALIDATION_PENDING','execution_enabled':False,
             'limitations':['ACTUAL_DATA_BYTES_NOT_VERIFIED','ACTUAL_OS_AND_RESOURCE_ENFORCEMENT_NOT_VERIFIED']}
     if confirm['view_hash'] != digest(view):raise Conflict('approval confirmation view mismatch')
-    return hk, rk
+    return hk, rk, binding
+
+
+def _validate_approval(fact, lookup):
+    # Preserve the original historical validation API. The preparation caller
+    # can reuse the binding computed by the FULL same validation, not supply a
+    # prevalidated DTO/flag or skip any original source/confirmation check.
+    return _approval_binding(fact, lookup)[:2]
 
 
 def _head(request, section, key, fact):

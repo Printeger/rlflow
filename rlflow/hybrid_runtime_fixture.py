@@ -12,7 +12,7 @@ import signal
 import sys
 import time
 
-SCENARIOS = frozenset(('complete', 'missing', 'running', 'bad_ack'))
+SCENARIOS = frozenset(('complete', 'missing', 'running', 'bad_ack', 'cpu_trial'))
 
 
 def run(parent_pid, nonce, scenario):
@@ -24,6 +24,8 @@ def run(parent_pid, nonce, scenario):
         raise SystemExit(126)
     resource.setrlimit(resource.RLIMIT_CPU, (2, 2))
     resource.setrlimit(resource.RLIMIT_FSIZE, (1024**2, 1024**2))
+    if scenario == 'cpu_trial':
+        resource.setrlimit(resource.RLIMIT_AS, (128*1024**2, 128*1024**2))
     # Identity registration and durable RELEASE_INTENT must precede this gate.
     # The unreleased child has its own finite lifetime even after a lost Popen.
     if not select.select([0], [], [], 3)[0] or os.read(0, 1) != b'G':
@@ -37,7 +39,24 @@ def run(parent_pid, nonce, scenario):
             raw = raw[count:]
 
     line({'type': 'runtime.started', 'nonce': nonce if scenario != 'bad_ack' else '0' * 32,
-          'pid': os.getpid(), 'program': 'FIXED_CPU_PROTOCOL_V1'})
+          'pid': os.getpid(), 'program': 'FIXED_CPU_PI_TRIAL_V1' if scenario == 'cpu_trial' else 'FIXED_CPU_PROTOCOL_V1'})
+    if scenario == 'cpu_trial':
+        # Exact immutable numerical profile, not a caller script/argument/data.
+        # Actual raw coordinates, not mocked business/usage counters.
+        began_cpu, began_wall = time.process_time_ns(), time.monotonic_ns()
+        counts = []
+        for seed in (7, 11, 19):
+            state = seed; inside = 0
+            for index in range(128):
+                state = (1664525*state + 1013904223) & 0xffffffff; x = state >> 16
+                state = (1664525*state + 1013904223) & 0xffffffff; y = state >> 16
+                hit = x*x+y*y < 65536**2; inside += hit
+                line({'type': 'cpu.trial.sample', 'seed': seed, 'index': index,
+                      'x': x, 'y': y, 'inside': hit})
+            counts.append(inside)
+        line({'type': 'cpu.trial.completed', 'inside_counts': counts,
+              'cpu_ns': time.process_time_ns()-began_cpu, 'wall_ns': time.monotonic_ns()-began_wall})
+        line({'type': 'fixture.end'}); os.fsync(1); return
     line({'type': 'thread.started', 'thread_id': 'fixture_parent'})
     line({'type': 'turn.started'})
     usage = {'input_tokens': 100, 'output_tokens': 10, 'cached_input_tokens': 20}

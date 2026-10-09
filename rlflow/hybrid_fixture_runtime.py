@@ -107,10 +107,13 @@ class FixtureRuntimeOwner:
             self._attempts = {}; self._leases = {}; self._active = None
             self._control_service = None
             self._safety_freeze = False
+            self._cpu_grants = {}; self._cpu_results = {}
             self.program = Path(__file__).with_name('hybrid_runtime_fixture.py')
             # Exact protected program, not any caller command or plan rewriting.
             raw = _read_bounded(self.program, 16384)
             self.program_raw = raw; self.program_hash = 'sha256:' + hashlib.sha256(raw).hexdigest()
+            self._cpu_evaluator = Path(__file__).with_name('hybrid_cpu_trial.py')
+            self._cpu_evaluator_hash = 'sha256:' + hashlib.sha256(_read_bounded(self._cpu_evaluator, 16384)).hexdigest()
             self.sources = FixtureUsageSourceOwner(pool)
             self.budget._fixture_runtime = self; _owners[id(self)] = self
 
@@ -135,7 +138,43 @@ class FixtureRuntimeOwner:
             raise PermissionError('original WorkingPlan INTENT and READY attempts required')
         return json.loads(first['raw']), json.loads(second['raw'])
 
-    def register(self, bundle, token, observation, claim, *, request_key, scenario='complete'):
+    def _cpu_binding(self, loaded):
+        from .hybrid_cpu_trial import approved_binding
+        binding = approved_binding(loaded['record']['contract']['proposal'],
+            json.loads(self.plans.registry._raw), self.program_hash, self._cpu_evaluator_hash)
+        binding.update({name: loaded[name] for name in ('proposal_hash', 'approval_hash', 'config_hash', 'scope_hash')})
+        return binding
+
+    def issue_cpu_trial_grant(self, bundle, token, observation):
+        """Private original-cap grant; no caller command/data/path or paid access."""
+        from .hybrid_cpu_trial import CpuTrialGrant
+        self._actual(); self.controller._issued(token); self._plan_original(bundle, token, observation)
+        with self.pool._lock, self.store.read_connection() as db:
+            db.execute('BEGIN'); read = ReadBudget(db, PREPARATION_READ_BYTES)
+            ready = self._ready_for_bundle(bundle)
+            loaded = self.budget._load(db, ready['request']['goal_ref'], read)
+            binding = self._cpu_binding(loaded)
+            with self._lock:
+                if len(self._cpu_grants) >= 32: raise Conflict('finite CPU trial grant capacity reached')
+                key = 'cpu_grant_' + uuid.uuid4().hex; binding['grant_id'] = key
+                grant = CpuTrialGrant(key, canonical(binding))
+                self._cpu_grants[id(grant)] = {'grant': grant, 'bundle': bundle, 'token': token,
+                    'observation': observation, 'attempt': None}
+                return grant
+
+    def _ready_for_bundle(self, bundle):
+        return json.loads(self.plans._ready_attempts[bundle.id]['raw'])
+
+    def _issued_cpu_grant(self, grant, bundle, token, observation):
+        from .hybrid_cpu_trial import CpuTrialGrant
+        row = self._cpu_grants.get(id(grant))
+        if (type(grant) is not CpuTrialGrant or row is None or row['grant'] is not grant or
+                any(row[name] is not value for name, value in
+                    (('bundle', bundle), ('token', token), ('observation', observation)))):
+            raise PermissionError('actual original same-plan CPU trial grant required')
+        return row
+
+    def register(self, bundle, token, observation, claim, *, request_key, scenario='complete', cpu_grant=None):
         """REGISTER/CANCEL compete on the ONE original ReservationHEAD CAS."""
         from .hybrid_protocol import ID, validate_schema
         from .hybrid_runtime_fixture import SCENARIOS
@@ -144,14 +183,19 @@ class FixtureRuntimeOwner:
         self.controller._issued(token); original_claim = self.pool._issued_claim(claim)
         validate_schema(ID, request_key)
         if type(scenario) is not str or scenario not in SCENARIOS: raise Conflict('fixed CPU protocol scenario required')
+        cpu_row = self._issued_cpu_grant(cpu_grant, bundle, token, observation) if scenario == 'cpu_trial' else None
+        if scenario != 'cpu_trial' and cpu_grant is not None:
+            raise PermissionError('CPU trial grant cannot upgrade a protocol capability')
         with self.pool._lock, self._lock:
             previous = self._attempts.get(request_key)
             if previous is not None:
                 if any(previous[name] is not value for name, value in
-                       (('bundle', bundle), ('token', token), ('observation', observation), ('claim', claim))) or previous['scenario'] != scenario:
+                       (('bundle', bundle), ('token', token), ('observation', observation), ('claim', claim))) or previous['scenario'] != scenario or previous.get('cpu_grant') is not cpu_grant:
                     raise Conflict('original fixture runtime request key reused')
                 attempt = previous
             else:
+                if cpu_row is not None and cpu_row['attempt'] is not None:
+                    raise Conflict('original CPU trial grant already belongs to another attempt')
                 if len(self._attempts) >= 32: raise Conflict('finite original fixture runtime attempts exceeded')
                 if original_claim['payload']['member_id'] != self.membership.id:
                     raise PermissionError('fixture runtime original Pool claim membership differs')
@@ -166,13 +210,18 @@ class FixtureRuntimeOwner:
                     'pool_id': self.pool.binding['pool_id'], 'member_id': self.membership.id,
                     'owner': self.process, 'nonce': uuid.uuid4().hex,
                     'model_enabled': False, 'candidate_write_enabled': False, 'delegation_enabled': False}
+                if cpu_row is not None:
+                    from .hybrid_cpu_trial import KIND, AUTHORIZATION
+                    origin.update(kind=KIND, authorization=AUTHORIZATION, cpu_trial=json.loads(cpu_grant.raw))
                 lease = FixtureExecutionLease(origin['lease_id'], canonical(origin))
                 attempt = {'lease': lease, 'origin': origin, 'bundle': bundle, 'token': token,
                     'observation': observation, 'claim': claim, 'scenario': scenario,
                     'intent': intent, 'ready': ready, 'claim_value': original_claim, 'entries': {}, 'source': None,
                     'spawn_entered': False, 'release_entered': False, 'started_ack': None,
-                    'producer_identity': None, 'terminal': None, 'spawn_monotonic': None}
+                    'producer_identity': None, 'terminal': None, 'spawn_monotonic': None,
+                    'cpu_grant': cpu_grant}
                 self._attempts[request_key] = attempt; self._leases[id(lease)] = attempt
+                if cpu_row is not None: cpu_row['attempt'] = attempt
             # Strong original attempt retained BEFORE all cross-database writes.
         # Runtime owner lock must NOT precede Store/Controller/Workspace locks.
         with self.pool._lock:
@@ -216,7 +265,15 @@ class FixtureRuntimeOwner:
         current = self.workspace._current(db, fact['request'], read, version)
         if current != wh or record != captured['observation']:
             raise Conflict('fixture runtime current original Workspace lineage changed')
-        sources = source_binding(self.budget._load(db, fact['request']['goal_ref'], read))
+        loaded = self.budget._load(db, fact['request']['goal_ref'], read)
+        sources = source_binding(loaded)
+        if attempt['cpu_grant'] is not None:
+            row = self._issued_cpu_grant(attempt['cpu_grant'], attempt['bundle'], attempt['token'], attempt['observation'])
+            expected = self._cpu_binding(loaded); expected['grant_id'] = attempt['cpu_grant'].id
+            if row['attempt'] is not attempt or canonical(expected) != attempt['cpu_grant'].raw:
+                raise Conflict('CPU trial current approved grant differs')
+            if 'sha256:' + hashlib.sha256(_read_bounded(self._cpu_evaluator, 16384)).hexdigest() != self._cpu_evaluator_hash:
+                raise Conflict('protected CPU trial evaluator changed')
         if any(sources[name] != value for name, value in captured['sources'].items()
                if name not in ('source_version', 'evaluated_at')):
             raise Conflict('fixture runtime current original Goal/approval/Registry changed')
@@ -348,6 +405,10 @@ class FixtureRuntimeOwner:
                 'started_ack_sha256': None if attempt['started_ack'] is None else digest(json.loads(attempt['started_ack'].raw)),
                 'terminal_proof_sha256': None if attempt['terminal'] is None else digest(attempt['terminal']),
                 'wall_seconds': 0 if attempt['terminal'] is None else attempt['terminal']['wall_seconds']}
+            if attempt['cpu_grant'] is not None:
+                result = self._cpu_results.get(id(attempt['lease']))
+                runtime.update(cpu_trial_release_attempted=attempt['release_entered'],
+                    cpu_trial_result=json.loads(result.raw) if phase == 'FIXTURE_SCOPE_STOPPED' and result is not None else None)
             for name in ('start_command', 'stop_command'):
                 if prior is not None and name in prior: runtime[name] = prior[name]
             if command is not None:
@@ -628,6 +689,64 @@ class FixtureRuntimeOwner:
             if process is not None and process.stdin is not None and not process.stdin.closed:
                 raise Conflict('fixture original release pipe still open')
         elif attempt['spawn_entered']: raise Conflict('fixture unknown original process cannot be adopted')
+        if attempt['cpu_grant'] is not None:
+            from .hybrid_cpu_trial import validate_result
+            result = self._cpu_results.get(id(attempt['lease']))
+            if result is not None: validate_result(json.loads(result.raw), attempt['origin'], attempt['producer_identity'])
+
+    def collect_cpu_trial(self, lease):
+        """Collect only original sealed FD bytes; never caller JSON/path/receipt."""
+        from .hybrid_cpu_trial import CpuTrialResult, evaluate, validate_result
+        attempt = self._issued(lease)
+        if attempt['cpu_grant'] is None: raise PermissionError('original CPU trial lease required')
+        with self.pool._lock, self._lock:
+            original = self._cpu_results.get(id(lease))
+            if original is not None: return original
+            source = self.sources._issued(attempt['source'])
+            with self.sources._lock:
+                if (source['runtime'] is not attempt or source['status'] != 'SEALED' or
+                        source['producer'] is None or source['producer'].poll() != 0 or
+                        self.sources._runtime_started(self, lease) is None):
+                    raise Conflict('complete original CPU trial source and exit0 required')
+                stamp = self.sources._physical(source)
+                if stamp != source['seen'] or stamp[0] > 65536:
+                    raise Conflict('sealed bounded original CPU trial source differs')
+                raw = os.pread(source['fds']['read'], stamp[0]+1, 0)
+                if (len(raw) != stamp[0] or self.sources._physical(source) != stamp or
+                        hashlib.sha256(raw).hexdigest() != source['hash'].hexdigest()):
+                    raise Conflict('CPU trial original sealed prefix changed')
+                value = evaluate(raw, nonce=attempt['origin']['nonce'], pid=attempt['producer_identity']['pid'])
+                value.update(source_id=attempt['source'].id, lease_id=lease.id,
+                    task_id=attempt['origin']['task_id'], attempt_id=attempt['origin']['attempt_id'],
+                    grant_id=attempt['cpu_grant'].id, program_sha256=self.program_hash,
+                    evaluator_sha256=self._cpu_evaluator_hash, producer=attempt['producer_identity'])
+                validate_result(value, attempt['origin'], attempt['producer_identity'])
+                result = CpuTrialResult(canonical(value)); self._cpu_results[id(lease)] = result
+                return result
+
+    def run_cpu_trial(self, lease):
+        """Finite original-cap compute/collect/STOP; does not complete any Goal."""
+        attempt = self._issued(lease)
+        if attempt['cpu_grant'] is None: raise PermissionError('original CPU trial lease required')
+        current = self._current(attempt)['fixture_runtime']['phase']
+        if current in ('STOP_REQUESTED', 'FIXTURE_SCOPE_STOPPED'):
+            self.stop_to_terminal(lease)
+            original = self._cpu_results.get(id(lease))
+            if original is None: raise Conflict('stopped CPU trial has no accepted complete result')
+            return original
+        try:
+            self.start(lease)
+            deadline = time.monotonic()+4
+            while time.monotonic() < deadline:
+                self.poll(lease, seal=True)
+                source = self.sources._issued(attempt['source'])
+                if source['status'] == 'SEALED': return self.collect_cpu_trial(lease)
+                if source['status'] in ('UNKNOWN', 'QUARANTINED', 'CLOSED'):
+                    raise Conflict('CPU trial original execution/result is UNKNOWN')
+                time.sleep(.01)
+            raise Conflict('finite CPU trial result observation deadline exceeded')
+        finally:
+            self.stop_to_terminal(lease)
 
     def stop_to_terminal(self, lease):
         attempt = self._issued(lease)

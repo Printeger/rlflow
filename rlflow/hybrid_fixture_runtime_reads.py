@@ -52,7 +52,8 @@ class FixtureTaskReader(HybridReader):
         value = self._point(db, read, head['last_entry_key'], version)
         if derived_heads(value)[SECTIONS[2]].get(key) != head:
             raise Conflict('fixture Task head is not original derived head')
-        if 'fixture_runtime' not in head:
+        if ('fixture_runtime' not in head or
+                head['fixture_runtime']['origin']['kind'] != 'PROTOCOL_CONFORMANCE'):
             return None
         return head, value
 

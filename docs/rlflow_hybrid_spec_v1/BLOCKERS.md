@@ -1,5 +1,9 @@
 # 阻塞与证据缺口
 
+Checkpoint49 FINAL：真实固定CPU计算/原始值独立验证/持久AUDIT_ONLY/STOP故障原cap恢复与必要集成182pass及实际命令browser1pass通过，241SHA及最终检查一致，无live测试。正在提交49；无新增需用户决定的阻塞。下一必须补当前合同证据激活、有限科研评价/下一步实际行为，不能停在AUDIT_ONLY。工程candidate/native、严格OS/data/network、任意树STOP、真实invoice、24h/8h与安装迁移仍未完成；付费/GPU/生产权限不扩。USERlock未改未stage。下方WIP均历史。
+
+49 WIP：实际单数值trial已有原raw/独立评价/持久AUDIT_ONLY/原STOPFREE及FD关闭失败恢复证据，仍没有正式科研Goal evidence activation/独立研究结论/下一步或真正工程candidate闭环。native、模型invoice、严格OS/data/network、任意树STOP、24h/8h与安装迁移缺口不变。原3s失败已改变为无执行剖析并定位重复完整审批计算，未延时/绕权限；新版actualsmoke1pass21s。唯一必要7模块原83562仍LIVE、241SHA冻结，最终49未验收/commit。48已提交da1d541；无需用户新增资源权限才能继续这个有限model-free范围，USERlock未动。
+
 48 FINAL：真实durable事件→有限Task只读刷新/原时间线、两身份离线补发5/7、实际STOP reap/Pool0通过；页面继续UNKNOWN/NOT_OBSERVED。原浏览器与Pool回归失败均已定位，timer/network交错/foreignFD生产误拒精确修复，注入夹具关连接后31pass+精确Runtime1pass，前端53pass，最终238SHA/检查通过，无live测试。47实际96517431950fe5c0ae46a3ca9c4763638a942630；48正在提交。没有新增需用户决定的外部阻塞。下一必须交付有限model-free CPU实际产出/验证行为，安全profile先设计；仍不能调用付费模型/GPU/迁移生产。正式native/独立工程科研验收、真实invoice、严格OS/data/network、任意树STOP、24h/8h、安装迁移与完整Goal未通过。不得用现有协议/新UI测试数量替代这些门。
 
 47 FINAL：人工固定CPU Dashboard真实Start/ACK/原key恢复/STOP故障后原key续清/reap/实际Pool0已交付；两独立命令恢复MUST已关闭，文案超时根因修复后browser1pass19.027s，必要web43pass/HTTP55pass/236SHA+检查通过，无live测试。46已提交3bf6cec；47正在提交。无新增需要用户决定的外部阻塞，继续48真实durable事件→有限只读Task刷新/时间线。这里只证明LOCAL_PROTOCOL_ONLY固定单参与者；当前UNKNOWN/资源NOT_OBSERVED保持，不证明native、真正工程科研、模型费用、严格cgroup/data/network、任意树/长期/安装迁移。STOP原意图可能在终态后继续保留，系FREE观察缺口的保守恢复设计，不自动重复执行。下方旧状态为历史。

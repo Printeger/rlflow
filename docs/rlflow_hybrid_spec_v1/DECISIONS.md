@@ -1,5 +1,15 @@
 # 开发决策记录
 
+## Checkpoint49 FINAL：原证据闭合与预算、STOP不因数值成功而放宽
+
+真实384点数值试验与182项必要集成、既有真实命令browser1项实际通过；结果仍AUDIT_ONLY/goal_completed=False。只复用已经完整验证的approval binding并核外层hk/rk/proposal同revision，不引入权限cache或更长3s gate。历史ACK必须推出G尝试，原raw/指标/SHA重建闭合；真实FD关闭失败仍占槽，原cap续清才能FREE。High确认三项生产MUST闭合，一项deepcopy误报由reviewer核对同SHA实码后明确撤回，不制造额外修复/重测。下一50在原current Goal/approval/Registry条件下激活证据并产生有限科研下一步，不自动宣称Goal完成或授予native/paid/GPU/生产权限。
+
+## Checkpoint49 WIP：独立固定数值profile，不给旧protocol/native argv追加执行权限
+
+新typed CPU grant要求原批准Goal/Registry固定程序/evaluator/输入/partial限额精确绑定，actualcap单attempt、旧JSON/复制/旧批准拒绝。原Pipeline/Pool/STOP不重造，原终态Budget同事件保存有界AUDIT_ONLY数值结果；历史重建canonical原stream核metrics/raw/SHA，不让ACK+False把启动消耗变0。当前结果不激活Goal完成，旧固定Task reader过滤新kind。CPU/wall为固定worker emit-asof，不冒称最终整树CPU/费用/cgroup。
+
+连续未G失败后非执行cProfile证明同_reference调用重复Registry解析；抽取完整_approval_binding返回绑定，旧_validate_approval二元返回不变。所有检查每次完整执行，无cachedauthority/skip参数，显式核两lookup的hk/rk/proposal_hash对应同revision。原3s期限不变。原smoke实际21s通过、closure剖析不作为性能验收；唯一必要集成83562仍LIVE，所有失败保留，见HYBRID_CPU_TRIAL.md。
+
 ## Checkpoint48：domain事实触发读取，不把连接或历史终态变成执行/FREE证明
 
 真实snapshot/domain版本绑定完整scope，高水位不足使新命令禁用；自动只读批次有限合并而不固定轮询。原POST在途不被domain打断，UNKNOWN与STOP原key/内容保持不变。真实fetch错误只有实际重连generation允许一次恢复，迟到旧GET也遵守；同LIVE心跳不重试。闭合原timeline保留UNKNOWN/NOT_OBSERVED，不以STARTED历史或LIVE连接冒充当前运行。

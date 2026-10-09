@@ -123,6 +123,10 @@ def derived_heads(value):
         if phase=='REGISTER_NO_HANDOFF':decision,reason='HELD','FIXTURE_REGISTERED_NO_HANDOFF'
         elif phase=='FIXTURE_SCOPE_STOPPED':
             usage={**zero(),'wall_seconds':runtime['wall_seconds']}
+            if runtime['origin']['kind']=='LOCAL_CPU_NUMERICAL_TRIAL':
+                # Conservative G-attempt accounting, not a fabricated ACK:
+                # unknown send outcome can never refund an experiment start.
+                usage['experiment_starts']=int(runtime['cpu_trial_release_attempted'])
             changed=settle_known(old_balance,reservation['amount'],usage,prior_status=reservation['status'])
             decision,reason='SETTLED','FIXTURE_SCOPE_TERMINATED'
         else:

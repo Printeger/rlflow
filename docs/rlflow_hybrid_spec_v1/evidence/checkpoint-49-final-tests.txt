@@ -1,0 +1,91 @@
+Checkpoint49 — fixed real model-free CPU numerical trial
+Parent: da1d541d2f5985d84186d4e98abbf23cc475a43f (Checkpoint48)
+Scope: private finite CPU/SQLite/loopback/Chrome only; no paid model, GPU,
+arbitrary candidate/native execution, production migration or protected writes.
+
+DELIVERY / ACCEPTANCE
+Separate exact approved FIXED_CPU_PI_TRIAL_V1 profile, original pointer grant
+and attempt, original writer/COMMIT/Popen/G provenance and deadlines retained.
+Actual three-seed/384-coordinate numerical trial, independent parent evaluation,
+sealed original FD/SHA/producer/ACK/result provenance, durable audit-only result.
+Original STOP/reap/all-FD closure precedes terminal settlement and PoolFREE.
+Release possibly attempted consumes one experiment start; provable no-G zero.
+Partial FD failure remains UNKNOWN/occupied; original-cap retry cleans without
+new compute, source growth or Popen. Historical ACK implies G-attempt; historical
+result raw/metrics/source SHA form one uniquely reconstructed original stream.
+compatible_cpu is partial, not OS network/tree enforcement or a native executor.
+CPU/wall are child kernel-reported as-of emit, not final whole-tree billing.
+Result is AUDIT_ONLY, goal_completed=false; no current evidence activation yet.
+
+ACTUAL ORIGINAL RUNS (all serial, terminal before repair)
+1. CPU smoke r1 original3467 terminalaef9f9 exit1:1fail14.92s.
+   G BrokenPipe, child126, raw/stderr empty. Original finally STOP remained.
+2. Timing diagnostic original36791 terminal046860 exit1:1fail15.16s.
+   Actual batch2.2407638s/exit126/raw0/stderr0; no blind third repeat.
+3. No-Popen closure profile original19982 terminal1b0808 exit0:1pass9.28s.
+   1,921,934calls/0.481s; original repeated approval/registry validation located.
+   This is diagnostic, NOT execution acceptance or runtime performance SLA.
+4. After conditional schema and CPU historical duplicate resolution repair,
+   smoke r2 original98154 terminal15e495 exit1:1fail14.89s.
+   Batch2.1777515s, before-G2.8780007s + last-gate0.1899929s exceeds original3s.
+   Did not extend TTL, relax assertions, drop final guards or cache authority.
+5. Full approval binding reuse (all original validation still performed),
+   no-Popen diagnostic original90984 terminal22151b exit0:1pass8.19s.
+   1,588,038calls/0.393s; diagnostic only. Outer hk/rk/proposal correspondence
+   was subsequently added after independent finding, with exact negative test.
+6. Smoke r3 original12961 terminal252173 exit0:1pass21.00s.
+   Actual counts96/101/104, estimates3.0/3.15625/3.25;
+   mean absolute error0.08821911547006896 vs baseline0.14159265358979312.
+   Worker CPU543230ns/wall1032015ns as-of this original run only.
+   Raw384/sourceSHA/independent evaluation/durable result/start1/reap/FD closure/
+   Pool0/idempotence/audit/replay/snapshot/recovery and negative historical
+   ACKfalse/raw/metrics/hash checks passed. Later outer revision checks do not
+   change program/evaluator; final-byte actual positive trial also in item7.
+7. Grant/STOP boundaries original12829 terminal8f81f5 exit1:
+   4pass/1fail/1warning29.44s. Real final-production-byte CPU compute with an
+   actual result-read FD close fault -> UNKNOWN/STOP_REQUESTED/occupied1 ->
+   original-cap retry all-close/FREE, no raw growth; copied/JSON grant denial,
+   no-G start0 and old protocol approval refusal passed. Sole failure was a
+   new cross-revision fixture with unrecomputed contract hash, not production.
+8. Test-only fixture hash correction, targeted original73931 terminal784e51
+   exit0:2pass/1warning9.05s. Valid different revision denied; incomplete original
+   source cannot collect, no-G STOP start0. Unchanged passed fault tests not rerun.
+9. Necessary dependent integration, original83562 terminalefa0ca exit0:
+   182pass/2warnings437.80s. Command:
+   PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q
+   tests/test_hybrid_authority.py tests/test_hybrid_preparation.py
+   tests/test_hybrid_preparation_sources.py tests/test_hybrid_preparation_service.py
+   tests/test_hybrid_fixture_runtime.py tests/test_hybrid_fixture_runtime_reads.py
+   tests/test_hybrid_approval_binding.py --disable-warnings
+   All241 source/test inputs frozen and matched after actual terminal.
+10. Necessary original command browser regression original71053 terminal55ddf3
+    exit0:1pass/0fail/0skip16.108s (runner16.307s). Actual original-key receipt
+    recovery, ACK, STOP FD failure original-key continuation, reap/FREE and
+    owner closure passed on final backend. Command:
+    node --test web_checks/fixture-runtime-browser.test.mjs
+    Not a repeat of all53 frontend cases or the unchanged48 two-identity browser.
+
+INDEPENDENT REVIEW
+Readonly existing High agent; no duplicate execution or parallel writer.
+Confirmed MUST fixes: historical ACK/start accounting, unique raw/metrics/SHA
+coupling, outer-source vs inner-approval exact revision correspondence.
+All confirmed narrow production MUST closed statically. A deepcopy finding was
+explicitly withdrawn after reviewer reread the actual same-SHA function; preserve
+the correction, do not present it as a real production repair/test requirement.
+Static review is not actual dynamic acceptance; execution evidence listed above.
+
+INPUTS / FINAL CHECKS
+241 manifest checkpoint-49-inputs.sha256 SHA256:
+6672c9ecfc3f86cf5ddbafa45de1c55bd98226649b524b89daf997addb91f3fe
+USER untracked package-lock.json remains unstaged, unchanged SHA256:
+becc7e2a36dfcad4ffe934b5ff2f0f68187611d6c0641bd63d81367651cfbf09
+Original failure/diagnostic logs retained in audit/hybrid-v1; SHA archive follows.
+Final compileall/pipcheck/diff and frozen241 SHA checks all exit0; no live tests.
+This is not a full fresh
+post-repair numerical suite or a complete M0-M5/Goal acceptance claim.
+
+NEXT / REMAINING GAPS
+Current-contract evidence activation + bounded research evaluation/next decision,
+then actual engineering candidate/native path; original strict OS/data/network,
+whole-tree STOP, real invoice, install/migration and24h/8h acceptance remain open.
+No new external user authority needed for the next finite model-free slice.

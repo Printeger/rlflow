@@ -350,7 +350,8 @@ class FixtureUsageSourceOwner:
                     if event['type'] == 'runtime.started' and attempt['runtime'] is not None:
                         runtime = attempt['runtime']
                         expected = {'type': 'runtime.started', 'nonce': runtime['origin']['nonce'],
-                                    'pid': attempt['producer_identity']['pid'], 'program': 'FIXED_CPU_PROTOCOL_V1'}
+                                    'pid': attempt['producer_identity']['pid'],
+                                    'program': 'FIXED_CPU_PI_TRIAL_V1' if runtime['scenario'] == 'cpu_trial' else 'FIXED_CPU_PROTOCOL_V1'}
                         if event != expected or runtime_ack is not None or not runtime['release_entered']:
                             raise Conflict('original gated fixture started ACK differs')
                         runtime_ack = _RuntimeStartedObservation(source, canonical({'source_id': source.id,

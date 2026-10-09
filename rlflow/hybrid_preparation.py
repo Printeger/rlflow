@@ -146,8 +146,11 @@ def _references(sources, lookup, *, current=False):
     record = lookup(GOALS[0], sources['contract_key']); fact = lookup(AUTHORITY[0], sources['approval_key'])
     if record is None or fact is None: raise Conflict('preparation original references missing')
     proposal = record['contract']['proposal']; confirm = fact['request']['confirmation']
-    binding = Registry(fact['registry_witness']).resolve(proposal)
-    _validate_approval(fact, lookup)
+    from .hybrid_authority import _approval_binding
+    hk, rk, binding = _approval_binding(fact, lookup)
+    if (rk != sources['contract_key'] or hk != sources['goal_ref'] or
+            binding['proposal_hash'] != sources['proposal_hash']):
+        raise Conflict('preparation approval binding differs from original source revision')
     draft_receipt = lookup(GOALS[2], sources['draft_command_key'])
     approval_receipt = lookup(AUTHORITY[3], sources['approval_command_key'])
     if (head_key(proposal['project_id'], proposal['data_mode'], proposal['goal_id']) != sources['goal_ref']

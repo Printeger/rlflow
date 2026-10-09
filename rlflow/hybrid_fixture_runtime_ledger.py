@@ -6,6 +6,7 @@ module supplies deterministic arithmetic/links, not caller attestations.
 from .hybrid_protocol import ID, HASH, obj, enum, validate_schema
 from .hybrid_goals import digest
 from .store import Conflict
+from .hybrid_cpu_trial import BINDING as CPU_BINDING, KIND as CPU_KIND, AUTHORIZATION as CPU_AUTHORIZATION
 
 PHASES = ('REGISTER_NO_HANDOFF', 'HANDOFF_UNKNOWN', 'PROCESS_REGISTERED',
           'RELEASE_INTENT', 'STARTED_AS_OBSERVED', 'STOP_REQUESTED',
@@ -16,7 +17,7 @@ PROCESS = obj({'pid': {**COUNT, 'minimum': 1}, 'pgid': {**COUNT, 'minimum': 1},
                'starttime': {'type': 'string', 'pattern': '^[0-9]{1,20}$'},
                'boot_id': {'type': 'string', 'pattern': '^[0-9a-f-]{36}$'}})
 REFERENCE = obj({'key': ID, 'hash': HASH})
-ORIGIN = obj({'task_id': ID, 'attempt_id': ID, 'lease_id': ID,
+PROTOCOL_ORIGIN = obj({'task_id': ID, 'attempt_id': ID, 'lease_id': ID,
     'kind': {'const': 'PROTOCOL_CONFORMANCE'}, 'authorization': {'const': 'LOCAL_PROTOCOL_ONLY'},
     'program_sha256': HASH, 'scenario': enum('complete', 'missing', 'running', 'bad_ack'),
     'working_plan_intent': REFERENCE, 'working_plan_ready': REFERENCE,
@@ -24,6 +25,12 @@ ORIGIN = obj({'task_id': ID, 'attempt_id': ID, 'lease_id': ID,
     'owner': PROCESS, 'nonce': {'type': 'string', 'pattern': '^[0-9a-f]{32}$'},
     'model_enabled': {'const': False}, 'candidate_write_enabled': {'const': False},
     'delegation_enabled': {'const': False}})
+CPU_ORIGIN = obj({**PROTOCOL_ORIGIN['properties'], 'kind': {'const': CPU_KIND},
+    'authorization': {'const': CPU_AUTHORIZATION}, 'scenario': {'const': 'cpu_trial'},
+    'cpu_trial': CPU_BINDING})
+ORIGIN = {'type': 'object', 'if': {'properties': {'kind': {'const': 'PROTOCOL_CONFORMANCE'}},
+                                 'required': ['kind']},
+          'then': PROTOCOL_ORIGIN, 'else': CPU_ORIGIN}
 nullable = lambda schema: {'oneOf': [schema, {'type': 'null'}]}
 CONTROL_BODY = obj({'action': enum('START_FIXED_CPU', 'STOP_FIXED_SCOPE'),
     'task_id': ID, 'expected_state_version': COUNT})
@@ -36,6 +43,8 @@ RUNTIME = obj({'phase': enum(*PHASES), 'origin': ORIGIN,
 # Optional only for compatibility with already persisted44 facts. A new
 # command appears only at its actual accepting phase, then remains immutable.
 RUNTIME['properties'].update(start_command=CONTROL_COMMAND, stop_command=CONTROL_COMMAND)
+RUNTIME['properties'].update(cpu_trial_release_attempted={'type': 'boolean'},
+                             cpu_trial_result=nullable({'type': 'object'}))
 
 
 def control_command_id(request, actor_id, client_key):
@@ -74,6 +83,20 @@ def validate_runtime(request, prior):
     value = request['fixture_runtime']; validate_schema(RUNTIME, value)
     current = phase(request)
     old = prior.get('fixture_runtime') if prior is not None else None
+    trial = value['origin']['kind'] == CPU_KIND
+    if trial:
+        from .hybrid_cpu_trial import validate_result
+        if (type(value.get('cpu_trial_release_attempted')) is not bool or 'cpu_trial_result' not in value or
+                (current == 'STARTED_AS_OBSERVED' or value['started_ack_sha256'] is not None) and
+                    not value['cpu_trial_release_attempted'] or
+                value['cpu_trial_release_attempted'] and current not in PHASES[4:] or
+                old is not None and old['cpu_trial_release_attempted'] and not value['cpu_trial_release_attempted'] or
+                value['cpu_trial_result'] is not None and
+                    (current != 'FIXTURE_SCOPE_STOPPED' or not value['cpu_trial_release_attempted'])):
+            raise Conflict('CPU trial original release/result phase differs')
+        if value['cpu_trial_result'] is not None: validate_result(value['cpu_trial_result'], value['origin'], value['producer'])
+    elif any(name in value for name in ('cpu_trial_release_attempted', 'cpu_trial_result')):
+        raise Conflict('protocol capability cannot acquire CPU trial fields')
     _control_links(request, old)
     if value['phase'] != current: raise Conflict('fixture runtime action/phase differs')
     if request['data_mode'] != 'fixture': raise Conflict('fixed CPU runtime is fixture only')
@@ -86,7 +109,9 @@ def validate_runtime(request, prior):
             raise Conflict('fixture registration requires exact unregistered HELD origin')
         # This fixed CPU diagnostic does not spend/settle synthetic model tokens.
         amount = prior['amount']
-        if amount['wall_seconds'] < 4 or any(n for k, n in amount.items() if k != 'wall_seconds'):
+        if (amount['wall_seconds'] < 4 or
+                amount['experiment_starts'] != int(trial) or
+                any(n for k, n in amount.items() if k not in ('wall_seconds', 'experiment_starts'))):
             raise Conflict('fixed CPU runtime requires wall-only finite reservation')
         return value
     if old is None or old['origin'] != value['origin']:
@@ -130,6 +155,22 @@ def validate_original_links(value, lookup):
     from .hybrid_working_plan import SECTIONS, validate_record, validate_links
     from .hybrid_budget_ledger import SECTIONS as BUDGET
     request = value['request']; runtime = request['fixture_runtime']; origin = runtime['origin']
+    if origin['kind'] == CPU_KIND:
+        from .hybrid_cpu_trial import approved_binding
+        from .hybrid_goals import SECTIONS as GOALS
+        from .hybrid_authority import SECTIONS as AUTHORITY
+        sources = value['policy_source']; record = lookup(GOALS[0], sources['contract_key'])
+        approval = lookup(AUTHORITY[0], sources['approval_key'])
+        if record is None or approval is None: raise Conflict('CPU trial original approval missing')
+        binding = approved_binding(record['contract']['proposal'], approval['registry_witness'],
+                                  origin['program_sha256'], origin['cpu_trial']['evaluator_sha256'])
+        # Budget.validate_links has already proved these exact policy sources
+        # with _references (whole original Registry/approval/confirmation).
+        # Do not recursively rebuild that same Registry a second time here.
+        binding.update(grant_id=origin['cpu_trial']['grant_id'], proposal_hash=sources['proposal_hash'],
+                       approval_hash=sources['approval_hash'], config_hash=sources['config_hash'],
+                       scope_hash=sources['scope_hash'])
+        if origin['cpu_trial'] != binding: raise Conflict('CPU trial grant differs from original approved sources')
     for section, field in zip(SECTIONS, ('working_plan_intent', 'working_plan_ready')):
         ref = origin[field]; original = lookup(section, ref['key'])
         if original is None or digest(original) != ref['hash']:
