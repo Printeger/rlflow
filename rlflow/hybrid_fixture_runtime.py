@@ -121,7 +121,8 @@ class FixtureRuntimeOwner:
             self._cpu_grants = {}; self._cpu_results = {}
             self._engineering_grants = {}; self._engineering_results = {}
             self._candidate_materials = {}
-            self._engineering_units = {}
+            self._execution_units = {}
+            self._engineering_units = self._execution_units  # Original SDK compatibility, same registry.
             self.program = Path(__file__).with_name('hybrid_runtime_fixture.py')
             # Exact protected program, not any caller command or plan rewriting.
             raw = _read_bounded(self.program, 16384)
@@ -143,12 +144,12 @@ class FixtureRuntimeOwner:
         return self._leases[id(lease)]
 
     def _unit_check(self, attempt):
-        unit = self._engineering_units.get(id(attempt['lease']))
+        unit = self._execution_units.get(id(attempt['lease']))
         if unit is not None: unit._check_operation()
 
     def _unit_effect_check(self, attempt):
         # Pure memory check AFTER the last source/SQL/Controller fence.
-        unit = self._engineering_units.get(id(attempt['lease']))
+        unit = self._execution_units.get(id(attempt['lease']))
         if unit is not None: unit._check_final()
 
     def _plan_original(self, bundle, token, observation):
@@ -470,7 +471,7 @@ class FixtureRuntimeOwner:
                       preparation, plan_witness, bootstrap):
         captured = attempt['ready']['source_context']
         version = self.budget._metadata(db)
-        unit = self._engineering_units.get(id(attempt['lease']))
+        unit = self._execution_units.get(id(attempt['lease']))
         unit_key = None
         if unit is not None and not cleanup:
             unit._check_operation()
@@ -864,6 +865,7 @@ class FixtureRuntimeOwner:
         """Collect only original sealed FD bytes; never caller JSON/path/receipt."""
         from .hybrid_cpu_trial import CpuTrialResult, evaluate, validate_result
         attempt = self._issued(lease)
+        self._unit_check(attempt)
         if attempt['cpu_grant'] is None: raise PermissionError('original CPU trial lease required')
         with self.pool._lock, self._lock:
             original = self._cpu_results.get(id(lease))

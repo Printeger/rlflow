@@ -45,7 +45,7 @@ class FixtureRuntimeControlService:
             raise ValueError('canonical control origin required')
         with runtime.pool._lock, runtime._lock:
             runtime._actual()
-            if (runtime._control_service is not None or runtime._engineering_units or
+            if (runtime._control_service is not None or runtime._execution_units or
                     runtime.store._hybrid_auth_owner is not auth):
                 raise Conflict('original Runtime/same approval AuthStore cannot be rebound')
             self.runtime, self.auth, self.origin = runtime, auth, origin

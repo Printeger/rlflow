@@ -1,0 +1,66 @@
+Checkpoint 58 final validation evidence (2026-10-10; no live tests).
+Base: 96a98e4 (Checkpoint 57). Trusted finite CPU SDK plus original shared
+engineering lifecycle; no new worker/HTTP/model/GPU/production migration.
+USER untracked package-lock.json not edited/staged, original SHA256:
+becc7e2a36dfcad4ffe934b5ff2f0f68187611d6c0641bd63d81367651cfbf09.
+
+All argv below execute at /home/mint/rl_dev/rlflow_standalone; .venv Python3.12;
+private actual CPU/SQLite fixtures. No parallel pytest/browser suite, restart,
+duplicate passed tests or source/test/schema edit during a live test.
+
+1. Actual one-call positive, session40234 / terminal1c39e5 / exit0:
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q tests/test_hybrid_cpu_execution_unit.py::test_one_call_actual384_raw_machine_scope_STOP_FREE_once_consumption_and_recovery --disable-warnings > audit/hybrid-v1/checkpoint-58-unit-r1.log 2>&1
+1 passed in25.98s. Actual writer-wait initial stale CAS rejects zero Popen, then
+valid original body; original CPU emits384 raw coordinates, complete sealed
+source -> retained original result -> STOP/reap/allFDclose/FREE -> current
+appraisal -> raw cold derive counts96/101/104 and MAE0.08821911547006896 -> next
+REQUEST_INDEPENDENT_REVIEW/Goalfalse/coverageempty/reviewNOT_PERFORMED.
+No candidate pwrite; duplicate/resume after expiry returns original ASOF history,
+not new current authority. Actual audit/snapshot/recovery passes.
+
+2. New boundary batch, session58063 / terminal0cba12 / exit1:
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q tests/test_hybrid_cpu_execution_unit.py -k 'not one_call_actual384' --disable-warnings > audit/hybrid-v1/checkpoint-58-boundary-r2.log 2>&1
+11 passed, 2 failed, 1 deselected in203.44s. Actual lastG/appraisal/decision COMMIT
+cancel rollback; collect/STOP/appraisal/decision lost returns resume; actual
+consumed.experiment_starts==1 before/after, no second Popen/G/recollect/pwrite;
+postSTOP TTL/actual Controller revision reject new appraisal; copied/mixed
+grant/service/fork/HTTP binding denial passed. Both failed rollback-injector cases
+concatenated None stage for a non-CPU Budget event before reaching their target
+CPU rollback. Diagnose same root cause after this actual terminal, narrow injector
+to actual CPU appraisal events, no validator weakening and no blind full rerun.
+
+3. Only two failed rollback cases plus three new necessary boundary cases:
+session84671 / terminal8c5089 / exit0:
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q 'tests/test_hybrid_cpu_execution_unit.py::test_original_stage_lost_results_resume_without_restart_G_or_second_consumption[ASSESSMENT_ROLLBACK]' 'tests/test_hybrid_cpu_execution_unit.py::test_original_stage_lost_results_resume_without_restart_G_or_second_consumption[DECISION_ROLLBACK]' tests/test_hybrid_cpu_execution_unit.py::test_rejected_internal_writer_CAS_does_not_poison_unaccepted_phase tests/test_hybrid_cpu_execution_unit.py::test_unknown_CPU_start_partial_parent_FD_cleanup_retains_exposure_no_fake_terminal --disable-warnings > audit/hybrid-v1/checkpoint-58-boundary-r3.log 2>&1
+5 passed in97.56s. Original full canonical valid fact attempts retained before
+uncertain COMMIT, exact bytes reused after actual rollback despite UTC/mono
+advance; no new authority cache, original current guards/finalTTL still apply.
+Internal appraisal/decision writer-wait stale rejects pre-write, can resume fresh
+unaccepted phase without a second experiment. Actual unknown CPU Popen and
+parent-program FD partial close retains original owner/slot; original-cap retry
+closes parent FD, keeps Source UNKNOWN/terminalNone/occupied1 and experiment
+consumed0/unknown_exposure1. Explicit original singleton owner safety shutdown
+does not produce terminal/FREE/refund. Unit never performs global owner shutdown.
+New17-case acceptance is composite1+r2passed11+r3affected2/new3, NOT a falsely
+claimed fresh entire-new-module rerun. Passed unaffected cases were not repeated.
+
+4. Necessary shared-lifecycle/old CPU regressions:
+session78623 / terminal3004d9 / exit0:
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q tests/test_hybrid_engineering_execution_unit.py tests/test_hybrid_cpu_trial_runtime.py tests/test_hybrid_cpu_assessment.py tests/test_hybrid_cpu_cold_verifier.py --disable-warnings > audit/hybrid-v1/checkpoint-58-regression-r1.log 2>&1
+27 passed in438.20s. Shared57 engineering behavior/actual oncewrite/cancel/unknown
+cleanup/HTTP/fork and original CPU worker/evaluation/history/TTL/cold decision
+have actual unchanged-contract regression. No domain/schema/UI changes; do not
+rerun or relabel unchanged previous Chrome/UI/2214-test full-suite evidence.
+
+Frozen290-input manifest, checked during and after regression, all match:
+519ecd240f6a8fb1c5cd03d8591dc2ea8efb6be8915bd635a6948c3b2a0ca247
+Archived checkpoint-58-final-inputs.sha256 and checkpoint-58-log-sha256.txt.
+Final checks exit0: .venv/bin/python -m compileall -q rlflow tests web_checks;
+.venv/bin/python -m pip check (No broken requirements found.); git diff --check;
+sha256sum --quiet -c docs/hybrid-v1/evidence/checkpoint-58-final-inputs.sha256.
+Independent High incremental design/code review found no confirmed MUST on
+reviewed new code; did not execute tests/write and is not product Reviewer.
+No live tests. Commit follows evidence; hash not self-embedded in its contents.
+Full Goal remains active: only approved fixedPI/add profiles, not generic native,
+independent scientific Reviewer/conditions, strict OS/whole-tree/invoice usage,
+fresh-install/migration/24hfixture8hUI or all M0-M5 acceptance.

@@ -104,6 +104,7 @@ class CpuAssessmentService:
                 guard.db is not db or guard.read.db is not db or guard.thread!=threading.get_ident() or not db.in_transaction):
             raise PermissionError('actual active CPU appraisal guard required')
         attempt,terminal,free=self._original_trial(guard.lease); value=json.loads(guard.raw)
+        self.runtime._unit_check(attempt)
         if 'machine_verification' in value:
             from .hybrid_cpu_cold_verifier import implementation_hash
             if (implementation_hash()!=self._cold_verifier_hash or
@@ -152,6 +153,7 @@ class CpuAssessmentService:
             value=json.loads(self._active.raw)
             if not timestamp(value['recorded_at'])<=now<timestamp(value['sources']['expires_at']):
                 raise Conflict('CPU appraisal expired at final owned COMMIT')
+            self.runtime._unit_effect_check(self.runtime._leases[id(self._active.lease)])
         if self._active is not None: raise Conflict('nested CPU appraisal transaction refused')
         try:
             with self.controller.token_transaction(token,read_bytes=PREPARATION_READ_BYTES,
@@ -185,6 +187,7 @@ class CpuAssessmentService:
                     if value['request']!=request: raise Conflict('CPU appraisal idempotency key reused')
                     return {'fact':value,'duplicate':True,'current_activation':'NOT_RECHECKED'}
             with self._transaction(token) as (db,read,control):
+                self.runtime._unit_check(attempt)
                 version=self.budget._metadata(db)
                 if version!=expected_state_version: raise Conflict('CPU appraisal stale expected version')
                 sources=self._current_sources(db,read,request['goal_ref']);_,mono=self.controller._sample()
@@ -201,6 +204,8 @@ class CpuAssessmentService:
                     if 'prior_assessment_key' in prior['request']:raise Conflict('CPU decision requires plain original appraisal')
                     from .hybrid_cpu_cold_verifier import verify
                     value.update(prior_assessment_hash=digest(prior),machine_verification=verify(result))
+                unit=self.runtime._execution_units.get(id(lease))
+                if unit is not None:value=unit._original_assessment_attempt(value)
                 validate_record(key,value);self._dependencies(db,value,read)
                 payload={'format':2,'put':[[SECTION,key,value]],'delete':[],'details':None}
                 present=read.object(SECTION,'') is not None
@@ -208,6 +213,7 @@ class CpuAssessmentService:
                 if present!=(tip is not None): raise Conflict('CPU appraisal domain differs from original tip')
                 if not present: payload['put'].append([SECTION,'',{}])
                 guard=_Guard(self,db,read,token,lease,value);self._active=guard;guard.check()
+                if unit is not None:unit._capture_assessment(value)
                 self.store._commit(db,EVENT,key,payload,version,digest(value),'hybrid-core',event_inputs(value),_authorization=guard)
                 guard.check()
             return {'fact':value,'duplicate':False,'current_activation':'EXPERIMENT_CURRENT_AS_OF'}
