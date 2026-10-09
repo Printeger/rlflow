@@ -1,0 +1,82 @@
+Checkpoint51 — cold original finite-trial research/raw-evidence HTTP
+Parent: 2a43838c5c4b3721b240de7d239aa929c0a68863 (Checkpoint50).
+Private finite CPU/SQLite/loopback only. No paid model/GPU, arbitrary script,
+native/candidate execution, production migration, protected writes or public host.
+
+DELIVERY / ACCEPTANCE
+Optional create_app cpu_assessment_readers startup injection; default routes404.
+GET /api/v1/projects/{project_id}/cpu-trial-assessments (default2/max5 keyset)
+GET /api/v1/projects/{project_id}/cpu-trial-assessments/{assessment_id}
+CpuAssessmentReader binds existing Store.attach_existing, protected Registry and
+fixed fixture project/epoch/server clock, not Runtime/Source/Pool/dispatch owners.
+Single BEGIN /64MiB cumulative original fact/event/dependency budget. Closed
+appraisal wholeevent -> original Budget terminal wholeevent -> Goal/Approval
+original facts -> both Preparation wholeevents -> original Plan/install/workspace/
+controller/Budget dependencies -> CPU appraisal links. Cached seeds are original
+proved objects only, not arbitrary projection snapshots/DTOs.
+Raw384 points/counts/metrics/SHA and three-axis research/next via public allowlist.
+No paths, producer/PID/boot, nonce, lease, Registry witness or Pool private facts
+in DTO. Current metadata version=projection=MAX(event seq) and scope/epoch checked
+in same snapshot, including inherited check_current. Fresh post-source UTC TTL
+for CURRENT_AS_OF, expired/changed consent remains HISTORICAL_ONLY. Bad originals
+or missing projection with original event503, never fake empty/current success.
+Auth before/after read+freshscope, project404, read-during-revocation401, sameorigin,
+closed queries. No GET poll/write/collect/Popen/owner adoption or arbitrary file.
+Current execution UNKNOWN/resource NOT_OBSERVED/controlsfalse; condition coverage
+empty, Goalfalse, independent_review NOT_PERFORMED, model/GPU/dispatchfalse.
+
+ACTUAL ORIGINAL RUNS / FAILURES
+1. PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q
+   tests/test_hybrid_cpu_assessment_reads.py --disable-warnings
+   r1 original87162 terminal2223b6 exit1:3fail/1warning39.80s. All new fixtures
+   called nonexistent Store.open_existing. Main first rg-read actual existing
+   attach_existing(project_id,data_mode), fixed TEST-only call, did not add fake
+   production compatibility API or blindly repeat without diagnosis.
+   Actual CPU compute occurred, but HTTP not proved at this failed fixture stage.
+2. Main also corrected known missing projection/originalEVENT detail503 and added
+   actual local socket case. Same command r2 original30148 terminal73ec7e exit0:
+   4pass/1warning49.71s. Actual raw trial -> appraisal -> HTTP full384/counts
+   96,101,104/error0.08821911547006896/current; cold Store has no bound owners;
+   after original Runtime+Pool shutdown still reads original data. No read effects
+   with poll/collect/write traps; owner Storeversion unchanged. Viewer/project
+   auth/defaultoff/query/paging/read-mid-revoke/sourcecorrupt503/detailmissing503/
+   final TTL expiry passed. Real uvicorn loopback GET original noG UNASSESSED/null
+   evidence, POST405, zero newPopen and bounded thread/socket close passed.
+3. Independent found projection_meta/source version mismatch could be swallowed
+   as historical200. Only new reader snapshot override adds same-BEGIN integer
+   equality guard, inherited check_current and startup snapshot also covered.
+   Only new required negative:
+   tests/test_hybrid_cpu_assessment_reads.py::test_corrupt_projection_version_and_startup_epoch_are_not_historical_success
+   Original85002 terminal1983b1 exit0:1pass/1warning10.06s. Corrupt list/detail503,
+   restored source CURRENT, bad epoch startup denied. Original4passed unchanged
+   cases not repeated; program/evaluator/runtime execution bytes unchanged.
+4. Necessary existing Web/read/auth/config/old Task API regression ONCE:
+   PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q
+   tests/test_web_api.py tests/test_web_auth.py tests/test_web_control_config.py
+   tests/test_hybrid_reads.py tests/test_hybrid_fixture_runtime_reads.py
+   --disable-warnings
+   Original36076 terminal79d0fe exit0:129pass/2warnings98.67s.
+   All264 source/test/schema/web inputs frozen and matched at actual terminal.
+   No live input edits/parallel suites/duplicate independent execution, no new
+   post-repair raw-trial repeat, old full regression or unrelated frontend suite.
+
+INDEPENDENT REVIEW / FINAL CHECKS
+Existing readonly High agent; no tests/writes. Narrow missing-projection detail
+source handling and new projection/source/event metadata equality closed; no
+remaining confirmed MUST. Original proofseed/TTL/DTO/auth boundaries reviewed,
+not a repeat of50/49 closed code. Static closure is not actual execution evidence.
+264 final manifest checkpoint-51-final-inputs.sha256 SHA256:
+7426d4fcc5fe6f19885471adf23a5f9dcc40eb3e61f849f1dee6bdc9e838435d
+Original development manifest and original failed rawlog retained separately.
+compileall/pipcheck/diff/final264 SHA checks all actual exit0; no live tests.
+Original log SHA archive checkpoint-51-log-sha256.txt. No fresh final five-new-
+case full-suite claim; targeted additive results accurately listed above.
+USER package-lock.json remains unchanged/unstaged SHA256:
+becc7e2a36dfcad4ffe934b5ff2f0f68187611d6c0641bd63d81367651cfbf09
+
+NEXT / REMAINING
+Actual research/raw data Dashboard wiring, current-contract independent review/
+trusted condition mapping/finite research decision; actual engineering candidate/
+native, strict OS/data/network/arbitrary-treeSTOP/invoice/install/migration/
+24h/8h and complete Goal remain open. No new external user authority needed for
+the bounded next slice; no paid/GPU/production authority inferred.

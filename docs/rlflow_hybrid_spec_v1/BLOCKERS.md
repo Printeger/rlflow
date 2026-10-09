@@ -1,5 +1,9 @@
 # 阻塞与证据缺口
 
+Checkpoint51 FINAL：真实有限研究状态/raw证据只读HTTP及实际cold/loopback通过，129项必要回归和264SHA/检查通过，High窄MUST关闭，无live测试，正在提交。无新增外部用户决策阻塞，下一真实Dashboard研究数据接线/独立评价与条件决定，仍不能以GET/VALID或无写cap页面证明科研Goal/工程native完成。严格OS/任意树/invoice/安装/长期缺口与付费/GPU/生产边界保留。USERlock未动，下方WIP均历史。
+
+51 WIP：真实有限研究appraisal与raw样本HTTP已交付、冷只读owner-free/原owner关闭/实际loopback有证据；当前UNKNOWN/NOT_OBSERVED/Goalfalse/coverage空/独立review未做保持。必要五模块原36076仍LIVE、264输入冻结，最终51未提交。无新增外部资源决策阻塞；下一真实研究数据UI/独立评价/条件有限决定，以及真正工程candidate/native/严格OS/任意树/invoice/安装/长期完整Goal缺口，不以GET或VALID替代。50已提交2a43838，USERlock未动。下方WIP均历史。
+
 Checkpoint50 FINAL：实际有限研究三轴appraisal/next及当前vs历史读取，必要回归123pass73.89s、262SHA和最终检查通过，High已确认窄MUST闭合，无live测试，正在提交。无需新增用户权限才能继续有限model-free范围；下一真实Experiment/证据对外读桥及独立评价/条件决策、实际工程candidate/native，而不是把建议当完成。付费/GPU/生产边界与严格OS/任意树/invoice/安装/长期缺口保留。USERlock未动。下方WIP均历史。
 
 50 WIP：实际有限研究appraisal/next与当前vs历史读回已交付，原结果不改、全局条件不自动激活。必要5依赖模块原48336 LIVE、262SHA冻结，尚无最终50验收/commit；开发两失败均新测试还原/注入夹具，定向已通过，High四窄MUST静态闭合。无新增外部用户决策阻塞；下一对外真实Experiment/evidence读桥、独立评价与条件/有限研究决定，以及真正工程candidate/native；严格OS/任意树/invoice/安装/长期缺口保留。49已提交c218732。下方历史不替代本状态。

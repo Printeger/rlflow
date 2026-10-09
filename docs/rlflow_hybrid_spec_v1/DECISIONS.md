@@ -1,5 +1,13 @@
 # 开发决策记录
 
+## Checkpoint51 FINAL：以实际原raw读取为交付，保留研究/完成分层
+
+真实完整原384样本与指纹、三轴/next、cold只读owner-free与原owner关闭、auth前后/actual loopback已证明；129项必要回归/264SHA/检查通过。新reader同BEGIN版本等值拒损坏，不让current加载失败掩成历史200；缺原投影而原event存在503。原结果、覆盖条件、独立review与Goal完成不被API命名或数值改善升级，下一实际UI和独立评价/条件决定需另行交付。
+
+## Checkpoint51 WIP：冷只读原始证据入口，不向DTO泄露或重建执行能力
+
+新CPU appraisal读桥只接既有cold Store.attach_existing与trusted Registry，原固定上下文scope/epoch；全原event/dependency闭包、同snapshot单读预算、末TTL与projection/source/event版本等值、鉴权读前后及freshscope后返回。默认关闭，page最多5、原raw384点allowlist；private nonce/path/producer/lease/Pool及Registry原物料不出DTO。历史FREE仍不等当前资源，科学三轴与Goal/独立review分离；未知来源坏为503，不能掩成空/404或正常历史。新增API是可调用实际行为，后续UI与独立评价才关闭相应产品缺口。
+
 ## Checkpoint50 FINAL：当前只激活有限实验事实，不满足未知条件
 
 原actual结果/PoolFREE/current原批准→独立不可变appraisal，三轴/next读回和当前失效历史保留实际通过；123项必要回归/262SHA/最终检查通过。四窄来源完整性问题修复不增加执行权限，两失败仅测试腐坏注入/还原，各原日志留存。condition_coverage=[]、independent_review未做、GoalcompletedFalse仍硬约束；下一真实产品读桥与独立评价/条件决定才推进缺口，不用VALID/SUPPORTED或新增测试数量冒称完整研究/Goal完成。

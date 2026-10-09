@@ -1,5 +1,9 @@
 # 需求包离线校验报告
 
+Checkpoint51 FINAL：必要五模块原36076终79d0fe exit0：129pass/2warning98.67s；264冻结SHA7426d4fc…8435d前后匹配，compileall/pipcheck/diff各exit0。真实rawHTTP/cold owner-free/owner关闭/鉴权读中revoke/keyset/坏源503/实际loopback原4pass49.71s、新projection/source/event版本guard定向1pass10.06s；未重复旧rawpositive/browser/前端/独立suite，不宣称最终fresh五新case套。r1全部新fixture错接口3fail保留。原证据与日志SHA见evidence/checkpoint-51-final-tests.txt，High窄MUST关闭，无live测试，正在提交。当前三轴与Goal/独立review严格分开，后者仍未验收；下方WIP均历史。
+
+51 WIP：原87162终2223b6 exit1 3fail1warning39.80s均新fixture不存在Store.open_existing，rg实际接口后test-only attach_existing修复；原30148终73ec7e exit0 4pass1warning49.71s，真实rawCPU HTTP/冷读且owner关闭/zeroGETeffects/authbeforeafter/default404/query/paging/坏源503与实际loopbackNoG通过。唯一新metadata guard原85002终1983b1 exit0 1pass1warning10.06s，源/投影版本损坏list/detail503+恢复/epoch拒。五既有Web依赖原36076 LIVE、264SHA冻结7426d4fc…8435d，最终51尚待。日志失败保留，不宣称最终fresh五新case或Goal条件完成，详见HYBRID_CPU_ASSESSMENT_API.md。
+
 Checkpoint50 FINAL：必要五模块原48336终cd5b24 exit0，123pass/1warning73.89s；262冻结SHA前后匹配9521d2d9…09c2da，compileall/pipcheck/diff各exit0。真实appraisal/原PoolFREE/当前vs历史/原幂等与实际丢COMMIT receipt恢复、周期快照和坏snapshot/删域拒绝/读末TTL/有界来源按原六新case分别通过；不是最终fresh六case套。开发两失败均夹具注入/还原，日志未隐藏且生产约束未放宽。High四窄MUST已静态关闭。无live测试，正在提交50，见evidence/checkpoint-50-final-tests.txt与日志hash。仅固定实验AS_OF、coverage=[]/Goalfalse/review未做，完整工程科研/原Goal验收仍缺；下方WIP均历史。
 
 50 WIP：原93316终f68b7e exit0 2pass37.18s，真实原CPU→研究appraisal/asof/过期历史/幂等/manual恢复及noG/通用writer拒。原86683终fbe9d7 exit1 2pass/1夹具projection.version漏列fail39.71s，已通过真实换版/撤销降历史；原7231终84c113 exit1 1pass/1注入被append-trigger拒fail29.29s，完整丢COMMIT返回/周期快照/重算删域坏snapshot/projection删域维护保due通过；test-only注入恢复trigger后原77235终c19f16 exit0 1pass12.77s。原失败全部保留，无生产trigger/必要断言放宽。High窄MUST闭合，5依赖模块原48336 LIVE、262SHA冻结9521d2d9…09c2da；最终50尚待。见HYBRID_CPU_ASSESSMENT.md；不是fresh全新trial suite/Goal条件完成或独立研究review。
