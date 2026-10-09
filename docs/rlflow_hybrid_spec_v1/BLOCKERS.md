@@ -1,5 +1,7 @@
 # 阻塞与证据缺口
 
+当前覆盖：41 已实际提交 3a7fec4；42 固定 managed fixture 应用共享三槽池正在必要最终复核/集成，暂无新增需用户决策的外部阻塞。原能力、真实占用与 NO_HANDOFF 全 FD 关闭已实现，仍非 Runtime 执行授权。可信 UsageOwner、Pool/Project/Budget 联合登记、最小工程与低成本科研执行闭环、整树可靠 STOP、生产安装/全主机 OS-model-data 门及原长期性能/UI 验收仍待依赖推进。用户权限边界不变；不调用付费模型/GPU，不迁移生产；USER package-lock.json 保留未改未 stage。下方旧 LIVE 为历史。
+
 Checkpoint40 最终验证全部实际终态：root/High同21modules各534pass/8既有外部H1skip/1既有Starlette warning（345.80s/344.19s）；中央full原14894 actual terminal exit0/chunkd5431d，**1818pass/32既有外部H1skip/1既有warning678.02s**。22source/test/schema SHA与冻结一致，范围无剩余MUST，compileall/pipcheck/diffcheck均exit0，当前无live测试。证据见HYBRID_RUNTIME_BOUNDARY.md及evidence/checkpoint-40-final-tests.txt。实际新private fixture非执行安装已实现，不代表旧namespace迁移/WorkingPlan/Runtime授权/UsageOwner/共享pool/可靠STOP或完整T12/M1/M0–M5验收；无新browser/NFR06/B1/24h/8h/离线18checks证明。下一41实现实际WorkingPlan，Goal active，USERpackage-lock保留未stage。下方candidate/LIVE均为保留历史阶段。
 
 40定向/独立已实际終态：root/High同21各534pass/8既有外部skip/1warning（345.80s/344.19s），22SHA一致、范围MUST关闭；中央FULL原14894 LIVE。无新增外部阻塞，不并行测试且source/tests/schema继续冻结。新fixture非执行安装已实现，不代表既有namespace迁移/完整新安装/WorkingPlan或运行验收；原M1/B1/NFR06/长期、Runtime/UsageOwner/共享pool/可靠STOP与完整Goal后续工作继续保留。

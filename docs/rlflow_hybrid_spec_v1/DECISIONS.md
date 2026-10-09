@@ -1,5 +1,9 @@
 # 开发决策记录
 
+## Checkpoint42：原事实索引与原连接身份
+
+独立复核发现可变 SQL slot/action 辅助字段能隐藏非最新占用，12 项绿不能豁免。改为 raw JSON 表达式索引、固定完整 DDL 检查、bounded SQL headers 与 byte-exact derived head；非空 prior 必须存在。startup/explicit audit 有限全重放，hot 操作固定三 head/fixeddepth，不用全历史扫描替代热路径修复。SQLite 连接按实际新打开的原 native RW inode 绑定，路径换回不构成证明；不引入 APSW/custom VFS/私有 CPython 布局。Linux FD census 不确定则拒绝，不降级路径。原槽最终守卫及 UTC/mono 必须在所有 IO 后覆盖实际 COMMIT；UNKNOWN/CLOSE_INTENT 也有最终 member/head/slot 守卫。真实 fork/部分关闭保留原 FD 生命周期，未完成 cleanup 不签发 FREE witness。详情见 HYBRID_HOST_POOL.md；生产全主机隔离、Runtime handoff 与 UsageOwner/STOP 不在本切片完成范围。
+
 ## Checkpoint41 全量发现的局部回归与最小修复
 
 唯一full原86772实际2048pass/2fail/32既有skip/1warn1312.45s，原日志保留不覆盖。cpu_approval旧测试要求只读MCP还携带写根，与native[]及只读合同矛盾，改断言而不恢复权限。telemetry原real worker的scratch是control私有子目录；新pure renderer错误的双向disjoint使准备提前失败。恢复原布局，只允许scratch在control下，candidate仍双向分离、control不可被scratch覆盖；schema/output/config/audit/transport、commands整树和原tool-registers路径均不可与scratch重叠。实际PI/Engineer CPU测试证明scratch可写而control sibling不可读写；未调用模型。High局部复核MUST关闭，四模块96pass、普通/大型READY完整closure2pass、61SHA一致及compile/pip/diff0。按影响范围修复验证，不重复28模块或另开full，明确不宣称修复后全量重新全绿。这次只修已发现回归，不扩41功能或运行许可。

@@ -1,0 +1,101 @@
+CHECKPOINT42 FINAL SCOPED POOL EVIDENCE — NOT RUNTIME/GOAL ACCEPTANCE
+FINAL42 block is authoritative; development pending/LIVE statements below
+are retained historical states, not current pending work or new grants.
+Parent41 actual3a7fec449028fb1d8cf086a3b82a4ca7f62bc28b; sole writer root.
+Unique pool-r1 ORIGINAL39802/chunkfbd5bd actualterminalexit0/chunk9ba3ce:
+12passed27.94s. No paid model/provider/GPU/public hosting/production migration.
+Actual argv:PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -B -m pytest -q
+ tests/test_hybrid_host_pool.py
+stdout/stderr audit/hybrid-v1/checkpoint-42-pool-r1.log, preserved original.
+a6b2eb8c07d5cf950a793501062e735bae105102a68fc2720721ccbd1b67e507  audit/hybrid-v1/checkpoint-42-pool-r1.log
+Root ALLsource/tests frozen while LIVE; no parallel suite/benchmark.
+Actual fixture application shared3 KernelFD+durable heads; two projects/processes,
+fourth denial; original child death does not refund; original UNKNOWN,
+no-handoff closing/all-FD witness/FREE then same-slot new-claim duplicate safety;
+copy/JSON denial, realCOMMIT before/after lost-return original-cap retry;
+restart joins new source-only membership but cannot adopt historical occupied.
+Protected fixed application/host_pool descriptor pins, app/projects lineage,
+actual first BootstrapWitness proof and later indexed historical DB identity.
+Only this managed fixture application is proved, NOT whole host legacy fencing.
+All start/release denied; native delegation not enabled. No actual UsageOwner,
+Runtime/Budget joint registration, OS/data/model limits or reliable STOP yet.
+Still outstanding: final clocks after last IO, final source guards on closing,
+finite startup full audit/nonlatest closure, actual fork and partial-close cases,
+independent static review/necessary final evidence. 12 green is not acceptance.
+Source candidate SHA AFTER r1 (same bytes throughout original LIVE):
+2c4fcd1f94be302fa82f2842feb00d3ba581a28bd74b99b747437a86fd34f51b  rlflow/hybrid_host_pool.py
+a0ed6fe2787f820dc9e5e35df43ee19bd22d51fbd15c54fabfda3f304d1749b5  rlflow/hybrid_host_pool_ledger.py
+e5bab8e3557ebf5f947994b76d641080492b908f2504cd6917fc7c6ac8254d0d  tests/test_hybrid_host_pool.py
+
+DEVELOPMENT r2 ORIGINAL13139/chunke6c748 actualterminalexit1/chunkb73f64:
+28passed/1failed68.15s. Exact same module argv as r1; no parallel suite;
+ALLsource/tests frozen throughout LIVE. Original log preserved:
+676469f06ce3ac97276539fc3061345587f9da4597df30ab71db351bd24c47ed  audit/hybrid-v1/checkpoint-42-pool-r2.log
+Frozen r2 input SHA:
+81554c67244e696b49056602a399cd93e8d61eae10ce49397ff7630862f12468  rlflow/hybrid_host_pool.py
+79ca1885e44961e1be4a9d1e49a479de8a571470b85e4f579d65484046e48349  rlflow/hybrid_host_pool_ledger.py
+020dffe30729d2cacaf1e14b601fad60f9f2e818e1454286b84a39c91ac19be0  tests/test_hybrid_host_pool.py
+
+FINAL42 scoped nonexecuting pool acceptance:
+High focused static delta review actualfinal: no confirmed remaining MUST_FIX;
+no High tests/writes, no repeated41 review. Fork post-yield SQL and source key
+limit residuals closed with actual new negatives before finalintegration.
+ONE final direct dependency integration ORIGINAL86229/chunk8cee31,
+actualterminalexit0/chunk754f33:117passed118.51s. Exact argv:
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -B -m pytest -q
+ tests/test_hybrid_host_pool.py tests/test_hybrid_fixture_materials.py
+ tests/test_hybrid_installation_service.py tests/test_hybrid_runtime_installation.py
+02f2d519a537099e8d4ed25f0891477d9d4128f57055c19a38f98272d8ade5ca  audit/hybrid-v1/checkpoint-42-integration-final.log
+ALLsource/tests/schema frozen whileLIVE; no parallel suite/benchmark.
+AFTER SHAcheck actualexit0/chunk19edfd; all17 match frozen below:
+47ad00d9cc3905faf856f1186bdc95866879fde36ea8e00d0bae16ebbcb8d2a2  rlflow/hybrid_fixture_materials.py
+b219f5673934343432dff835bd2450dc86d634949880f51a76b50c4ab93b6dcf  rlflow/hybrid_goals.py
+6431e79f2e577bd61aa51d570fe360b5ccd4e60567b2e41716ac2c47ce799952  rlflow/hybrid_host_pool.py
+79ca1885e44961e1be4a9d1e49a479de8a571470b85e4f579d65484046e48349  rlflow/hybrid_host_pool_ledger.py
+637c342f062898df5bbe07e7680e76f518b1f5de995760340d64f7ffa562f1df  rlflow/hybrid_installation_service.py
+91b2b2bb15bf1c267eb1d4875e20f955ffe2fb8768766d0213473a81ba757553  rlflow/hybrid_protocol.py
+a038f295b98741ad7cf86121b3597563bd5d4623c7f6013818780187f218acb4  rlflow/hybrid_reads.py
+5706b9ab3c968fae36ccb0b4e1cee379861d765c877f7738af2d4b95e388d81f  rlflow/hybrid_runtime_boundary.py
+f4c554f5d8ab2fd5e80f52754f1b700f845ca8d8f94208e612b697477aaf45ef  rlflow/hybrid_runtime_installation.py
+e6ec857988c8eebcc9b942aea925173864b68f285c90d57a81143d22ce7b18a4  rlflow/hybrid_workspace_kernel.py
+b77738df92f90b255805cf4a86adedfc72a6afad3341700a201254896a8c4a37  rlflow/jobs.py
+3019b2b3fee910b033c669c9b1f52604f4f35eefc218c677d37d6b7f06a26086  rlflow/observation.py
+38e5f2e7605b45cfe4cf15a664b55cd5bd58034cce97f9262bed4d585e072c58  rlflow/store.py
+47129b029a626b45463be2986624ad362016ea36838e565e89ef0272008cf292  tests/test_hybrid_fixture_materials.py
+264d6fe171bf910792ff0c47f182e4ab0343c76d6fea671749cd2d4392bfa05e  tests/test_hybrid_host_pool.py
+394f06918320beef9089ee0eb891f859e994898ecc4ceea53dbdd734c7520d15  tests/test_hybrid_installation_service.py
+4196e5b67091e550d68eaa2ddf6e39653f91e67cfc7f61e8ef84e45c199b9aa1  tests/test_hybrid_runtime_installation.py
+
+New3files py_compile actualexit0/chunk9d07a4; diffcheck exit0/chunk248477.
+No broadfull rerun:42 adds isolated pool modules, existing runtime/Store unchanged;
+finalintegration covers new originalprocess guards/nativeSQL/fork lifecycle
+and actual direct installer/material/domain dependencies. Prior41 full failure
+and local repair evidence retained; NOT called newfullall-green.
+Private Linux application/fixed trusted connector nativeFD census only;
+NOT arbitrarySQLite/VFS/noncooperating sameUID/wholehost/production fencing.
+All pool start/release flags remain false. No paidmodel/GPU/provider/production
+migration. Actual fork and actual finite child processes are localCPUfixtures.
+Remaining trustedUsageOwner, jointPool/Budget/Runtime registration, handoff,
+reliable wholeprocess-tree STOP and original fullGoal gates NOT accepted.
+USER package-lock.json untouched/untracked/notstage:
+becc7e2a36dfcad4ffe934b5ff2f0f68187611d6c0641bd63d81367651cfbf09
+No current external blocker requiring user choice; next trustedusage slice.
+Failure: oversize SQL key was correctly SQL-CASE bounded to NULL and denied,
+but raised generic ProtocolError instead of expected contextual Conflict.
+AFTER actualterminal, root added explicit indexed-key/member-id type denial.
+Other28 actual cases passed, including raw-index hidden-claim/index-DDL,
+oversize cells, head float-equivalence, missing prior, nativeDB swap-restore,
+last-IO TTL/slot-lock rollback, finite historical audit, fork and partialclose.
+High focused delta review ongoing. No repeated Checkpoint41 review/tests.
+Startup/explicit full audit has fixed30s cooperative envelope/max4096 facts;
+hot operations retain fixed5s, indexed3heads/fixeddepth proof, no fullreplay.
+Final acceptance/commit42 still pending; no Runtime/Usage/STOP authorization.
+
+Unique key-repair-r1 ORIGINAL96533/chunk03fb34 actualterminalexit0/chunka6cc6c:
+1passed2.55s; exact argv adds node selector
+tests/test_hybrid_host_pool.py::test_oversize_sql_cells_fail_closed_before_projection_adoption[key]
+49f3e29a212c09e239d566d800ad1a453c57eadb7df75ad1ac7db810d0140caa  audit/hybrid-v1/checkpoint-42-key-repair-r1.log
+3source/test SHA before/after match; frozen repaired candidate:
+930f5f6eb190923294f7b39c4895e8acd1b21ab598d98519f95507e0a3b780ae  rlflow/hybrid_host_pool.py
+79ca1885e44961e1be4a9d1e49a479de8a571470b85e4f579d65484046e48349  rlflow/hybrid_host_pool_ledger.py
+020dffe30729d2cacaf1e14b601fad60f9f2e818e1454286b84a39c91ac19be0  tests/test_hybrid_host_pool.py
