@@ -1,5 +1,9 @@
 # 阻塞与证据缺口
 
+Checkpoint66 FINAL：本片无剩余必须修复项或新增用户决定阻塞，126必要回归与最后3项实际恢复差量通过，原所有失败归档，无live测试。当前已完成原强cap账本故障安全STOP，仍未证明磁盘审计预留、严格OS配额、任意树或全主机资源保证；原cgroup无用户委派，不擅改系统。下一可在原私有项目内实施有限派发实际FS共享准入与小额应急预留；硬quota/独立卷/迁移/大额预留/删除证据仍需决定。产品Reviewer新合同与额度询问未答，不调用；T22/B1/长期/T23/M5缺口保持。详HYBRID_STOP_STORAGE_FAILURE.md；下方WIP为历史。
+
+Checkpoint66 WIP：无新增外部决策阻止当前本地安全收尾。原账本故障物理STOP与UNKNOWN保留已分轮实测；八module必要回归61888 LIVE，冻结等待真实终态，非阻塞或失败。尚待终态cleanup phase定向验收、最终归档/commit。本机cgroup root属root且未委派用户写权限，严格OS/任意树未证明，不修改系统权限；磁盘拒启动与预留审计空间下一切片。产品Reviewer仍待原已提出的新隔离合同/模型额度决定，无回答不调用；原T22/B1/长期/T23/M5缺口保持。
+
 Checkpoint65：本片实际结果→条件分母→缺证/缺独立Review阻断→API/Dashboard已交付，新增MUST和必要回归关闭。真实独立产品Reviewer路径仍需要新隔离批准合同与非零模型额度；原fixture模型/token/GPU均零，已向用户询问，未获授权、不调用。该路径权限缺口不阻止在现权限内继续T21资源隔离/恢复；严格OS/任意树、账单、T22 B1/24hfixture8hUI、T23及M5原缺口保持，完整Goal active。256连续原事件窗口超限503为明确可用性限制，不自动全历史重放或宣称当前。USERlock未改未stage；详HYBRID_DELIVERY_EVIDENCE.md。
 
 Checkpoint64：本片无新增用户决定或权限阻塞。原有限全集STOP的真实SDK/HTTP/UI、UNKNOWN续原收尾与有界中断/容量拒绝通过，必要回归20pass，开发High MUST关闭；见HYBRID_FINITE_HOST_STOP.md。双preG屏障失败已定位原共享Pool start持锁，不改watchdog/权限锁，不称同时双preG生产者已证明。完整Goal仍缺native/产品独立Reviewer/ConditionEvidence最终门、严格OS/任意树/invoice、T22 B1/24hfixture8hUI及依赖后的T23/M5。继续最高已满足依赖的产品结果Review/条件门纵向切片；真实付费模型/GPU/生产状态仍需另行授权，未调用或迁移。USERlock未动，下方历史不替代本状态。

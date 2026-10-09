@@ -1,0 +1,138 @@
+Checkpoint66 final development acceptance; baseline27ad05b; full M0-M5 Goal ACTIVE.
+Python3.12.3 .venv, original isolated fixed CPU/engineering participants and
+original shared Pool/Auth. No paid model/GPU/production migration/push.
+USER package-lock SHA becc7e2a36dfcad4ffe934b5ff2f0f68187611d6c0641bd63d81367651cfbf09
+unchanged, never staged. All tests sequential, no live source/test edits or restart.
+Python: PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest.
+Raw logs and each round's frozen SHA/end-check: audit/hybrid-v1/checkpoint-66-*.
+
+r1: -q -s tests/test_hybrid_stop_storage_failure.py (then four cases).
+stop-storage-r1.log; original67601 terminalf5315b exit1;
+3passed/1failed/1teardown-error/1warning80.54s. Actual SDK Project/Pool/partial
+FD fault: original preG child reaped, FD cleanup retained/retried, failed STOP
+UNKNOWN/occupied2/no terminal, original recovery no spawn, other project intact.
+HTTP physical cleanup worked but healed human STOP advanced version before old
+cleanup CAS; immutable retained pure cleanup could not recover. Root cause
+diagnosed; no unchanged retry. Added exact successful local cleanup rollback
+witness, current-CAS re-link only for known absent pure cleanup, never unknown
+COMMIT or new control acceptance. High two cleanup boundaries fixed as well:
+independent engineering input close/all-owner attempts; operation first cleanup
+result retained so coordinator does not automatically cancel twice.
+331 r1 pins matched after actual terminal, before source changes.
+
+r2: -q -s tests/test_hybrid_stop_storage_failure.py::test_actual_HTTP_stop_intent_commit_failure_still_cleans_then_same_key_recovers
+stop-storage-r2.log; original81702 terminal2672a8 exit0;
+1passed/1warning21.50s. Actual original preG child; STOP acceptance503, original
+Run202 is acceptance not execution success; reaped/allFDclosed/noG/UNKNOWN and
+occupied2 during fault. Same original STOP key after heal202, duplicate no new
+version, occupied1, no Popen, other original unit untouched. 331 pins match.
+Four source files remained unchanged through r8; r9 changes only one Runtime
+witness-consumption line, after r8 actual terminal. Other three remain unchanged.
+
+r3: -q -s tests/test_hybrid_stop_storage_failure.py -k 'bare_runtime or exactly_once'.
+stop-storage-r3.log; original33525 terminalb34462 exit1;
+3passed/1failed/1teardown-error/4deselected/1warning47.00s.
+Actual owner ledger read/write unavailable and owner partial FD bodies executed;
+whole STOP accept failure only one automatic cancel and explicit same-key
+unknown recovery passed. Test errors: second bare start still retained preG
+fault hook asserting child alive; partial source cleanup raises Conflict not
+OSError, so outer expected Conflict accidentally caught before retry assertions.
+Diagnosed exact trace and restored real release hook/expected interface type;
+not a relaxation of cleanup or exposure conditions. 331 pins match.
+
+r4: -q -s tests/test_hybrid_stop_storage_failure.py -k 'bare_runtime and not owner]'.
+stop-storage-r4.log; original23202 terminala8ac09 exit0;
+2passed/6deselected/1warning18.71s. Only r3 failed/teardown-error parameter cases:
+bare attempt physical reap/closedFD/noG/frozen restart and normal durable cleanup;
+partial owner retains both original owners, heals original remaining FD, retires
+without terminal/FREE/refund. Passed unchanged r3 cases not repeated. Pins match.
+
+r5: -q -s tests/test_hybrid_stop_storage_failure.py -k 'COMMIT_lost or bare_engineering'.
+stop-storage-r5.log; original91657 terminal18bf45 exit0;
+2passed/8deselected/1warning19.90s. Actual original SQLite COMMIT inside writer
+followed by lost return: no rollback witness; real successor event/CAS advance,
+exact original committed STOP retained unchanged, cleanup Pool0/no new effect.
+Actual bare engineering preG STOP ledger ENOSPC plus source FD EIO: reaped,
+original input independently closed, source original retry closes remainingFD,
+freeze rejects G, original durable cleanup Pool0. Pins match.
+
+r6: -q -s tests/test_hybrid_stop_storage_failure.py -k 'rollback_failure or source_owner_partial or (bare_engineering and owner)'.
+stop-storage-r6.log; original34227 terminale4bd7a exit1;
+1passed/2failed/10deselected/1warning15.54s. Actual SQLite Connection rollback
+raises: no witness; real successor CAS cannot rebase old cleanup; original
+safety shutdown retains UNKNOWN/occupied1. Other test-only errors: owner has
+correctly retired and release is PermissionError rather than Conflict; standalone
+source scenario is linger, whereas running belongs to Runtime protocol fixture.
+Corrected to established interface/scenario, no changed product assertions.
+331 pins match; passed rollback case not repeated.
+
+r7: -q -s tests/test_hybrid_stop_storage_failure.py -k 'source_owner_partial or (bare_engineering and owner)'.
+stop-storage-r7.log; original28132 terminal82474b exit0;
+2passed/11deselected/1warning9.97s. Engineering owner partial source cleanup
+still closes original input, retains original owner, original retry retires and
+rejects G, occupied1/no refund. Two actual original standalone producers: first
+FD close failure still reaps both and closes second entirely; original owner
+retained until remaining FD retry, no Pool refund/occupied2. 331 pins match.
+
+The first13 distinct new cases use composite targeted results, not a final
+new-module rerun. Initial failures/input identities remain intact. Until r8
+terminal, four source files last changed before r2; later edits were only new
+acceptance tests. High initially closed the two cleanup MUST findings.
+Reviewer neither wrote nor ran tests and is NOT independent product Reviewer.
+
+r8 only necessary affected regression, original61888 terminal9a5d3f exit0:
+-q tests/test_hybrid_fixture_runtime.py tests/test_hybrid_usage_source.py
+tests/test_hybrid_cpu_execution_unit.py tests/test_hybrid_engineering_execution_unit.py
+tests/test_hybrid_fixture_runtime_control.py tests/test_hybrid_cpu_unit_control.py
+tests/test_hybrid_engineering_unit_control.py tests/test_hybrid_finite_host_stop.py
+> audit/hybrid-v1/checkpoint-66-regression-r8.log 2>&1
+126passed/2existing-warnings1414.95s. Warnings: Starlette BlockingPortal alias
+deprecation and original multi-threaded fork test deprecation. 331 input paths
+frozen checkpoint-66-inputs-r8.sha256 all match after actual terminal. Normal
+original engineering STOP->single core apply/AST21 included, no source latch
+mis-freeze. No source/test editing throughout this actual live regression.
+
+Latest incremental High confirmed one narrow witness-lifetime MUST while r8
+remained frozen: prior successful rollback witness must be consumed immediately
+before a new actual write attempt, then only this attempt's actual successful
+rollback can sign again. Pre-r9 code could retain A's witness after B's unknown
+COMMIT/failed rollback. Existing event/projection absence gate protects real
+committed facts, so this is not evidence of fake FREE; it violates the declared
+unknown-attempt no-rebase rule. After r8 actual terminal and full hash match,
+added one line before actual write_attempted/_commit to consume phase witness.
+
+r9: -q -s tests/test_hybrid_stop_storage_failure.py -k 'True or terminal_rollback_recovers'.
+stop-storage-r9.log; original82172 terminalfb4006 exit0;
+3passed/13deselected/1existing-warning29.87s. Actual A cleanup rollback signs,
+then B same-CAS true SQLite COMMIT succeeds/lost return OR original rollback
+raises: old marker absent. Real successor event verifies immutable committed
+record confirmation or unchanged old-CAS refusal/UNKNOWN exposure retention.
+Third actual engineering case: real result baseline2failed/repaired3passed,
+request_stop commitENOSPC causes existing physical freeze; healed STOP then
+terminal writeENOSPC actually rolls back and signs exact terminal witness;
+real successor CAS advance, original lease/key/physical terminal recover Pool0.
+Actual CandidateOutput.apply still fails exact physical-freeze Conflict,
+0pwrite, source candidate remains original BEFORE bytes, Store version unchanged.
+No new spawn in recovery. Normal terminal failure alone does NOT create freeze.
+
+Final16 new cases = original13 composite results plus r9's3 targeted combinations,
+not a fresh all-module run. Original non-parametric lost-return/rollback-failure
+tests map to final prior_rollback=False bodies; only new True variants rerun.
+High readonly final one-line/test delta: witness MUST and two uncovered recovery
+branches closed with these actual results. No remaining confirmed source MUST;
+agent neither wrote nor ran tests, not product Reviewer. No live tests remain.
+
+Final331 input SHA7cc917dcb79879defb991d381a49ae7370def96cf5c2c04eb7ccdb8df4c1bbe0.
+All r1-r9 end checks match their respective frozen inputs. Final r9 differs from
+r8 ONLY rlflow/hybrid_fixture_runtime.py and new test file; other329 unchanged.
+Final compilation/pipcheck/diffcheck tool09f7be exit0: compileall quiet,
+No broken requirements found, diff clean. No UI/schema/Store changes, so do not
+repeat old Chrome/Node or whole-library checks as if this were new coverage.
+Final manifest: evidence/checkpoint-66-final-inputs.sha256.
+Raw27 logs/frozen manifests/end-check hashes: evidence/checkpoint-66-log-sha256.txt.
+Raw logs remain audit/hybrid-v1, including all first failures and diagnoses.
+No unchanged passed test or review repeat, no new feature during close.
+Next T21 disk dispatch admission
+and actual small owned audit reserve, not merely a probe; strict cgroup/quota,
+arbitrary tree, independent product Review/native/invoice/T22/B1/24hfixture8hUI/
+T23/M5 and full Goal remain incomplete. No new external blocker for this close.

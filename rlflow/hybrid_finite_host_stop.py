@@ -171,8 +171,11 @@ class FiniteHostStop:
             # Only original scoped cap cleanup, no renewed Auth/Controller,
             # candidate write, machine acceptance or new worker effects.
             error=type(exc).__name__
-            try:cleanup=service.unit.cancel()
-            except Exception:cleanup=None
+            if operation is not None and getattr(operation,'_accept_cleanup_attempted',False):
+                cleanup=operation._accept_cleanup_result
+            else:
+                try:cleanup=service.unit.cancel()
+                except Exception:cleanup=None
         return {'project_id':service.project_id,'store_epoch':service.store_epoch,'task_id':service.task_id,
             'intent':receipt,'intent_status':'ACCEPTED' if receipt is not None else 'UNKNOWN',
             'cleanup_status':'ORIGINAL_SCOPE_STOPPED' if cleanup is not None and cleanup['status']=='CANCELLED_SCOPE_STOPPED' else 'UNKNOWN',

@@ -158,6 +158,8 @@ class FixtureRuntimeOwner:
             # be the final pure fence AFTER those checks, immediately before
             # physical G/pwrite or a new machine COMMIT.
             unit._check_final()
+        if attempt.get('physical_safety_freeze'):
+            raise Conflict('original attempt frozen after failed durable STOP')
 
     def _plan_original(self, bundle, token, observation):
         entry = self.plans.builder._slot(bundle); seed = entry['seed']
@@ -342,6 +344,8 @@ class FixtureRuntimeOwner:
         self._unit_check(attempt)
         if self._control_service is not None: self._control_service._check_authority(cleanup=False, attempt=attempt)
         if self._safety_freeze: raise Conflict('fixture runtime permanently frozen for physical cleanup')
+        if attempt.get('physical_safety_freeze'):
+            raise Conflict('original attempt frozen after failed durable STOP')
         self.controller.check_token_in_transaction(db, attempt['token'], read)
         slot, record = self.workspace._issued(attempt['observation'])
         if slot['closed'] is not None or self.workspace._unresolved_renewal(slot):
@@ -479,11 +483,22 @@ class FixtureRuntimeOwner:
                     with self.store.lock(), self.store.connect() as db:
                         db.execute('BEGIN IMMEDIATE'); read = ReadBudget(db, PREPARATION_READ_BYTES)
                         with self._held(db, cleanup=True):
-                            control = self.controller._original(db, captured['controller']['fact_key'], read)
-                            yield db, read, control
-                            final(); now, mono = self.controller._sample(); deadlines(now, mono); db.commit()
-                            if self._control_service is not None:
-                                self._control_service._committed(attempt['entries'][phases[-1]])
+                            try:
+                                control = self.controller._original(db, captured['controller']['fact_key'], read)
+                                yield db, read, control
+                                final(); now, mono = self.controller._sample(); deadlines(now, mono); db.commit()
+                                if self._control_service is not None:
+                                    self._control_service._committed(attempt['entries'][phases[-1]])
+                            except BaseException:
+                                if db.in_transaction:
+                                    db.rollback()  # Failure/lost COMMIT return is NOT a rollback witness.
+                                    guard=self._active
+                                    if (guard is not None and guard.db is db and guard.cleanup and
+                                            getattr(guard,'write_attempted',False) and len(phases)==1 and
+                                            phases[0] in ('STOP_REQUESTED','FIXTURE_SCOPE_STOPPED') and
+                                            guard.raw==canonical(attempt['entries'][phases[0]])):
+                                        attempt.setdefault('known_cleanup_rollback',{})[phases[0]]=digest(attempt['entries'][phases[0]])
+                                raise
             try:
                 with transaction() as (db, read, control):
                     for phase in phases:
@@ -515,6 +530,20 @@ class FixtureRuntimeOwner:
         if command is not None: request['idempotency_key'] = command['command_id']
         if unit_key is not None: request['idempotency_key'] = unit_key
         original = attempt['entries'].get(phase)
+        if (original is not None and cleanup and command is None and
+                phase in ('STOP_REQUESTED','FIXTURE_SCOPE_STOPPED') and
+                original['request']['expected_state_version']!=version and
+                attempt.get('known_cleanup_rollback',{}).get(phase)==digest(original)):
+            # Only a proved rollback of THIS cleanup writer may be re-linked
+            # to current heads. Never rebase unknown COMMIT or control acceptance.
+            runtime=original['request']['fixture_runtime']
+            prior=original['prior_reservation'].get('fixture_runtime') or {}
+            key=entry_key(original['request'])
+            if (all(runtime.get(n)==prior.get(n) for n in ('start_command','stop_command')) and
+                    read.object(BUDGET[0],key) is None and
+                    db.execute('SELECT 1 FROM events WHERE idempotency_key=?',(key,)).fetchone() is None):
+                attempt['known_cleanup_rollback'].pop(phase)
+                original=None
         if original is not None and command is not None:
             name = 'start_command' if phase == 'HANDOFF_UNKNOWN' else 'stop_command'
             if original['request']['fixture_runtime'].get(name) != command:
@@ -568,6 +597,8 @@ class FixtureRuntimeOwner:
         put = [[BUDGET[0], entry_key(original['request']), original]]
         put.extend([s, k, v] for s, values in derived_heads(original).items() for k, v in values.items())
         payload = {'format': 2, 'put': put, 'delete': [], 'details': None}
+        attempt.get('known_cleanup_rollback',{}).pop(phase,None)
+        guard.write_attempted=True
         self.store._commit(db, EVENT, entry_key(original['request']), payload, version,
             account_key(scope(original['request'])), 'hybrid-core', event_inputs(original), _authorization=guard)
         guard.check()
@@ -721,6 +752,8 @@ class FixtureRuntimeOwner:
         now, mono = self.controller._final_token_freshness(guard.db, guard.attempt['token'], guard.read)
         self._final_deadlines(guard, now, mono)
         self._unit_effect_check(guard.attempt)
+        if guard.attempt.get('source_stop_latched'):
+            raise Conflict('original participant STOP prohibits new spawn or release')
 
     def _actual_handoff_link(self, attempt):
         from .store import sha
@@ -948,25 +981,59 @@ class FixtureRuntimeOwner:
         finally:
             self.stop_to_terminal(lease)
 
+    def _stop_original_participant(self, lease):
+        """Original cap physical cleanup only. No Store/Pool facts or refunds."""
+        attempt=self._issued(lease)
+        with self.pool._lock,self._lock:
+            error=None
+            try:
+                if attempt['source'] is not None:
+                    source=self.sources._issued(attempt['source']);process=source['producer']
+                    if source['runtime'] is not attempt:
+                        raise PermissionError('original same-lease participant cleanup required')
+                    if process is not None and process.poll() is None:
+                        if identity(process.pid)!=source['producer_identity']:
+                            raise Conflict('fixture STOP original live identity differs')
+                        self.sources._check_pidfd(source,live=True)
+                        signal.pidfd_send_signal(source['fds']['pidfd'],signal.SIGTERM)
+                        try:process.wait(timeout=.2)
+                        except subprocess.TimeoutExpired:pass
+                    self.sources.stop_fixture(attempt['source'])
+            except BaseException as exc:error=exc
+            try:
+                if attempt['engineering_grant'] is not None:
+                    self._close_engineering_input(self._engineering_grants[id(attempt['engineering_grant'])])
+            except BaseException as exc:
+                if error is None:error=exc
+                else:error.add_note('original engineering input close incomplete: '+type(exc).__name__)
+            if error is not None:raise error
+            if attempt['spawn_entered'] and attempt['producer_identity'] is None:
+                raise Conflict('fixture STOP unknown handoff retains Pool/Budget exposure')
+
+    def _freeze_failed_stop(self,attempt):
+        # Memory only, before waiting for any Pool/Store/producer lock. This
+        # irreversible freeze never expands an old lease or refunds exposure.
+        attempt['physical_safety_freeze']=True
+        unit=self._execution_units.get(id(attempt['lease']))
+        if unit is not None:unit._cancelled.set()
+
     def stop_to_terminal(self, lease):
         attempt = self._issued(lease)
-        self.request_stop(lease)  # Both durable freezes precede any interrupt/close.
+        # Stop the original participant at the last pure spawn/G fence even
+        # when a durable STOP cannot be written. Normal core apply stays valid.
+        attempt['source_stop_latched']=True
+        try:
+            self.request_stop(lease)  # Normal durable freezes still precede interrupt.
+        except BaseException as error:
+            self._freeze_failed_stop(attempt)
+            try:self._stop_original_participant(lease)
+            except BaseException as cleanup_error:
+                error.add_note('original physical STOP incomplete: '+type(cleanup_error).__name__)
+            raise  # UNKNOWN; never mint terminal/FREE for failed durable STOP.
         with self.pool._lock, self._lock:
             if attempt['terminal'] is None:
-                if attempt['source'] is not None:
-                    source = self.sources._issued(attempt['source']); process = source['producer']
-                    if process is not None and process.poll() is None:
-                        if identity(process.pid) != source['producer_identity']:
-                            raise Conflict('fixture STOP original live identity differs')
-                        self.sources._check_pidfd(source, live=True)
-                        signal.pidfd_send_signal(source['fds']['pidfd'], signal.SIGTERM)
-                        try: process.wait(timeout=.2)
-                        except subprocess.TimeoutExpired: pass
-                    self.sources.stop_fixture(attempt['source'])  # KILL/reap bounded fallback + all FD closes.
-                if attempt['spawn_entered'] and attempt['producer_identity'] is None:
-                    raise Conflict('fixture STOP unknown handoff retains Pool/Budget exposure')
+                self._stop_original_participant(lease)
                 wall = 0 if attempt['spawn_monotonic'] is None else math.ceil(time.monotonic() - attempt['spawn_monotonic'])
-                if attempt['engineering_grant'] is not None:self._close_engineering_input(self._engineering_grants[id(attempt['engineering_grant'])])
                 attempt['terminal'] = {'scope': 'FIXED_CPU_SINGLE_PARTICIPANT', 'lease_id': lease.id,
                     'program_sha256': attempt['origin']['program_sha256'], 'producer': attempt['producer_identity'],
                     'all_original_source_fds_closed': True, 'original_participant_reaped': True,
@@ -1007,22 +1074,35 @@ class FixtureRuntimeOwner:
         owner for bounded retry; no replacement owner or PID adoption is used.
         """
         self._actual()
+        self._safety_freeze=True
+        for attempt in tuple(self._attempts.values()):self._freeze_failed_stop(attempt)
         with self.pool._lock:
-            self._safety_freeze = True
             registered = []
             for attempt in self._attempts.values():
                 value = attempt['entries'].get('REGISTER_NO_HANDOFF')
-                if value is not None and self._confirm_entry(attempt, value) is not None:
-                    self.request_stop(attempt['lease'])
+                if value is not None:
+                    # Ledger failure cannot cut off the owner-wide final
+                    # original FD/participant cleanup below. No FREE is made.
+                    try:self.request_stop(attempt['lease'])
+                    except Exception:pass
                     registered.append(attempt)
             with _registry, self._lock:
-                if self.sources._live: self.sources.shutdown_safety()
-                for row in self._engineering_grants.values():self._close_engineering_input(row)
+                errors=[]
+                if self.sources._live:
+                    try:self.sources.shutdown_safety()
+                    except BaseException as exc:errors.append(exc)
+                for row in self._engineering_grants.values():
+                    try:self._close_engineering_input(row)
+                    except BaseException as exc:errors.append(exc)
                 for material in self._candidate_materials.values():
-                    if material.fd is not None:material.close_fd()
+                    try:
+                        if material.fd is not None:material.close_fd()
+                    except BaseException as exc:errors.append(exc)
                 for attempt in registered:
                     slot = self.pool._claim_slots[id(attempt['claim'])]
-                    slot.close()
+                    try:slot.close()
+                    except BaseException as exc:errors.append(exc)
+                if errors:raise errors[0]
                 self._live = False; _owners.pop(id(self), None)
             return {'state': 'PHYSICAL_CLOSED_EXPOSURE_UNKNOWN',
                     'runtime_stopped': False, 'refund_enabled': False,

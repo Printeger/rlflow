@@ -505,14 +505,17 @@ class FixtureUsageSourceOwner:
         self._actual()
         unknown = False
         with _registry, self._lock:
+            errors=[]
             for attempt in self._attempts.values():
                 try: self._cleanup_attempt(attempt)
-                except Conflict:
+                except Conflict as exc:
                     if (attempt['producer'] is not None or attempt['producer_identity'] is not None or
                             not attempt['launch_entered'] or attempt['status'] != 'UNKNOWN' or
                             any(fd is not None for fd in attempt['fds'].values())):
-                        raise
-                    unknown = True
+                        errors.append(exc)
+                    else:unknown = True
+                except BaseException as exc:errors.append(exc)
+            if errors:raise errors[0]
             self._live = False; _owners.pop(id(self), None)
         return {'state': 'PARENT_FDS_CLOSED_EXPOSURE_UNKNOWN' if unknown else 'ORIGINAL_PARENT_FDS_CLOSED',
                 'runtime_stopped': False, 'settlement_enabled': False}
