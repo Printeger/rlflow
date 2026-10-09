@@ -5,6 +5,7 @@ close, then attest completion. Failed commit retains the actual capability.
 Renewal uses original pending objects, held-COMMIT activation and explicit ACK.
 """
 from contextlib import contextmanager
+from dataclasses import dataclass
 from datetime import timedelta
 import json
 import threading
@@ -41,6 +42,21 @@ class _Guard:
         return self.budget.object(section,key)
 
 
+@dataclass(frozen=True, eq=False)
+class _PlanContext:
+    """Actual held writer observation; no DTO adoption or execution permit."""
+    owner: object
+    db: object
+    read: object
+    token: object
+    observation: object
+    material_witness: object
+    bootstrap: object
+    raw: bytes
+    thread: int
+    plan_witness: object = None
+
+
 class WorkspaceService:
     def __init__(self,store,registry,controller,preparation,budget,working):
         if (type(store) is not Store or type(registry) is not Registry or
@@ -54,7 +70,135 @@ class WorkspaceService:
         self.store,self.registry,self.controller,self.preparation,self.budget,self.working=store,registry,controller,preparation,budget,working
         self.project_id,self.data_mode,self.store_epoch=controller.project_id,controller.data_mode,controller.store_epoch
         self._config_hash=registry.config_hash;self._active=None;self._slots={};self._lock=threading.RLock()
+        self._plan_active=None
         store.bind_hybrid_workspace(self)
+
+    def _plan_sources(self, owner, db, read, token, observation, material_witness, bootstrap):
+        """Current full original sources in the ONE owned Controller database."""
+        from .hybrid_working_plan_service import WorkingPlanService
+        active=self.controller._token_active
+        if (type(owner) is not WorkingPlanService or owner.workspace is not self or
+                self.store._hybrid_working_plan_service is not owner or
+                owner.installation.store is not self.store):
+            raise PermissionError('fixed actual Working plan owner required')
+        if (active is None or active[0] is not db or active[1] is not token or active[2] is not read or
+                active[3]!=threading.get_ident() or type(read) is not ReadBudget or read.db is not db or
+                not db.in_transaction):
+            raise PermissionError('actual owned Controller plan writer required')
+        version=self._metadata(db);control=self.controller.check_token_in_transaction(db,token,read)
+        slot,record=self._issued(observation)
+        if slot['closed'] is not None or self._unresolved_renewal(slot):
+            raise Conflict('plan requires original live workspace without pending renewal')
+        working_slot,_=self.working._slot(observation)
+        self.working.check(observation)
+        request={'project_id':self.project_id,'data_mode':self.data_mode,'workspace_id':record['workspace_id']}
+        original_claim=read.object(SECTIONS[2],claim_key(request))
+        if original_claim is None:raise Conflict('plan original durable workspace claim missing')
+        validate_record(SECTIONS[2],claim_key(request),original_claim)
+        acquired=self._point(db,original_claim['origin_fact_key'],read)
+        if acquired['request']['operation']!='acquire' or claim(acquired)!=original_claim:
+            raise Conflict('plan original workspace acquire claim differs')
+        current=self._current(db,acquired['request'],read,version)
+        if current is None or current['state']!='HELD_PRE_RUNTIME':
+            raise Conflict('plan requires current HELD_PRE_RUNTIME workspace head')
+        fact=self._point(db,current['fact_key'],read);self._dependencies(db,fact,read)
+        if (fact['observation']!=record or fact['observation_issued_monotonic_ns']!=observation.issued_monotonic_ns or
+                fact['observation_expires_monotonic_ns']!=observation.expires_monotonic_ns or
+                fact['request']['workspace_id']!=record['workspace_id']):
+            raise Conflict('plan actual current Working observation differs from durable head')
+        sources=source_binding(self.budget._load(db,fact['request']['goal_ref'],read))
+        if any(sources[n]!=v for n,v in fact['sources'].items() if n not in ('source_version','evaluated_at')):
+            raise Conflict('plan current Goal approval or Registry source changed')
+        _,reservation,_=self.budget._heads(db,{**fact['request'],'action':'MARK_UNKNOWN'},read,version)
+        if (reservation is None or reservation['status']!='HELD' or
+                reservation['runtime_registration']!='NOT_AUTHORIZED' or reservation!=fact['budget_reservation']):
+            raise Conflict('plan requires exact current HELD NOT_AUTHORIZED budget reservation')
+        entry=self.budget._point(db,reservation['last_entry_key'],read);self.budget._dependencies(db,entry,read)
+        ref=fact['preparation']
+        intent=self.preparation._original(db,PREPARATION[0],ref['intent_key'],read)
+        outcome=self.preparation._original(db,PREPARATION[1],ref['result_key'],read)
+        self.preparation._historical(db,ref['intent_key'],intent,outcome,read)
+        self.preparation.check_material_witness(material_witness,intent,outcome)
+        if (material_witness.materials[0] is not working_slot['base'] or
+                json.loads(material_witness.raw)['intent_key']!=ref['intent_key'] or
+                reservation['preparation']!=ref):
+            raise Conflict('plan fresh original preparation differs from actual Working base')
+        bootstrap_ref=owner.installation._bootstrap_point(db,bootstrap,read)
+        if bootstrap.material is not owner.material:
+            raise Conflict('plan bootstrap differs from original fixed owner material')
+        return {'project_id':self.project_id,'data_mode':self.data_mode,'store_epoch':self.store_epoch,
+            'sources':sources,'preparation':ref,'workspace_head':current,'workspace_claim':original_claim,
+            'budget_reservation':reservation,'controller':{'fact_key':controller_key(control['request']),
+                'fact_hash':digest(control),'controller_epoch':control['controller_epoch'],'head_revision':control['head_revision']},
+            'observation':record,'observation_issued_monotonic_ns':observation.issued_monotonic_ns,
+            'observation_expires_monotonic_ns':observation.expires_monotonic_ns,'bootstrap':bootstrap_ref}
+
+    def _check_plan_context(self,context):
+        if (type(context) is not _PlanContext or self._plan_active is not context or
+                context.owner._context is not context or context.thread!=threading.get_ident()):
+            raise PermissionError('actual active original Working plan context required')
+        current=self._plan_sources(context.owner,context.db,context.read,context.token,context.observation,
+            context.material_witness,context.bootstrap)
+        expected=json.loads(context.raw)
+        # Evaluation time/version are as-of metadata, not a refreshed lease.
+        for value in (current,expected):
+            for key in ('source_version','evaluated_at'):value['sources'].pop(key)
+        if current!=expected:raise Conflict('original Working plan current context changed')
+        if context.plan_witness is not None:context.plan_witness.check()
+
+    @contextmanager
+    def _plan_context(self,owner,token,observation,material_witness,bootstrap,*,plan_witness=None):
+        """Protected source-only context; fixed owner, no arbitrary callbacks.
+
+        Lock order: Store -> Controller -> Workspace -> Working -> Plan ->
+        Installation -> Builder. Every lock covers the actual owned COMMIT.
+        No file hash/copy or witness issuance is performed under this writer.
+        """
+        from .hybrid_working_plan_service import WorkingPlanService
+        if (type(owner) is not WorkingPlanService or owner.workspace is not self or
+                getattr(self.store,'_hybrid_working_plan_service',None) is not owner):
+            raise PermissionError('fixed original Working plan context owner required')
+        if plan_witness is not None:
+            from .hybrid_working_plan_materials import _WorkingPlanWitness
+            if type(plan_witness) is not _WorkingPlanWitness or plan_witness.builder is not owner.builder:
+                raise PermissionError('actual original plan material witness required')
+            plan_witness.check()
+        def before_commit():
+            self._check_plan_context(self._plan_active)
+            if plan_witness is not None:owner._final_fact(self._plan_active)
+        def final_deadlines(now,mono):
+            context=self._plan_active;raw=json.loads(context.raw)
+            working_now,working_mono=self.working._sample()
+            material_now,material_mono=self.preparation._witness_sample()
+            witness=context.material_witness;proof=json.loads(witness.raw);observation=context.observation
+            final_now=max(now,working_now,material_now)
+            if (not timestamp(raw['observation']['checked_at'])<=final_now<timestamp(raw['observation']['expires_at']) or
+                    final_now>=timestamp(raw['sources']['expires_at']) or
+                    not observation.issued_monotonic_ns<=working_mono<observation.expires_monotonic_ns or
+                    not timestamp(proof['checked_at'])<=final_now<timestamp(proof['expires_at']) or
+                    not witness.issued_monotonic_ns<=material_mono<witness.expires_monotonic_ns):
+                raise Conflict('Working plan sources expired at final owned commit')
+            from .hybrid_fixture_materials import _deadline
+            _deadline(context.bootstrap.inventory.deadline)
+            if context.plan_witness is not None:_deadline(context.plan_witness.deadline)
+        def clear():
+            self._plan_active=None;owner._context=None
+            owner._active=None;owner._publication_pending=None
+        def committed():
+            owner._publication_committed(self._plan_active)
+        @contextmanager
+        def held():
+            with self._lock,self.working._lock,owner._lock,owner.installation._lock,owner.installation.builder._lock:
+                if self._plan_active is not None or owner._context is not None:
+                    raise Conflict('nested Working plan context refused')
+                yield
+        with self.controller.token_transaction(token,read_bytes=PREPARATION_READ_BYTES,
+                _before_commit=before_commit,_after_final_sample=final_deadlines,_on_exit=clear,
+                _commit_context=held,_after_commit=committed) as (db,read,control):
+            raw=self._plan_sources(owner,db,read,token,observation,material_witness,bootstrap)
+            context=_PlanContext(owner,db,read,token,observation,material_witness,bootstrap,canonical(raw),threading.get_ident(),plan_witness)
+            self._plan_active=context;owner._context=context
+            yield context
 
     def _metadata(self,db):
         if self.store._hybrid_workspace_service is not self or self.registry.config_hash!=self._config_hash:

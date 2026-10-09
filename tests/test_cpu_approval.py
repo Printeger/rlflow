@@ -36,7 +36,7 @@ def test_cpu_exec_is_only_preapproved_tool(tmp_path, monkeypatch):
         assert config['features.multi_agent'] is False
         mcp = json.loads((tmp_path / 'control/result.mcp.json').read_text())
         assert mcp['role'] == role
-        assert mcp['write_roots'] == [str(write_root)]
+        assert mcp['write_roots'] == ([str(write_root)] if role == 'Engineer' else [])
         assert env['CUDA_VISIBLE_DEVICES'] == ''
     context = {'schema_version':'1.0','session':'session_one','generation':'generation_one',
                'request_sha256':'1'*64,'candidate_sha256':'2'*64}

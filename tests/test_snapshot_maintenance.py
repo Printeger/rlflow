@@ -71,6 +71,82 @@ def test_corrupt_blob_or_descriptor_does_not_publish(due):
     assert not maintain(store) and slot(store)==(1,0)
 
 
+def aliased_blob(store,raw,copies=10,*,digest=None):
+    import hashlib
+    digest=hashlib.sha256(raw).hexdigest() if digest is None else digest
+    with store.connect() as db:
+        db.execute('INSERT OR REPLACE INTO blobs VALUES(?,?)',(digest,raw))
+        db.execute("UPDATE projection SET value=? WHERE section='historical' AND object_key='item'",
+                   (canonical([{'$rlflow_blob':digest,'literal':True}]*copies).decode(),))
+    return digest
+
+
+def test_same_snapshot_blob_cache_saves_physical_reads_not_expansion(due,monkeypatch):
+    from rlflow import hybrid_reads
+    digest=aliased_blob(due,canonical('x'*1000))
+    original=hybrid_reads.ReadBudget;reads=[];budgets=[]
+    class Observed(original):
+        def __init__(self,db,limit):
+            super().__init__(db,limit);budgets.append(self)
+            db.set_trace_callback(lambda sql:reads.append(sql) if sql.startswith('SELECT data FROM blobs') else None)
+    monkeypatch.setattr(hybrid_reads,'ReadBudget',Observed)
+    assert maintain(due,max_bytes=20000)
+    assert len(budgets)==1 and len(reads)==1 and (digest,True) in budgets[0].blobs
+    assert 20000-budgets[0].expanded>=10020
+    assert 20000-budgets[0].remaining<10020
+
+
+@pytest.mark.parametrize('bounds',[{'max_bytes':8000},{'max_nodes':1000}])
+def test_cached_alias_expansion_limits_keep_due(due,bounds):
+    aliased_blob(due,canonical(['x'*10]*200))
+    assert not maintain(due,**bounds) and slot(due)==(1,0)
+    with due.connect() as db:assert not db.execute('SELECT 1 FROM snapshots').fetchone()
+
+
+def test_cached_literal_marker_data_is_not_reinterpreted(due):
+    value={'$rlflow_blob':0}
+    aliased_blob(due,canonical(value),copies=2)
+    assert maintain(due)
+    with due.connect() as db:
+        state=json.loads(db.execute('SELECT state FROM snapshots').fetchone()[0])
+    assert state['historical']['item']==[value,value]
+
+
+@pytest.mark.parametrize('raw',[b'{"x":1,"x":2}',b'{"x":NaN}',b'{"x":1e999}'])
+def test_blob_json_ambiguity_keeps_due(due,raw):
+    aliased_blob(due,raw,copies=2)
+    assert not maintain(due) and slot(due)==(1,0)
+
+
+def test_blob_hash_damage_keeps_due(due):
+    aliased_blob(due,canonical('changed'),copies=2,digest='0'*64)
+    assert not maintain(due) and slot(due)==(1,0)
+
+
+@pytest.mark.parametrize('phase',['decode','sources','closure'])
+def test_original_deadline_after_bounded_operation_keeps_due(due,monkeypatch,phase):
+    from rlflow import snapshot_maintenance as module,hybrid_reads,contracts
+    now=[100.0]
+    monkeypatch.setattr(module.time,'monotonic',lambda:now[0])
+    if phase=='decode':
+        original=hybrid_reads.ReadBudget.decode
+        def late(self,value):
+            result=original(self,value);now[0]=106.0;return result
+        monkeypatch.setattr(hybrid_reads.ReadBudget,'decode',late)
+    elif phase=='sources':
+        original=due._working_plan_summary
+        def late(*args):
+            result=original(*args);now[0]=106.0;return result
+        monkeypatch.setattr(due,'_working_plan_summary',late)
+    else:
+        original=contracts.validate_runtime_state
+        def late(value):
+            result=original(value);now[0]=106.0;return result
+        monkeypatch.setattr(contracts,'validate_runtime_state',late)
+    assert not maintain(due,seconds=5) and slot(due)==(1,0)
+    with due.connect() as db:assert not db.execute('SELECT 1 FROM snapshots').fetchone()
+
+
 def test_busy_writer_or_maintenance_lock_drops_without_wait(due):
     with due.lock():
         start=time.monotonic();assert not maintain(due);assert time.monotonic()-start<.5
@@ -108,8 +184,8 @@ def test_existing_snapshot_wrong_storage_type_not_accepted(due):
 
 
 def test_structure_budget_is_checked_before_json_tree_allocation(due,monkeypatch):
-    from rlflow import snapshot_maintenance as module
-    monkeypatch.setattr(module.json,'loads',lambda *a:pytest.fail('oversize tree parsed before budget check'))
+    from rlflow import hybrid_reads as module
+    monkeypatch.setattr(module.json,'loads',lambda *a,**k:pytest.fail('oversize tree parsed before budget check'))
     assert not maintain(due,max_nodes=1) and slot(due)==(1,0)
 
 

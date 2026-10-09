@@ -4,7 +4,6 @@ This compatibility full-state builder is bounded by input bytes/time, not a
 streaming chunk snapshot. Failure leaves due pending and older snapshots intact.
 """
 import hashlib
-import json
 import math
 import sqlite3
 import threading
@@ -30,27 +29,15 @@ def maintain(store,*,seconds=5,max_bytes=32*1024*1024,max_rows=100000,max_nodes=
                 tip=db.execute('SELECT event_id,payload_sha256,new_state_version FROM events WHERE seq=?',(version,)).fetchone()
                 if tip is None or tip['new_state_version']!=version:return False
                 registration=store._goal_registration(db)
-                budget=[max_bytes]
-                nodes=[max_nodes]
+                from .hybrid_reads import ReadBudget
+                # One envelope/cache for this exact RO snapshot. Cache hits save
+                # physical blob reads, never logical expanded byte/node charges.
+                read=ReadBudget(db,max_bytes)
+                read.nodes=read.expanded_nodes=max_nodes
                 def parse(raw):
-                    # Conservative preflight BEFORE allocating the JSON tree.
-                    # Delimiters inside strings may overcount; skipping optional
-                    # maintenance is safe, silently relaxing limits is not.
-                    nodes[0]-=1+sum(raw.count(c) for c in (b'{',b'[',b',',b':'))
-                    if nodes[0]<0:raise ValueError('snapshot structural budget exceeded')
-                    check();return json.loads(raw)
+                    check();value=read.parse(raw);check();return value
                 def decode(value):
-                    check()
-                    if isinstance(value,dict) and set(value) in ({'$rlflow_blob'},{'$rlflow_blob','literal'}):
-                        row=db.execute('SELECT data FROM blobs WHERE digest=? AND length(data)<=?',(value['$rlflow_blob'],budget[0])).fetchone()
-                        if row is None:raise Conflict('snapshot blob unavailable or exceeds budget')
-                        budget[0]-=len(row[0])
-                        if hashlib.sha256(row[0]).hexdigest()!=value['$rlflow_blob']:raise Conflict('snapshot blob integrity mismatch')
-                        literal=value.get('literal',False);value=parse(row[0])
-                        if literal:return value
-                    if isinstance(value,dict):return {k:decode(v) for k,v in value.items()}
-                    if isinstance(value,list):return [decode(v) for v in value]
-                    return value
+                    check();value=read.decode(value);check();return value
                 state={'version':version};count=0
                 # Bound each raw descriptor before SQLite returns it to Python.
                 size='length(CAST(section AS BLOB))+length(CAST(object_key AS BLOB))+length(CAST(value AS BLOB))'
@@ -58,8 +45,8 @@ def maintain(store,*,seconds=5,max_bytes=32*1024*1024,max_rows=100000,max_nodes=
                 for row in db.execute(query,(max_bytes,max_bytes,max_bytes)):
                     check();count+=1
                     if count>max_rows or row['value'] is None:raise ValueError('snapshot projection exceeds bound')
-                    raw=row['value'].encode();budget[0]-=len(raw)+len(row['section'].encode())+len(row['object_key'].encode())
-                    if budget[0]<0:raise ValueError('snapshot bytes exceed bound')
+                    raw=row['value'].encode();read.remaining-=len(row['section'].encode())+len(row['object_key'].encode())
+                    if read.remaining<0:raise ValueError('snapshot bytes exceed bound')
                     value=decode(parse(raw))
                     if row['object_key']=='':state[row['section']]=value
                     else:state.setdefault(row['section'],{})[row['object_key']]=value
@@ -67,32 +54,34 @@ def maintain(store,*,seconds=5,max_bytes=32*1024*1024,max_rows=100000,max_nodes=
                 # the UNIQUE idempotency-key index avoids any history scan.
                 source_events={key:store._goal_event(db,key) for key in state.get('hybrid_goal_commands',{})}
                 def source_parse(raw):
-                    budget[0]-=len(raw)
-                    if budget[0]<0:raise ValueError('snapshot source witness exceeds byte budget')
                     return parse(raw)
-                goal_sources={key:store._goal_source(db,key,max_bytes=max(0,min(budget[0],16*1024*1024)),_parse=source_parse,_decode=decode)
+                goal_sources={key:store._goal_source(db,key,max_bytes=max(0,min(read.remaining,16*1024*1024)),_parse=source_parse,_decode=decode)
                               for key in state.get('hybrid_goal_commands',{})}
-                authority_events={key:store._authority_event(db,key,max_bytes=max(0,min(budget[0],3*1024*1024)),_parse=source_parse,_decode=decode)
+                authority_events={key:store._authority_event(db,key,max_bytes=max(0,min(read.remaining,3*1024*1024)),_parse=source_parse,_decode=decode)
                                   for key in state.get('hybrid_approval_commands',{})}
-                preparation_events={key:store._preparation_event(db,key,max_bytes=max(0,min(budget[0],4*1024**2)),_parse=source_parse,_decode=decode)
+                preparation_events={key:store._preparation_event(db,key,max_bytes=max(0,min(read.remaining,4*1024**2)),_parse=source_parse,_decode=decode)
                                     for section in ('hybrid_preparation_intents','hybrid_preparation_results')
                                     for key in state.get(section,{})}
-                controller_events={key:store._controller_event(db,key,max_bytes=max(0,min(budget[0],256*1024)),_parse=source_parse,_decode=decode)
+                controller_events={key:store._controller_event(db,key,max_bytes=max(0,min(read.remaining,256*1024)),_parse=source_parse,_decode=decode)
                                    for key in state.get('hybrid_controller_facts',{})}
                 controller_tip=store._controller_tip(db,version)
-                admission_events={key:store._admission_event(db,key,max_bytes=max(0,min(budget[0],256*1024)),_parse=source_parse,_decode=decode)
+                admission_events={key:store._admission_event(db,key,max_bytes=max(0,min(read.remaining,256*1024)),_parse=source_parse,_decode=decode)
                                   for key in state.get('hybrid_admission_facts',{})}
                 admission_summary=store._admission_summary(db,version)
-                budget_events={key:store._budget_event(db,key,max_bytes=max(0,min(budget[0],1024*1024)),_parse=source_parse,_decode=decode)
+                budget_events={key:store._budget_event(db,key,max_bytes=max(0,min(read.remaining,1024*1024)),_parse=source_parse,_decode=decode)
                                for key in state.get('hybrid_budget_entries',{})}
                 budget_summary=store._budget_summary(db,version)
-                workspace_events={key:store._workspace_event(db,key,max_bytes=max(0,min(budget[0],1024*1024)),_parse=source_parse,_decode=decode)
+                workspace_events={key:store._workspace_event(db,key,max_bytes=max(0,min(read.remaining,1024*1024)),_parse=source_parse,_decode=decode)
                                   for key in state.get('hybrid_workspace_facts',{})}
                 workspace_summary=store._workspace_summary(db,version)
                 from .hybrid_runtime_installation import SECTIONS as installation_sections
-                installation_events={key:store._installation_event(db,key,max_bytes=max(0,min(budget[0],1024**2)),_parse=source_parse,_decode=decode)
+                installation_events={key:store._installation_event(db,key,max_bytes=max(0,min(read.remaining,1024**2)),_parse=source_parse,_decode=decode)
                                      for section in installation_sections for key in state.get(section,{})}
                 installation_summary=store._installation_summary(db,version)
+                from .hybrid_working_plan import SECTIONS as working_plan_sections
+                working_plan_events={key:store._working_plan_event(db,key,max_bytes=max(0,min(read.remaining,17*1024**2)),_parse=source_parse,_decode=decode)
+                                     for section in working_plan_sections for key in state.get(section,{})}
+                working_plan_summary=store._working_plan_summary(db,version)
             check()
             from .contracts import validate_runtime_state
             validate_runtime_state(state);check()
@@ -112,6 +101,8 @@ def maintain(store,*,seconds=5,max_bytes=32*1024*1024,max_rows=100000,max_nodes=
             workspace_complete(state,registration,workspace_events.get,event_summary=workspace_summary);check()
             from .hybrid_runtime_installation import validate_complete as installation_complete
             installation_complete(state,registration,installation_events.get,event_summary=installation_summary);check()
+            from .hybrid_working_plan import validate_complete as working_plan_complete
+            working_plan_complete(state,registration,working_plan_events.get,event_summary=working_plan_summary);check()
             raw=canonical(state);check()
             if len(raw)>max_bytes:return False
             digest=hashlib.sha256(raw).hexdigest();check()

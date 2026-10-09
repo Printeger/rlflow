@@ -1,0 +1,322 @@
+CHECKPOINT41 WIP — NOT execution authority or complete WorkingPlan acceptance
+public-CAS-r1 original88283 actualterminalexit0/chunk1d1805:
+2passed93deselected6.69s. Wrong/bool public CAS refused before stage move or
+publication/READYattempt allocation. Exact argv:
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q
+tests/test_hybrid_working_plan_service.py -k 'public_publish_wrong_cas'
+log audit/hybrid-v1/checkpoint-41-plan-public-cas-r1.log
+SHA40eec353ec6aa2f926db2872b6acd46ea3f51288879fca09a06edd79bf5718a8.
+publication-version-r1 original83835 actualterminalexit0/chunkc858cb:
+8passed85deselected30.40s, exact argv below.
+SHA27b09dbb2f27e2dfc1a63d4696b158c67ec0bf55a427d13bb191d69a8e7c0ffa.
+High readonly current-version/readonly-phase review no new MUST.
+Now root final28 original64479 LIVE, actual59 SHA frozen; see final-tests.txt.
+Allsource/test/schema frozen, no concurrent suite/benchmark. No final result yet.
+confirmation-r1 original16923 actualterminalexit0/chunk5f3e45:
+16passed72deselected60.70s, exact argv below.
+SHA030070b995265bedec30b0ffa9ede1b965cd95a65f6e1d31a07f81a72e8314b7.
+final-boundaries-r1 original73795 actualterminalexit0/chunk11878e:
+4passed88deselected16.46s. Actual held ACK locks (another real thread cannot
+acquire Workspace/Working/Plan), both pending layers block READY allocation,
+generic duplicateREADY write denied before existing. Exact argv:
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q
+tests/test_hybrid_working_plan_service.py
+-k 'both_pending_layers_block_before_attempt or duplicate_generic or success_ack_keeps'
+log audit/hybrid-v1/checkpoint-41-plan-final-boundaries-r1.log
+SHAa36a338450d2f6f3e90318b9930cfc082dca4c1667e79e4635ed406a81461aaa.
+publication-version-r1 original83835 LIVE, exact argv:
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q
+tests/test_hybrid_working_plan_service.py
+-k 'unrelated_core_versions or confirmation_unknown or success_ack_keeps'
+log audit/hybrid-v1/checkpoint-41-plan-publication-version-r1.log.
+Readonly physical guard permits unrelated core version advances with unchanged
+current heads; cannot append fact. Normal INTENT/READY CAS unchanged.
+ALLsource/tests/schema frozen, serial; no final integration/independent/full yet.
+ready-capacity-r2 original29550 actualterminalexit0/chunk809aed:
+1passed71deselected94.89s, exact argv below. Actual18万literal schema native
+publication + READYsecondCAS + duplicate + audit/replay/manual + explicit
+64MiB/8Mi nodes/30s periodic maintenance + recover all passed.
+SHAa7979db579aa55140ec907c9ae0e199f21ee7708dd69b1f45cda902fce9f0ee0.
+High fixed successful-COMMIT hook real-code readonly review no new MUST.
+confirmation-r1 original16923 LIVE, exact argv:
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q
+tests/test_hybrid_working_plan_service.py
+-k 'confirmation_unknown or publication_final_proof or two_threads or current_terminal_budget'
+log audit/hybrid-v1/checkpoint-41-plan-confirmation-r1.log.
+16actualcases COMMIT/ACK/rebase before/after faults, finalsource/dualgraph/UTCmono
+failed publication noACK, two actual READYthreads one fact, current budget
+CANCEL/UNKNOWN wins before publish/READY. ALLsource/tests/schema frozen, serial.
+No41final/full/independenttest/commit or runtime/complete Goal acceptance.
+ready-capacity-r1 original27710 actualterminalexit1/chunk052271:
+1failed71deselected31.43s. NOT reached READY: _publish owned context final
+Workspace source proof exhausted cumulative expanded64MiB after redundant
+explicit heavy source/fact checks. Native rename/fsync had completed; no READY.
+SHA24bf3f245775d3f03492c26c1a381667111450727504a047c5abb7fca58023a2.
+Repair preserves beforeRename full durableINTENT proof, fsync parent/dualgraph
+check, and owned context sole full final_sources/fact/dualgraph/finalclock->COMMIT.
+Only redundant explicit expansion removed. Canonical _published activation is
+fixed memory-only _after_commit within original locks, actualpending identities;
+no independent published bool, COMMIT exception no ACK, native receipt retained.
+High design review accepts; actual-code review/rerun still pending.
+ready-capacity-r2 original29550 LIVE, exact same argv as r1 below;
+log audit/hybrid-v1/checkpoint-41-plan-ready-capacity-r2.log.
+ALLsource/tests/schema frozen, no parallel suite. No increased bounds.
+ready-r1 original74113 actualterminalexit0/chunk89f3d7:
+12passed59deselected55.19s. Exact argv below; ordinary schema only.
+SHA2227ba59ce6273fd25e9136b0bffca26231b9d70ad54300929175115e384ec70.
+High initial READY static review no new MUST, no independent test.
+ready-capacity-r1 original27710 LIVE, exact argv:
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q
+tests/test_hybrid_working_plan_service.py -k 'actual_ready_two_cas and True'
+log audit/hybrid-v1/checkpoint-41-plan-ready-capacity-r1.log.
+Actual180k literal schema two-CAS publication+READY+all closure/recovery chain;
+not reuse of INTENT-only evidence. Original64MiB/8Mi nodes/30s bounds unchanged.
+ALLsource/tests/schema frozen, serial. No41final/full/commit or runtime grant.
+publication-r2 original42750 actualterminalexit0/chunke5cf64:
+20passed76deselected48.80s, exact argv below.
+SHAa0541b1f40f97857c6ea50bfecd54f0c44b9f1ff191cba3dd57bee26ca3d2ff4.
+High native-success receipt provenance MUST actual-code review closed,
+no independent test. Older LIVE line retained as history.
+Actual READY second-CAS owner is now initial implementation, no runtime grant.
+ready-r1 original74113 LIVE, exact argv:
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q
+tests/test_hybrid_working_plan_service.py -k 'actual_ready'
+log audit/hybrid-v1/checkpoint-41-plan-ready-r1.log.
+ALLsource/tests/schema frozen, no parallel tests/benchmark. No final acceptance.
+Private physical publication-r1 original23004 actualexit0/chunk889e69:
+9passed49deselected35.54s. Actual INTENT -> owned original NOREPLACE/fsync,
+dual original graphs and root-ctime-only rebase, unknown rename/fsync retries,
+noINTENT/callerMove/occupiedDest/changedChild negatives. Not READY authority.
+argv PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q
+tests/test_hybrid_working_plan_service.py
+-k 'actual_original_working_publication or actual_working_publication'
+log audit/hybrid-v1/checkpoint-41-plan-publication-r1.log
+SHAf9ea6622620061ba841680827e6b824f9e16e2fcd1c66858c82affafb7fa432c.
+High identified MUST despite nine passes: entered-before-native flag could accept
+callerMove after known BEFORE failure. Fixed with exact original native-success
+receipt assigned only after syscall rc0 and before helper return; dest recovery
+must have original success receipt. New knownFailure->callerMove negative.
+publication-r2 original42750 LIVE: sameprefix two modules
+tests/test_hybrid_working_plan_service.py tests/test_hybrid_installation_service.py
+-k 'publication or rename or no_replace'
+log audit/hybrid-v1/checkpoint-41-plan-publication-r2.log.
+No concurrent suite; ALL source/test/schema frozen. No READY or runtime grant.
+maintenance-intent-r3 original68617 actualterminalexit0/chunk919e6e:
+48passed36deselected37.90s, same actual argv recorded below.
+SHA4175a767728e1b0e464435fd0ff3af2688cd40946a8a61994293f4a3de71a841.
+No live suite now. Prior r3 LIVE line retained as history. Large INTENT r2
+actually passed and was not pointlessly repeated after fixture-only hash repair.
+LATEST additional serial actual evidence (older pending statements retained below):
+intent-capacity-diagnostic-r1 original1015 actualexit1/chunk4fb413:
+1fail47deselected43.84s. Duplicate large literal schema blob physical reads
+exhausted old maintenance raw64MiB; actual INTENT/audit/replay/manual/recover
+had passed before periodic maintenance. No cap increase.
+log audit/hybrid-v1/checkpoint-41-plan-intent-capacity-diagnostic-r1.log
+SHA84f81d6941d5dff258b43846314d568e90b233f1b4b21401b7a76f2424786f11.
+maintenance-budget-r1 original96678 actualexit0/chunk3cdf06:31pass2.54s.
+argv PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q
+tests/test_snapshot_maintenance.py
+log audit/hybrid-v1/checkpoint-41-maintenance-budget-r1.log
+SHAa391c9107f3c98b04f29b66a1d1f04a1a2f273cf3f6d692e37563642f971a881.
+maintenance-intent-capacity-r2 original29266 actualexit1/chunkf5a8b8:
+37pass1fixturefail46deselected60.73s. Actual180k literal-schema INTENT,
+complete periodic snapshot/recover and actual DB.COMMIT lost-return retry pass.
+Only bad-hash fixture failed BEFORE target at immutable blob UPDATE trigger;
+repair fixture inserts wrong digest initially, production trigger unchanged.
+argv PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q
+tests/test_snapshot_maintenance.py tests/test_hybrid_working_plan_service.py
+-k 'snapshot or maintenance or large_legal_literal_schema_actual_intent or durable_commit_lost_return'
+log audit/hybrid-v1/checkpoint-41-maintenance-intent-capacity-r2.log
+SHA7b8323f45428d77eca85aa03d4fcd89163843e6b5ea9def8702c4553b4618ab0.
+maintenance-intent-r3 original68617 LIVE, serial and all source/test/schema frozen:
+same two modules -k 'not large and (snapshot or maintenance or actual_intent)'
+log audit/hybrid-v1/checkpoint-41-maintenance-intent-r3.log.
+High readonly shared-budget real-code review no new MUST; no independent test.
+No41final/full/commit or actual publication/READY/runtime acceptance.
+
+Parent40 actual19ce9c4; root sole writer. USERpackage-lock untouched/unstaged.
+No paidprovider/model/GPU/publichosting/protectedworkspacewrites.
+Serial suites; source/tests/schema frozen during each original live suite.
+Root renderer-r1 original6642 actualterminalexit0/chunkb5da9c:
+170passed11.11s. Four exact modules, argv prefix:
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -B -m pytest -q
+tests/test_codex_policy_renderer.py tests/test_execution_adapter.py
+tests/test_hybrid_runtime_boundary.py tests/test_isolation.py
+stdout/stderr audit/hybrid-v1/checkpoint-41-renderer-r1.log.
+Actual pure noIO/env/version helper, six-role emptywrites, invalid bounded
+profile/paths, original legacy wrapper parity and actual BOUND published release
+pure renderer succeeds while legacy codex_command still denies; actual existing
+CPU/doctor/guardian tests pass. No model calls or new runtime grant.
+Only binds renderer-r1 source BEFORE subsequent BootstrapWitness additions.
+High readonly interface design feasible; actual scope review/tests still pending.
+
+bootstrap-r1 original36528 actualterminalexit1/chunk06cce5:83pass3fail46.08s.
+Three exactmodules bootstrap_witness/installation_service/codex_policy_renderer.
+All three failed BEFORE target proof: positive fixture used forbidden RuntimeState
+notes field; two corruption fixtures were prevented by real append-only event
+triggers. Thus those cases did not prove later-version source or damaged-source
+denial. Repair only fixture: valid historical domain write; explicitly disable
+appropriate trigger ONLY in private disposable corrupted database before damage.
+No production append-only protection changed. Also High readonly advice adds
+exact ReadBudget+actual BEGIN to source-only point and finite aggregate policy
+output cap; these helpers still cannot prove caller DB ownership or grant execution.
+Root same3 rerun pending; WorkingPlan actual writer/context/builder/Store still absent.
+renderer-r1 logSHA269615a72bf2ab2a9e532a6aec3fc441fb2f104cd41be43f31a170be4e57709b.
+
+bootstrap-r2 original9140 actualterminalexit0/chunk7e4cf1:87pass43.23s.
+Same3 modules plus exactbudget/noBEGIN case, no parallel suite. Positive atV3
+and actual damaged original events now reach target validation. Private contexts
+retire on error/exit; refs remain source-only, not caller connection authority.
+Root current plan-context-r1 original84943 LIVE, ONLY
+tests/test_hybrid_working_plan_service.py, same argvprefix, log
+audit/hybrid-v1/checkpoint-41-plan-context-r1.log. ALLsource/tests/schema frozen.
+Actual NEW guarded fixture/Store/epoch+operator human approval/prep/currentHELD
+budget/Working hold; tests exercise source-only owned Controller context. Actual
+WorkingExecutionPlan/bundle/currentcandidatehash/INTENT/READY domain still absent.
+No runtime grant, no41final/independent/full/commit/completeGoal acceptance.
+
+plan-context-r1 original84943 actualterminalexit0/chunk9ec5a7:12pass23.38s.
+Actual source-only one owned writer/kernel/claim/currentheads/bothpending/current
+consent/budget plus original bootstrap; final proof followed by UTC-only/mono-only
+and bootstrap deadline expiry denies, actual FD retained, no events/plan written.
+High readonly same scope noMUST, later livePlanGuard/CAS explicitly still needed.
+Root plan-material-r1 original96087 LIVE same single module/argvprefix,
+audit/hybrid-v1/checkpoint-41-plan-material-r1.log. ALLsource/tests/schema frozen.
+Actual new immutable WorkingExecutionPlan/WorkingPlanBundle, full finite held
+directory graph/current Working hash, approved mappedwrites (never wholecopy
+fallback), original model subset/role/profile/schema from issued Prep, generated
+policy NOlegacy wrapper, actual private unpublished fsynced material/seal. Original
+snapshot plan untouched; originalattempt/cap retained after failure, publish/start
+explicitly deny. Durable plan INTENT/READY/liveWriteGuard/snapshot closure pending.
+
+plan-material-r1 original96087 actualterminalexit1/chunkef65e6:
+12pass10fail42.38s. All10 material cases failed before issuance: actual original
+PreparationBundle.path remains staging after publication. Reader now uses only
+original adapter bundle/known publication seal/final slot, held directory identity
+and exact raw SHA; no exists-fallback or adoption from DTO. Constructor now checks
+fixed original owner/Store binding and protected preparation control parent.
+High readonly found two MUST: material inventory released before candidate hash;
+build final verify refreshed 30s deadline. Both repaired with simultaneous retained
+graphs/final bilateral identity checks and original operation deadline propagation.
+Added candidate-hash material file/root/emptydir race and expired-before-IO cases.
+No41final/runtime claim. Same single module plan-material-r2 pending.
+
+plan-material-r2 original88092 actualterminalexit0/chunk353541:
+26pass50.22s. Original integration model path repaired, both retained-graph race
+and original deadline-before-IO cases passed. High readonly same static scope
+no remaining MUST; no independent final/full41 acceptance.
+Next actual ephemeral original WorkingPlan witness captures BOTH graphs before
+hash outside writer, retains through caller scope; point only checks identities,
+stamps/Kernel/deadline, no hashes. Private active registry/thread identity, copied
+witness/retired/late material/candidate/path/deadline changes deny. Not Store write
+guard or publication authority. Single module witness-r1 pending.
+
+witness-r1 original42181 actualterminalexit0/chunk1ab908:33pass63.95s.
+Next proactively correct future lock order: witness point must not acquire
+Builder while future writer already holds Working (build hashes under Builder
+and samples Working). Point now reads only original identity/thread-scoped active
+registry/immutable slot and retained graphs, no Builder lock. Borrow/retire still
+use short Builder lock outside writer. Added actual other-thread held Builder
+while caller holds Working, witness point must finish without waiting for it.
+Single same module witness-r2 pending; all runtime/publication remains denied.
+
+witness-r2 original79405 actualterminalexit0/chunk6443fb:34pass66.48s.
+Real other-thread held Builder while caller held Working, original witness point
+completed without waiting. High confirmed inverse lock issue and nohash point
+direction; bounded tuple snapshot now used for concurrent original issued lookup.
+Next capacity-r1 ONLY new 180000 literal-schema actual installation/prep/HELD
+Working/plan context+material+witness test, same original 64MiB read envelope,
+no budget increase or claim that prior small fixtures prove capacity. Pending.
+
+capacity-r1 original23042 actualterminalexit0/chunk1cc1c8:
+1pass34deselected26.24s. 180000 actual literal entries survived original
+preparation and current Working plan/source/witness without any read/time budget
+increase. No independent final/full41 proof; no material publication/writeguard.
+Earlier log SHAs:
+2c9e4b2549946820d0038b6a345e13749007e193e96492105aae9452dab2cdd2 plan-material-r1
+7c2fcaf47e041376b1211907d16dfc69962e32845387000e4cbdb606ee20330c plan-material-r2
+bf7abd6b33c70b4468a6b2275b6c41b3269ad0ba583f4493db6a62a68764d07f plan-witness-r1
+36fb3bca3dc80334c7b39e92aef885b20dd45d89935626a06e533cecfa49a044 plan-witness-r2
+
+Pure immutable WorkingPlan domain initially added (not Store wired). domain-r1
+direct actualexit1/chunkd0464a:37fixtureerrors0.14s; imported plans fixture also
+needs explicit native_setup fixture registration in this test module. No case
+reached pure validation; fixture registration corrected only, no gates loosened.
+Same ONLY tests/test_hybrid_working_plan.py domain-r2 pending.
+
+domain-r2 original88003 actualterminalexit0/chunk594fe0:37pass77.34s.
+Only pure domain with actual unpublished material; no durable plan facts. Added
+explicit material seed as-of cannot exceed commit version/time, precede actual
+observation, or immutable original source facts: rerun source closure with seed
+as-of in historical mode. Four rehashed early/future version/time negatives.
+domain-r3 same ONLY pure module pending; Store/guards/publication still absent.
+
+domain-r3 original19203 actualterminalexit0/chunk37a368:41pass91.79s.
+High found three pure MUST: no wholefact input digest, namespace/parentchain only
+weak prefix/depth, impossible NUL/UTF8/depth names accepted. Repaired exact
+working_plan_fact_hash input; direct child candidate + original Kernel parent;
+fixed working_plans_uuid direct bootstrap child + original chain prefix;
+4096byte path/4000byte names/NUL/finite graph depth/components. Also original
+Workspace/Budget/Prep capture UTC and workspace mono ordering, READY mono>=INTENT.
+Added rehashed namespace/chain/impossible-name/READY-mono negatives. domain-r4
+single pure module pending. Still no Store/liveguard/publish/41final acceptance.
+
+domain-r4 original66828 actualterminalexit0/chunk5e12ed:49pass102.88s.
+High readonly three pure MUST closed, no remaining MUST in pure scope.
+Next Store optional/private maps +pure _apply with bounded decodedreuse +guards
+before retry/whole-state +original event fullmetadata/firstmarker/canonical
+wholefact inputs +true indexed tip/COUNT +manual/periodic recovery closure wired.
+Actual WorkingPlan guard still explicit DENY stub: no service write/publication.
+Store tests use actual EMPTY-domain complete closure and generic/DTO denial;
+original-source helper diagnostics use explicitly synthetic rows in a DIFFERENT
+disposable unregistered database, NOT durable service/replay acceptance.
+store-r1 ONLY tests/test_hybrid_working_plan_store.py pending, no parallel suite.
+
+store-r1 original24420 actualterminalexit1/chunkb0ca34:20pass1fixturefail46.04s.
+Actual EMPTY-domain audit/replay/manual/periodic/recover passed before incorrect
+fixture method Store.open_existing call. Correct fixture to actual protected
+Store.attach_existing(root, project_id, data_mode); production unchanged.
+store-r2 same ONLY module pending; original source-helper synthetic row diagnostics
+are still NOT actual durable plan service acceptance. All live plan writes deny.
+
+store-r2 original28255 actualterminalexit1/chunk44df5b:20pass1fail45.61s.
+Changed diagnostic path after two unsuccessful fixture-attach attempts: exact
+stat found original NEW fixture runtime775/DB644/writer.lock664 under host umask002.
+Attach correctly denies group-writable runtime. Root700 ancestors previously
+protected reachability but do not satisfy protected attach's runtime contract.
+Prospective41 fix ONLY fresh FixtureMaterialBuilder namespace creation: precreate
+runtime700, original new regular/owner/nlink checked NOFOLLOW FDs fchmod DB/lock600;
+ongoing physical points reject runtime/DB/lock permission damage. No existing
+namespace chmod/adoption; committed40/history/seals unchanged and not requalified.
+Added3 actual permission-damage negatives and same real attach closure test.
+store-r3 same ONLY module pending; live WorkingPlan guard still explicit DENY.
+
+store-r3 original39864 actualterminalexit0/chunk148ff4:24pass51.97s.
+High found fresh-only parent continuity MUST: absolute-path chmod could touch
+replacement sameUID files and capture their identity after enable. Fixed runtime
+original held chain captured immediately after mkdir, descriptor-relative opens,
+original FD/path stamps before/after chmod+fsync, runtime chain continuous; pin
+DB/lock to Store BEFORE enable, same originals/permissions/chain required after.
+Add actual runtime replaced after constructor, foreign file bytes/mode untouched;
+DB/lock removed at enable cannot recreate. No existingnamespace repair.
+store-r4 ONLY same Store module plus original fixture materials module pending.
+
+store-r4 original88616 actualterminalexit0/chunk4b3304:53pass66.25s.
+High readonly fresh parent-continuity MUST closed; no new MUST in Store/DENY/
+source-reader/EMPTY-domain scope. Next actual INTENT owner guard初接: exact
+owned context/db/read/thread/token/issuedbundle/originalrequest/raw/currentheads
+and wholefact inputs; first actual persist-before-publish event through Store.
+Complete heavy source proof at owned context entry/final; immutable-only lookup
+cache, mutable heads always actualdb; final original event+actualdualgraphs,
+then existing puredeadline→COMMIT. READY/publication/runtime still absent.
+
+intent-r1 original22148 actualterminalexit1/chunk615363:
+12pass1fail35deselected77.08s. Actual INTENT+duplicate/fullsmall audit/replay/manual/
+periodic/recover, originalDTO/CAS denial, pre-COMMIT insert before/after failures
+and late material/Working/UTC/mono rollback passed. These are NOT durable COMMIT
+lost-return injections. High readonly INTENT-only current scope noMUST.
+Actual 180000literal new INTENT/audit/replay/manual snapshot/recover passed; same
+64MiB periodic maintenance returned false. No new budget/time cap allowed.
+Add ONLY test diagnostic probes for source-helper stage, max_bytes scalar and
+failure class/fixed message; no source bytes/secrets or product gate changes.
+intent-capacity-diagnostic-r1 ONLY large actualintent case pending.

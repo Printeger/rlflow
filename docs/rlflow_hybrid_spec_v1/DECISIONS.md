@@ -1,6 +1,26 @@
 # 开发决策记录
 
+## Checkpoint41 全量发现的局部回归与最小修复
+
+唯一full原86772实际2048pass/2fail/32既有skip/1warn1312.45s，原日志保留不覆盖。cpu_approval旧测试要求只读MCP还携带写根，与native[]及只读合同矛盾，改断言而不恢复权限。telemetry原real worker的scratch是control私有子目录；新pure renderer错误的双向disjoint使准备提前失败。恢复原布局，只允许scratch在control下，candidate仍双向分离、control不可被scratch覆盖；schema/output/config/audit/transport、commands整树和原tool-registers路径均不可与scratch重叠。实际PI/Engineer CPU测试证明scratch可写而control sibling不可读写；未调用模型。High局部复核MUST关闭，四模块96pass、普通/大型READY完整closure2pass、61SHA一致及compile/pip/diff0。按影响范围修复验证，不重复28模块或另开full，明确不宣称修复后全量重新全绿。这次只修已发现回归，不扩41功能或运行许可。
+
+Checkpoint41状态覆盖：下方“待大型终态/回归进行中”是历史决策时状态。实际大型两phase capacity-r2原29550已exit0，1pass71deselected94.89s；root/High冻结28模块均实际exit0各886pass/8既有skip/1warning，59SHA一致。中央FULL唯一原86772目前LIVE，source/test/schema冻结，完整Goal继续。成功hook、原native成功receipt、共享预算展开计费的安全规则未因测试结果放宽。
+
+## Checkpoint41：原native成功与实际COMMIT后内存发布确认分离
+
+publication-r1九项绿后High发现rename前entered标记可被“已知失败后callerMove”利用；不以测试通过豁免。改exact原_RenameReceipt，仅fixed parentFD/names/thread/devino匹配且native rc0后设置成功，helper返回丢失仍有原见证，未调用/明确错误没有成功。Working dest重试与原双图rebase必须原成功receipt，不能用path存在代替。r2新plan+旧installer定向20项通过，旧installer不传receipt的行为保持不变。
+
+大型两phase r1实际未到READY，在_publish最后source proof因额外重复heavyproof耗尽64MiB expanded。不扩大限额：保留beforeRename原INTENTfullpoint和fsync后parent/双图检查，仅删除重复显式来源展开，ownedcontext唯一完整final_sources/fact/graph→freshUTCmono→COMMIT不删。固定_after_commit闭包在原全部锁内做memory-only ACK；pending原attempt/bundle/witness/context/guard/receipt由actual fsync后登记，成功COMMIT才把原bundle写单一canonical _published map，不另设published权威bool。异常COMMIT不ACK，原native receipt/attempt可重新核seal和fsync；无SQL/hash/FS/新TTL在成功hook内。该修复仍待实际大型终态，不能预称READY容量通过。
+
+## Checkpoint41：同快照blob读取去重不减少逻辑展开计费
+
+实际大型INTENT诊断表明周期维护重复读取同literal schema blob耗尽64MiB。不提高预算：复用既有exact ReadBudget，在同RO BEGIN内建一个raw+expanded byte/node envelope及cache，projection/source均复用；只有相同(digest,literal)省重复物理读取和SHA验证，每次decode引用仍扣原expanded成本。raw section/key和每个descriptor仍计费，默认32MiB/5s可安全延期，显式64MiB/8Mi nodes大型实际正例已在r2通过。原cooperative deadline parse/decode前后、source与pure closure后检查，不宣称严格kernel timeout；失效保持due，不跨事务缓存或缓存mutable当前HEAD。High实码静态无新MUST，r2唯一夹具错误修复后回归仍进行中。
+
+真实COMMIT后lost-return测试必须先调用db.commit再抛错；原_commit插入后失败仍在事务提交前，不能混记该证据。实际INTENT owner保留同bundle/原attempt raw、同原request重复核当前完整proof，不从历史DTO或磁盘路径重建能力。下一实际NOREPLACE publication只可由登记的原owner操作重定位仍held图，并限定root ctime变化，子目录/文件stamp不能采纳新值；设计尚非实现或READY验收。
+
 ## Checkpoint40：实际新fixture非执行安装与原seal发布
+
+40已提交19ce9c4。下一41抽取内部纯native renderer，不引入legacy bypass布尔开关；required explicit写集合、既有native禁用字段/model+effort保持。legacy None默认只在原guarded wrapper显式展开；原显式[]在CPU无candidate写权限，旧native的`or [candidate]`却错显示wholecopy，修成[]是收紧错误展示而非扩大权限。OpenAI Docs核验MCP required/allowlist与ignore-user-config仍使用CODEX_HOME认证；不以官方配置说明替代本机census、批准scope或OS执行证据，出处见HYBRID_WORKING_PLAN.md。41实际BootstrapWitness/WorkspaceContext/PlanStore域与两phase仍待实现，所有execution/release保持false。
 
 本切片仅创建新的私有fixture Store/epoch、source/snapshot/working/bootstrap namespace，不热迁移旧root/旧二进制/运行中或UNKNOWN进程。强制release-local策略默认显式UNBOUND；新guarded code自身固定BOUND catalogue，冷legacy子入口无条件拒绝，不能用请求中的foreign root、lease或布尔值解除。
 

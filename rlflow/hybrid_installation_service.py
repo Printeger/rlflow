@@ -6,6 +6,8 @@ INTENT must be durable before descriptor-relative no-replace publication. READY
 uses the exact original core seal and fresh CAS; unknown returns retain material.
 """
 import ctypes
+from contextlib import contextmanager
+from dataclasses import dataclass
 import json
 import os
 import threading
@@ -20,11 +22,25 @@ from .observation import ObservationReader
 from .store import Conflict, canonical
 
 
-def _rename_no_replace(parent_fd, old_name, new_name):
+class _RenameReceipt:
+    """Protected native-success observation, not a publication capability."""
+    def __init__(self,parent_fd,old_name,new_name):
+        self.parent_fd,self.old_name,self.new_name=parent_fd,old_name,new_name
+        info=os.fstat(parent_fd);self.parent_identity=(info.st_dev,info.st_ino)
+        self.thread=threading.get_ident();self.succeeded=False
+
+
+def _rename_no_replace(parent_fd, old_name, new_name,*,_receipt=None):
     """Linux renameat2(RENAME_NOREPLACE), no ordinary rename fallback."""
     if (any(type(name) is not str or not name or '/' in name or '\x00' in name or name in ('.', '..')
             for name in (old_name, new_name)) or type(parent_fd) is not int or parent_fd < 0):
         raise Conflict('fixed original relative publication names required')
+    if _receipt is not None:
+        info=os.fstat(parent_fd)
+        if (type(_receipt) is not _RenameReceipt or _receipt.succeeded or
+                (_receipt.parent_fd,_receipt.old_name,_receipt.new_name,_receipt.thread,_receipt.parent_identity)!=
+                (parent_fd,old_name,new_name,threading.get_ident(),(info.st_dev,info.st_ino))):
+            raise PermissionError('actual original native rename receipt required')
     libc = ctypes.CDLL(None, use_errno=True)
     function = getattr(libc, 'renameat2', None)
     if function is None: raise PermissionError('actual kernel no-replace publication unavailable')
@@ -33,6 +49,7 @@ def _rename_no_replace(parent_fd, old_name, new_name):
     if function(parent_fd, os.fsencode(old_name), parent_fd, os.fsencode(new_name), 1) != 0:
         number = ctypes.get_errno()
         raise OSError(number, os.strerror(number))
+    if _receipt is not None:_receipt.succeeded=True
 
 
 class _Guard:
@@ -44,6 +61,16 @@ class _Guard:
     def check(self): self.owner.check_guard(self.db, self)
 
 
+@dataclass(frozen=True, eq=False)
+class _BootstrapWitness:
+    """Original live inventory context, NOT a serialized execution permit."""
+    owner: object
+    material: object
+    inventory: object
+    raw: bytes
+    thread: int
+
+
 class FixtureInstallationService:
     def __init__(self, builder):
         if type(builder) is not FixtureMaterialBuilder:
@@ -51,6 +78,7 @@ class FixtureInstallationService:
         builder._check()
         self.builder, self.store = builder, builder.store
         self._lock = threading.RLock(); self._active = None; self._published = None
+        self._bootstrap_contexts = {}
         self.project_id, self.store_epoch = builder.project_id, builder.store_epoch
         self.store.bind_hybrid_installation(self)
 
@@ -89,6 +117,74 @@ class FixtureInstallationService:
         if value != expected:
             raise Conflict('original fixture installation core fact differs')
         return value
+
+    @contextmanager
+    def _bootstrap_witness(self, material):
+        """Original READY + actual issued release, hashes OUTSIDE the writer.
+
+        Lifetime retains the original inventory; no Installation/Builder lock
+        is held while waiting for a subsequent Controller writer. This does
+        not enable execution. Its only consumer must prove its OWN fixed
+        Store writer and current authority before using these source refs.
+        """
+        if self._active is not None and self._active.thread == threading.get_ident():
+            raise Conflict('nested original installation bootstrap witness refused')
+        with self.builder._witness(material) as inventory:
+            with self._lock, self.builder._lock:
+                if self._published is not material or inventory.path != material.release_path:
+                    raise PermissionError('original owner-published bootstrap required')
+                _, original = self.builder._slot(material); ready = self._ready_value(original)
+                refs = {'intent_key': intent_key(original['request']), 'intent_hash': digest(original),
+                    'publication_key': publication_key(ready['request']), 'publication_hash': digest(ready),
+                    'expected_seal_hash': digest(original['expected_seal']),
+                    'project_id': self.project_id, 'data_mode': 'fixture', 'store_epoch': self.store_epoch,
+                    'installation_id': material.id, 'release_id': ready['release_id']}
+                if len(self._bootstrap_contexts) >= 32:
+                    raise Conflict('original bootstrap witness capacity reached')
+                witness = _BootstrapWitness(self, material, inventory, canonical(refs), threading.get_ident())
+                self._bootstrap_contexts[id(witness)] = witness
+            try:
+                # This owned read is historical/source verification only, NOT
+                # admission. Later plan CAS repeats the point in its owned DB.
+                with self.store.read_connection() as db:
+                    db.execute('BEGIN')
+                    self._bootstrap_point(db, witness, ReadBudget(db, 16*1024**2))
+                yield witness
+            finally:
+                with self._lock: self._bootstrap_contexts.pop(id(witness), None)
+
+    def _bootstrap_point(self, db, witness, read):
+        """Bounded original source proof; caller separately owns its writer.
+
+        No token, guard, budget mutation, runtime permission or new TTL is
+        issued here. WorkingPlan's guard MUST enforce exact owned DB/current
+        Controller, source and workspace authorization before any CAS.
+        """
+        # Private original identity BEFORE parsing any fields/caller bytes.
+        if (type(witness) is not _BootstrapWitness or
+                self._bootstrap_contexts.get(id(witness)) is not witness or
+                witness.owner is not self or witness.thread != threading.get_ident() or
+                type(read) is not ReadBudget or read.db is not db or not db.in_transaction):
+            raise PermissionError('actual active original bootstrap witness required')
+        version = self._metadata(db)
+        if version < 2: raise Conflict('original durable installation READY required')
+        if (self._published is not witness.material or witness.inventory.builder is not self.builder or
+                witness.inventory.material is not witness.material or
+                witness.inventory.path != witness.material.release_path or
+                witness.material.stage_path.exists() or witness.material.stage_path.is_symlink()):
+            raise Conflict('actual original owner-published release required')
+        _, original = self.builder._slot(witness.material); ready = self._ready_value(original)
+        state = self._state(db, read, version); refs = json.loads(witness.raw)
+        if (state.get(SECTIONS[0], {}).get(refs['intent_key']) != original or
+                state.get(SECTIONS[1], {}).get(refs['publication_key']) != ready or
+                refs != {'intent_key': intent_key(original['request']), 'intent_hash': digest(original),
+                    'publication_key': publication_key(ready['request']), 'publication_hash': digest(ready),
+                    'expected_seal_hash': digest(original['expected_seal']), 'project_id': self.project_id,
+                    'data_mode': 'fixture', 'store_epoch': self.store_epoch,
+                    'installation_id': witness.material.id, 'release_id': ready['release_id']}):
+            raise Conflict('original bootstrap source reference differs')
+        witness.inventory.check(); _deadline(witness.inventory.deadline)
+        return refs
 
     @staticmethod
     def _ready_value(original):

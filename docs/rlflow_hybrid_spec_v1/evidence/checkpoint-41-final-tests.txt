@@ -1,0 +1,239 @@
+CHECKPOINT41 FINAL NONEXECUTING SLICE — NOT COMPLETE GOAL ACCEPTANCE
+FINAL repaired nonexecuting slice checks; full Goal/M1 NOT accepted.
+Original root/High exact28 each886pass8skip1warn bind original59SHA below.
+FULL original86772 exit1/chunk228c11:2048pass2fail32skip1warn1312.45s.
+Both failures diagnosed/closed by local fix, ORIGINALfull log not rewritten.
+Repair-policy original75264 exit0/chunk88334c:96pass1warn12.22s.
+SHA88d43c7bc2cf17e56791f03070e9edaf8261c7f6a12e631554fdf47c204f047e.
+Repair-ready original51517 exit0/chunka58efa:2pass93deselected100.70s.
+Exact argv:PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -B -m pytest -q
+ tests/test_hybrid_working_plan_service.py
+ -k test_actual_ready_two_cas_publication_and_complete_closure
+SHA1b35e1339ddeeb8af81a525af72459d7be750f51a2d2aece9ecd2547337b6085.
+No independent repeated suite or full-r2; no claim repaired full all-green.
+High added-boundary-only static review no remaining MUST; old reviews not repeated.
+Final61SHA before/after match; old59 below retain ORIGINALrun identity.
+compileall -q rlflow tests exit0/chunkd691a2;pip check exit0/chunke7beac;
+git diff --check exit0/chunkfe5ef3. No live suite, no model/provider/GPU.
+Actual repair log paths:audit/hybrid-v1/checkpoint-41-repair-policy-r1.log
+ audit/hybrid-v1/checkpoint-41-repair-ready-r1.log.
+Final repaired61 input SHA256:
+9f79851a0e81f2b9f27aef753060faf55bdfe8b2b0178b9ff01423bda9aaf27f  rlflow/contracts.py
+3c71ef4caefc5574157c9089bb91725f1c9c5fb5877083800228cc6135ebcf4f  rlflow/engine.py
+7b2fdaf8a731365f7155330320f6de1bba0a451be8200453692c2fa29fa175a1  rlflow/execution_adapter.py
+803f69fc76b0f4cf23f3b7a20dbde01572435bfd91a2ecaed752ea09734cf96a  rlflow/experiments.py
+29c09b6c18bbb66e53351109f388a9ae0a58c2095aa9298ce20d3b615d8b11d8  rlflow/hybrid_budget_service.py
+b9bf6107feacdce7f606496c33e99e8227429cfe6bb70bac89134a6ba2ee667c  rlflow/hybrid_controller_service.py
+47ad00d9cc3905faf856f1186bdc95866879fde36ea8e00d0bae16ebbcb8d2a2  rlflow/hybrid_fixture_materials.py
+637c342f062898df5bbe07e7680e76f518b1f5de995760340d64f7ffa562f1df  rlflow/hybrid_installation_service.py
+6aac15b2427378edd02ffd46e042c31d2153494669c1511368a0e5484b244369  rlflow/hybrid_preparation_service.py
+a038f295b98741ad7cf86121b3597563bd5d4623c7f6013818780187f218acb4  rlflow/hybrid_reads.py
+f289bbcd83eb25cc6bd4cd9ae52e546adb1aa499971de8bb493535d263bfa079  rlflow/hybrid_registry.py
+5706b9ab3c968fae36ccb0b4e1cee379861d765c877f7738af2d4b95e388d81f  rlflow/hybrid_runtime_boundary.py
+f4c554f5d8ab2fd5e80f52754f1b700f845ca8d8f94208e612b697477aaf45ef  rlflow/hybrid_runtime_installation.py
+bf5b4561a1ddca214bf9cbb502fd308a277a1f3a59e5cb4c60850ec9f0243dc8  rlflow/hybrid_snapshot.py
+11e43e053a85c6a0441cf8f3e1ef396c0b9573a1794e17e6c0535c062d7de2dc  rlflow/hybrid_working_copy.py
+98d29a4d4608898ed06d7d40ec3c7cc4bd0aa258ce231a709078d6f2ab652908  rlflow/hybrid_working_plan.py
+e4fb9830677b5a292f75cac82a7cf1a7dbb5efd057b26493df9d00124d9a3733  rlflow/hybrid_working_plan_materials.py
+c3fecea2bb6ffc48a3a08ea8a8c20001f28c570016595433026d3009af1453a0  rlflow/hybrid_working_plan_service.py
+e6ec857988c8eebcc9b942aea925173864b68f285c90d57a81143d22ce7b18a4  rlflow/hybrid_workspace_kernel.py
+ab485803f3750881ddbdc739703099428f443f2fb58d3b18bb603db8ab43b5ca  rlflow/hybrid_workspace_service.py
+3eda34570cf92ab1f74df7d2fac2f6628db92ba759da6e5efaf0bbed7d02bd9b  rlflow/isolation.py
+b77738df92f90b255805cf4a86adedfc72a6afad3341700a201254896a8c4a37  rlflow/jobs.py
+c00f6c5f2079ecb44c4dd09875781b332ce8a2d2fba6768dc06e30441e7f4852  rlflow/lifeguard.py
+16b979d9f7ecf6db8a6efc7c35a982c5f82cba8e4c1e82d377bf68d2d670d97c  rlflow/repairs.py
+6336e6efca6133c8d40501c808190b871b80bc3bbeca9f25b20deaa8a875f64a  rlflow/resources.py
+1d14e0449d8e5f2b5c2eac38c208cee552b4522e949fdcdef0f5d9819ce9af42  rlflow/runtime_boundary_policy.py
+a31ecee95e6278c61e6dcd977d6368a21b6e7e22daa4172664420b29a91e9485  rlflow/snapshot_maintenance.py
+ec5ba2cd4b75ea0356abc73ce495f87a55fdffc78a53a3b8a8bcfd5da6016e65  rlflow/startup.py
+38e5f2e7605b45cfe4cf15a664b55cd5bd58034cce97f9262bed4d585e072c58  rlflow/store.py
+ed2b0ca9a8c20956d2d195e60a86da0cbbe2447c166a8cbe12aea772df7e48bc  rlflow/worker.py
+2494e91bf81a4a6c563e43d7ba68c0df376498da0c0dd7326b918cea8de52cd5  schemas/RuntimeState.json
+2ed8a90969117ac848a23d957fdd74044ac0135badb6f2d8a33ccb72e525c464  tests/test_codex_policy_renderer.py
+bacb9226fe8657b4f04ff5a861e98fce10256fded553f748b20e3741820ddc96  tests/test_contracts.py
+cc0f2388762998c7032c7b92fa631437082549fdfb2fea0d9e29613c029820a5  tests/test_cpu_approval.py
+f9afd3f88d66f9a0977e7eb4a85ee843fffd945a548f0066378cee72e6a54137  tests/test_engine.py
+0d7b02ee1d7e45fdf909312baf45516f94c1bc47b622a8ea9a8630a92b300e34  tests/test_execution_adapter.py
+225fcf2de02e9dcce035ddf9cc2ab3a7f823ee35215b14bd11993b5b22997469  tests/test_experiments_v2.py
+5d47a31e93aaaff113206e0183671378fd56d5cf33b5f48538d3826e26d3998d  tests/test_hybrid_bootstrap_witness.py
+4edf4740ed180e275b94c16f1598f8c78355c6f9b06adb06296e7b4d2b04da11  tests/test_hybrid_budget_service.py
+cb50af02fbb0c6525d4f34907955900e02c3c39342815e529bac49268150366c  tests/test_hybrid_controller_service.py
+47129b029a626b45463be2986624ad362016ea36838e565e89ef0272008cf292  tests/test_hybrid_fixture_materials.py
+394f06918320beef9089ee0eb891f859e994898ecc4ceea53dbdd734c7520d15  tests/test_hybrid_installation_service.py
+90ec178292f3c25e7fc0b5ce6917fab0a824c8ca09fc5f8e7d3cd338cbea5972  tests/test_hybrid_preparation_service.py
+12d76f319e68f4067b6bba8517dceaf078a41e8cb32702dfa94d26d2ee10f0cd  tests/test_hybrid_reads.py
+d627f6bd761d16b685bf765efe3d36e80237b4928ba62b93423ab52a7ca8cf6f  tests/test_hybrid_runtime_boundary.py
+4196e5b67091e550d68eaa2ddf6e39653f91e67cfc7f61e8ef84e45c199b9aa1  tests/test_hybrid_runtime_installation.py
+60079236d1cd94fb01c199ca3e9241f598cefb3ee480fbc7c152638de80d175e  tests/test_hybrid_working_plan.py
+2f8a01c3b7fe40194b9bb5a1f80dd73251b2e9e7d95f6bc131e1a326ef57e223  tests/test_hybrid_working_plan_service.py
+c692f9262589f790201e1fcfb761eae84b069e32eada61d24cf9f78988454248  tests/test_hybrid_working_plan_store.py
+b3fd423430cb63b0676e0cdcefb8612ae87c508cb6982d7bfa3b2e43eea6b8f0  tests/test_hybrid_workspace_renewal_service.py
+f28e1c4c103df8d4e300430ece68252f3622a044a68f213c242258dc623eb202  tests/test_hybrid_workspace_service.py
+3685fa6ebd142e02f0b63f80127ac21bc5df6c7640f8838d76a3d6ba9165584e  tests/test_isolation.py
+1e290b5942362d06bd40bef0658565c481e403e9c5cfa5386cd235a2e3f1e6e5  tests/test_jobs.py
+8d2000f26c210965c23fbcba0def44101084c07733d5e92d03b0d1de93ced425  tests/test_releases.py
+d9cb9bbf7bc9803a75655f32c8789250375833e104c58481e2291ab5406038fd  tests/test_repairs_v2.py
+90ae314852abb267a83dcb11d136672beaff74602df841618b2d6bedd5a35118  tests/test_resources_v3.py
+b9ecff983021622ebf9e7adfc80033ea340801f3c15dddd83c1efeff088db353  tests/test_snapshot_maintenance.py
+6a74223f7f249b0cef2606433e46b325f2ac29ce56b03ecee61ac331de82ac3a  tests/test_startup_observation.py
+cde733e98fa93fc139547bfc7355afcabef4ec6f381ee61d1b5ed23c27a875e2  tests/test_startup_v3.py
+9e30826821bad590e950f8919a11bdca90b087cd58182fc2411b4471fe99e444  tests/test_store_policy.py
+f462cd71f9bbea3d7dacfadfff0aa6a4d6d1b14ede185dd2fd35263de3d0eadb  tests/test_telemetry.py
+
+Earlier candidate/LIVE lines below are HISTORY, not current status.
+CURRENT full-r1 ORIGINAL86772 actualterminalexit1/chunk228c11:
+2048passed,2failed,32 existing external H1 skipped,1 existing warning,1312.45s.
+Original59SHA after all match. Full log SHA:
+71a7abec7bdac820710fdfba0be69ddf834b04adcf485f8d37c20d83e57d1c7d.
+FAIL1 cpu_approval old assertion advertised write_roots for readonly roles;
+fixed assertion to native/MCP identical approved Engineer roots or readonly[].
+FAIL2 telemetry real worker preparation rejected original control/scratch
+nesting. Local renderer repair permits only scratch BELOW control, preserving
+candidate bidirectional separation and rejecting control covered by scratch.
+Protected schema/output/config/audit/transport/commands tree/register journal
+overlap still denied. Added actual CPU scratch write/control sibling read+write
+denial for PI+Engineer, no model/provider/GPU. High local static MUST closed,
+no repeated whole-candidate review or independent suite.
+Unique four-module repair-policy-r1 ORIGINAL75264/chunkdfb676 currently LIVE:
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -B -m pytest -q
+tests/test_codex_policy_renderer.py tests/test_cpu_approval.py
+tests/test_telemetry.py tests/test_isolation.py
+stdout/stderr audit/hybrid-v1/checkpoint-41-repair-policy-r1.log (noclobber).
+ALLsource/tests/schema frozen61 inputs; no parallel suite/benchmark.
+Original28 runs above/below bind prior59 hashes, not relabelled as repaired
+source verification. Repair actual result/final checks/commit still pending.
+LATEST independent exact28 ONCE ORIGINAL40768 actualterminalexit0/chunk10cef0:
+886passed,8 existing external H1 skipped,1 existing Starlette warning,999.93s.
+before/after59SHA all match frozen; root independently rechecked59/59
+exit0/chunk8155d0. Log SHA:
+3af56297ac2c356f3b5b5d2d03c319f8f9dd52630ea81aafd5fcf24b82cdca0c.
+Central FULL ONCE ORIGINAL86772/chunkf6745a currently LIVE:
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -B -m pytest -q
+stdout/stderr audit/hybrid-v1/checkpoint-41-full-r1.log (new noclobber).
+No parallel suite/benchmark, ALLsource/test/schema frozen. Full result pending;
+older LIVE/not-started statements below are retained history, not current status.
+CURRENT High independent exact28 ONCE ORIGINAL40768/chunkd856f5 LIVE;
+before59/59 SHAverify exit0/chunkbba9c9, exact root module order/prefix.
+stdout/stderr audit/hybrid-v1/checkpoint-41-independent-final.log (new noclobber).
+Root no parallel suite/benchmark, ALLsource/test/schema still frozen.
+LATEST root final exact28 ORIGINAL64479 actualterminalexit0/chunkbb63bc:
+886 passed,8 existing external H1 skipped,1 existing Starlette warning,
+990.87s (0:16:30). Complete59 SHA after==frozen, actualSHA command exit0;
+git diff --check exit0. No root live suite now, source/tests/schema still frozen.
+Root log SHA e688ab9bca30db850665a5a496c7d516356555977b78b5e71a58caff3d8ead75.
+High unified frozen static review no remaining MUST, actual59/59 SHAcheck OK;
+no independent suite yet. Same28 ONCE independent authorization follows root
+terminal; root must not run tests/benchmark in parallel. Full remains pending.
+Prior LIVE/not-started lines below are retained history, not current status.
+CURRENT root integration-r1 ORIGINAL64479 LIVE; stdout/stderr path below.
+ALLsource/test/schema frozen, no parallel tests/benchmark; High unified static
+frozen review running READONLY, not authorized independent suite yet.
+Older not-started line retained as manifest-creation history.
+Parent40 actual19ce9c4; root sole writer; Goal active. USERpackage-lock untouched.
+No paid provider/model/GPU/public hosting/protected workspace writes.
+Actual nonexecuting WorkingExecutionPlan material, original INTENT, native-success
+receipt, retained dual graphs, physical publication and second CAS READY;
+legacy execution remains denied, start remains denied, all execution/release false.
+Prospective fresh-only private runtime permissions and original parent continuity;
+no historical40 material/evidence rewrite or existing namespace migration.
+Shared maintenance budget/cache same RO BEGIN, aliases always expanded-charged.
+Development results/failures: checkpoint-41-development-tests.txt; not final yet.
+Latest public-CAS-r1 original88283 actualexit0/chunk1d1805:2pass93deselected6.69s.
+No remaining static MUST in individual High reviews; unified frozen review pending.
+Freeze preflight first SHA argv mistakenly included nonexistent production
+hybrid_workspace_renewal_service.py (renewal lives in WorkspaceService), exit1;
+removed nonexistent path BEFORE any final suite. Actual59-path SHA command exit0.
+Root final exact28 modules and later High same28 ONCE are SERIAL, no concurrent
+suite/benchmark, ALLsource/test/schema frozen through actual terminal.
+Root integration-r1 log audit/hybrid-v1/checkpoint-41-integration-r1.log
+STATUS: not started at manifest creation. Final result/independent/full pending.
+Actual root argv:
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -B -m pytest -q
+tests/test_hybrid_installation_service.py
+tests/test_hybrid_fixture_materials.py
+tests/test_hybrid_runtime_installation.py
+tests/test_hybrid_runtime_boundary.py
+tests/test_snapshot_maintenance.py
+tests/test_engine.py
+tests/test_jobs.py
+tests/test_isolation.py
+tests/test_experiments_v2.py
+tests/test_startup_v3.py
+tests/test_startup_observation.py
+tests/test_resources_v3.py
+tests/test_repairs_v2.py
+tests/test_releases.py
+tests/test_contracts.py
+tests/test_store_policy.py
+tests/test_hybrid_controller_service.py
+tests/test_hybrid_preparation_service.py
+tests/test_hybrid_budget_service.py
+tests/test_hybrid_workspace_service.py
+tests/test_hybrid_workspace_renewal_service.py
+tests/test_codex_policy_renderer.py
+tests/test_hybrid_bootstrap_witness.py
+tests/test_hybrid_working_plan_service.py
+tests/test_hybrid_working_plan.py
+tests/test_hybrid_working_plan_store.py
+tests/test_execution_adapter.py
+tests/test_hybrid_reads.py
+stdout/stderr redirected to above log. Actual59 frozen input SHA256:
+9f79851a0e81f2b9f27aef753060faf55bdfe8b2b0178b9ff01423bda9aaf27f  rlflow/contracts.py
+3c71ef4caefc5574157c9089bb91725f1c9c5fb5877083800228cc6135ebcf4f  rlflow/engine.py
+7b2fdaf8a731365f7155330320f6de1bba0a451be8200453692c2fa29fa175a1  rlflow/execution_adapter.py
+803f69fc76b0f4cf23f3b7a20dbde01572435bfd91a2ecaed752ea09734cf96a  rlflow/experiments.py
+29c09b6c18bbb66e53351109f388a9ae0a58c2095aa9298ce20d3b615d8b11d8  rlflow/hybrid_budget_service.py
+b9bf6107feacdce7f606496c33e99e8227429cfe6bb70bac89134a6ba2ee667c  rlflow/hybrid_controller_service.py
+47ad00d9cc3905faf856f1186bdc95866879fde36ea8e00d0bae16ebbcb8d2a2  rlflow/hybrid_fixture_materials.py
+637c342f062898df5bbe07e7680e76f518b1f5de995760340d64f7ffa562f1df  rlflow/hybrid_installation_service.py
+6aac15b2427378edd02ffd46e042c31d2153494669c1511368a0e5484b244369  rlflow/hybrid_preparation_service.py
+a038f295b98741ad7cf86121b3597563bd5d4623c7f6013818780187f218acb4  rlflow/hybrid_reads.py
+f289bbcd83eb25cc6bd4cd9ae52e546adb1aa499971de8bb493535d263bfa079  rlflow/hybrid_registry.py
+5706b9ab3c968fae36ccb0b4e1cee379861d765c877f7738af2d4b95e388d81f  rlflow/hybrid_runtime_boundary.py
+f4c554f5d8ab2fd5e80f52754f1b700f845ca8d8f94208e612b697477aaf45ef  rlflow/hybrid_runtime_installation.py
+bf5b4561a1ddca214bf9cbb502fd308a277a1f3a59e5cb4c60850ec9f0243dc8  rlflow/hybrid_snapshot.py
+11e43e053a85c6a0441cf8f3e1ef396c0b9573a1794e17e6c0535c062d7de2dc  rlflow/hybrid_working_copy.py
+98d29a4d4608898ed06d7d40ec3c7cc4bd0aa258ce231a709078d6f2ab652908  rlflow/hybrid_working_plan.py
+e4fb9830677b5a292f75cac82a7cf1a7dbb5efd057b26493df9d00124d9a3733  rlflow/hybrid_working_plan_materials.py
+c3fecea2bb6ffc48a3a08ea8a8c20001f28c570016595433026d3009af1453a0  rlflow/hybrid_working_plan_service.py
+e6ec857988c8eebcc9b942aea925173864b68f285c90d57a81143d22ce7b18a4  rlflow/hybrid_workspace_kernel.py
+ab485803f3750881ddbdc739703099428f443f2fb58d3b18bb603db8ab43b5ca  rlflow/hybrid_workspace_service.py
+56b93b051611b82da6ae915893d920f53e4cd46d8c61a1b44b81f209aee610a6  rlflow/isolation.py
+b77738df92f90b255805cf4a86adedfc72a6afad3341700a201254896a8c4a37  rlflow/jobs.py
+c00f6c5f2079ecb44c4dd09875781b332ce8a2d2fba6768dc06e30441e7f4852  rlflow/lifeguard.py
+16b979d9f7ecf6db8a6efc7c35a982c5f82cba8e4c1e82d377bf68d2d670d97c  rlflow/repairs.py
+6336e6efca6133c8d40501c808190b871b80bc3bbeca9f25b20deaa8a875f64a  rlflow/resources.py
+1d14e0449d8e5f2b5c2eac38c208cee552b4522e949fdcdef0f5d9819ce9af42  rlflow/runtime_boundary_policy.py
+a31ecee95e6278c61e6dcd977d6368a21b6e7e22daa4172664420b29a91e9485  rlflow/snapshot_maintenance.py
+ec5ba2cd4b75ea0356abc73ce495f87a55fdffc78a53a3b8a8bcfd5da6016e65  rlflow/startup.py
+38e5f2e7605b45cfe4cf15a664b55cd5bd58034cce97f9262bed4d585e072c58  rlflow/store.py
+ed2b0ca9a8c20956d2d195e60a86da0cbbe2447c166a8cbe12aea772df7e48bc  rlflow/worker.py
+2494e91bf81a4a6c563e43d7ba68c0df376498da0c0dd7326b918cea8de52cd5  schemas/RuntimeState.json
+44fcd0c012c69a9628b4379555b96ac3e9e4366e9ad6f3ccc82b84e50ea44104  tests/test_codex_policy_renderer.py
+bacb9226fe8657b4f04ff5a861e98fce10256fded553f748b20e3741820ddc96  tests/test_contracts.py
+f9afd3f88d66f9a0977e7eb4a85ee843fffd945a548f0066378cee72e6a54137  tests/test_engine.py
+0d7b02ee1d7e45fdf909312baf45516f94c1bc47b622a8ea9a8630a92b300e34  tests/test_execution_adapter.py
+225fcf2de02e9dcce035ddf9cc2ab3a7f823ee35215b14bd11993b5b22997469  tests/test_experiments_v2.py
+5d47a31e93aaaff113206e0183671378fd56d5cf33b5f48538d3826e26d3998d  tests/test_hybrid_bootstrap_witness.py
+4edf4740ed180e275b94c16f1598f8c78355c6f9b06adb06296e7b4d2b04da11  tests/test_hybrid_budget_service.py
+cb50af02fbb0c6525d4f34907955900e02c3c39342815e529bac49268150366c  tests/test_hybrid_controller_service.py
+47129b029a626b45463be2986624ad362016ea36838e565e89ef0272008cf292  tests/test_hybrid_fixture_materials.py
+394f06918320beef9089ee0eb891f859e994898ecc4ceea53dbdd734c7520d15  tests/test_hybrid_installation_service.py
+90ec178292f3c25e7fc0b5ce6917fab0a824c8ca09fc5f8e7d3cd338cbea5972  tests/test_hybrid_preparation_service.py
+12d76f319e68f4067b6bba8517dceaf078a41e8cb32702dfa94d26d2ee10f0cd  tests/test_hybrid_reads.py
+d627f6bd761d16b685bf765efe3d36e80237b4928ba62b93423ab52a7ca8cf6f  tests/test_hybrid_runtime_boundary.py
+4196e5b67091e550d68eaa2ddf6e39653f91e67cfc7f61e8ef84e45c199b9aa1  tests/test_hybrid_runtime_installation.py
+60079236d1cd94fb01c199ca3e9241f598cefb3ee480fbc7c152638de80d175e  tests/test_hybrid_working_plan.py
+2f8a01c3b7fe40194b9bb5a1f80dd73251b2e9e7d95f6bc131e1a326ef57e223  tests/test_hybrid_working_plan_service.py
+c692f9262589f790201e1fcfb761eae84b069e32eada61d24cf9f78988454248  tests/test_hybrid_working_plan_store.py
+b3fd423430cb63b0676e0cdcefb8612ae87c508cb6982d7bfa3b2e43eea6b8f0  tests/test_hybrid_workspace_renewal_service.py
+f28e1c4c103df8d4e300430ece68252f3622a044a68f213c242258dc623eb202  tests/test_hybrid_workspace_service.py
+3685fa6ebd142e02f0b63f80127ac21bc5df6c7640f8838d76a3d6ba9165584e  tests/test_isolation.py
+1e290b5942362d06bd40bef0658565c481e403e9c5cfa5386cd235a2e3f1e6e5  tests/test_jobs.py
+8d2000f26c210965c23fbcba0def44101084c07733d5e92d03b0d1de93ced425  tests/test_releases.py
+d9cb9bbf7bc9803a75655f32c8789250375833e104c58481e2291ab5406038fd  tests/test_repairs_v2.py
+90ae314852abb267a83dcb11d136672beaff74602df841618b2d6bedd5a35118  tests/test_resources_v3.py
+b9ecff983021622ebf9e7adfc80033ea340801f3c15dddd83c1efeff088db353  tests/test_snapshot_maintenance.py
+6a74223f7f249b0cef2606433e46b325f2ac29ce56b03ecee61ac331de82ac3a  tests/test_startup_observation.py
+cde733e98fa93fc139547bfc7355afcabef4ec6f381ee61d1b5ed23c27a875e2  tests/test_startup_v3.py
+9e30826821bad590e950f8919a11bdca90b087cd58182fc2411b4471fe99e444  tests/test_store_policy.py

@@ -441,6 +441,125 @@ def _serve(config: dict) -> None:
                               'error':{'code':-32000,'message':str(exc)}}),flush=True)
 
 
+def _render_codex_policy(role, candidate, scratch, schema, output, *, catalog,
+                         write_roots, read_extra, execute_extra, memory_bytes,
+                         model, effort, command_seconds, codex, python,
+                         isolation_module, tool_context=None, tool_launch_directory=None):
+    """Pure unexecuted policy bytes; NO filesystem, environment or capability.
+
+    All paths and write sets are explicit lexical inputs from a protected
+    caller. Physical scope, catalog provenance, approval and execution gates
+    must be proved separately. In particular, empty writes NEVER mean the
+    entire candidate. Calling this renderer is not a runtime permission.
+    """
+    if role not in ROLES: raise IsolationError('Unknown role')
+    if (type(memory_bytes) is not int or not 64*1024**2 <= memory_bytes <= 16*1024**3 or
+            type(command_seconds) is not int or not 1 <= command_seconds <= 3600 or
+            type(model) is not str or not re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9_.:-]{0,159}', model) or
+            type(effort) is not str or effort not in ('low', 'medium', 'high', 'xhigh', 'max')):
+        raise IsolationError('explicit bounded policy profile required')
+    def path(value):
+        if (type(value) is not str or not value.startswith('/') or '\x00' in value or
+                len(value.encode()) > 4096 or str(Path(value)) != value or
+                '..' in Path(value).parts or len(Path(value).parts) > 64):
+            raise IsolationError('explicit canonical absolute policy path required')
+        return value
+    candidate, scratch, schema, output, codex, python, isolation_module = map(
+        path, (candidate, scratch, schema, output, codex, python, isolation_module))
+    for roots in (write_roots, read_extra, execute_extra):
+        if type(roots) is not list or len(roots) > 128 or any(path(p) != p for p in roots):
+            raise IsolationError('explicit bounded policy path list required')
+        if len(set(roots)) != len(roots): raise IsolationError('duplicate policy path')
+    if role != 'Engineer' and write_roots:
+        raise IsolationError('non-Engineer policy cannot write candidate')
+    # A JSON round trip detaches returned bytes and never mutates the original
+    # protected catalog or caller objects. It does not probe model availability.
+    try:
+        raw = json.dumps(catalog, allow_nan=False)
+        if len(raw.encode()) > 16*1024**2: raise IsolationError('policy model catalog exceeds bound')
+        detached = json.loads(raw)
+        if type(detached) is not dict or type(detached.get('models')) is not list:
+            raise IsolationError('invalid explicit policy model catalog')
+        models = [m for m in detached['models'] if m['slug'] == model]
+        if not models: raise IsolationError('Requested model absent from local Codex model catalog')
+        if effort not in {x['effort'] for x in models[0].get('supported_reasoning_levels', [])}:
+            raise IsolationError('Requested reasoning effort is not supported by selected model')
+    except (KeyError, TypeError, ValueError, RecursionError) as error:
+        raise IsolationError('invalid explicit policy model catalog') from error
+    for item in models:
+        item.update(shell_type='disabled', apply_patch_tool_type=None,
+                    experimental_supported_tools=[], supports_search_tool=False,
+                    include_skills_usage_instructions=False, include_plugin_usage_instructions=False,
+                    include_apps_usage_instructions=False, tool_mode='direct', multi_agent_version='disabled')
+    if tool_context is not None and not tool_context_valid(tool_context):
+        raise IsolationError('Invalid tool context')
+    trusted = Path(output).parent
+    roots = [Path(candidate), Path(scratch)]
+    if (roots[0] == roots[1] or roots[0] in roots[1].parents or roots[1] in roots[0].parents or
+            trusted == roots[0] or roots[0] in trusted.parents or trusted in roots[0].parents or
+            trusted == roots[1] or roots[1] in trusted.parents):
+        raise IsolationError('policy control must remain outside writable workspaces')
+    # Legacy workers keep scratch as a PRIVATE CHILD of their control directory.
+    # That grants no access to its siblings. The reverse nesting would expose
+    # control bytes, and no scratch may cover a protected artifact itself.
+    protected = [Path(schema), Path(output)] + [trusted / (Path(output).name + suffix)
+        for suffix in ('.models.json', '.mcp.json', '.commands.jsonl', '.commands.jsonl.transport')]
+    protected += [trusted / 'commands', trusted / 'tool-registers.jsonl']
+    if tool_launch_directory is not None:
+        protected.append(Path(path(tool_launch_directory)) / 'tool-registers.jsonl')
+    if any(p == roots[1] or roots[1] in p.parents or p in roots[1].parents for p in protected):
+        raise IsolationError('policy scratch overlaps protected control artifact')
+    if any(Path(p) != roots[0] and roots[0] not in Path(p).parents for p in write_roots):
+        raise IsolationError('policy write root outside candidate')
+    catalog_path = str(trusted / (Path(output).name + '.models.json'))
+    config_path = str(trusted / (Path(output).name + '.mcp.json'))
+    tool_config = {'role': role, 'candidate': candidate, 'scratch': scratch,
+        'read_extra': read_extra, 'write_roots': write_roots, 'execute_extra': execute_extra,
+        'memory_bytes': memory_bytes, 'command_seconds': command_seconds,
+        'audit': str(trusted / (Path(output).name + '.commands.jsonl'))}
+    if tool_context is not None: tool_config['tool_context'] = tool_context
+    if tool_launch_directory is not None:
+        if tool_context is None: raise IsolationError('Launch witness requires tool context')
+        tool_config['tool_launch_directory'] = path(tool_launch_directory)
+    argv = [codex, 'exec', '--ignore-user-config', '--ignore-rules', '--ephemeral', '--skip-git-repo-check',
+            '--sandbox', 'workspace-write', '-C', scratch, '--json', '--output-schema', schema,
+            '--output-last-message', output, '-m', model]
+    config = {'model_reasoning_effort': effort, 'use_legacy_landlock': True,
+        'approval_policy': 'never', 'project_doc_max_bytes': 0, 'allow_login_shell': False,
+        'web_search': 'disabled', 'model_catalog_json': catalog_path,
+        'skills.include_instructions': False, 'skills.bundled.enabled': False,
+        'tools.update_plan.enabled': False, 'tools.experimental_request_user_input.enabled': False,
+        'features.tool_registry.turn_metadata_includes_tool_info': True,
+        'mcp_servers.rlflow_cpu.command': python,
+        'mcp_servers.rlflow_cpu.args': ['-I', isolation_module, '_mcp', config_path],
+        'mcp_servers.rlflow_cpu.startup_timeout_sec': 10,
+        'mcp_servers.rlflow_cpu.tool_timeout_sec': command_seconds + 10,
+        'mcp_servers.rlflow_cpu.required': True,
+        'mcp_servers.rlflow_cpu.enabled_tools': ['cpu_exec'],
+        'mcp_servers.rlflow_cpu.tools.cpu_exec.approval_mode': 'approve',
+        'sandbox_workspace_write.writable_roots': write_roots,
+        'sandbox_workspace_write.exclude_slash_tmp': True,
+        'sandbox_workspace_write.exclude_tmpdir_env_var': True}
+    for feature in ['shell_tool','unified_exec','apply_patch_freeform','view_image','js_repl','code_mode',
+              'code_mode_only','code_mode_host','apps','plugins','multi_agent','multi_agent_v2',
+              'collab','hooks','codex_hooks','plugin_hooks','shell_snapshot','shell_snapshot_v2',
+              'browser_use','computer_use','image_generation','imagegenext','memory_tool','memories',
+              'skill_search','skill_mcp_dependency_install','remote_control','search_tool','tool_suggest',
+              'request_permissions_tool','request_rule','goals','worktrees','codex_git_commit',
+              'standalone_web_search','web_search','tool_search','sleep_tool','send_message_to_user_async',
+              'deferred_executor','token_budget','current_time_reminder','recommended_plugins']:
+        config['features.' + feature] = False
+    config['features.skip_host_skill_discovery'] = True
+    config['features.use_legacy_landlock'] = True
+    for key, value in config.items(): argv.extend(['-c', key + '=' + json.dumps(value, separators=(',', ':'))])
+    argv.append('-')
+    models_raw = json.dumps({'models': models}, allow_nan=False).encode()
+    tool_raw = json.dumps(tool_config, allow_nan=False).encode()
+    if len(models_raw) + len(tool_raw) + len(json.dumps(argv).encode()) > 16*1024**2:
+        raise IsolationError('rendered policy output exceeds finite byte bound')
+    return argv, models_raw, tool_raw
+
+
 def codex_command(role: str, candidate: str | Path, scratch: str | Path,
                   schema: str | Path, output: str | Path, *,
                   read_extra: list[str] | None = None, write_roots: list[str] | None = None,
@@ -475,62 +594,18 @@ def codex_command(role: str, candidate: str | Path, scratch: str | Path,
         # Only the local rejecting census uses a synthetic catalog. It must never
         # be a fallback for a real account/model missing from the operator cache.
         catalog = json.loads(json.dumps(_census_catalog))
-    models = [m for m in catalog['models'] if m['slug']==model]
-    if not models: raise IsolationError('Requested model absent from local Codex model catalog')
-    if effort not in {x['effort'] for x in models[0].get('supported_reasoning_levels', [])}:
-        raise IsolationError('Requested reasoning effort is not supported by selected model')
-    for m in models:
-        m.update(shell_type='disabled',apply_patch_tool_type=None,
-                 experimental_supported_tools=[],supports_search_tool=False,
-                 include_skills_usage_instructions=False,include_plugin_usage_instructions=False,
-                 include_apps_usage_instructions=False,tool_mode='direct',multi_agent_version='disabled')
-    catalog_path = trusted/(output.name+'.models.json')
-    catalog_path.write_text(json.dumps({'models':models}))
-    config_path = trusted/(output.name+'.mcp.json')
-    tool_config = {'role':role,'candidate':str(candidate),'scratch':str(scratch),
-        'read_extra':read_extra or [],'write_roots':write_roots,
-        'execute_extra':execute_extra or [],'memory_bytes':memory_bytes,'command_seconds':command_seconds,
-        'audit':str(trusted/(output.name+'.commands.jsonl'))}
-    if tool_context is not None:tool_config['tool_context'] = tool_context
-    if tool_launch_directory is not None:
-        if tool_context is None:raise IsolationError('Launch witness requires tool context')
-        tool_config['tool_launch_directory'] = str(Path(tool_launch_directory).resolve(strict=True))
-    config_path.write_text(json.dumps(tool_config))
-    argv = [CODEX,'exec','--ignore-user-config','--ignore-rules','--ephemeral','--skip-git-repo-check',
-            '--sandbox','workspace-write','-C',str(scratch),'--json','--output-schema',str(Path(schema).resolve()),
-            '--output-last-message',str(output),'-m',model]
-    config = {'model_reasoning_effort':effort,'use_legacy_landlock':True,'approval_policy':'never','project_doc_max_bytes':0,
-        'allow_login_shell':False,'web_search':'disabled','model_catalog_json':str(catalog_path),
-        'skills.include_instructions':False,'skills.bundled.enabled':False,
-        'tools.update_plan.enabled':False,'tools.experimental_request_user_input.enabled':False,
-        'features.tool_registry.turn_metadata_includes_tool_info':True,
-        'mcp_servers.rlflow_cpu.command':sys.executable,
-        'mcp_servers.rlflow_cpu.args':['-I',str(Path(__file__).resolve()),'_mcp',str(config_path)],
-        'mcp_servers.rlflow_cpu.startup_timeout_sec':10,
-        'mcp_servers.rlflow_cpu.tool_timeout_sec':command_seconds+10,
-        'mcp_servers.rlflow_cpu.required':True}
-    # Only the bounded, stage-scoped CPU tool is pre-approved. Native tools
-    # remain disabled and the server still enforces Landlock/seccomp limits.
-    config['mcp_servers.rlflow_cpu.enabled_tools'] = ['cpu_exec']
-    config['mcp_servers.rlflow_cpu.tools.cpu_exec.approval_mode'] = 'approve'
-    # Advertise the same writes to the role that cpu_exec enforces. A global
-    # read-only declaration makes Engineer correctly refuse implementation.
-    config['sandbox_workspace_write.writable_roots'] = ((write_roots or [str(candidate)]) if role == 'Engineer' else [])
-    config['sandbox_workspace_write.exclude_slash_tmp'] = True
-    config['sandbox_workspace_write.exclude_tmpdir_env_var'] = True
-    for f in ['shell_tool','unified_exec','apply_patch_freeform','view_image','js_repl','code_mode',
-              'code_mode_only','code_mode_host','apps','plugins','multi_agent','multi_agent_v2',
-              'collab','hooks','codex_hooks','plugin_hooks','shell_snapshot','shell_snapshot_v2',
-              'browser_use','computer_use','image_generation','imagegenext','memory_tool','memories',
-              'skill_search','skill_mcp_dependency_install','remote_control','search_tool','tool_suggest',
-              'request_permissions_tool','request_rule','goals','worktrees','codex_git_commit',
-              'standalone_web_search','web_search','tool_search','sleep_tool','send_message_to_user_async',
-              'deferred_executor','token_budget','current_time_reminder','recommended_plugins']:
-        config['features.'+f] = False
-    config['features.skip_host_skill_discovery'] = True
-    config['features.use_legacy_landlock'] = True
-    for k,v in config.items(): argv.extend(['-c', k+'='+json.dumps(v,separators=(',',':'))])
-    argv.append('-')
+    # Keep legacy's None default only HERE, behind its mandatory legacy gate.
+    # An explicit empty set matches CPU enforcement; never advertise wholecopy.
+    writes = ([str(candidate)] if write_roots is None else list(write_roots)) if role == 'Engineer' else []
+    argv, models_raw, tool_raw = _render_codex_policy(role, str(candidate), str(scratch),
+        str(Path(schema).resolve()), str(output), catalog=catalog, write_roots=writes,
+        read_extra=list(read_extra or []), execute_extra=list(execute_extra or []),
+        memory_bytes=memory_bytes, model=model, effort=effort, command_seconds=command_seconds,
+        codex=CODEX, python=sys.executable, isolation_module=str(Path(__file__).resolve()),
+        tool_context=tool_context,
+        tool_launch_directory=str(Path(tool_launch_directory).resolve(strict=True)) if tool_launch_directory is not None else None)
+    (trusted / (output.name + '.models.json')).write_bytes(models_raw)
+    (trusted / (output.name + '.mcp.json')).write_bytes(tool_raw)
     env = {k:v for k,v in os.environ.items() if k in ('HOME','USER','LANG','LC_ALL','CODEX_HOME','HTTPS_PROXY','HTTP_PROXY','ALL_PROXY','NO_PROXY','SSL_CERT_FILE','SSL_CERT_DIR')}
     env.update(PATH='/usr/local/bin:/usr/bin:/bin',CUDA_VISIBLE_DEVICES='',NVIDIA_VISIBLE_DEVICES='none')
     return argv,env

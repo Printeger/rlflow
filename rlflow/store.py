@@ -75,7 +75,8 @@ PRIVATE_HOT_SECTIONS = frozenset(('tool_sources','tool_receipts','tool_scan',
     'hybrid_controller_facts','hybrid_controller_heads','hybrid_admission_facts',
     'hybrid_budget_entries','hybrid_budget_goal_heads','hybrid_budget_reservation_heads','hybrid_budget_project_heads',
     'hybrid_workspace_facts','hybrid_workspace_heads','hybrid_workspace_claims',
-    'hybrid_runtime_installation_intents','hybrid_runtime_installation_publications'))
+    'hybrid_runtime_installation_intents','hybrid_runtime_installation_publications',
+    'hybrid_working_plan_intents','hybrid_working_plan_results'))
 
 
 class ObjectMap(dict):
@@ -144,6 +145,7 @@ class Store:
         self._hybrid_budget_service = None
         self._hybrid_workspace_service = None
         self._hybrid_installation_service = None
+        self._hybrid_working_plan_service = None
         self._existing_identity = None
         self.root = Path(root).resolve()
         (self.root / "runtime").mkdir(parents=True, exist_ok=True)
@@ -234,7 +236,7 @@ class Store:
         for name in ('_hybrid_auth_owner', '_hybrid_registry', '_hybrid_authority_service',
                      '_hybrid_draft_auth_owner', '_hybrid_draft_service', '_hybrid_preparation_service',
                      '_hybrid_controller_service', '_hybrid_admission_service', '_hybrid_budget_service',
-                     '_hybrid_workspace_service', '_hybrid_installation_service'):
+                     '_hybrid_workspace_service', '_hybrid_installation_service', '_hybrid_working_plan_service'):
             setattr(store, name, None)
         db = sqlite3.connect(store.db.as_uri() + '?mode=ro', uri=True, timeout=5)
         try:
@@ -409,6 +411,18 @@ class Store:
 
     def _apply(self, state, payload, db, event):
         preparation_decoded=False
+        from .hybrid_working_plan import SECTIONS as plan_sections, EVENTS as plan_events, validate_transition as plan_transition
+        if (event['event_type'] in plan_events or any(s in plan_sections for s,k,v in payload.get('put',[])) or
+                any(s in plan_sections for s,k in payload.get('delete',[])) or set(payload.get('set',{})) & set(plan_sections)):
+            from .hybrid_reads import ReadBudget
+            budget=ReadBudget(db,PREPARATION_READ_BYTES)
+            try:decoded={**payload,'put':[[s,k,budget.decode(v)] for s,k,v in payload.get('put',[])]}
+            except (ValueError,TypeError,KeyError,RecursionError):
+                raise Conflict('Working plan replay decoding exceeds safe envelope') from None
+            plan_transition(decoded,lambda s,k:({} if s in state else None) if k=='' else state.get(s,{}).get(k),
+                event_type=event['event_type'],key=event['idempotency_key'],object_id=event['object_id'],producer=event['producer'],
+                version=event['new_state_version'],registration=self._goal_registration(db))
+            payload=decoded;preparation_decoded=True
         from .hybrid_runtime_installation import SECTIONS as installation_sections, EVENTS as installation_events, validate_transition as installation_transition
         if (event['event_type'] in installation_events or any(s in installation_sections for s,k,v in payload.get('put',[])) or
                 any(s in installation_sections for s,k in payload.get('delete',[])) or set(payload.get('set',{})) & set(installation_sections)):
@@ -656,6 +670,13 @@ class Store:
 
     def _commit(self, db, event_type, key, payload, previous, object_id, producer, inputs, *, _authorization=None):
         ver = previous + 1
+        from .hybrid_working_plan import SECTIONS as plan_sections, EVENTS as plan_events, validate_transition as plan_transition
+        if (event_type in plan_events or any(s in plan_sections for s,k,v in payload['put']) or
+                any(s in plan_sections for s,k in payload['delete'])):
+            service=self._check_working_plan_guard(db,_authorization)
+            plan_transition(payload,_authorization.lookup,event_type=event_type,key=key,object_id=object_id,
+                producer=producer,version=ver,registration=self._goal_registration(db))
+            service.check_live_write(db,payload,inputs,_authorization)
         from .hybrid_runtime_installation import SECTIONS as installation_sections, EVENTS as installation_events, validate_transition as installation_transition
         if (event_type in installation_events or any(s in installation_sections for s,k,v in payload['put']) or
                 any(s in installation_sections for s,k in payload['delete'])):
@@ -860,6 +881,67 @@ class Store:
         from .hybrid_runtime_installation import validate_complete as installation_complete
         installation_complete(state,self._goal_registration(db),lambda k:self._installation_event(db,k),
                               event_summary=self._installation_summary(db,state['version']))
+        from .hybrid_working_plan import validate_complete as working_plan_complete
+        working_plan_complete(state,self._goal_registration(db),lambda k:self._working_plan_event(db,k),
+                              event_summary=self._working_plan_summary(db,state['version']))
+
+    def bind_hybrid_working_plan(self,service):
+        from .hybrid_working_plan_service import WorkingPlanService
+        if type(service) is not WorkingPlanService or service.store is not self:
+            raise TypeError('fixed original Working plan owner required')
+        with self.lock(),self.read_connection() as db:
+            self._require_budget_indices(db)
+            if self._hybrid_working_plan_service not in (None,service):raise Conflict('Working plan owner cannot be rebound')
+            self._hybrid_working_plan_service=service
+
+    def _check_working_plan_guard(self,db,guard):
+        service=self._hybrid_working_plan_service
+        if service is None:raise PermissionError('protected actual Working plan owner required')
+        service.check_guard(db,guard)
+        return service
+
+    def _working_plan_summary(self,db,version):
+        from .hybrid_working_plan import EVENTS
+        row=db.execute('SELECT CASE WHEN length(CAST(idempotency_key AS BLOB))<=128 THEN idempotency_key END,new_state_version FROM events WHERE event_type IN (?,?) AND seq<=? ORDER BY seq DESC LIMIT 1',(*EVENTS,version)).fetchone()
+        count=db.execute('SELECT COUNT(*) FROM events WHERE event_type IN (?,?) AND seq<=?',(*EVENTS,version)).fetchone()[0]
+        return tuple(row) if row is not None else None,count
+
+    def _working_plan_event(self,db,key,*,max_bytes=17*1024**2,_parse=None,_decode=None):
+        """Indexed complete original metadata/put/marker/inputs, bounded decode."""
+        from .hybrid_working_plan import SECTIONS,EVENTS,validate_record,expected_objects,event_inputs
+        if _parse is None and _decode is None:
+            from .hybrid_reads import ReadBudget
+            read=ReadBudget(db,PREPARATION_READ_BYTES);_parse,_decode=read.parse,read.decode
+        row=db.execute('SELECT seq,previous_state_version,new_state_version,object_version,CASE WHEN length(CAST(event_type AS BLOB))<=64 THEN event_type END AS event_type,CASE WHEN length(CAST(producer AS BLOB))<=64 THEN producer END AS producer,CASE WHEN length(CAST(object_id AS BLOB))<=160 THEN object_id END AS object_id,CASE WHEN length(CAST(payload_sha256 AS BLOB))<=64 THEN payload_sha256 END AS payload_sha256,CASE WHEN length(CAST(input_versions AS BLOB))<=4096 THEN input_versions END AS input_versions,CASE WHEN length(CAST(payload AS BLOB))<=? THEN payload END AS payload FROM events WHERE idempotency_key=?',(max_bytes,key)).fetchone()
+        if row is None:return None
+        if row['payload'] is None or row['event_type'] not in EVENTS:raise Conflict('Working plan original source unavailable or exceeds bound')
+        payload=_parse(row['payload'].encode())
+        if sha(payload)!=row['payload_sha256'] or canonical(payload).decode()!=row['payload']:
+            raise Conflict('Working plan original source integrity differs')
+        if (type(payload) is not dict or set(payload)!={'format','put','delete','details'} or
+                type(payload['format']) is not int or payload['format']!=2 or type(payload['put']) is not list or
+                payload['delete']!=[] or payload['details'] is not None or not 1<=len(payload['put'])<=2):
+            raise Conflict('Working plan original source shape differs')
+        section=SECTIONS[EVENTS.index(row['event_type'])];objects={};markers={}
+        for item in payload['put']:
+            if type(item) is not list or len(item)!=3 or item[0]!=section or type(item[1]) is not str:
+                raise Conflict('Working plan original extra descriptor')
+            _,objkey,encoded=item;value=_decode(encoded)
+            if objkey:
+                if objkey in objects:raise Conflict('Working plan original duplicate descriptor')
+                validate_record(section,objkey,value);objects[objkey]=value
+            else:
+                if section in markers or value!={}:raise Conflict('Working plan original marker differs')
+                markers[section]=value
+        prior=db.execute('SELECT 1 FROM events WHERE event_type=? AND seq<? LIMIT 1',(row['event_type'],row['seq'])).fetchone()
+        if set(objects)!={key} or markers!=({section:{}} if prior is None else {}):
+            raise Conflict('Working plan original single fact/first marker differs')
+        value=objects[key];version=value['accepted_state_version']
+        if (row['seq']!=version or row['new_state_version']!=version or row['previous_state_version']!=version-1 or
+                row['object_version']!=version or row['object_id']!=value['request']['plan_id'] or
+                row['producer']!='hybrid-core' or row['input_versions']!=canonical(event_inputs(value)).decode()):
+            raise Conflict('Working plan original metadata or canonical whole-fact inputs differ')
+        return ((row['event_type'],row['producer'],row['object_id'],version),expected_objects(section,key,value),event_inputs(value))
 
     def bind_hybrid_installation(self, service):
         from .hybrid_installation_service import FixtureInstallationService
@@ -1288,7 +1370,8 @@ class Store:
             from .hybrid_budget_ledger import EVENT as budget_event
             from .hybrid_workspace import EVENT as workspace_event
             from .hybrid_runtime_installation import EVENTS as installation_events
-            if event_type in installation_events or event_type in (controller_event,admission_event,budget_event,workspace_event) or event_type in preparation_events or event_type in authority_events.values() or (event_type=='HYBRID_GOAL_DRAFTED' and self._hybrid_draft_auth_owner is not None):
+            from .hybrid_working_plan import EVENTS as working_plan_events
+            if event_type in working_plan_events or event_type in installation_events or event_type in (controller_event,admission_event,budget_event,workspace_event) or event_type in preparation_events or event_type in authority_events.values() or (event_type=='HYBRID_GOAL_DRAFTED' and self._hybrid_draft_auth_owner is not None):
                 raise PermissionError('Hybrid service events require guarded object transactions')
             if self._existing(db,key,event_type,object_id):
                 db.commit()
@@ -1358,6 +1441,9 @@ class Store:
                 from .hybrid_budget_ledger import EVENT as budget_event, SECTIONS as budget_sections
                 from .hybrid_workspace import EVENT as workspace_event, SECTIONS as workspace_sections
                 from .hybrid_runtime_installation import EVENTS as installation_events, SECTIONS as installation_sections
+                from .hybrid_working_plan import EVENTS as working_plan_events, SECTIONS as working_plan_sections
+                if event_type in working_plan_events or any(s in working_plan_sections for s,k in objects):
+                    self._check_working_plan_guard(db,authorization)
                 if event_type in installation_events or any(s in installation_sections for s,k in objects):
                     self._check_installation_guard(db,authorization)
                 if event_type==workspace_event or any(s in workspace_sections for s,k in objects):

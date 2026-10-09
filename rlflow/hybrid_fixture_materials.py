@@ -234,22 +234,49 @@ class FixtureMaterialBuilder:
         for name in ('store', 'working', 'snapshots', 'source', 'bootstrap'):
             path = self.root / name; path.mkdir(mode=0o700)
             self._roots[name] = path
-        self.store = Store(self._roots['store'])
-        self.project_id = project_id
-        self.store_epoch = enable(self.store, project_id=self.project_id, data_mode='fixture')
-        info = self.store.db.stat(); self._database_identity = [info.st_dev, info.st_ino]
-        # This created Store must never recreate a subsequently missing database.
-        self.store._existing_identity = tuple(self._database_identity)
-        lock_info = (self.store.root / 'runtime/writer.lock').lstat()
-        if not stat.S_ISREG(lock_info.st_mode) or lock_info.st_uid != os.getuid() or lock_info.st_nlink != 1:
-            raise Conflict('original fixture writer lock unavailable')
-        self.store._existing_lock_identity = (lock_info.st_dev, lock_info.st_ino)
+        # This is our freshly created isolated namespace, never an existing
+        # install/migration. Do not depend on the host's group-writable umask.
+        (self._roots['store']/'runtime').mkdir(mode=0o700)
+        runtime=self._roots['store']/'runtime'
+        with _held_chain(runtime) as (fds,chain):
+            self._runtime_chain=chain
+            self.store=Store(self._roots['store'])
+            if directory_chain(runtime)!=chain:raise Conflict('new fixture original runtime changed during Store creation')
+            original={}
+            for name in ('research.db','writer.lock'):
+                fd=os.open(name,os.O_RDONLY|os.O_NOFOLLOW|os.O_NONBLOCK|os.O_CLOEXEC,dir_fd=fds[-1])
+                try:
+                    info=os.fstat(fd)
+                    if not stat.S_ISREG(info.st_mode) or info.st_uid!=os.getuid() or info.st_nlink!=1:
+                        raise Conflict('new fixture original private Store file required')
+                    original[name]=(info.st_dev,info.st_ino)
+                    if stamp(os.stat(name,dir_fd=fds[-1],follow_symlinks=False))!=stamp(info):
+                        raise Conflict('new fixture original Store file rebound before protection')
+                    os.fchmod(fd,0o600);os.fsync(fd)
+                    if (stamp(os.stat(name,dir_fd=fds[-1],follow_symlinks=False))!=stamp(os.fstat(fd)) or
+                            directory_chain(runtime)!=chain):
+                        raise Conflict('new fixture original Store file/parent rebound during protection')
+                finally:os.close(fd)
+            # Pin BEFORE enable; a lost/replaced database/lock must never
+            # cause creation or adoption during initial registration.
+            self._database_identity=list(original['research.db'])
+            self.store._existing_identity=original['research.db']
+            self.store._existing_lock_identity=original['writer.lock']
+            self.project_id=project_id
+            if directory_chain(runtime)!=chain:raise Conflict('new fixture original runtime changed before enable')
+            self.store_epoch=enable(self.store,project_id=self.project_id,data_mode='fixture')
+            for name,expected in original.items():
+                info=os.stat(name,dir_fd=fds[-1],follow_symlinks=False)
+                if (not stat.S_ISREG(info.st_mode) or info.st_uid!=os.getuid() or info.st_nlink!=1 or
+                        stat.S_IMODE(info.st_mode)!=0o600 or (info.st_dev,info.st_ino)!=expected):
+                    raise Conflict('new fixture original Store identity changed during enable')
+            if directory_chain(runtime)!=chain:raise Conflict('new fixture original runtime changed during enable')
+            os.fsync(fds[-1]);os.fsync(fds[-2])
         maintenance_lock = self.store.root / 'runtime/snapshot-maintenance.lock'
         _write_new(maintenance_lock, b'')
         maintenance_info = maintenance_lock.lstat()
         self.store._existing_lock_identities = {'writer': self.store._existing_lock_identity,
             'snapshot-maintenance': (maintenance_info.st_dev, maintenance_info.st_ino)}
-        self._runtime_chain = directory_chain(self.store.db.parent)
         self._chains = {name: directory_chain(path) for name, path in self._roots.items()}
         self._root_chain = directory_chain(self.root)
         self._mount_namespace = os.stat('/proc/thread-self/ns/mnt').st_ino
@@ -271,12 +298,16 @@ class FixtureMaterialBuilder:
         info = self.store.db.lstat()
         if directory_chain(self.store.db.parent) != self._runtime_chain:
             raise Conflict('fixture original database parent rebound')
+        with _held_chain(self.store.db.parent) as (fds,_):
+            parent_info=os.fstat(fds[-1])
+            if parent_info.st_uid!=os.getuid() or parent_info.st_mode&0o077:
+                raise Conflict('fixture original private database parent changed')
         if (not stat.S_ISREG(info.st_mode) or info.st_uid != os.getuid() or info.st_nlink != 1 or
-                [info.st_dev, info.st_ino] != self._database_identity):
+                stat.S_IMODE(info.st_mode)!=0o600 or [info.st_dev, info.st_ino] != self._database_identity):
             raise Conflict('fixture original database identity differs')
         info = (self.store.root / 'runtime/writer.lock').lstat()
         if (not stat.S_ISREG(info.st_mode) or info.st_uid != os.getuid() or info.st_nlink != 1 or
-                (info.st_dev, info.st_ino) != self.store._existing_lock_identity):
+                stat.S_IMODE(info.st_mode)!=0o600 or (info.st_dev, info.st_ino) != self.store._existing_lock_identity):
             raise Conflict('fixture original writer lock identity differs')
 
     def _check(self):
