@@ -1,5 +1,9 @@
 # 需求包离线校验报告
 
+Checkpoint44 FINAL：唯一full原61478实际exit0/chunk19e380，2160pass/32既有外部H1skip/1既有warning1751.73s，214冻结SHA after匹配；compileall/pipcheck/diff0。真实固定CPU scope的登记/进程身份/原ACK/可靠STOP及FD关闭/资源返还已验收，模型/native/候选写/任意执行树仍禁；实际wall-only消费不代表synthetic token或invoice结算。开发失败、High原MUST关闭与batch增量、完整来源SHA及唯一full证据见evidence/checkpoint-44-final-tests.txt。正在提交，完整Goal继续；下方LIVE为历史。
+
+Checkpoint44：27个新增本地用例逐项实际通过，首次真实原保护 Task/Attempt/FixtureLease→两库matching→固定gated CPU子进程→两事件原子identity/release→原nonce ACK→durable STOP/回收/FD完整关闭→wall-only结算/PoolFREE；不执行native/model/candidate write，任意进程树STOP=false。High来源/期限及新batch静态范围无剩余已确认MUST；唯一全量61478正在运行，全部214代码/测试输入冻结，尚无最终full结果或commit。完整失败/修复、实际session与证据见HYBRID_FIXTURE_RUNTIME.md/evidence/checkpoint-44-development-tests.txt。不是工程/科研/真实模型计费/M1/完整Goal完成。
+
 Checkpoint43：实际保护来源与有限 CPU producer 的 SOURCE_ONLY/FIXTURE 行为交付，见 HYBRID_USAGE_SOURCE.md/evidence/checkpoint-43-source-tests.txt。唯一 r1 原67296 actual31pass/2fixturefail29.47s；escaped JSON bytes 修复后定向2pass0.08s；High 新增测试 reaped-PID cleanup 安全修复后原34948定向1pass1.37s。三生产 MUST 闭合，生产四 SHA 不变；py_compile/diff0。保留失败，不虚称修复后 full 全绿、不重复41/42已通过套。不是 actual tokens/invoice/Budget settle/Runtime/整树 STOP/完整Goal通过。
 
 Checkpoint42 最终：固定 managed fixture 应用下跨项目/实际进程共享三真实 FD 槽与持久占用，第四个拒绝；UNKNOWN/死亡/TTL/重启不返还；原 NO_HANDOFF 关闭事实→全部原 FD 关闭→FREE，复制/历史能力不接管，原 COMMIT 丢返回重试不重占已实现。High 原事实索引/SQL 限额/原连接/最终 COMMIT/fork 增量静态复核无剩余已确认 MUST。唯一直接依赖集成原86229实际117pass118.51s，17SHA一致，新增3文件编译/diff0；开发r2的1异常类型失败已修并单项1pass，原失败日志保留。证据 HYBRID_HOST_POOL.md/evidence/checkpoint-42-pool-tests.txt。没有重跑41或另开全量/重复独立suite；当前无live测试，正在提交42。全部运行授权false；不代表全主机强隔离/Runtime/UsageOwner/可靠STOP/原M1或完整Goal通过。下一可信用量来源→最小端到端执行与整树STOP；无新增需用户决策阻塞，USERpackage-lock未改未stage。下方LIVE为历史。

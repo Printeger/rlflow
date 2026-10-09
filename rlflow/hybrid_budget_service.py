@@ -83,7 +83,11 @@ class BudgetService:
         if value['request']['action']!='RESERVE':
             key=value['prior_reservation']['origin_entry_key']
             if key not in entries:entries[key]=self._point(db,key,budget)
-        validate_links(value,lambda s,k:state.get(s,{}).get(k))
+        lookup=lambda s,k:state.get(s,{}).get(k)
+        from .hybrid_fixture_runtime_ledger import ACTIONS as fixture_actions, dependency_lookup
+        if value['request']['action'] in fixture_actions:
+            lookup=dependency_lookup(self.store,db,budget,state)
+        validate_links(value,lookup)
         return state
 
     def _existing(self,request):
@@ -124,6 +128,12 @@ class BudgetService:
             store_epoch=self.store_epoch,goal_ref=goal_ref,now=now,_budget=budget)
 
     def check_guard(self,db,guard):
+        from .hybrid_fixture_runtime import _FixtureRuntimeGuard
+        if type(guard) is _FixtureRuntimeGuard:
+            runtime=getattr(self,'_fixture_runtime',None)
+            if runtime is None or runtime.budget is not self or guard.owner is not runtime:
+                raise PermissionError('actual original bound fixture runtime required')
+            return runtime.check_guard(db,guard)
         if (type(guard) is not _Guard or guard.owner is not self or self._active is not guard or
                 guard.db is not db or guard.budget.db is not db or guard.thread!=threading.get_ident()):
             raise PermissionError('actual active budget owner guard required')
@@ -157,6 +167,10 @@ class BudgetService:
             raise Conflict('budget consent expired or clock regressed after final reads')
 
     def check_live_write(self,db,payload,inputs,guard):
+        from .hybrid_fixture_runtime import _FixtureRuntimeGuard
+        if type(guard) is _FixtureRuntimeGuard:
+            self.check_guard(db,guard)
+            return guard.owner.check_live_write(db,payload,inputs,guard)
         self.check_guard(db,guard);value=json.loads(guard.raw);request=value['request']
         expected={(SECTIONS[0],entry_key(request)):value}
         expected.update({(s,k):v for s,values in derived_heads(value).items() for k,v in values.items()})
@@ -193,6 +207,9 @@ class BudgetService:
         No UsageOwner, runtime registration, release, execution or JSON refund.
         """
         self.controller._refuse_nested_writer();self.controller._issued(token)
+        from .hybrid_fixture_runtime_ledger import ACTIONS as fixture_actions
+        if type(request) is dict and request.get('action') in fixture_actions:
+            raise PermissionError('fixed original fixture Runtime owner required; no JSON runtime/refund API')
         check_bytes(request,8192);validate_schema(REQUEST,request);request=json.loads(canonical(request))
         if (request['project_id'],request['data_mode'],request['store_epoch'])!=(self.project_id,self.data_mode,self.store_epoch):
             raise Conflict('budget request scope differs')

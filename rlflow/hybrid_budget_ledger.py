@@ -12,7 +12,9 @@ from .hybrid_controller import (SECTIONS as CONTROLLER,validate_record as contro
 from .hybrid_authority import timestamp
 from .hybrid_admission import PREPARATION_REF,CONTROLLER_REF
 from .hybrid_budget import (DIMENSIONS,MAXIMUM,SCOPE,account_key,zero,vector,add,subtract,
-    balances,validate_balances,finalization_floor,reserve,rebase,mark_unknown,cancel_held)
+    balances,validate_balances,finalization_floor,reserve,rebase,mark_unknown,cancel_held,settle_known)
+from .hybrid_fixture_runtime_ledger import (ACTIONS as FIXTURE_ACTIONS, RUNTIME as FIXTURE_RUNTIME,
+    validate_runtime as fixture_transition, validate_original_links as fixture_links)
 from .store import Conflict,sha
 
 SECTIONS=('hybrid_budget_entries','hybrid_budget_goal_heads',
@@ -29,7 +31,8 @@ COMMON={**SCOPE['properties'],'store_epoch':ID,'idempotency_key':ID,'expected_st
 REQUEST={'oneOf':[
     obj({**COMMON,'action':{'const':'RESERVE'},'preparation_intent_key':ID,
          'amount':VECTOR,'purpose':{'const':'EXECUTION'}}),
-    obj({**COMMON,'action':enum('MARK_UNKNOWN','CANCEL_BEFORE_RUNTIME'),'reservation_id':ID})]}
+    obj({**COMMON,'action':enum('MARK_UNKNOWN','CANCEL_BEFORE_RUNTIME'),'reservation_id':ID}),
+    obj({**COMMON,'action':enum(*FIXTURE_ACTIONS),'reservation_id':ID,'fixture_runtime':FIXTURE_RUNTIME})]}
 GOAL_DATA={'scope':SCOPE,'policy':POLICY,'policy_source':SOURCES,'balance':BALANCES}
 RESERVATION_DATA={'scope':SCOPE,'reservation_id':ID,'origin_entry_key':ID,
     'preparation':PREPARATION_REF,'origin_sources':SOURCES,'amount':VECTOR,
@@ -38,14 +41,20 @@ RESERVATION_DATA={'scope':SCOPE,'reservation_id':ID,'origin_entry_key':ID,
 PROJECT_DATA={'project_id':ID,'data_mode':enum('live','fixture'),
     'consumed':VECTOR,'reserved':VECTOR,'unknown_exposure':VECTOR}
 POINTER={'last_entry_key':ID,'last_entry_hash':HASH,'accepted_state_version':POSITIVE}
-HEADS=(obj({**GOAL_DATA,**POINTER}),obj({**RESERVATION_DATA,**POINTER}),obj({**PROJECT_DATA,**POINTER}))
+FIXTURE_RESERVATION={**RESERVATION_DATA,'status':enum('HELD','UNKNOWN','SETTLED'),
+    'runtime_registration':enum('REGISTER_NO_HANDOFF','HANDOFF_UNKNOWN','PROCESS_REGISTERED',
+        'RELEASE_INTENT','STARTED_AS_OBSERVED','STOP_REQUESTED','FIXTURE_SCOPE_STOPPED'),
+    'fixture_runtime':FIXTURE_RUNTIME}
+HEADS=(obj({**GOAL_DATA,**POINTER}),{'oneOf':[obj({**RESERVATION_DATA,**POINTER}),
+    obj({**FIXTURE_RESERVATION,**POINTER})]},obj({**PROJECT_DATA,**POINTER}))
 nullable=lambda schema:{'oneOf':[schema,{'type':'null'}]}
 ENTRY=obj({'schema_version':{'const':'1.0'},'request':REQUEST,'request_hash':HASH,
     'policy_source':SOURCES,'policy':POLICY,'preparation':PREPARATION_REF,'controller':CONTROLLER_REF,
     'recorded_at':TIME,'controller_checked_monotonic_ns':COUNT,
     'prior_goal':nullable(HEADS[0]),'prior_reservation':nullable(HEADS[1]),'prior_project':nullable(HEADS[2]),
-    'decision':enum('HELD','DENIED','UNKNOWN','CANCELLED'),
-    'reason':enum('BUDGET_RESERVED','BUDGET_UNAVAILABLE','EXPOSURE_UNKNOWN','CORE_CANCELLED_BEFORE_RUNTIME'),
+    'decision':enum('HELD','DENIED','UNKNOWN','CANCELLED','SETTLED'),
+    'reason':enum('BUDGET_RESERVED','BUDGET_UNAVAILABLE','EXPOSURE_UNKNOWN','CORE_CANCELLED_BEFORE_RUNTIME',
+        'FIXTURE_REGISTERED_NO_HANDOFF','FIXTURE_EXPOSURE_RETAINED','FIXTURE_SCOPE_TERMINATED'),
     'accepted_state_version':POSITIVE,'execution_enabled':{'const':False}})
 
 
@@ -102,6 +111,25 @@ def derived_heads(value):
         reservation={'scope':owner,'reservation_id':reservation_key(request),'origin_entry_key':entry_key(request),
             'preparation':value['preparation'],'origin_sources':value['policy_source'],'amount':amount,
             'purpose':'EXECUTION','status':decision,'runtime_registration':'NOT_AUTHORIZED','execution_enabled':False}
+    elif request['action'] in FIXTURE_ACTIONS:
+        runtime=fixture_transition(request,prior_reservation)
+        if previous is None:raise Conflict('fixture runtime original Goal balance required')
+        if value['policy']!=previous['policy'] or value['policy_source']!=previous['policy_source']:
+            raise Conflict('fixture runtime cannot replace original budget policy')
+        if value['preparation']!=prior_reservation['preparation']:
+            raise Conflict('fixture runtime cannot replace original preparation')
+        reservation=_head_base(prior_reservation)
+        phase=runtime['phase'];changed=old_balance
+        if phase=='REGISTER_NO_HANDOFF':decision,reason='HELD','FIXTURE_REGISTERED_NO_HANDOFF'
+        elif phase=='FIXTURE_SCOPE_STOPPED':
+            usage={**zero(),'wall_seconds':runtime['wall_seconds']}
+            changed=settle_known(old_balance,reservation['amount'],usage,prior_status=reservation['status'])
+            decision,reason='SETTLED','FIXTURE_SCOPE_TERMINATED'
+        else:
+            if reservation['status']=='HELD':changed=mark_unknown(old_balance,reservation['amount'])
+            elif reservation['status']!='UNKNOWN':raise Conflict('fixture runtime retained exposure required')
+            decision,reason='UNKNOWN','FIXTURE_EXPOSURE_RETAINED'
+        reservation={**reservation,'status':decision,'runtime_registration':phase,'fixture_runtime':runtime}
     else:
         if (previous is None or prior_reservation is None or
                 prior_reservation['reservation_id']!=request['reservation_id'] or
@@ -230,6 +258,13 @@ def validate_links(value,lookup,*,current=False):
                 not timestamp(sources['evaluated_at'])<timestamp(sources['expires_at']) or
                 any(sources[name]!=item for name,item in intent['sources'].items() if name not in ('source_version','evaluated_at'))):
             raise Conflict('budget reserve is not current original preparation consent')
+    elif request['action'] in FIXTURE_ACTIONS:
+        fixture_links(value,lookup)
+        prior=value['prior_reservation'];original=lookup(SECTIONS[0],prior['origin_entry_key'])
+        if (original is None or original['request']['action']!='RESERVE' or original['decision']!='HELD' or
+                original['preparation']!=value['preparation'] or
+                timestamp(value['recorded_at'])<timestamp(original['recorded_at'])):
+            raise Conflict('fixture runtime original HELD reservation proof differs')
     else:
         prior=value['prior_reservation'];original=lookup(SECTIONS[0],prior['origin_entry_key'])
         if (original is None or original['request']['action']!='RESERVE' or original['decision']!='HELD' or
@@ -239,15 +274,16 @@ def validate_links(value,lookup,*,current=False):
     cr=value['controller'];control=lookup(CONTROLLER[0],cr['fact_key'])
     if control is None:raise Conflict('budget original controller missing')
     controller_record(CONTROLLER[0],cr['fact_key'],control);control_request=control['request']
+    cleanup=request['action'] in ('FIXTURE_RUNTIME_STOP_REQUESTED','FIXTURE_RUNTIME_FIXTURE_SCOPE_STOPPED')
     if (cr!={'fact_key':controller_key(control_request),'fact_hash':digest(control),
              'controller_epoch':control['controller_epoch'],'head_revision':control['head_revision']} or
             any(control_request[name]!=request[name] for name in ('project_id','data_mode','store_epoch')) or
             control['accepted_state_version']>=value['accepted_state_version'] or
-            not timestamp(control['issued_at'])<=timestamp(value['recorded_at'])<timestamp(control['expires_at']) or
-            not control['issued_monotonic_ns']<=value['controller_checked_monotonic_ns']<control['expires_monotonic_ns'] or
+            not cleanup and not timestamp(control['issued_at'])<=timestamp(value['recorded_at'])<timestamp(control['expires_at']) or
+            not cleanup and not control['issued_monotonic_ns']<=value['controller_checked_monotonic_ns']<control['expires_monotonic_ns'] or
             (request['action']=='RESERVE' and control['config_hash']!=sources['config_hash'])):
         raise Conflict('budget original controller capture differs')
-    if current and lookup(CONTROLLER[1],controller_scope(request['project_id'],request['data_mode']))!=controller_head(control):
+    if current and not cleanup and lookup(CONTROLLER[1],controller_scope(request['project_id'],request['data_mode']))!=controller_head(control):
         raise Conflict('budget controller is not current head')
 
 

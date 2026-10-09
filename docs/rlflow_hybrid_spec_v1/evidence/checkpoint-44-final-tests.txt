@@ -1,0 +1,64 @@
+Checkpoint 44 FINAL verified fixed CPU scope, not full Goal acceptance
+Parent bd138e98f8987f24a86435e1b56cd96377cddfd8
+Branch hybrid-v1; only protected private fixture/local CPU execution.
+No paid model/Codex exec/GPU/production migration/candidate write/delegation.
+
+Delivered actual behavior:
+original Plan/Workspace/Goal/approval/Budget/Pool -> original Task/Attempt/Lease
+registration/cancel CAS -> two-DB matching HANDOFF_UNKNOWN -> fixed gated
+Popen -> original PID/start/boot/PGID/pidfd -> two original identity/release
+events in one owned COMMIT -> original G -> nonce/PID/program ACK -> observed
+STARTED -> durable STOP before interrupt -> bounded original TERM/KILL/reap
+and all Source/pipe FD close -> wall-only settlement -> original Pool tombstone
+and all old slot FD close -> FREE. Unknown does not relaunch/adopt/refund.
+Scope FIXED_CPU_SINGLE_PARTICIPANT; arbitrary_tree_stop=False.
+Synthetic/source-only tokens and actual invoice remain UNKNOWN, not settled.
+
+Local development history/actual sessions/failures/repairs retained in
+checkpoint-44-development-tests.txt. 27 distinct new cases passed locally;
+then the single final FULL suite re-exercised the actual final source.
+High static incremental review: final deadline+Pool Project source MUST closed;
+fixed two-event batch increment no new MUST. High did not run duplicate tests.
+
+FULL ONCE exact argv:
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q --tb=short
+Original session61478, actual terminal chunk19e380, exit0:
+2160 passed, 32 existing external H1 skips, 1 existing Starlette/anyio warning,
+1751.73s. No new skip, suppressed failure or repeated full suite.
+Raw audit/checkpoint-44-full-r1.log SHA:
+ab10489de580626e6f1aba14709821aada31da1ebc4a63e217e33bbf372b492b
+
+All214 rlflow/tests file bytes frozen throughout FULL and after terminal;
+standalone sha256sum -c actualexit0/chunkb10222, no source edits after FULL.
+Committed checkpoint-44-final-inputs.sha256 is the complete frozen list.
+Original audit/checkpoint-44-final-inputs.sha256 SHA:
+b4787f125698da38ae487a61c552a9a5c73b1a330b1f96d7186cf0333ac66910
+Final compileall/pip check actualexit0/chunk518bb8 (no broken requirements).
+Final diffcheck actualexit0; no live test/benchmark.
+USER untracked package-lock.json retained, unstaged and unchanged SHA:
+becc7e2a36dfcad4ffe934b5ff2f0f68187611d6c0641bd63d81367651cfbf09
+
+Other sealed local logs SHA:
+5a1c8956d54c9d1e8ea0fbdbc299178aa2087f88a4d26aed73e0863f7afb2011 smoke-r1
+312d2f4dbc9cedd0804e7a28af18805fb7f1b5de6515b0b77835af8e2987c915 smoke-r2
+bca598d73ed6a5074da609b6d17c0d48f77f587cf0c9ab5ddd580026645be472 smoke-r3
+1a9b9bde3f8b53e335e247f65c256bea5df3415b12fd6f1eb844e639dd521b0f smoke-r4
+354e8cae0df3df20bf53ac0d970ec26cc7f64fa039bc47124af1b9afad558a00 smoke-r5
+c23948de775b361122ce092ebba7d2029eb9c1872303593cb1f9d917e873e539 smoke-r6
+2b61c5076b282107d182262975d613505bc936165b71c4bd647e016f0d71078a gate-diagnostic-r1
+3c42169c1ab692902ef68f82e366a95355ab4f1022732aca64f7a20ea1b0e873 gate-diagnostic.prof
+beb34e9081963d37b7032f283f71723c9a2e7ec6828a1a70097c2ee3c0dfb281 runtime-batch-r1
+a5e62c4e5e4f511499e4b6d6e052233a4db4c0670f55550db933aa29780c3afc runtime-remaining-r1
+2d8d569dc2eac5088000df19ed813929c1cc5d6c541c017d793d8fcaa75d4307 runtime-faults-r1
+bd73c0641f33d8c69c780078419489e3b854d5586c723b22dc66e8a4e58f4039 runtime-boundaries-r1
+4bd805900a50bc535c77ec752c5237f961c3020be7a2f87fb736b9f62f406222 runtime-boundary-repair-r1
+7763331d6999601df671130b0bd005bf8db16bf15852c603e0cc6edb4c420f82 runtime-lifecycle-r1
+4ffd77e26c25d17d1115fc3edaace5ee68bea657998de2950bfdb7039accf701 runtime-fork-repair-r1
+All names refer to audit/checkpoint-44-<name>.log, except .prof as stated.
+
+Remaining: actual backend Task read/Start-Stop API & Dashboard; native/model
+execution and trusted real token/invoice settle; strict OS/model/data/network/
+candidate enforcement; arbitrary process-tree STOP; engineering/research real
+loops, installation/migration and B1/24h fixture/8h UI/final Goal audit.
+No new external decision blocker; next slice actual fixture control/read bridge.
+Commit follows this evidence; never claim the whole Goal completed.

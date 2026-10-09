@@ -1,0 +1,64 @@
+Checkpoint 44 development evidence (NOT final acceptance)
+Parent: bd138e98f8987f24a86435e1b56cd96377cddfd8
+Scope: protected fixed CPU PROTOCOL_CONFORMANCE runtime only.
+No paid model, Codex exec, GPU, production migration or candidate writes.
+All suites serial; inputs not edited while their original session was live.
+
+smoke-r1 original session76441 terminal87d2f8 exit1: 1fail5.09s.
+Cause: actual Store Budget writer requires guard.budget ReadBudget interface.
+smoke-r2 original28524 terminal045949 exit1: 1fail1error9.56s.
+Cause: new Pool action length exceeds old bounded(action,16), SQL NULL.
+smoke-r3 original94236 terminal1ccea7 exit1: 1fail1error11.29s.
+Cause: reused nonexecuting preparation fixture forbids all Popen; test now
+allows ONLY exact fixed Python -B -I -S original program FD/scenario argv.
+smoke-r4 original15164 terminal010bab exit1: 1fail1error15.11s.
+Real Popen succeeds; G BrokenPipe, fixed child's stderr empty; three-second
+unreleased gate expires during identity/release-intent persistence and proofs.
+gate-diagnostic-r1 original75064 terminal7e3df5 WRAPPER EXIT0 but pytest
+1fail41.45s; failure actual release wall budget elapsed under profiling.
+158374693 calls, schema24.879s, runtime original links13.207s.
+This is diagnostic evidence, NOT passing test evidence.
+smoke-r5 original71967 terminalfd41af exit1: 1fail1error13.20s.
+PROCESS_REGISTERED1.163104s, RELEASE_INTENT1.160086s, G BrokenPipe.
+smoke-r6 original82860 terminal635f4d exit1: 1fail13.40s.
+PROCESS_REGISTERED1.098877s, RELEASE_INTENT1.099738s, G BrokenPipe.
+Buffered stdin close EPIPE only accepted if original stream actually CLOSED;
+finite original STOP cleanup now succeeds, no teardown error in r6.
+Repeated r5/r6 gate failure: STOP identical reruns; redesign critical path.
+
+Raw logs: audit/checkpoint-44-runtime-smoke-r{1,2,3,4,5,6}.log
+Diagnostic: audit/checkpoint-44-gate-diagnostic-r1.log and .prof
+Final candidate/hash/integration/final acceptance/commit: NOT YET AVAILABLE.
+
+After root-cause diagnosis: fixed PROCESS_REGISTERED + RELEASE_INTENT are two
+original events/CAS steps in ONE owned COMMIT. Fixed gate remains three seconds.
+batch-r1 original37632 terminalee426e actual exit0: 1passed18.93s.
+Actual batch2.041962s; real original ACK→STARTED observed; repeated start uses
+same Popen; durable STOP→original reap/all Source FD close→known wall-only
+settlement→Pool FREE; repeat old terminal does NOT affect newly claimed slot.
+Raw log audit/checkpoint-44-runtime-batch-r1.log.
+Remaining five tests original99963 currently LIVE, code/test/schema frozen.
+This is finite protocol-scope evidence, NOT native/model/arbitrary-tree proof.
+
+remaining-r1 original99963 terminal5d44f5 exit0: 5pass1deselected50.55s.
+faults-r1 original6703 terminal09732e exit0: 7pass6deselected86.39s.
+boundaries-r1 original37967 terminal285a1b exit1:
+9pass2fixturefail1teardownerror13deselected117.03s.
+Fixture causes: frozen witness field mutation; PoolMembership treated as dict.
+Production unchanged; use actual test monotonic clock beyond original witness
+deadline and constrain dict type. Targeted repair original46160 terminal251bf0
+exit0: 2pass17.67s. No repetition of the other nine passed cases.
+lifecycle-r1 original32443 terminal2e255e exit1:
+2pass1fixturefail24deselected32.51s. Child source hook actually closes FDs but
+retains stale integer fields; fixture expected None incorrectly. Correct test
+checks actual original FD fstat EBADF, not mutating production hook. Targeted
+fork repair original92071 terminalba865a exit0: 1pass8.75s.
+27 unique new cases now have actual passing local evidence; not a final full
+suite claim. All original failures retained in their uniquely named logs.
+
+FULL ONCE original61478 currently LIVE, all214 rlflow/tests inputs frozen.
+Frozen manifest audit/checkpoint-44-final-inputs.sha256
+Manifest SHA b4787f125698da38ae487a61c552a9a5c73b1a330b1f96d7186cf0333ac66910
+USER package-lock.json unchanged/untracked, SHA
+becc7e2a36dfcad4ffe934b5ff2f0f68187611d6c0641bd63d81367651cfbf09
+Final full outcome/after SHA/final checks/commit: PENDING.

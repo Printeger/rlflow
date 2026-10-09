@@ -1,5 +1,9 @@
 # 阻塞与证据缺口
 
+44 FINAL：固定CPU单参与者scope全量实际2160pass/32既有skip/1warning1751.73s，214SHA/静态/依赖检查通过，正在归档提交。无新增需要用户决定的外部阻塞。下一实际Task读桥与受权端到端Start/Stop API；native模型/可信真实token与invoice、严格OS/data/candidate/network和任意树STOP、工程科研闭环/安装迁移/长期/UI完整验收仍未完成，现有付费/GPU/系统配置/生产权限不变。下方LIVE是历史。
+
+44：固定CPU scope已经有真实原能力登记/两库matching/进程身份/原ACK/实际STOP回收/全部FD关闭与资源返还的27项本地证据；唯一full61478尚LIVE，未提交或宣称最终验收。它只执行PROTOCOL_CONFORMANCE，无native/model/candidate/delegation；SOURCE_ONLY synthetic token不结算，真实wall-only终态消费不代表模型invoice可信。下一缺口是实际Task读桥与受权端到端Start/Stop入口，仍未接Dashboard/通用调度。完整native严格OS/model/data、任意执行树STOP、工程科研任务、长期/浏览器/生产安装迁移验收仍欠缺，无新增需用户决策的外部阻塞；不擅自用paid/GPU/系统配置/生产状态。下方43“注册尚缺”为历史，不能覆盖44最新状态。
+
 43：原来源有限观察/最终封闭与实际 CPU producer 生命周期已交付，仍 FIXTURE/SOURCE_ONLY；不接受 caller path/usage JSON 作为结算。原 Task/Attempt/Lease 注册、跨 Pool/Project/Budget matching、实际 execution release/ACK/可信来源结算及整树 STOP 是下一开发缺口，不是已完成行为。无新增需用户决策的外部阻塞；严格 cgroup/硬 quota/真实模型与 GPU 等权限边界继续保留，未获授权不运行或迁移。41=3a7fec4，42=634a36e，下方旧进行中为历史。
 
 当前覆盖：41 已实际提交 3a7fec4；42 固定 managed fixture 应用共享三槽池正在必要最终复核/集成，暂无新增需用户决策的外部阻塞。原能力、真实占用与 NO_HANDOFF 全 FD 关闭已实现，仍非 Runtime 执行授权。可信 UsageOwner、Pool/Project/Budget 联合登记、最小工程与低成本科研执行闭环、整树可靠 STOP、生产安装/全主机 OS-model-data 门及原长期性能/UI 验收仍待依赖推进。用户权限边界不变；不调用付费模型/GPU，不迁移生产；USER package-lock.json 保留未改未 stage。下方旧 LIVE 为历史。

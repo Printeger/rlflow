@@ -11,7 +11,9 @@ from .store import Conflict, canonical, sha
 CAPACITY = 3
 MAX_EVENTS = 4096
 MAX_BYTES = 16384
-ACTIONS = {'REGISTER', 'CLAIM', 'UNKNOWN', 'CLOSE_INTENT', 'FREE'}
+RUNTIME_ACTIONS = {'FIXTURE_LINKED', 'FIXTURE_HANDOFF_UNKNOWN', 'FIXTURE_STOP_REQUESTED',
+                   'FIXTURE_STOPPED', 'FIXTURE_FREE'}
+ACTIONS = {'REGISTER', 'CLAIM', 'UNKNOWN', 'CLOSE_INTENT', 'FREE'} | RUNTIME_ACTIONS
 
 
 def closed(value, keys):
@@ -92,15 +94,22 @@ def validate(value):
                     raise Conflict('pool claim finite deadline required')
         else:
             names = ('claim_key', 'claim_hash', 'prior_key')
+            if action in RUNTIME_ACTIONS:
+                names += ('runtime_lease_id', 'project_fact_key', 'project_fact_hash')
+                if action == 'FIXTURE_FREE': names += ('close_witness_hash',)
             if action == 'UNKNOWN': names += ('reason',)
             if action == 'FREE': names += ('close_witness_hash',)
             closed(payload, names)
             identifier(payload['claim_key']); identifier(payload['prior_key'])
+            if action in RUNTIME_ACTIONS:
+                identifier(payload['runtime_lease_id']); identifier(payload['project_fact_key'])
+                if type(payload['project_fact_hash']) is not str or not re.fullmatch('sha256:[0-9a-f]{64}', payload['project_fact_hash']):
+                    raise Conflict('fixture runtime original project source digest required')
             if type(payload['claim_hash']) is not str or not re.fullmatch('sha256:[0-9a-f]{64}', payload['claim_hash']):
                 raise Conflict('original pool claim digest required')
             if action == 'UNKNOWN' and payload['reason'] not in ('OWNER_REQUESTED_UNKNOWN', 'REGISTRATION_PENDING'):
                 raise Conflict('closed pool unknown reason required')
-            if action == 'FREE' and (type(payload['close_witness_hash']) is not str or
+            if action in ('FREE', 'FIXTURE_FREE') and (type(payload['close_witness_hash']) is not str or
                     not re.fullmatch('sha256:[0-9a-f]{64}', payload['close_witness_hash'])):
                 raise Conflict('original closed slot witness digest required')
     return value
@@ -126,7 +135,7 @@ def parse(raw):
 
 def head(value):
     if value['action'] == 'REGISTER': return None
-    return {'key': value['key'], 'version': value['version'], 'state': value['action'],
+    return {'key': value['key'], 'version': value['version'], 'state': 'FREE' if value['action'] == 'FIXTURE_FREE' else value['action'],
             'claim_key': value['key'] if value['action'] == 'CLAIM' else value['payload']['claim_key']}
 
 
@@ -144,7 +153,7 @@ def links(value, lookup, members, *, current=None):
         prior = lookup(payload['prior_key']) if payload['prior_key'] is not None else None
         if payload['prior_key'] is not None and prior is None:
             raise Conflict('original prior FREE pool fact missing')
-        if prior is not None and (prior['pool_id'] != value['pool_id'] or prior['action'] != 'FREE' or prior['slot'] != value['slot'] or
+        if prior is not None and (prior['pool_id'] != value['pool_id'] or prior['action'] not in ('FREE', 'FIXTURE_FREE') or prior['slot'] != value['slot'] or
                                   prior['version'] >= value['version']):
             raise Conflict('pool claim cannot reuse occupied slot')
     else:
@@ -155,8 +164,13 @@ def links(value, lookup, members, *, current=None):
                 prior['version'] >= value['version'] or
                 head(prior)['claim_key'] != claim['key']):
             raise Conflict('host pool original claim lineage differs')
-        allowed = {'UNKNOWN': {'CLAIM'}, 'CLOSE_INTENT': {'CLAIM', 'UNKNOWN'}, 'FREE': {'CLOSE_INTENT'}}[action]
+        allowed = {'UNKNOWN': {'CLAIM'}, 'CLOSE_INTENT': {'CLAIM', 'UNKNOWN'}, 'FREE': {'CLOSE_INTENT'},
+            'FIXTURE_LINKED': {'CLAIM'}, 'FIXTURE_HANDOFF_UNKNOWN': {'FIXTURE_LINKED'},
+            'FIXTURE_STOP_REQUESTED': {'CLAIM', 'FIXTURE_LINKED', 'FIXTURE_HANDOFF_UNKNOWN'},
+            'FIXTURE_STOPPED': {'FIXTURE_STOP_REQUESTED'}, 'FIXTURE_FREE': {'FIXTURE_STOPPED'}}[action]
         if prior['action'] not in allowed: raise Conflict('host pool no-handoff transition refused')
+        if action in RUNTIME_ACTIONS and prior['action'] in RUNTIME_ACTIONS and prior['payload']['runtime_lease_id'] != payload['runtime_lease_id']:
+            raise Conflict('fixture pool original runtime lease lineage changed')
     if current is not None:
         if action == 'CLAIM':
             if current['state'] != 'FREE' or current['key'] != payload['prior_key']:

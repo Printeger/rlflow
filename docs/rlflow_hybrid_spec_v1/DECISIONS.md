@@ -1,5 +1,13 @@
 # 开发决策记录
 
+## Checkpoint44：固定真实执行 scope，不改写 native 计划
+
+原 WorkingPlan READY 提供来源上下文，不把它的 argv 偷换成 CPU 程序然后称 native 执行。保护 startup 固定独立 PROTOCOL_CONFORMANCE profile/program SHA；原 owner 派生并持久化Task/Attempt/FixtureLease，所有模型/候选写/native delegation继续禁。只结算真实owner mono wall；fixture tokens及invoice保持UNKNOWN。
+
+两库 matching 不是假跨库原子事务；HANDOFF_UNKNOWN在任何Popen/G前持久化。三秒child gate失败连续两次后不再原样重跑，profile证据定位重复闭包和两独立交易；固定身份/release保留两条原event/CAS、共用同一个owned COMMIT，unknown ACK同读事务核BOTH，G仍独立最终核验。没有提高watchdog/权限/预算上限来让测试通过。
+
+STOP先持久冻结，再原pidfd有限TERM/KILL/reap和全部原FD关闭；有限固定单参与者scope终态才可wall结算和PoolFREE。Unknown及部分关闭不能自动退款；shutdown_safety只物理清理并永久冻结，不能mint STOPPED/FREE。源码的cold/full Pool source验证原Project BudgetEVENT，不接受hash格式或历史DTO重建cap。固定程序无后代不等于任意执行树/cgroup保证。详见HYBRID_FIXTURE_RUNTIME.md；最终全量仍在执行。
+
 ## Checkpoint43：来源观察不冒充执行或结算
 
 原 owner 从保护 startup 创建直接 stdout FD 的有限 producer，避免给 caller Path/FD 包一层就称可信来源。尚无 Task/Attempt/Lease/Runtime 原链，所以严格 SOURCE_ONLY/FIXTURE，不伪造字符串身份、不结算预算。尾锚只能检出局部变化，实时 receipt 仅 as-of；完整 producer 终态后分批全前缀最终 SHA 才 SEALED，旧前缀改写并追加不能冒充完整。独立增量审查的三生产 MUST 修复为唯一 Pool→Source fork coordinator、previous turn_lineage 去重、UnicodeError→Conflict 进入隔离回滚。有限 CPU producer 不等于 CLI/provider/真实模型或整树 STOP，下一必须实际贯通注册与执行闭环。官方 Codex 自定义 provider 配置仅只读核对，本切片不调用 CLI provider 或付费模型。

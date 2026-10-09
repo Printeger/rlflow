@@ -94,11 +94,11 @@ def _fork_prepare():
     for owner in _owners.values(): owner._lock.acquire()
     # Python runs before-fork callbacks in REVERSE registration order. Owned
     # downstream components join this coordinator, not a later os callback.
-    for prepare, _, _ in _fork_extensions.values(): prepare()
+    for name in sorted(_fork_extensions): _fork_extensions[name][0]()
 
 
 def _fork_parent():
-    for _, parent, _ in reversed(tuple(_fork_extensions.values())): parent()
+    for name in reversed(sorted(_fork_extensions)): _fork_extensions[name][1]()
     for owner in reversed(tuple(_owners.values())): owner._lock.release()
     _registry_lock.release()
 
@@ -380,7 +380,7 @@ All model, child process and native delegation handoff remain denied.
         self._actual()
         if type(key) is not str: raise Conflict('bounded indexed pool key required')
         identifier(key)
-        row = db.execute('SELECT seq,' + ','.join((_bounded('key', 160), _bounded('action', 16),
+        row = db.execute('SELECT seq,' + ','.join((_bounded('key', 160), _bounded('action', 32),
                          "CASE WHEN typeof(slot) IN ('integer','null') THEN slot END AS slot",
                          "typeof(slot) IN ('integer','null') AS slot_ok",
                          _bounded('raw', MAX_BYTES), _bounded('hash', 64))) +
@@ -439,9 +439,10 @@ All model, child process and native delegation handoff remain denied.
                 lookup = lambda key: self._point(db, key)
                 members = lambda key: self._member_point(db, key)
                 links(value, lookup, members)
+                self._verify_runtime_source(db, value)
                 if value['action'] != 'CLAIM':
                     claim = lookup(value['payload']['claim_key']); links(claim, lookup, members)
-                if value['action'] == 'FREE': links(lookup(value['payload']['prior_key']), lookup, members)
+                if value['action'] in ('FREE', 'FIXTURE_FREE'): links(lookup(value['payload']['prior_key']), lookup, members)
             result.append(current)
         projected_members = db.execute('SELECT COUNT(*) FROM members').fetchone()[0]
         original_members = db.execute('SELECT COUNT(*) FROM ledger INDEXED BY action_tip WHERE ' +
@@ -468,6 +469,7 @@ All model, child process and native delegation handoff remain denied.
                 if current is None and (value['action'] != 'CLAIM' or value['payload']['prior_key'] is not None):
                     raise Conflict('pool full audit initial slot lineage differs')
                 links(value, lambda key: self._point(db, key), registrations.get, current=current)
+                self._verify_runtime_source(db, value)
                 replay[value['slot']] = head(value)
         if replay != heads or len(registrations) != db.execute('SELECT COUNT(*) FROM members').fetchone()[0]:
             raise Conflict('pool full audit projection replay differs')
@@ -476,6 +478,49 @@ All model, child process and native delegation handoff remain denied.
         self._actual()
         with self._transaction(audit=True) as db: self._audit(db)
         return {'verified': True, 'execution_enabled': False}
+
+    def _verify_runtime_source(self, db, value):
+        """Bounded historical Project event proof, never a reconstructed cap."""
+        from .hybrid_host_pool_ledger import RUNTIME_ACTIONS
+        if value['action'] not in RUNTIME_ACTIONS: return
+        from .hybrid_budget_ledger import SECTIONS as BUDGET, EVENT, expected_objects, account_key, scope, validate_record
+        claim = self._point(db, value['payload']['claim_key'])
+        registered = self._member_point(db, claim['payload']['member_id'])
+        member_value = registered['payload']; root = Path(member_value['store_root'])
+        if self.projects_root not in root.parents: raise Conflict('fixture runtime project outside actual pool')
+        with _held_chain(root) as (fds, chain):
+            _private(fds[-1])
+            if chain != member_value['store_chain']: raise Conflict('fixture runtime project namespace rebound')
+        with _held_chain(root / 'runtime') as (fds, chain):
+            _private(fds[-1])
+            if chain != member_value['runtime_chain']: raise Conflict('fixture runtime runtime namespace rebound')
+        if (list(_file_pair(root / 'runtime/research.db')) != member_value['db_identity'] or
+                list(_file_pair(root / 'runtime/writer.lock')) != member_value['writer_identity']):
+            raise Conflict('fixture runtime original project database rebound')
+        store = Store.attach_existing(root, project_id=member_value['project_id'], data_mode='fixture')
+        with store.read_connection() as project_db:
+            project_db.execute('BEGIN'); read = ReadBudget(project_db, 16*1024**2)
+            meta = ObservationReader._meta(project_db)
+            if (meta['project_id'],meta['data_mode'],meta['store_epoch']) != (member_value['project_id'],'fixture',member_value['store_epoch']):
+                raise Conflict('fixture pool original Project registration differs')
+            key = value['payload']['project_fact_key']; fact = read.object(BUDGET[0], key)
+            if fact is None or digest(fact) != value['payload']['project_fact_hash']:
+                raise Conflict('fixture pool original Project phase source differs')
+            validate_record(BUDGET[0], key, fact)
+            proof = store._budget_event(project_db, key, _parse=read.parse, _decode=read.decode)
+            if proof != ((EVENT, 'hybrid-core', account_key(scope(fact['request'])), fact['accepted_state_version']), expected_objects(fact)):
+                raise Conflict('fixture pool original Project event differs')
+            runtime = fact['request'].get('fixture_runtime'); origin = runtime['origin'] if runtime else {}
+            expected_phase = {'FIXTURE_LINKED':'REGISTER_NO_HANDOFF', 'FIXTURE_HANDOFF_UNKNOWN':'HANDOFF_UNKNOWN',
+                'FIXTURE_STOP_REQUESTED':'STOP_REQUESTED', 'FIXTURE_STOPPED':'FIXTURE_SCOPE_STOPPED',
+                'FIXTURE_FREE':'FIXTURE_SCOPE_STOPPED'}[value['action']]
+            if (runtime is None or runtime['phase'] != expected_phase or
+                    origin['lease_id'] != value['payload']['runtime_lease_id'] or
+                    origin['pool_claim'] != {'key':claim['key'], 'hash':digest(claim)} or
+                    origin['pool_id'] != self.binding['pool_id'] or origin['member_id'] != member_value['member_id'] or
+                    (fact['request']['project_id'],fact['request']['data_mode'],fact['request']['store_epoch']) !=
+                    (member_value['project_id'],'fixture',member_value['store_epoch'])):
+                raise Conflict('fixture pool original Project runtime scope differs')
 
     def _append(self, db, value):
         validate(value); previous = self._point(db, value['key'])
@@ -623,7 +668,9 @@ All model, child process and native delegation handoff remain denied.
         value = self._issued_claim(claim); slot = value['slot']
         if self._point(db, value['key']) != value: raise Conflict('original durable pool claim missing')
         _, heads = self._state(db); current = heads[slot]
-        allowed = {'CLAIM', 'UNKNOWN', 'CLOSE_INTENT'} if closing else {'CLAIM', 'UNKNOWN'}
+        allowed = ({'CLAIM', 'UNKNOWN', 'CLOSE_INTENT', 'FIXTURE_LINKED', 'FIXTURE_HANDOFF_UNKNOWN',
+                    'FIXTURE_STOP_REQUESTED', 'FIXTURE_STOPPED'} if closing else
+                   {'CLAIM', 'UNKNOWN', 'FIXTURE_LINKED', 'FIXTURE_HANDOFF_UNKNOWN'})
         if current is None or current['claim_key'] != value['key'] or current['state'] not in allowed:
             raise Conflict('pool claim no longer has original occupied head')
         if value['payload']['owner'] != self.process: raise PermissionError('original pool process identity differs')
@@ -724,6 +771,52 @@ All model, child process and native delegation handoff remain denied.
         if closing is None:
             closing = _Closing(claim, canonical(value)); self._closings[id(claim)] = closing
         return closing
+
+    def _fixture_runtime_change(self, owner, lease, action, project_value):
+        """Exact original Runtime proof, not a caller stopped/refund boolean."""
+        from .hybrid_fixture_runtime import FixtureRuntimeOwner
+        from .hybrid_host_pool_ledger import RUNTIME_ACTIONS
+        if type(owner) is not FixtureRuntimeOwner or owner.pool is not self or action not in RUNTIME_ACTIONS:
+            raise PermissionError('actual original fixed fixture Runtime owner required')
+        attempt = owner._issued(lease); claim = self._issued_claim(attempt['claim'])
+        owner._verify_pool_link(attempt, action, project_value)
+        key = action.lower() + '_' + sha([claim['key'], lease.id])
+        def final(db):
+            owner._verify_pool_link(attempt, action, project_value)
+            self._member_current(db, owner.membership)
+            original = self._attempts.get(key)
+            stopped_retry = (action == 'FIXTURE_STOPPED' and original is not None and
+                             self._state(db)[1][claim['slot']] == head(original) and self._point(db, key) == original)
+            if stopped_retry:
+                # Durable irreversible runtime tombstone precedes partial FD
+                # closure. It cannot reopen handoff; retry only remaining FDs.
+                slot = self._claim_slots[id(attempt['claim'])]
+                if all(fd is not None for fd in slot.fds): slot.check()
+            elif action != 'FIXTURE_FREE':
+                self._claim_current(db, attempt['claim'], deadline=False, closing=True)
+            else:
+                slot = self._claim_slots[id(attempt['claim'])]
+                if not slot.closed or any(fd is not None for fd in slot.fds):
+                    raise Conflict('fixture Runtime original Pool descriptors not all closed')
+        with self._lock, self._transaction(final=final) as db:
+            original = self._attempts.get(key)
+            if original is None:
+                if len(self._attempts) >= MAX_EVENTS:
+                    raise Conflict('finite original pool attempt capacity reached')
+                version, heads = self._state(db); current = heads[claim['slot']]
+                payload = {'claim_key': claim['key'], 'claim_hash': digest(claim), 'prior_key': current['key'],
+                           'runtime_lease_id': lease.id, 'project_fact_key': project_value['request']['idempotency_key'],
+                           'project_fact_hash': digest(project_value)}
+                from .hybrid_budget_ledger import entry_key
+                payload['project_fact_key'] = entry_key(project_value['request'])
+                if action == 'FIXTURE_FREE': payload['close_witness_hash'] = digest(attempt['pool_closed'])
+                original = {'pool_id': self.binding['pool_id'], 'action': action, 'key': key,
+                            'version': version + 1, 'slot': claim['slot'], 'payload': payload}
+                self._attempts[key] = original
+            elif original['payload']['project_fact_hash'] != digest(project_value):
+                raise Conflict('fixture Runtime original pool phase source differs')
+            self._append(db, original)
+        return original
 
     def close_original(self, closing):
         self._actual()

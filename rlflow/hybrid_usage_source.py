@@ -50,6 +50,12 @@ class SourceObservation:
     raw: bytes
 
 
+@dataclass(frozen=True, eq=False)
+class _RuntimeStartedObservation:
+    source: FixtureUsageSource
+    raw: bytes
+
+
 def _prepare_fork():
     _registry.acquire()
     for owner in _owners.values(): owner._lock.acquire()
@@ -120,7 +126,7 @@ class FixtureUsageSourceOwner:
         with _held_chain(attempt['path']) as (fds, chain):
             _private(fds[-1]); _private(fds[-2])
             if chain != attempt['chain']: raise Conflict('original fixture source ancestors rebound')
-            for name in ('events.jsonl', 'stderr.log'):
+            for name in attempt['identities']:
                 original = attempt['identities'][name]
                 current = os.stat(name, dir_fd=fds[-1], follow_symlinks=False)
                 if [current.st_dev, current.st_ino] != original:
@@ -128,18 +134,52 @@ class FixtureUsageSourceOwner:
             for name, fd in attempt['fds'].items():
                 if fd is None or name == 'pidfd': continue
                 info = os.fstat(fd)
-                original = attempt['identities']['events.jsonl' if name in ('read', 'write') else 'stderr.log']
+                file_name = {'read': 'events.jsonl', 'write': 'events.jsonl',
+                             'stderr': 'stderr.log', 'program': 'program.py'}[name]
+                original = attempt['identities'][file_name]
                 flags = fcntl.fcntl(fd, fcntl.F_GETFL)
                 if (not stat.S_ISREG(info.st_mode) or info.st_uid != os.geteuid() or info.st_nlink != 1 or
                         stat.S_IMODE(info.st_mode) != 0o600 or [info.st_dev, info.st_ino] != original or
-                        os.get_inheritable(fd) or (name == 'read' and flags & os.O_ACCMODE != os.O_RDONLY) or
-                        (name != 'read' and (flags & os.O_ACCMODE != os.O_WRONLY or not flags & os.O_APPEND))):
+                        os.get_inheritable(fd) or (name in ('read', 'program') and flags & os.O_ACCMODE != os.O_RDONLY) or
+                        (name not in ('read', 'program') and (flags & os.O_ACCMODE != os.O_WRONLY or not flags & os.O_APPEND))):
                     raise Conflict('original private fixture source descriptor differs')
         read_fd = attempt['fds']['read']
         if read_fd is None: raise Conflict('original fixture usage reader closed')
         info = os.fstat(read_fd)
         if info.st_size > MAX_FILE: raise Conflict('finite original usage file bound exceeded')
         return (info.st_size, info.st_mtime_ns, info.st_ctime_ns)
+
+    def _allocate(self, membership, claim, scenario, member):
+        """Internal allocation only. Strong original attempt precedes file IO."""
+        if len(self._attempts) >= 32: raise Conflict('finite fixture source capacity reached')
+        attempt = {'source': None, 'claim': claim, 'membership': membership, 'scenario': scenario,
+                   'producer': None, 'producer_identity': None, 'fds': {}, 'status': 'ALLOCATING',
+                   'launch_entered': False, 'stdin_identity': None, 'pidfd_identity': None,
+                   'offset': 0, 'seen': None, 'tail': b'', 'anchor': b'', 'hash': hashlib.sha256(),
+                   'end': False, 'audit': None, 'receipt': None, 'partial_released': False,
+                   'runtime': None, 'runtime_ack': None}
+        self._attempts[id(claim)] = attempt
+        path = Path(tempfile.mkdtemp(prefix='source-', dir=self.root)); attempt['path'] = path
+        attempt['chain'] = directory_chain(path)
+        for name in ('events.jsonl', 'stderr.log'): _write_new(path / name, b'')
+        attempt['identities'] = {}
+        with _held_chain(path) as (fds, _):
+            for key, name, flags in (('read', 'events.jsonl', os.O_RDONLY | os.O_NONBLOCK),
+                                      ('write', 'events.jsonl', os.O_WRONLY | os.O_APPEND),
+                                      ('stderr', 'stderr.log', os.O_WRONLY | os.O_APPEND)):
+                fd = os.open(name, flags | os.O_NOFOLLOW | os.O_CLOEXEC, dir_fd=fds[-1])
+                attempt['fds'][key] = fd; info = os.fstat(fd)
+                attempt['identities'][name] = [info.st_dev, info.st_ino]
+        source_id = 'fixture_source_' + uuid.uuid4().hex
+        binding = {'source_id': source_id, 'project_id': member['payload']['project_id'],
+            'store_epoch': member['payload']['store_epoch'], 'member_hash': hashlib.sha256(membership.raw).hexdigest(),
+            'pool_claim_hash': hashlib.sha256(claim.raw).hexdigest(), 'scenario': scenario,
+            'owner': self.process, 'file_identity': attempt['identities']['events.jsonl'],
+            'data_mode': 'fixture', 'source_only': True, 'settlement_enabled': False}
+        source = FixtureUsageSource(source_id, canonical(binding)); attempt['source'] = source
+        self._sources[id(source)] = attempt
+        attempt['accumulator'] = Accumulator('per_turn' if scenario == 'per_turn' else 'cumulative')
+        return attempt
 
     def start_fixture(self, membership, claim, scenario='cumulative'):
         """One original finite fixture producer per original claim, never a model."""
@@ -155,35 +195,10 @@ class FixtureUsageSourceOwner:
                     raise Conflict('original fixture source attempt request differs')
                 if previous['source'] is None: raise Conflict('original source allocation uncertain; no repeat launch')
                 return previous['source']
-            if len(self._attempts) >= 32: raise Conflict('finite fixture source capacity reached')
             if self.pool.check(claim)['state'] != 'CLAIM': raise Conflict('fixture source requires original unclosed claim')
-            attempt = {'source': None, 'claim': claim, 'membership': membership, 'scenario': scenario,
-                       'producer': None, 'producer_identity': None, 'fds': {}, 'status': 'ALLOCATING',
-                       'launch_entered': False, 'stdin_identity': None, 'pidfd_identity': None,
-                       'offset': 0, 'seen': None, 'tail': b'', 'anchor': b'', 'hash': hashlib.sha256(),
-                       'end': False, 'audit': None, 'receipt': None, 'partial_released': False}
-            self._attempts[id(claim)] = attempt  # Strong retention BEFORE allocation/Popen.
             try:
-                path = Path(tempfile.mkdtemp(prefix='source-', dir=self.root)); attempt['path'] = path
-                attempt['chain'] = directory_chain(path)
-                for name in ('events.jsonl', 'stderr.log'): _write_new(path / name, b'')
-                attempt['identities'] = {}
-                with _held_chain(path) as (fds, _):
-                    for key, name, flags in (('read', 'events.jsonl', os.O_RDONLY | os.O_NONBLOCK),
-                                              ('write', 'events.jsonl', os.O_WRONLY | os.O_APPEND),
-                                              ('stderr', 'stderr.log', os.O_WRONLY | os.O_APPEND)):
-                        fd = os.open(name, flags | os.O_NOFOLLOW | os.O_CLOEXEC, dir_fd=fds[-1])
-                        attempt['fds'][key] = fd; info = os.fstat(fd)
-                        attempt['identities'][name] = [info.st_dev, info.st_ino]
-                source_id = 'fixture_source_' + uuid.uuid4().hex
-                binding = {'source_id': source_id, 'project_id': member['payload']['project_id'],
-                    'store_epoch': member['payload']['store_epoch'], 'member_hash': hashlib.sha256(membership.raw).hexdigest(),
-                    'pool_claim_hash': hashlib.sha256(claim.raw).hexdigest(), 'scenario': scenario,
-                    'owner': self.process, 'file_identity': attempt['identities']['events.jsonl'],
-                    'data_mode': 'fixture', 'source_only': True, 'settlement_enabled': False}
-                source = FixtureUsageSource(source_id, canonical(binding)); attempt['source'] = source
-                self._sources[id(source)] = attempt
-                attempt['accumulator'] = Accumulator('per_turn' if scenario == 'per_turn' else 'cumulative')
+                attempt = self._allocate(membership, claim, scenario, member)
+                source = attempt['source']
                 self._physical(attempt)
                 self.pool._claim_slots[id(claim)].check(); self.pool._claim_clocks(claimed)
                 attempt['status'] = 'START_UNKNOWN'
@@ -204,8 +219,85 @@ class FixtureUsageSourceOwner:
                 attempt['status'] = 'READING'
                 return source
             except BaseException:
-                attempt['status'] = 'UNKNOWN'
+                retained = self._attempts.get(id(claim))
+                if retained is not None: retained['status'] = 'UNKNOWN'
                 raise
+
+    def _runtime_allocate(self, owner, lease):
+        """Only the exact bound Runtime's original attempt can allocate."""
+        from .hybrid_fixture_runtime import FixtureRuntimeOwner
+        if type(owner) is not FixtureRuntimeOwner or owner.sources is not self:
+            raise PermissionError('fixed original fixture Runtime source binding required')
+        runtime = owner._issued(lease); claim = runtime['claim']
+        with self._lock:
+            old = self._attempts.get(id(claim))
+            if old is not None:
+                if old.get('runtime') is not runtime or old['source'] is None:
+                    raise Conflict('original runtime source allocation uncertain; no reallocation')
+                return old['source']
+            member = self.pool._issued_member(owner.membership)
+            try:
+                attempt = self._allocate(owner.membership, claim, 'runtime.' + runtime['scenario'], member)
+                attempt['runtime'] = runtime
+                _write_new(attempt['path'] / 'program.py', owner.program_raw)
+                fd = os.open(attempt['path'] / 'program.py', os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK | os.O_CLOEXEC)
+                attempt['fds']['program'] = fd; info = os.fstat(fd)
+                attempt['identities']['program.py'] = [info.st_dev, info.st_ino]
+                attempt['status'] = 'ALLOCATED_NO_HANDOFF'; self._physical(attempt)
+                return attempt['source']
+            except BaseException:
+                retained = self._attempts.get(id(claim))
+                if retained is not None: retained['status'] = 'UNKNOWN'
+                raise
+
+    def _runtime_spawn(self, owner, lease):
+        runtime = owner._issued(lease); attempt = self._issued(runtime['source'])
+        with self._lock:
+            if owner.sources is not self or attempt['runtime'] is not runtime:
+                raise PermissionError('actual original runtime producer source required')
+            if attempt['launch_entered']: return attempt['producer_identity']
+            self._physical(attempt)
+            if hashlib.sha256(os.pread(attempt['fds']['program'], 16385, 0)).hexdigest() != owner.program_hash.removeprefix('sha256:'):
+                raise Conflict('fixed original CPU program changed before handoff')
+            owner._check_spawn_gate(runtime)
+            attempt['launch_entered'] = True; attempt['status'] = 'START_UNKNOWN'
+            runtime['spawn_entered'] = True; runtime['spawn_monotonic'] = time.monotonic()
+            try:
+                process = subprocess.Popen([sys.executable, '-B', '-I', '-S', '/proc/self/fd/' + str(attempt['fds']['program']),
+                    str(self.process['pid']), runtime['origin']['nonce'], runtime['scenario']], stdin=subprocess.PIPE,
+                    stdout=attempt['fds']['write'], stderr=attempt['fds']['stderr'],
+                    env={'PATH': '/usr/bin:/bin'}, close_fds=True, pass_fds=(attempt['fds']['program'],), start_new_session=True)
+                attempt['producer'] = process
+                pipe = os.fstat(process.stdin.fileno()); attempt['stdin_identity'] = [pipe.st_dev, pipe.st_ino]
+                attempt['producer_identity'] = identity(process.pid)
+                if attempt['producer_identity'] is None or attempt['producer_identity']['pgid'] != process.pid:
+                    raise Conflict('actual original gated fixture process identity unavailable')
+                attempt['fds']['pidfd'] = os.pidfd_open(process.pid, 0)
+                pin = os.fstat(attempt['fds']['pidfd']); attempt['pidfd_identity'] = [pin.st_dev, pin.st_ino]
+                attempt['status'] = 'READING'
+                return attempt['producer_identity']
+            except BaseException:
+                attempt['status'] = 'UNKNOWN'; raise
+
+    def _runtime_release(self, owner, lease):
+        runtime = owner._issued(lease); attempt = self._issued(runtime['source'])
+        with self._lock:
+            if owner.sources is not self or attempt['runtime'] is not runtime:
+                raise PermissionError('actual original runtime release source required')
+            if runtime['release_entered']: return
+            self._physical(attempt); self._check_pidfd(attempt, live=True)
+            pipe = os.fstat(attempt['producer'].stdin.fileno())
+            if [pipe.st_dev, pipe.st_ino] != attempt['stdin_identity']:
+                raise Conflict('original gated fixture pipe changed')
+            owner._check_release_gate(runtime)
+            runtime['release_entered'] = True  # Lost send outcome must NEVER resend.
+            attempt['producer'].stdin.write(b'G'); attempt['producer'].stdin.flush()
+
+    def _runtime_started(self, owner, lease):
+        runtime = owner._issued(lease); attempt = self._issued(runtime['source'])
+        if owner.sources is not self or attempt['runtime'] is not runtime:
+            raise PermissionError('actual original runtime observation required')
+        return attempt['runtime_ack']
 
     def _observation(self, attempt):
         accumulator = attempt.get('accumulator')
@@ -248,14 +340,23 @@ class FixtureUsageSourceOwner:
                     return self._observation(attempt)
                 remaining = POLL_BYTES - len(attempt['anchor']) - len(attempt['tail'])
                 raw = os.pread(fd, remaining, attempt['offset']); cursor = 0; lines = 0; node_budget = [POLL_NODES]
-                ended = attempt['end']
+                ended = attempt['end']; runtime_ack = attempt['runtime_ack']
                 while lines < POLL_LINES:
                     newline = raw.find(b'\n', cursor)
                     if newline < 0: break
                     line = raw[cursor:newline + 1]
                     if ended: raise Conflict('original fixture usage appended after end')
                     event = parse_line(line, node_budget=node_budget)
-                    if event['type'] == 'fixture.end': ended = True
+                    if event['type'] == 'runtime.started' and attempt['runtime'] is not None:
+                        runtime = attempt['runtime']
+                        expected = {'type': 'runtime.started', 'nonce': runtime['origin']['nonce'],
+                                    'pid': attempt['producer_identity']['pid'], 'program': 'FIXED_CPU_PROTOCOL_V1'}
+                        if event != expected or runtime_ack is not None or not runtime['release_entered']:
+                            raise Conflict('original gated fixture started ACK differs')
+                        runtime_ack = _RuntimeStartedObservation(source, canonical({'source_id': source.id,
+                            'event': event, 'offset': attempt['offset'] + cursor, 'line_sha256': hashlib.sha256(line).hexdigest(),
+                            'lease_sha256': hashlib.sha256(runtime['lease'].raw).hexdigest()}))
+                    elif event['type'] == 'fixture.end': ended = True
                     else: aggregate.accept(source.id, attempt['offset'] + cursor, line, _parsed=event,
                         _allowed_threads=frozenset(('fixture_parent', 'fixture_child'))
                         if attempt['scenario'] == 'parent_inclusive' else None)
@@ -270,6 +371,7 @@ class FixtureUsageSourceOwner:
                 attempt['anchor'] = (attempt['anchor'] + raw[:cursor])[-MAX_LINE:]
                 attempt['tail'] = remainder if b'\n' not in remainder else b''
                 attempt['accumulator'] = aggregate; attempt['end'] = ended; attempt['seen'] = final_stamp
+                attempt['runtime_ack'] = runtime_ack
                 if attempt['producer'] is None or attempt['producer_identity'] is None:
                     attempt['status'] = 'UNKNOWN'
                 elif attempt['producer'].poll() is not None:
@@ -354,7 +456,8 @@ class FixtureUsageSourceOwner:
             try:
                 if name == 'pidfd': self._check_pidfd(attempt, live=False)
                 else:
-                    info = os.fstat(fd); key = 'events.jsonl' if name in ('read', 'write') else 'stderr.log'
+                    info = os.fstat(fd); key = {'read': 'events.jsonl', 'write': 'events.jsonl',
+                        'stderr': 'stderr.log', 'program': 'program.py'}[name]
                     if [info.st_dev, info.st_ino] != attempt['identities'][key]:
                         raise Conflict('original fixture cleanup descriptor reused')
                 os.close(fd); attempt['fds'][name] = None
@@ -364,7 +467,11 @@ class FixtureUsageSourceOwner:
                 info = os.fstat(process.stdin.fileno())
                 if [info.st_dev, info.st_ino] != attempt['stdin_identity']:
                     raise Conflict('original fixture cleanup pipe reused')
-                process.stdin.close()
+                try: process.stdin.close()
+                except BrokenPipeError:
+                    # Buffered close can report the already-dead reader while
+                    # successfully closing the original verified descriptor.
+                    if not process.stdin.closed: raise
             except (OSError, Conflict) as error: errors.append(error)
         if errors:
             attempt['status'] = 'UNKNOWN'; raise Conflict('original fixture partial cleanup retained') from errors[0]
