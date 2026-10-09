@@ -121,6 +121,7 @@ class FixtureRuntimeOwner:
             self._cpu_grants = {}; self._cpu_results = {}
             self._engineering_grants = {}; self._engineering_results = {}
             self._candidate_materials = {}
+            self._engineering_units = {}
             self.program = Path(__file__).with_name('hybrid_runtime_fixture.py')
             # Exact protected program, not any caller command or plan rewriting.
             raw = _read_bounded(self.program, 16384)
@@ -140,6 +141,15 @@ class FixtureRuntimeOwner:
         if type(lease) is not FixtureExecutionLease or self._leases.get(id(lease), {}).get('lease') is not lease:
             raise PermissionError('actual original fixture Task/Attempt/Lease required')
         return self._leases[id(lease)]
+
+    def _unit_check(self, attempt):
+        unit = self._engineering_units.get(id(attempt['lease']))
+        if unit is not None: unit._check_operation()
+
+    def _unit_effect_check(self, attempt):
+        # Pure memory check AFTER the last source/SQL/Controller fence.
+        unit = self._engineering_units.get(id(attempt['lease']))
+        if unit is not None: unit._check_final()
 
     def _plan_original(self, bundle, token, observation):
         entry = self.plans.builder._slot(bundle); seed = entry['seed']
@@ -321,6 +331,7 @@ class FixtureRuntimeOwner:
     def _fresh(self, db, read, attempt):
         """Independent post-registration guard; NEVER skip old PlanGuard."""
         self._actual(); self.pool.check(attempt['claim'])
+        self._unit_check(attempt)
         if self._control_service is not None: self._control_service._check_authority(cleanup=False, attempt=attempt)
         if self._safety_freeze: raise Conflict('fixture runtime permanently frozen for physical cleanup')
         self.controller.check_token_in_transaction(db, attempt['token'], read)
@@ -459,6 +470,11 @@ class FixtureRuntimeOwner:
                       preparation, plan_witness, bootstrap):
         captured = attempt['ready']['source_context']
         version = self.budget._metadata(db)
+        unit = self._engineering_units.get(id(attempt['lease']))
+        unit_key = None
+        if unit is not None and not cleanup:
+            unit._check_operation()
+            if phase == 'HANDOFF_UNKNOWN': unit_key = unit._handoff(version)
         request = {name: attempt['intent']['request'][name] for name in
                    ('project_id', 'data_mode', 'store_epoch', 'goal_ref')}
         request.update(action=ACTIONS[PHASES.index(phase)],
@@ -470,6 +486,7 @@ class FixtureRuntimeOwner:
         command = (None if self._control_service is None else
                    self._control_service._accepting_command(attempt, phase, version))
         if command is not None: request['idempotency_key'] = command['command_id']
+        if unit_key is not None: request['idempotency_key'] = unit_key
         original = attempt['entries'].get(phase)
         if original is not None and command is not None:
             name = 'start_command' if phase == 'HANDOFF_UNKNOWN' else 'stop_command'
@@ -677,6 +694,7 @@ class FixtureRuntimeOwner:
         # Controller actual process/STOP IO is LAST, then one exact final sample.
         now, mono = self.controller._final_token_freshness(guard.db, guard.attempt['token'], guard.read)
         self._final_deadlines(guard, now, mono)
+        self._unit_effect_check(guard.attempt)
 
     def _actual_handoff_link(self, attempt):
         from .store import sha
@@ -719,6 +737,7 @@ class FixtureRuntimeOwner:
 
     def start(self, lease):
         attempt = self._issued(lease)
+        self._unit_check(attempt)
         if self._control_service is not None: self._control_service._dispatch_entry(lease)
         with self.pool._lock:
             current = self._current(attempt)['fixture_runtime']['phase']
@@ -800,6 +819,7 @@ class FixtureRuntimeOwner:
         """Sealed source only, no caller patch/claim or candidate mutation."""
         from .hybrid_engineering_patch import EngineeringPatchResult,evaluate,validate_result
         attempt=self._issued(lease)
+        self._unit_check(attempt)
         if attempt['engineering_grant'] is None:raise PermissionError('original engineering lease required')
         with self.pool._lock,self._lock:
             original=self._engineering_results.get(id(lease))
@@ -962,7 +982,7 @@ class FixtureRuntimeOwner:
                     self.request_stop(attempt['lease'])
                     registered.append(attempt)
             with _registry, self._lock:
-                if self.sources._live: self.sources.shutdown()
+                if self.sources._live: self.sources.shutdown_safety()
                 for row in self._engineering_grants.values():self._close_engineering_input(row)
                 for material in self._candidate_materials.values():
                     if material.fd is not None:material.close_fd()

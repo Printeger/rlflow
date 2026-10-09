@@ -1,0 +1,81 @@
+Checkpoint 57 final validation evidence (2026-10-10; no live tests)
+Base commit: 9e01e09 (Checkpoint 56).
+Scope: actual original-cap finite fixed engineering SDK unit and necessary
+unknown-start parent-FD safety cleanup. No native/model/GPU/production use.
+User untracked package-lock.json was not edited/staged; original SHA256:
+becc7e2a36dfcad4ffe934b5ff2f0f68187611d6c0641bd63d81367651cfbf09.
+
+All commands run at /home/mint/rl_dev/rlflow_standalone with local .venv Python
+3.12. Python tests explicitly disable plugin autoload. Real private CPU/SQLite
+fixtures are used. No parallel test, duplicate suite, restart or live-input edit.
+
+1. Smoke r1, original session 37353 / terminal chunk 2ebce1 / exit 1:
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q tests/test_hybrid_engineering_execution_unit.py::test_one_call_writer_CAS_original_effect_once_recovery_and_binding --disable-warnings > audit/hybrid-v1/checkpoint-57-unit-r1.log 2>&1
+1 failed in 8.24s. Private incoherent metadata corruption was rejected by the
+pre-existing Controller source-version invariant before the intended CAS check.
+Diagnostic changed to actual durable competing FIXTURE_PROGRESS noop event;
+no production guard weakened and no worker was launched in this stale test.
+
+2. Smoke r2, original session 36090 / terminal chunk 25ecd9 / exit 1:
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q tests/test_hybrid_engineering_execution_unit.py::test_one_call_writer_CAS_original_effect_once_recovery_and_binding --disable-warnings > audit/hybrid-v1/checkpoint-57-unit-r2.log 2>&1
+1 failed in 22.10s, after actual stale-CAS rejection then valid worker/STOP/FREE/
+single core write. Frozen fixture UTC made acceptance timestamp equal to plain
+result, correctly rejected by original strictly later linkage. Fixture helper
+steps its synthetic UTC one microsecond/monotonic 1000ns before actual acceptance;
+production UTC semantics/validators are unchanged. Distinct root causes, no
+identical blind rerun after two repeated failures.
+
+3. New unit module r3, original session 41236 / terminal c25c7b / exit 1:
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q tests/test_hybrid_engineering_execution_unit.py --disable-warnings > audit/hybrid-v1/checkpoint-57-unit-r3.log 2>&1
+10 passed, 1 failed, 2 teardown errors in 205.12s. Actual one-call machine21/
+one-pwrite, three cancel boundaries, G/write/acceptance lost returns, mutual HTTP
+binding, copied lease and actual fork/prestart STOP exercised. Failed expectation
+of FREE after durable HANDOFF without PID violated the old no-producer lineage
+contract. Unknown Popen teardown exposed parent-FD early cleanup denial. These
+were diagnosed, not hidden: UNKNOWN and occupied=1 retained; Unit no longer
+constructs invalid private terminal; Source closes only original verified parent
+FDs then remains UNKNOWN. Explicit safety retirement does not prove STOP/FREE.
+Independent incremental review separately found shared cleanup-error race and
+latch-before-procfs IO; both fixed before r4, no repeated Checkpoint 56 review.
+
+4. Targeted affected boundaries r4, session 19588 / terminal 7778d9 / exit 0:
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q 'tests/test_hybrid_engineering_execution_unit.py::test_lost_original_outcomes_resume_never_repeats_effect_or_invents_unknown_free[HANDOFF]' 'tests/test_hybrid_engineering_execution_unit.py::test_lost_original_outcomes_resume_never_repeats_effect_or_invents_unknown_free[POPEN_UNKNOWN]' 'tests/test_hybrid_engineering_execution_unit.py::test_cancel_latches_before_blocked_pool_final_effects_and_closes_original_scope[G]' --disable-warnings > audit/hybrid-v1/checkpoint-57-boundary-r4.log 2>&1
+3 passed in 38.23s. Lost original HANDOFF/Popen results cannot relaunch/release/
+write/adopt; occupied=1, terminal=None, exposure UNKNOWN. Two actual cleanup
+threads with second STOP held return both local UNKNOWN and fixed errors.
+Cancel latches before held Runtime identity IO and while original Pool owned;
+last G refuses, original child reaped and actual FDs closed. Explicit original
+singleton fixture safety shutdown never frees/refunds unknown slots.
+
+5. New Source safety r5, session 75789 / terminal f5a870 / exit 0:
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q tests/test_hybrid_unknown_source_cleanup.py --disable-warnings > audit/hybrid-v1/checkpoint-57-source-r5.log 2>&1
+2 passed in 5.91s. Unknown Popen/partial parent FD close keeps actual owner for
+retry and another source's original FDs/process unchanged. Strict shutdown still
+rejects UNKNOWN even with all parent FDs closed. Explicit safety retirement does
+not mint terminal/FREE/refund. Actual Popen object with missing identity cannot
+be retired as no-process; its original fixed watchdog exits before cleanup.
+
+6. Necessary original regressions, original session 7016 / terminal e6dd4a / exit 0:
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q tests/test_hybrid_fixture_runtime.py tests/test_hybrid_fixture_runtime_control.py tests/test_hybrid_usage_source.py tests/test_hybrid_engineering_output.py::test_actual_fixed_engineering_candidate_write_stop_output_and_recovery tests/test_hybrid_engineering_output.py::test_actual_last_graph_boundary_blocks_write_and_retains_intent tests/test_hybrid_engineering_output.py::test_actual_lost_physical_write_return_reconcile_after_expiry_without_rewrite tests/test_hybrid_engineering_acceptance.py::test_actual_readonly_machine_acceptance_21_cases_original_bytes_no_rerun_and_cold_view --disable-warnings > audit/hybrid-v1/checkpoint-57-regression-r1.log 2>&1
+Result: 78 passed, 2 warnings in 630.35s. No new schema/domain/history/UI changes; unchanged prior UI,
+browser and 2214-test full-suite evidence are retained, not falsely called fresh.
+287 frozen source/test/web/dependency input SHA256 manifest:
+1273a5d854cb11c6dd35b6d7e16cd544a8f6d8fcbb200e588e550d9cc7fd8a5e.
+Archived as checkpoint-57-final-inputs.sha256; checked during and after run, all match.
+
+Independent High incremental design and code review: two new confirmed MUST
+and actual unknown-start gap closed; no remaining confirmed MUST on reviewed
+delta. Readonly reviewer did not run tests/write and is not product Reviewer.
+Final compilation/dependency/diff/input checks passed; see raw-log SHA256 file.
+Compilation: .venv/bin/python -m compileall -q rlflow tests web_checks
+Dependencies: .venv/bin/python -m pip check (No broken requirements found.)
+Diff: git diff --check (clean); no live test, source/test edits during regression,
+untracked USER lock changes, extra model/GPU calls or production migration.
+New unit acceptance is composite r3 plus affected r4, not a falsely claimed
+fresh full rerun after the narrow fixes. Final unit machine-positive/pwrite/
+cancel-PWRITE/cancel-COMMIT and lost G/write/acceptance have actual r3 evidence;
+r4 proves the changed no-PID/concurrent cleanup/pure-latch-last-G behaviors.
+Checkpoint commit pending at evidence creation; do not self-embed a commit hash.
+Full Goal remains active: fixed SDK machine disposition is not generic native
+Engineer, independent review/condition coverage, strict OS/arbitrary tree STOP,
+trusted invoice usage, new-install/migration or long-running full acceptance.

@@ -452,8 +452,7 @@ class FixtureUsageSourceOwner:
             try: process.wait(timeout=2)
             except subprocess.TimeoutExpired:
                 attempt['status'] = 'UNKNOWN'; raise Conflict('finite original fixture cleanup incomplete') from None
-        if process is None and attempt['launch_entered']:
-            raise Conflict('original fixture startup outcome unknown; no process adoption')
+        unknown_start = process is None and attempt['launch_entered']
         errors = []
         for name, fd in tuple(attempt['fds'].items()):
             if fd is None: continue
@@ -479,6 +478,12 @@ class FixtureUsageSourceOwner:
             except (OSError, Conflict) as error: errors.append(error)
         if errors:
             attempt['status'] = 'UNKNOWN'; raise Conflict('original fixture partial cleanup retained') from errors[0]
+        if unknown_start:
+            # Parent descriptors can be safely closed by their original inode
+            # identities even when no child identity was returned. That is NOT
+            # proof of participant termination or a refundable no-handoff.
+            attempt['status'] = 'UNKNOWN'
+            raise Conflict('original fixture startup outcome unknown; no process adoption')
         attempt['status'] = 'CLOSED'
 
     def stop_fixture(self, source):
@@ -494,3 +499,20 @@ class FixtureUsageSourceOwner:
             for attempt in self._attempts.values():
                 self._cleanup_attempt(attempt)
             self._live = False; _owners.pop(id(self), None)
+
+    def shutdown_safety(self):
+        """Retire original parent FD owner, never prove unknown children stopped."""
+        self._actual()
+        unknown = False
+        with _registry, self._lock:
+            for attempt in self._attempts.values():
+                try: self._cleanup_attempt(attempt)
+                except Conflict:
+                    if (attempt['producer'] is not None or attempt['producer_identity'] is not None or
+                            not attempt['launch_entered'] or attempt['status'] != 'UNKNOWN' or
+                            any(fd is not None for fd in attempt['fds'].values())):
+                        raise
+                    unknown = True
+            self._live = False; _owners.pop(id(self), None)
+        return {'state': 'PARENT_FDS_CLOSED_EXPOSURE_UNKNOWN' if unknown else 'ORIGINAL_PARENT_FDS_CLOSED',
+                'runtime_stopped': False, 'settlement_enabled': False}

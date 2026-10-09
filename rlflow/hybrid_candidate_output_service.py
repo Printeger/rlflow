@@ -160,6 +160,7 @@ class CandidateOutputService:
         if self.runtime._safety_freeze:raise Conflict('candidate output permanently frozen for cleanup')
         now,mono=self.controller._final_token_freshness(guard.db,guard.token,guard.read)
         self._deadlines(guard,now,mono)
+        self.runtime._unit_effect_check(self.runtime._leases[id(guard.row['lease'])])
 
     def _deadlines(self,guard,now,mono):
         if self._active is not guard or guard.receipt:raise PermissionError('original live write boundary required')
@@ -219,6 +220,7 @@ class CandidateOutputService:
     def apply(self,lease,token,*,idempotency_key,expected_state_version):
         """One durable intent and one exact original-inode pwrite, never replay."""
         self._actual();self.controller._refuse_nested_writer();self.controller._issued(token)
+        self.runtime._unit_check(self.runtime._issued(lease))
         with self.runtime.pool._lock,self._lock:
             attempt,terminal,free=self._original(lease)
             request={k:terminal['request'][k] for k in ('project_id','data_mode','store_epoch','goal_ref')}
@@ -335,6 +337,7 @@ class CandidateOutputService:
                             existing=self._point(db,SECTIONS[1],key,read)
                             if existing['request']!=request:raise Conflict('candidate acceptance idempotency request changed')
                             return {'fact':existing,'duplicate':True,'execution_authority':'NONE'}
+                        self.runtime._unit_check(self.runtime._issued(lease))
                         if self.budget._metadata(db)!=expected_state_version:raise Conflict('candidate acceptance stale writer version')
                         if implementation_hash()!=self._cold_verifier_hash:raise Conflict('candidate acceptance protected AST verifier changed')
                         actual=material._read_target(witness[1],AFTER,witness[2]);machine=verify(actual,implementation=self._cold_verifier_hash)
@@ -343,6 +346,8 @@ class CandidateOutputService:
                             'accepted_state_version':expected_state_version+1,'recorded_at':now.isoformat().replace('+00:00','Z'),
                             'sources':{**prior['sources'],'source_version':expected_state_version},'machine_verification':machine}
                         guard=self._put(db,read,SECTIONS[1],value,row,receipt=True)
-                        guard.check();db.commit()
+                        guard.check()
+                        self.runtime._unit_effect_check(self.runtime._leases[id(lease)])
+                        db.commit()
                         return {'fact':value,'duplicate':False,'execution_authority':'NONE'}
                 finally:self._active=None
