@@ -45,7 +45,7 @@ class _PlanWriteGuard:
 class WorkingPlanService:
     def __init__(self, workspace, installation, material):
         if (type(workspace) is not WorkspaceService or type(installation) is not FixtureInstallationService or
-                workspace.store is not installation.store or workspace.data_mode != 'fixture' or
+                workspace.store is not installation.store or workspace.data_mode != installation.data_mode or
                 (workspace.project_id, workspace.store_epoch) != (installation.project_id, installation.store_epoch) or
                 workspace.working.namespace != installation.builder._roots['working'] or
                 workspace.preparation.builder.source != installation.builder._roots['source'] or
@@ -228,9 +228,10 @@ class WorkingPlanService:
                 original=self._intent_attempts.get(seed.id)
                 if original is None:
                     if source['sources']['source_version']!=expected_version:raise Conflict('Working plan expected writer version changed')
-                    request={'project_id':self.workspace.project_id,'data_mode':'fixture','store_epoch':self.workspace.store_epoch,
+                    request={'project_id':self.workspace.project_id,'data_mode':self.workspace.data_mode,'store_epoch':self.workspace.store_epoch,
                         'goal_ref':source['sources']['goal_ref'],'plan_id':bundle.id,'idempotency_key':json.loads(seed.raw)['idempotency_key'],
                         'expected_state_version':expected_version,'action':'prepare_working_plan'}
+                    if self.workspace.data_mode=='live':request['domain_profile']=source['domain_profile']
                     _,mono=self.controller._sample()
                     value={'request':request,'request_hash':digest(request),'accepted_state_version':expected_version+1,
                         'source_context':source,'recorded_at':source['sources']['evaluated_at'],

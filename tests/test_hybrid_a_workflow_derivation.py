@@ -40,10 +40,12 @@ def workflow_bound(config,*,short=False):
 @pytest.fixture
 def original(tmp_path,native_setup,monkeypatch,request):
     tmp_path.chmod(0o700);pool=HostPoolOwner.create_fixture(tmp_path)
-    short=getattr(request,'param',False)
+    param=getattr(request,'param',False)
+    short=param if type(param) is bool else False
     options=dict(bound=lambda config:workflow_bound(config,short=short),source=FILES['module/source.py'],
         amount={**zero(),'model_sessions':1,'model_input_tokens':50000,
                 'model_output_tokens':4000,'wall_seconds':11 if short else 310})
+    if type(param) is dict:options.update(param)
     fixture=plan_fixture.__wrapped__(pool.projects_root,native_setup,SimpleNamespace(param=options),monkeypatch)
     plans,token,observation,*_=next(fixture);owner=None
     try:

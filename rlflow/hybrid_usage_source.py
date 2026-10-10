@@ -212,7 +212,7 @@ class FixtureUsageSourceOwner:
             'store_epoch': member['payload']['store_epoch'], 'member_hash': hashlib.sha256(membership.raw).hexdigest(),
             'pool_claim_hash': hashlib.sha256(claim.raw).hexdigest(), 'scenario': scenario,
             'owner': self.process, 'file_identity': attempt['identities']['events.jsonl'],
-            'data_mode': 'fixture', 'source_only': True, 'settlement_enabled': False}
+            'data_mode': member['payload']['data_mode'], 'source_only': True, 'settlement_enabled': False}
         source = FixtureUsageSource(source_id, canonical(binding)); attempt['source'] = source
         self._sources[id(source)] = attempt
         attempt['accumulator'] = Accumulator('per_turn' if scenario == 'per_turn' else 'cumulative')
@@ -221,6 +221,8 @@ class FixtureUsageSourceOwner:
     def start_fixture(self, membership, claim, scenario='cumulative'):
         """One original finite fixture producer per original claim, never a model."""
         self._actual(); member = self.pool._issued_member(membership); claimed = self.pool._issued_claim(claim)
+        if member['payload']['data_mode']!='fixture':
+            raise PermissionError('synthetic fixture source cannot enter live domain')
         if claimed['payload']['member_id'] != member['payload']['member_id']:
             raise PermissionError('original fixture source membership/claim differs')
         if type(scenario) is not str or scenario not in SCENARIOS: raise Conflict('fixed finite fixture scenario required')
@@ -358,7 +360,7 @@ class FixtureUsageSourceOwner:
         totals = (accumulator.totals(inclusive_parent='fixture_parent' if attempt['scenario'] == 'parent_inclusive' else None)
                   if accumulator is not None else dict.fromkeys(('input_tokens', 'output_tokens', 'cached_tokens')))
         totals['complete'] = attempt['status'] == 'SEALED' and totals.get('complete', False)
-        value = {'source_id': attempt['source'].id, 'data_mode': 'fixture', 'source_only': True,
+        value = {'source_id': attempt['source'].id, 'data_mode': json.loads(attempt['source'].raw)['data_mode'], 'source_only': True,
                  'source_status': attempt['status'], 'offset': attempt['offset'],
                  'observed_prefix_sha256': attempt['hash'].hexdigest(), 'usage': totals,
                  'actual_cost_status': 'UNKNOWN', 'actual_cost': None, 'estimated_cost': None,

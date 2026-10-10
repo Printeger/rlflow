@@ -218,7 +218,14 @@ class FixtureMaterialBuilder:
     publish() below is deliberately unavailable until a core owner supplies the
     original persisted INTENT proof. verify() alone never permits publication.
     """
-    def __init__(self, parent, *, project_id):
+    @classmethod
+    def create_live(cls,parent,*,project_id):
+        """Protected fresh private Store only; no attach/migration or execution."""
+        return cls(parent,project_id=project_id,_data_mode='live')
+
+    def __init__(self, parent, *, project_id, _data_mode='fixture'):
+        if _data_mode not in ('fixture','live'):raise ValueError('closed fresh installation domain')
+        self.data_mode=_data_mode
         validate_schema(ID, project_id)
         parent = Path(parent).absolute()
         with _held_chain(parent) as (fds, _):
@@ -264,7 +271,7 @@ class FixtureMaterialBuilder:
             self.store._existing_lock_identity=original['writer.lock']
             self.project_id=project_id
             if directory_chain(runtime)!=chain:raise Conflict('new fixture original runtime changed before enable')
-            self.store_epoch=enable(self.store,project_id=self.project_id,data_mode='fixture')
+            self.store_epoch=enable(self.store,project_id=self.project_id,data_mode=self.data_mode)
             for name,expected in original.items():
                 info=os.stat(name,dir_fd=fds[-1],follow_symlinks=False)
                 if (not stat.S_ISREG(info.st_mode) or info.st_uid!=os.getuid() or info.st_nlink!=1 or
@@ -315,7 +322,7 @@ class FixtureMaterialBuilder:
         with self.store.read_connection() as db:
             db.execute('BEGIN')
             meta = ObservationReader._meta(db)
-            if (meta['project_id'], meta['data_mode'], meta['store_epoch']) != (self.project_id, 'fixture', self.store_epoch):
+            if (meta['project_id'], meta['data_mode'], meta['store_epoch']) != (self.project_id, self.data_mode, self.store_epoch):
                 raise Conflict('fixture installation original registration differs')
 
     def prepare(self):
@@ -332,9 +339,12 @@ class FixtureMaterialBuilder:
                     return material
                 raise Conflict('original fixture preparation incomplete; retained blocked attempt')
             request = {'action': 'prepare_fixture_runtime_installation', 'project_id': self.project_id,
-                'data_mode': 'fixture', 'store_epoch': self.store_epoch,
+                'data_mode': self.data_mode, 'store_epoch': self.store_epoch,
                 'installation_id': 'fixture_install_' + uuid.uuid4().hex,
                 'idempotency_key': 'fixture_intent', 'expected_state_version': 0}
+            if self.data_mode=='live':
+                from .hybrid_live_domain import PROFILE,PREPARE
+                request.update(action=PREPARE,domain_profile=PROFILE)
             entry = {'request': request}
             self._attempt = entry  # ONE retained attempt before any material IO.
             with self.store.read_connection() as db:

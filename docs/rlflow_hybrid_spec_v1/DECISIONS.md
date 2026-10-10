@@ -1,5 +1,7 @@
 # 开发决策记录
 
+2026-10-11 显式新建 live 域而非 fixture 晋升：Store 原合法 data_mode 是 live|fixture，历史“REAL”仅语义描述，不另增 enum。create_live 只创建全新私有目录/数据库/epoch；live installation 使用不同 action 和必需 profile，旧 schema/actions/事实 bytes 不改。bootstrap/WorkingPlan/Pool 是闭 fixture 与闭 live 两分支，原 metadata 与事件仍须一致；Runtime 再按 exact NativeModelOwner 和 accounted A workflow 双门拒绝旧 V1/普通执行器。live 表示数据域，不表示运行批准、成功来源、条件接纳或自主闭环；本片只验证原登记/不放行 STOP。通用 CPU live workflow 仍需独立原 parents，不能把 fixture CPU 条件直接搬入 live。
+
 2026-10-11 后验资格由exact原Source result发行，不由data cache或JSON声明：source持独立exec origin/ACK/raw/grant，原最后G门witness只证明授权写意图；实际held ELF/stdio与同PID原thread、原STARTED、自然exit0/全prefix成功audit/完整CLIusage才可发结果。账户绑定为固定trustedCLI的forced ChatGPT/workspace执行成功推论，不解析JWT/不证明provider价格或后台总请求。官方OpenAI文档已实际搜索fetch auth与non-interactive-mode：forced mismatch exits、JSONL usage存在；无total-provider计费担保。结果/ACK首行一致；cap canonical后最后STOP门，关FD前最后audit失效不能结算但不中断物理STOP。BaseOwner fixture域限制是直接真实链缺口，下一显式REAL域/持久facts，既有fixture或历史来源不自动升级。
 
 2026-10-11 将原批准启动权限与后验生成资格分离：仅原A accounted workflow可在REGISTER时发一次samelease强持有NativeModelLaunch，需原缓存副本完整性，不能用caller JSON/复制cap/V1/历史升级启动。G前原材料/cache/ready检查均早于原Controller最后效果门；G写前置release_entered，失联不重发。当前源码launch路径可实现，但开发期无actual G，测试硬拦截写入口；成功发G也不直接ACK/account/source/usage/条件。原native STOP明确FIXED_NATIVE_SINGLE_TGID（既有kernel禁止新TGID并持原pidfd/reap），对外不再误称fixedCPU；旧历史证据不被重新资格化。实际CLI auth refresh/后验来源与EOF发行仍待开发，不放宽cache替换清理。

@@ -108,11 +108,13 @@ class FixtureRuntimeOwner:
             raise TypeError('fixed original Pool/WorkingPlan owners required')
         with pool._lock, _registry:
             registered = pool._issued_member(membership)
-            if (registered['payload']['project_id'], registered['payload']['store_epoch'],
+            if (registered['payload']['project_id'], registered['payload']['data_mode'], registered['payload']['store_epoch'],
                     registered['payload']['store_root']) != (plans.workspace.project_id,
-                    plans.workspace.store_epoch, str(plans.store.root)):
+                    plans.workspace.data_mode, plans.workspace.store_epoch, str(plans.store.root)):
                 raise Conflict('fixture runtime must use original same-application project membership')
-            if plans.workspace.data_mode != 'fixture' or plans.controller.owner['process'] != pool.process:
+            if (plans.workspace.data_mode!='fixture' and not
+                    (type(self) is NativeModelOwner and plans.workspace.data_mode=='live') or
+                    plans.controller.owner['process'] != pool.process):
                 raise Conflict('fixed original fixture runtime process and scope required')
             if len(_owners) >= 16 or getattr(plans.workspace.budget, '_fixture_runtime', None) is not None:
                 raise Conflict('finite fixed fixture runtime owner cannot be rebound')

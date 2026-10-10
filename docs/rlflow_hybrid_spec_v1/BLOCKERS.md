@@ -1,5 +1,7 @@
 # 阻塞与证据缺口
 
+2026-10-11 原 BaseOwner/安装/Pool/WorkingPlan 固定 fixture 的直接链缺口已本地补为显式新建 live 域，原 REGISTER/NO_HANDOFF STOP/冷回放通过；没有生产迁移、实际生成或 A 完成。下一最小开发缺口为原 result/candidate 持久化、同 workflow 受管 CPU、新不同 Evaluator 派生、条件 CAS 和一次未完成需求接续；其他恢复增强后置。本地实现无权限阻塞；仅实际模型调用等待已提出的小额 A 合同批准，GPU/B/C/instinctRL HOLD 不变。首真实 task NOT_EXECUTED，无新增用户决定。
+
 2026-10-11 原后验ACK/result/usage publisher条件路径本地已实现，但仅零模型负例和纯账务验证，真实生成与known settlement仍NOT_VERIFIED。确认真实闭环还受BaseOwner硬要求fixture域及候选cap仅内存限制，下一优先显式REAL域与持久原candidate/result事实，再同workflowCPU、新独立Reviewer和条件CAS/接续。非新增恢复扩展，首真实task NOT_EXECUTED。本地无权限阻塞，实际G/model调用待已有小额A合同；GPU/B/C/instinctRL HOLD保持。
 
 2026-10-11 原A first Engineer批准启动接线本地已实现，未携原launch cap仍拒，旧V1不升级；小额A合同待批仅阻工具实际G/model调用，不阻代码。真实来源/账户后验、完整stdout/EOF/usage issuer与同workflowCPU/新独立Evaluator/条件CAS/接续仍是开发缺口，首task NOT_EXECUTED。其他恢复增强后置，GPU/B/C/instinctRL HOLD未变，无新增用户决定。

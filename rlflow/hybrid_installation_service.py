@@ -80,9 +80,12 @@ class FixtureInstallationService:
         self._lock = threading.RLock(); self._active = None; self._published = None
         self._bootstrap_contexts = {}
         self.project_id, self.store_epoch = builder.project_id, builder.store_epoch
+        self.data_mode=builder.data_mode
         self.store.bind_hybrid_installation(self)
 
     def _metadata(self, db):
+        if self.builder.data_mode!=self.data_mode:
+            raise Conflict('original installation builder domain changed')
         if self.store._hybrid_installation_service is not self:
             raise PermissionError('original bound fixture installation owner required')
         self.builder._check_physical()
@@ -90,7 +93,7 @@ class FixtureInstallationService:
         version = db.execute('SELECT version FROM projection_meta WHERE singleton=1').fetchone()[0]
         tip = db.execute('SELECT COALESCE(MAX(seq),0) FROM events').fetchone()[0]
         if ((meta['project_id'], meta['data_mode'], meta['store_epoch']) !=
-                (self.project_id, 'fixture', self.store_epoch) or
+                (self.project_id, self.data_mode, self.store_epoch) or
                 type(version) is not int or meta['source_version'] != version or tip != version):
             raise Conflict('actual fixture installation registration or source tip differs')
         return version
@@ -106,7 +109,7 @@ class FixtureInstallationService:
                 if rows[0][0] != '' or read.object(section, '') != {}:
                     raise Conflict('fixture installation original collection marker missing')
                 state[section] = {row[0]: read.object(section, row[0]) for row in rows[1:]}
-        validate_complete(state, (self.project_id, 'fixture'),
+        validate_complete(state, (self.project_id, self.data_mode),
                           lambda key: self.store._installation_event(db, key, _parse=read.parse, _decode=read.decode),
                           event_summary=self.store._installation_summary(db, version))
         return state
@@ -137,8 +140,10 @@ class FixtureInstallationService:
                 refs = {'intent_key': intent_key(original['request']), 'intent_hash': digest(original),
                     'publication_key': publication_key(ready['request']), 'publication_hash': digest(ready),
                     'expected_seal_hash': digest(original['expected_seal']),
-                    'project_id': self.project_id, 'data_mode': 'fixture', 'store_epoch': self.store_epoch,
+                    'project_id': self.project_id, 'data_mode': self.data_mode, 'store_epoch': self.store_epoch,
                     'installation_id': material.id, 'release_id': ready['release_id']}
+                if self.data_mode=='live':
+                    refs['domain_profile']=original['request']['domain_profile']
                 if len(self._bootstrap_contexts) >= 32:
                     raise Conflict('original bootstrap witness capacity reached')
                 witness = _BootstrapWitness(self, material, inventory, canonical(refs), threading.get_ident())
@@ -175,13 +180,15 @@ class FixtureInstallationService:
             raise Conflict('actual original owner-published release required')
         _, original = self.builder._slot(witness.material); ready = self._ready_value(original)
         state = self._state(db, read, version); refs = json.loads(witness.raw)
-        if (state.get(SECTIONS[0], {}).get(refs['intent_key']) != original or
-                state.get(SECTIONS[1], {}).get(refs['publication_key']) != ready or
-                refs != {'intent_key': intent_key(original['request']), 'intent_hash': digest(original),
+        expected = {'intent_key': intent_key(original['request']), 'intent_hash': digest(original),
                     'publication_key': publication_key(ready['request']), 'publication_hash': digest(ready),
                     'expected_seal_hash': digest(original['expected_seal']), 'project_id': self.project_id,
-                    'data_mode': 'fixture', 'store_epoch': self.store_epoch,
-                    'installation_id': witness.material.id, 'release_id': ready['release_id']}):
+                    'data_mode': self.data_mode, 'store_epoch': self.store_epoch,
+                    'installation_id': witness.material.id, 'release_id': ready['release_id']}
+        if self.data_mode=='live':expected['domain_profile']=original['request']['domain_profile']
+        if (state.get(SECTIONS[0], {}).get(refs['intent_key']) != original or
+                state.get(SECTIONS[1], {}).get(refs['publication_key']) != ready or
+                refs != expected):
             raise Conflict('original bootstrap source reference differs')
         witness.inventory.check(); _deadline(witness.inventory.deadline)
         return refs
@@ -191,6 +198,9 @@ class FixtureInstallationService:
         request = {**original['request'], 'action': 'publish_fixture_runtime_installation',
             'expected_state_version': 1, 'idempotency_key': 'fixture_ready',
             'intent_key': intent_key(original['request']), 'intent_hash': digest(original)}
+        if request['data_mode']=='live':
+            from .hybrid_live_domain import PUBLISH
+            request['action']=PUBLISH
         return {'request': request, 'request_hash': digest(request), 'accepted_state_version': 2,
             'catalog_sha256': original['expected_seal']['descriptor']['catalog_sha256'],
             'release_id': original['expected_seal']['release_id'],

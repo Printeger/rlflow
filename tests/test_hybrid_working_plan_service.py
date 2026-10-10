@@ -42,10 +42,18 @@ def plans(tmp_path, native_setup, request, monkeypatch):
     parent=tmp_path/'installation-parent';parent.mkdir(mode=0o700)
     options = request.param if type(getattr(request, 'param', None)) is dict else {}
     project_id = options.get('project_id', 'project_fixture')
-    builder=FixtureMaterialBuilder(parent,project_id=project_id)
+    builder=(FixtureMaterialBuilder.create_live(parent,project_id=project_id)
+        if options.get('data_mode')=='live' else FixtureMaterialBuilder(parent,project_id=project_id))
+    data_mode=builder.data_mode
     installation=FixtureInstallationService(builder);material=builder.prepare()
     installation.persist_intent(material);installation.publish(material)
     store=builder.store;registry,proposal=options.get('bound', bound)(options.get('config', native_config)())
+    if data_mode=='live':
+        # Construct new originals consistently, not edits to persisted facts.
+        from rlflow.hybrid_registry import Registry
+        config=json.loads(registry._raw);config.update(project_id=project_id,data_mode=data_mode)
+        registry=Registry(config)
+        proposal.update(project_id=project_id,data_mode=data_mode,registry_bindings=registry.bindings)
     proposal['scope']['writable_paths']=['module/']
     utc=[datetime(2026,10,9,tzinfo=timezone.utc)];mono=[100*10**9]
     human=Principal('fixture_human','human',{'operator','approver'},{project_id})
@@ -53,9 +61,9 @@ def plans(tmp_path, native_setup, request, monkeypatch):
     auth=AuthStore([Credential.create(human,phrase)],ttl=100)
     session,access=auth.login(human.id,phrase);origin='http://127.0.0.1:8765'
     args={'token':session,'csrf':access.csrf,'origin':origin}
-    drafts=DraftService(store,auth,project_id=builder.project_id,data_mode='fixture',origin=origin)
+    drafts=DraftService(store,auth,project_id=builder.project_id,data_mode=data_mode,origin=origin)
     drafts.submit(proposal,**args,idempotency_key='draft',expected_revision=0,expected_state_version=store.version())
-    approvals=ApprovalService(store,auth,registry,project_id=builder.project_id,data_mode='fixture',origin=origin,clock=lambda:utc[0])
+    approvals=ApprovalService(store,auth,registry,project_id=builder.project_id,data_mode=data_mode,origin=origin,clock=lambda:utc[0])
     confirmation=approvals.prepare(**args,goal_id=proposal['goal_id'],ttl_seconds=60)['confirmation']
     approvals.approve(confirmation,**args,idempotency_key='approve')
     source=builder._roots['source'];(source/'module').mkdir(mode=0o700)
@@ -63,10 +71,10 @@ def plans(tmp_path, native_setup, request, monkeypatch):
     control=builder._roots['bootstrap']/'preparation';control.mkdir(mode=0o700)
     adapter=CodexExecAdapter(registry,control)
     snapshots=SnapshotBuilder(source,['module/source.py'],builder._roots['snapshots'])
-    prep=PreparationService(store,registry,snapshots,adapter,project_id=builder.project_id,data_mode='fixture',
+    prep=PreparationService(store,registry,snapshots,adapter,project_id=builder.project_id,data_mode=data_mode,
         store_epoch=builder.store_epoch,clock=lambda:utc[0],monotonic_ns=lambda:mono[0])
-    goal=head_key(builder.project_id,'fixture',proposal['goal_id'])
-    preparation={'project_id':builder.project_id,'data_mode':'fixture','goal_ref':goal,
+    goal=head_key(builder.project_id,data_mode,proposal['goal_id'])
+    preparation={'project_id':builder.project_id,'data_mode':data_mode,'goal_ref':goal,
         'idempotency_key':'prepare','role':options.get('role','Engineer'),'context':{'text':proposal['objective']}}
     if getattr(request,'param',False) and not options:
         schema={'type':'object','description':'Working plan literal capacity fixture',
@@ -75,18 +83,18 @@ def plans(tmp_path, native_setup, request, monkeypatch):
         assert len(canonical(schema))<4*1024**2
         monkeypatch.setattr('rlflow.execution_adapter.role_schema',lambda role:schema)
     prep.prepare(preparation)
-    controller=ControllerService(store,registry,project_id=builder.project_id,data_mode='fixture',
+    controller=ControllerService(store,registry,project_id=builder.project_id,data_mode=data_mode,
         store_epoch=builder.store_epoch,clock=lambda:utc[0],monotonic_ns=lambda:mono[0])
     acquired=controller.acquire('controller',expected_version=store.version(),ttl_seconds=60);token=acquired['token']
     budget=BudgetService(store,registry,controller,prep)
-    reserve={'project_id':builder.project_id,'data_mode':'fixture','goal_ref':goal,'store_epoch':builder.store_epoch,
+    reserve={'project_id':builder.project_id,'data_mode':data_mode,'goal_ref':goal,'store_epoch':builder.store_epoch,
         'idempotency_key':'reserve','expected_state_version':store.version(),'action':'RESERVE',
         'preparation_intent_key':intent_key(preparation),'amount':{**zero(),**options.get('amount', {'wall_seconds':1})},'purpose':'EXECUTION'}
     budget.record(reserve,token)
     working=WorkingCopyOwner(snapshots,builder._roots['working'],clock=lambda:utc[0],monotonic_ns=lambda:mono[0])
     workspace=WorkspaceService(store,registry,controller,prep,budget,working)
     observation=workspace.stage(intent_key(preparation));record=json.loads(observation.raw)
-    request={'project_id':builder.project_id,'data_mode':'fixture','goal_ref':goal,'store_epoch':builder.store_epoch,
+    request={'project_id':builder.project_id,'data_mode':data_mode,'goal_ref':goal,'store_epoch':builder.store_epoch,
         'idempotency_key':'workspace','expected_state_version':store.version(),'expected_workspace_revision':0,
         'workspace_id':record['workspace_id'],'reservation_id':reservation_key(reserve),'operation':'acquire','ttl_seconds':30}
     workspace.record(request,token,observation)

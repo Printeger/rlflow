@@ -522,11 +522,11 @@ All model, child process and native delegation handoff remain denied.
         if (list(_file_pair(root / 'runtime/research.db')) != member_value['db_identity'] or
                 list(_file_pair(root / 'runtime/writer.lock')) != member_value['writer_identity']):
             raise Conflict('fixture runtime original project database rebound')
-        store = Store.attach_existing(root, project_id=member_value['project_id'], data_mode='fixture')
+        store = Store.attach_existing(root, project_id=member_value['project_id'], data_mode=member_value['data_mode'])
         with store.read_connection() as project_db:
             project_db.execute('BEGIN'); read = ReadBudget(project_db, 16*1024**2)
             meta = ObservationReader._meta(project_db)
-            if (meta['project_id'],meta['data_mode'],meta['store_epoch']) != (member_value['project_id'],'fixture',member_value['store_epoch']):
+            if (meta['project_id'],meta['data_mode'],meta['store_epoch']) != (member_value['project_id'],member_value['data_mode'],member_value['store_epoch']):
                 raise Conflict('fixture pool original Project registration differs')
             key = value['payload']['project_fact_key']; fact = read.object(BUDGET[0], key)
             if fact is None or digest(fact) != value['payload']['project_fact_hash']:
@@ -562,7 +562,7 @@ All model, child process and native delegation handoff remain denied.
                     origin['pool_claim'] != {'key':claim['key'], 'hash':digest(claim)} or
                     origin['pool_id'] != self.binding['pool_id'] or origin['member_id'] != member_value['member_id'] or
                     (fact['request']['project_id'],fact['request']['data_mode'],fact['request']['store_epoch']) !=
-                    (member_value['project_id'],'fixture',member_value['store_epoch'])):
+                    (member_value['project_id'],member_value['data_mode'],member_value['store_epoch'])):
                 raise Conflict('fixture pool original Project runtime scope differs')
             if (memo is not None and cached is None and len(memo) < CAPACITY and
                     sum(len(k) + len(v[0]) + len(v[1]) for k, v in memo.items()) +
@@ -620,14 +620,14 @@ All model, child process and native delegation handoff remain denied.
         if (list(_file_pair(root / 'runtime/research.db')) != value['db_identity'] or
                 list(_file_pair(root / 'runtime/writer.lock')) != value['writer_identity']):
             raise Conflict('pool original project database/writer identity differs')
-        store = Store.attach_existing(root, project_id=value['project_id'], data_mode='fixture')
+        store = Store.attach_existing(root, project_id=value['project_id'], data_mode=value['data_mode'])
         with store.read_connection() as db:
             db.execute('BEGIN'); budget = ReadBudget(db, 16*1024**2)
             meta = ObservationReader._meta(db)
             version = db.execute('SELECT version FROM projection_meta WHERE singleton=1').fetchone()[0]
             tip, total = db.execute('SELECT COALESCE(MAX(seq),0),COUNT(*) FROM events').fetchone()
             if ((meta['project_id'], meta['data_mode'], meta['store_epoch']) !=
-                    (value['project_id'], 'fixture', value['store_epoch']) or
+                    (value['project_id'], value['data_mode'], value['store_epoch']) or
                     version != meta['source_version'] or version != tip or version != total):
                 raise Conflict('pool project registration/event tip differs')
             state = {'version': version}
@@ -639,7 +639,7 @@ All model, child process and native delegation handoff remain denied.
                         rows[0][0] != '' or budget.object(section, '') != {}):
                     raise Conflict('pool original installation collections differ')
                 state[section] = {rows[1][0]: budget.object(section, rows[1][0])}
-            validate_complete(state, (value['project_id'], 'fixture'),
+            validate_complete(state, (value['project_id'], value['data_mode']),
                 lambda key: store._installation_event(db, key, _parse=budget.parse, _decode=budget.decode),
                 event_summary=store._installation_summary(db, version))
             refs = value['bootstrap']
@@ -663,11 +663,14 @@ All model, child process and native delegation handoff remain denied.
         if self.projects_root not in installation.builder.root.parents:
             raise Conflict('project cannot create/select another application pool')
         with installation._bootstrap_witness(material) as witness:
-            payload = {'project_id': installation.project_id, 'data_mode': 'fixture', 'store_epoch': installation.store_epoch,
+            payload = {'project_id': installation.project_id, 'data_mode': installation.data_mode, 'store_epoch': installation.store_epoch,
                 'store_root': str(installation.store.root), 'store_chain': directory_chain(installation.store.root),
                 'runtime_chain': installation.builder._runtime_chain,
                 'db_identity': list(installation.store._existing_identity),
                 'writer_identity': list(installation.store._existing_lock_identity), 'bootstrap': json.loads(witness.raw)}
+            if installation.data_mode=='live':
+                from .hybrid_live_domain import PROFILE
+                payload['domain_profile']=PROFILE
             payload['member_id'] = 'member_' + sha(payload); member(payload)
             key = 'register_' + sha([self.binding['pool_id'], payload['member_id']])
             with self._lock:

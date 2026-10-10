@@ -22,6 +22,14 @@ from .hybrid_runtime_installation import (CHAIN,TRIPLE,RAW_HASH,SECTIONS as INST
     validate_record as installation_record,validate_links as installation_links)
 from .hybrid_authority import timestamp
 from .store import Conflict,sha,canonical
+from .hybrid_live_domain import PROFILE as LIVE_PROFILE
+
+
+def _domains(schema):
+    """Keep historical fixture bytes closed; live requires an explicit profile."""
+    fields=schema['properties']
+    return {'oneOf':[schema,obj({**fields,'data_mode':{'const':'live'},
+        'domain_profile':{'const':LIVE_PROFILE}})]}
 
 SECTIONS=('hybrid_working_plan_intents','hybrid_working_plan_results')
 EVENTS=('HYBRID_WORKING_PLAN_INTENT','HYBRID_WORKING_PLAN_READY')
@@ -31,10 +39,12 @@ FILES=('plan.json','packet.json','result.schema.json','command-plan.json',
 BOOTSTRAP=obj({'intent_key':ID,'intent_hash':HASH,'publication_key':ID,'publication_hash':HASH,
     'expected_seal_hash':HASH,'project_id':ID,'data_mode':{'const':'fixture'},'store_epoch':ID,
     'installation_id':ID,'release_id':RAW_HASH})
+BOOTSTRAP=_domains(BOOTSTRAP)
 CONTEXT=obj({'project_id':ID,'data_mode':{'const':'fixture'},'store_epoch':ID,'sources':SOURCES,
     'preparation':PREPARATION_REF,'workspace_head':HEAD,'workspace_claim':CLAIM,
     'budget_reservation':BUDGET_HEADS[1],'controller':CONTROLLER_REF,'observation':OBSERVATION,
     'observation_issued_monotonic_ns':COUNT,'observation_expires_monotonic_ns':POSITIVE,'bootstrap':BOOTSTRAP})
+CONTEXT=_domains(CONTEXT)
 TREE=obj({'files':{**array(obj({'name':PATH,'bytes':{**COUNT,'maximum':256*1024**2},
     'sha256':HASH,'mode':{'const':0o600}}),4096),'minItems':1},
     'directories':{**array(PATH,4096),'minItems':1},'total_bytes':{**COUNT,'maximum':256*1024**2},
@@ -53,6 +63,7 @@ COMMON={'project_id':ID,'data_mode':{'const':'fixture'},'store_epoch':ID,'goal_r
     'plan_id':ID,'idempotency_key':ID,'expected_state_version':COUNT}
 REQUESTS=(obj({**COMMON,'action':{'const':'prepare_working_plan'}}),
     obj({**COMMON,'action':{'const':'publish_working_plan'},'intent_key':ID,'intent_hash':HASH}))
+REQUESTS=tuple(_domains(schema) for schema in REQUESTS)
 BASE={'request_hash':HASH,'accepted_state_version':POSITIVE,'source_context':CONTEXT,
     'recorded_at':TIME,'controller_checked_monotonic_ns':COUNT,'execution_enabled':{'const':False},
     'release_enabled':{'const':False}}
@@ -136,6 +147,10 @@ def validate_record(section,key,value):
             value['recorded_at']!=sources['evaluated_at'] or
             any(context[n]!=request[n] or sources[n]!=request[n] for n in ('project_id','data_mode','store_epoch')) or
             sources['goal_ref']!=request['goal_ref']):raise Conflict('Working plan source identity or CAS differs')
+    if any(context['bootstrap'][n]!=request[n] for n in ('project_id','data_mode','store_epoch')):
+        raise Conflict('Working plan original bootstrap domain differs')
+    if request.get('domain_profile')!=context.get('domain_profile') or request.get('domain_profile')!=context['bootstrap'].get('domain_profile'):
+        raise Conflict('Working plan explicit original domain profile differs')
     mono=value['controller_checked_monotonic_ns'];obs=context['observation']
     if (type(mono) is not int or not context['observation_issued_monotonic_ns']<=mono<context['observation_expires_monotonic_ns'] or
             not timestamp(obs['checked_at'])<=timestamp(value['recorded_at'])<timestamp(obs['expires_at']) or

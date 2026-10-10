@@ -221,7 +221,11 @@ def validate_runtime(request, prior):
         raise Conflict('another profile cannot acquire engineering result fields')
     _control_links(request, old)
     if value['phase'] != current: raise Conflict('fixture runtime action/phase differs')
-    if request['data_mode'] != 'fixture': raise Conflict('fixed CPU runtime is fixture only')
+    if request['data_mode']!='fixture':
+        from .hybrid_native_model_profile import KIND as NATIVE_KIND
+        if (request['data_mode']!='live' or value['origin']['kind']!=NATIVE_KIND or
+                value['origin']['native_model'].get('workflow',{}).get('accounting_version')!='A_REGISTRATION_CEILINGS_V1'):
+            raise Conflict('live runtime requires original accounted native engineering workflow')
     if current == 'REGISTER_NO_HANDOFF':
         if (prior is None or prior['status'] != 'HELD' or
                 prior['runtime_registration'] != 'NOT_AUTHORIZED' or

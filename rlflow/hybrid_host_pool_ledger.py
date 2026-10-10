@@ -47,22 +47,31 @@ def process(value):
 
 
 def member(value):
-    closed(value, ('member_id', 'project_id', 'data_mode', 'store_epoch', 'store_root',
-                   'store_chain', 'runtime_chain', 'db_identity', 'writer_identity', 'bootstrap'))
+    fields=('member_id', 'project_id', 'data_mode', 'store_epoch', 'store_root',
+                   'store_chain', 'runtime_chain', 'db_identity', 'writer_identity', 'bootstrap')
+    if value.get('data_mode')=='live':
+        from .hybrid_live_domain import PROFILE
+        fields+=('domain_profile',)
+        if value.get('domain_profile')!=PROFILE:raise Conflict('explicit isolated live pool domain required')
+    closed(value,fields)
     for name in ('member_id', 'project_id', 'store_epoch'): identifier(value[name])
-    if value['data_mode'] != 'fixture': raise Conflict('fixture pool membership only')
+    if value['data_mode'] not in ('fixture','live'): raise Conflict('closed original pool membership domain required')
     root = _path(value['store_root']); _chain_value(value['store_chain'], root)
     _chain_value(value['runtime_chain'], root / 'runtime')
     pair(value['db_identity']); pair(value['writer_identity'])
     ref = value['bootstrap']
-    closed(ref, ('intent_key', 'intent_hash', 'publication_key', 'publication_hash', 'expected_seal_hash',
-                 'project_id', 'data_mode', 'store_epoch', 'installation_id', 'release_id'))
+    ref_fields=('intent_key', 'intent_hash', 'publication_key', 'publication_hash', 'expected_seal_hash',
+                 'project_id', 'data_mode', 'store_epoch', 'installation_id', 'release_id')
+    if value['data_mode']=='live':
+        ref_fields+=('domain_profile',)
+        if ref.get('domain_profile')!=value['domain_profile']:raise Conflict('original pool bootstrap profile differs')
+    closed(ref,ref_fields)
     for name in ('intent_key', 'publication_key', 'installation_id'): identifier(ref[name])
     for name in ('intent_hash', 'publication_hash', 'expected_seal_hash'):
         if type(ref[name]) is not str or not re.fullmatch('sha256:[0-9a-f]{64}', ref[name]):
             raise Conflict('original pool bootstrap hash required')
     if (ref['project_id'], ref['data_mode'], ref['store_epoch']) != (
-            value['project_id'], 'fixture', value['store_epoch']):
+            value['project_id'], value['data_mode'], value['store_epoch']):
         raise Conflict('pool membership bootstrap scope differs')
     if type(ref['release_id']) is not str or not re.fullmatch('[0-9a-f]{64}', ref['release_id']):
         raise Conflict('original pool release identity required')

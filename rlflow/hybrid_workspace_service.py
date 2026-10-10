@@ -126,12 +126,14 @@ class WorkspaceService:
         bootstrap_ref=owner.installation._bootstrap_point(db,bootstrap,read)
         if bootstrap.material is not owner.material:
             raise Conflict('plan bootstrap differs from original fixed owner material')
-        return {'project_id':self.project_id,'data_mode':self.data_mode,'store_epoch':self.store_epoch,
+        result={'project_id':self.project_id,'data_mode':self.data_mode,'store_epoch':self.store_epoch,
             'sources':sources,'preparation':ref,'workspace_head':current,'workspace_claim':original_claim,
             'budget_reservation':reservation,'controller':{'fact_key':controller_key(control['request']),
                 'fact_hash':digest(control),'controller_epoch':control['controller_epoch'],'head_revision':control['head_revision']},
             'observation':record,'observation_issued_monotonic_ns':observation.issued_monotonic_ns,
             'observation_expires_monotonic_ns':observation.expires_monotonic_ns,'bootstrap':bootstrap_ref}
+        if self.data_mode=='live':result['domain_profile']=bootstrap_ref['domain_profile']
+        return result
 
     def _check_plan_context(self,context):
         if (type(context) is not _PlanContext or self._plan_active is not context or

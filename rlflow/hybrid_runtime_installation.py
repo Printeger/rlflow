@@ -41,6 +41,11 @@ COMMON = {'project_id': ID, 'data_mode': {'const': 'fixture'}, 'store_epoch': ID
 INTENT_REQUEST = obj({**COMMON, 'action': {'const': 'prepare_fixture_runtime_installation'}})
 READY_REQUEST = obj({**COMMON, 'action': {'const': 'publish_fixture_runtime_installation'},
     'intent_key': ID, 'intent_hash': HASH})
+from .hybrid_live_domain import PROFILE as LIVE_PROFILE,PREPARE as LIVE_PREPARE,PUBLISH as LIVE_PUBLISH
+LIVE_COMMON={**COMMON,'data_mode':{'const':'live'},'domain_profile':{'const':LIVE_PROFILE}}
+INTENT_REQUEST={'oneOf':[INTENT_REQUEST,obj({**LIVE_COMMON,'action':{'const':LIVE_PREPARE}})]}
+READY_REQUEST={'oneOf':[READY_REQUEST,obj({**LIVE_COMMON,'action':{'const':LIVE_PUBLISH},
+    'intent_key':ID,'intent_hash':HASH})]}
 INTENT = obj({'request': INTENT_REQUEST, 'request_hash': HASH, 'binding': BINDING,
     'expected_seal': SEAL, 'accepted_state_version': POSITIVE,
     'state': {'const': 'LEGACY_DENIED_UNPUBLISHED'}, 'execution_enabled': {'const': False},
@@ -79,7 +84,7 @@ def publication_key(request):
 
 def event_inputs(value):
     request = value['request']
-    return {} if request['action'] == 'prepare_fixture_runtime_installation' else {
+    return {} if request['action'] in ('prepare_fixture_runtime_installation',LIVE_PREPARE) else {
         'runtime_installation_intent': [request['intent_key'], request['intent_hash']]}
 
 
@@ -149,7 +154,7 @@ def validate_record(section, key, value):
 
 def validate_links(value, lookup):
     request = value['request']
-    if request['action'] == 'prepare_fixture_runtime_installation':
+    if request['action'] in ('prepare_fixture_runtime_installation',LIVE_PREPARE):
         return
     original = lookup(SECTIONS[0], request['intent_key'])
     if original is None:

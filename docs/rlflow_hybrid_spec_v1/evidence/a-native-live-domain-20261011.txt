@@ -1,0 +1,50 @@
+A fresh isolated LIVE domain / 2026-10-11
+Base ccd6d65, branch hybrid-v1. Local implementation, not A/98 completion.
+
+Behavior: FixtureMaterialBuilder.create_live creates a NEW private Store and
+epoch; no attach, fixture upgrade, production migration or runtime permission.
+Closed new live installation actions and mandatory
+ISOLATED_LIVE_ENGINEERING_V1 profile; original metadata/event/bootstrap,
+WorkingPlan context/request, Pool member and source domain remain consistent.
+Runtime exact NativeModelOwner + original accounted A workflow only;
+generic fixture/diagnostic/old local CPU remain denied in live.
+
+Positive command (no model/real credential/GPU calls):
+PYTHONPATH=. PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q tests/test_hybrid_native_live_domain.py
+Original session 23162, terminal output933b1a exit0:
+1 passed in 15.77s
+Fresh live originals: Proposal/Registry/human local approval/bootstrap/plan/
+Pool/member/source; FIRST_ENGINEER REGISTER_NO_HANDOFF; Popen prohibited;
+STOP SETTLED, Pool0, all original FDs closed; snapshot recover=audit=replay.
+Negative: fixture owner, crossdomain workspace/member, fixture source,
+old fixture installation action with live profile, profile-only member upgrade,
+different bootstrap profile rejected. No actual model start or credentials.
+
+Necessary affected old-domain regression (not duplicate/new full-suite claim):
+PYTHONPATH=. PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q tests/test_hybrid_runtime_installation.py tests/test_hybrid_working_plan.py tests/test_hybrid_host_pool.py::test_original_unknown_close_witness_and_reused_slot_idempotency tests/test_hybrid_a_workflow_derivation.py::test_original_workflow_first_engineer_register_stop_and_cold_replay
+Original session 21887, terminal outpute11765 exit0:
+74 passed in 143.95s (0:02:23)
+
+Failures retained: direct pytest autoload imported ROS launch_testing and failed
+on missing lark before collection; disabled unrelated auto plugins. Next direct
+entrypoint missed repo import; used python -m pytest and explicit PYTHONPATH.
+33543/output08fc8b error1/1.89s Proposal fixture scope mismatch;
+66726/output3f311a error1/1.86s Registry fixture scope mismatch.
+After two related scope failures checked root construction as one chain, rebuilt
+NEW registry/proposal consistently before approval, no persisted fact edits.
+22694/output25fe96 fail1/6.09s test used .values() on Store.objects list;
+read actual API, fixed tuple access. Only affected new case rerun above.
+All handles terminal, no restart/duplicate independent tests.
+
+Independent readonly finite_app_review_63 final: no confirmed direct MUST.
+Reviewed closed historical actions, original metadata/profile/hash chain,
+exact owner and ledger dual live gates, earliest fixture source denial.
+No reviewer tests or models launched; this is DEVELOPMENT review, not product
+independent Reviewer or real engineering task evidence.
+
+Compileall/diff check passed; user package-lock.json untouched, SHA256
+becc7e2a36dfcad4ffe934b5ff2f0f68187611d6c0641bd63d81367651cfbf09
+Actual task NOT_EXECUTED, original result/candidate durable facts, same-workflow
+CPU/new Evaluator/condition CAS/continuation still required. Actual A model run
+pending existing small contract approval; GPU/B/C/instinctRL HOLD unchanged.
+Original Goal ACTIVE; no full-suite/A/checkpoint98 acceptance claim.
