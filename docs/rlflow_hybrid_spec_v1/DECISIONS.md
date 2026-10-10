@@ -1,5 +1,7 @@
 # 开发决策记录
 
+2026-10-11 A 执行桥复用原 Source/launch/STOP/结算，不引入另一个 Supervisor、caller receipt 或自动重试。固定原序列 deadline 在观察与 Source 发行末门重核；异常仍 STOP，历史结果不能升级为条件。上轮同A readonly Evaluator 已登记，受审候选 frozen stdin 与 baseline 明确区分；本轮将已有原入口接成有限执行及持久归档闭包。见 HYBRID_A_NATIVE_EXECUTION_BRIDGE.md。
+
 2026-10-11 CPU→Reviewer不临时清Budget指针/另建零账本，也不复用settled Engineer/CPU计划、claim或lease。新增受保护反向交接：exact CPU/原review cap、全部CPU原SETTLED/FREE/FD、current token，原Workspace全部关闭后正常shutdown与source实际退休；强留root+原正常退休tuple/source/complete-close digest，constructor独立重核再原子写Budget pointer/_owners/child。Safety或可变retired bool不能晋升，lost安装返回只取原child。admission→Pool→registry保持CPU准备和STOP同锁序；共享既有exact关闭/CAS helper不复制改其语义。此Owner尚无新Reviewer grant/角色plan/high预算，不把构造器能力误作模型来源、条件或自主任务验收。
 
 2026-10-11 Reviewer未知candidate输入必须来自原执行CPU的完整STOP/SETTLED/FREE终态及原Engineer持久结果，不能用caller JSON/开发期High/同hash发grant。纯from_cpu只重放DATA，原Owner核wholeevent/全部history/currentApproval/pins/FD/Pool后封存lease/cap/raw；重复消费全重证。跨新reservation的policy_source snapshot source_version必然推进，沿现有Budget guard只排除source_version/evaluated_at，其他所有字段（含批准/作用域/epoch/expiry）一致，不能把快照序号误作合同批准身份。当前材料不是新Owner/high grant或条件，后续仍须不同角色plan/原新会话和同账本配额，不借FIRST_ENGINEER旧计划升级。

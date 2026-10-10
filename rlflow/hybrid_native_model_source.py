@@ -622,8 +622,10 @@ class NativeModelSourceOwner(FixtureUsageSourceOwner):
             runtime,source,attempt,witness=self._released_original(owner,lease)
             old=self._model_results.get(id(source))
             if old is not None:return self._issued_native_result(owner,lease,old[2])
-            if runtime.get('source_stop_latched'):
+            if (runtime.get('source_stop_latched') or runtime.get('physical_safety_freeze') or
+                    owner._safety_freeze):
                 raise Conflict('STOP prohibits a new native result')
+            owner._check_workflow_native_deadline(lease)
             self._physical(attempt)
             ack=self._runtime_started(owner,lease)
             if (ack is None or runtime['started_ack'] is not ack or
@@ -669,7 +671,11 @@ class NativeModelSourceOwner(FixtureUsageSourceOwner):
             except Exception:
                 self._packet_failures.add(id(source))
                 raise
-            if runtime.get('source_stop_latched'):
+            owner._check_workflow_native_deadline(lease)
+            # Identity/clock reads are finished. STOP must be the last PURE
+            # check immediately before publishing, not before helper IO.
+            if (runtime.get('source_stop_latched') or runtime.get('physical_safety_freeze') or
+                    owner._safety_freeze):
                 raise Conflict('STOP raced original native result; no issue')
             self._model_results[id(source)]=(owner,lease,cap,cap.raw,
                 runtime['native_model_grant'],runtime['native_model_grant'].raw)

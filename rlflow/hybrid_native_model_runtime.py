@@ -8,6 +8,7 @@ import json
 import hashlib
 import uuid
 import threading
+import time
 
 from .hybrid_fixture_runtime import FixtureRuntimeOwner
 from .hybrid_native_model_profile import KIND, approved_binding
@@ -73,6 +74,10 @@ class NativeModelOwner(FixtureRuntimeOwner):
         self._native_cpu_handoff_roots={}
         self._native_cpu_retirements={}
         self._launch_active=None
+        self._workflow_native_run_lock=threading.Lock()
+        self._workflow_native_run=None
+        self._workflow_native_completed=None
+        self._workflow_native_deadline=None
         super().__init__(*args,**kwargs)
 
     def _actual(self):
@@ -756,6 +761,130 @@ class NativeModelOwner(FixtureRuntimeOwner):
     def collect_native_result(self,lease):
         """Original completed result capability, or None for a finite pending step."""
         return self.sources.collect_native_result(self,lease)
+
+    def _check_workflow_native_deadline(self,lease):
+        self._issued(lease)
+        sequence=self._workflow_native_run
+        root=self._workflow_native_deadline
+        if sequence is None and root is None:return  # Original low-level collection only.
+        if (sequence is None or root is None or root[0] is not sequence or root[1] is not lease or
+                sequence['lease'] is not lease or root[2] is not sequence['launch']):
+            raise PermissionError('original native workflow deadline required')
+        if time.monotonic()>=root[3]:
+            raise Conflict('finite native workflow observation deadline exceeded')
+
+    def _workflow_native_completion(self,attempt,cap):
+        """Original Source capability AND durable terminal, never caller DATA."""
+        from .hybrid_budget_ledger import entry_key
+        self.sources._issued_native_result(self,attempt['lease'],cap)
+        original=attempt['entries'].get('FIXTURE_SCOPE_STOPPED')
+        if original is None:raise Conflict('original workflow native terminal missing')
+        terminal=self._confirm_entry(attempt,original)
+        if terminal is None or terminal['decision']!='SETTLED':
+            raise Conflict('original workflow native settlement unavailable; no new model')
+        self._check_terminal(attempt)
+        runtime=terminal['request']['fixture_runtime']
+        usage=self._native_usage_publication(attempt);result=self._native_result_publication(attempt)
+        if (usage is None or result is None or runtime.get('native_model_usage')!=usage or
+                runtime.get('native_model_result')!=result or self._current(attempt)['status']!='SETTLED' or
+                not self.pool._claim_slots[id(attempt['claim'])].closed):
+            raise Conflict('original workflow native usage/result/full STOP differs')
+        self._verify_pool_link(attempt,'FIXTURE_FREE',terminal)
+        from .store import sha
+        key='fixture_free_'+sha([attempt['claim_value']['key'],attempt['lease'].id])
+        with self.pool._transaction() as db:
+            free=self.pool._point(db,key)
+            if (free is None or free['action']!='FIXTURE_FREE' or
+                    free['payload']['project_fact_hash']!=digest(terminal)):
+                raise Conflict('original workflow native Pool FREE missing')
+        return {'terminal':{'key':entry_key(terminal['request']),'hash':digest(terminal)},
+            'result':result,'usage':usage,'source_authenticated':True,'account_qualified':True,
+            'account_binding':'TRUSTED_CLI_FORCED_CHATGPT_WORKSPACE',
+            'condition_evidence_enabled':False}
+
+    def run_workflow_native(self,lease,*,launch):
+        """One approved native attempt through original result, full STOP and archive.
+
+        Does not read host credentials, mint launch consent, retry an uncertain
+        run or create another session. Callers must first obtain the exact
+        original launch under the separately approved A execution contract.
+        STOP remains independent of the sequence lock, including timeout/error.
+        """
+        attempt=self._issued(lease);self._unit_check(attempt)
+        self.controller._refuse_nested_writer()
+        workflow=attempt['origin']['native_model'].get('workflow',{})
+        if (workflow.get('accounting_version')!='A_REGISTRATION_CEILINGS_V1' or
+                workflow.get('stage') not in ('FIRST_ENGINEER','INDEPENDENT_REVIEW')):
+            raise PermissionError('original accounted A native workflow required')
+        if not self._workflow_native_run_lock.acquire(blocking=False):
+            raise Conflict('original native workflow sequence already active')
+        try:
+            sequence=self._workflow_native_run
+            if sequence is not None:
+                if sequence['lease'] is not lease or sequence['launch'] is not launch:
+                    raise PermissionError('original native workflow sequence lease/launch required')
+                completed=self._workflow_native_completed
+                if completed is None:raise Conflict('native workflow outcome unresolved; no redispatch')
+                if (completed[0] is not sequence or completed[1] is not lease or completed[2] is not launch or
+                        sequence['complete'] is not completed):
+                    raise PermissionError('original native workflow completion required')
+                if canonical(self._workflow_native_completion(attempt,completed[3]))!=completed[4]:
+                    raise Conflict('original native workflow completion changed')
+                return json.loads(completed[4])
+            # A copied/foreign/changed launch cannot latch or STOP another run.
+            self._check_launch(attempt,launch)
+            with self._workflow_cpu_admission_lock:
+                self._actual()
+                if self._safety_freeze:raise Conflict('native workflow frozen for cleanup')
+                if self._current(attempt)['fixture_runtime']['phase']!='REGISTER_NO_HANDOFF':
+                    raise Conflict('native workflow requires original first no-handoff phase')
+                sequence={'lease':lease,'launch':launch,'complete':None,'phase':'START'}
+                deadline=time.monotonic()+attempt['origin']['native_model']['seconds']
+                self._workflow_native_deadline=(sequence,lease,launch,deadline)
+                self._workflow_native_run=sequence
+            cap=None;failure=None
+            try:
+                self.start(lease,launch=launch)
+                sequence['phase']='OBSERVE'
+                while time.monotonic()<deadline:
+                    with self._workflow_cpu_admission_lock,self.pool._lock:
+                        self._actual()
+                        if self._safety_freeze:raise Conflict('native workflow frozen for cleanup')
+                        phase=self._current(attempt)['fixture_runtime']['phase']
+                        if phase in ('STOP_REQUESTED','FIXTURE_SCOPE_STOPPED'):
+                            raise Conflict('original native workflow STOP prohibits completion')
+                        # Leave the guard writer before poll can publish ACK.
+                        with self._gate(attempt,phase):pass
+                        self._check_workflow_native_deadline(lease)
+                        state=self.poll_native(lease)
+                        self._check_workflow_native_deadline(lease)
+                        if state['started_observed']:
+                            cap=self.collect_native_result(lease)
+                            self._check_workflow_native_deadline(lease)
+                            if cap is not None:break
+                        source=self.sources._issued(attempt['source'])
+                        if (source['producer'] is not None and source['producer'].poll() is not None and
+                                (source['producer'].poll()!=0 or not state['started_observed'])):
+                            raise Conflict('native workflow exited without original complete result')
+                    time.sleep(.05)
+                if cap is None:raise Conflict('finite native workflow observation deadline exceeded')
+            except BaseException as error:
+                failure=error;raise
+            finally:
+                sequence['phase']='STOP'
+                try:self.stop_to_terminal(lease)
+                except BaseException as cleanup:
+                    if failure is not None:
+                        failure.add_note('Original native STOP incomplete: '+type(cleanup).__name__)
+                        raise failure from cleanup
+                    raise
+            with self._workflow_cpu_admission_lock,self.pool._lock:
+                value=self._workflow_native_completion(attempt,cap)
+                completed=(sequence,lease,launch,cap,canonical(value))
+                self._workflow_native_completed=completed
+                sequence['complete']=completed;sequence['phase']='COMPLETE'
+                return json.loads(completed[4])
+        finally:self._workflow_native_run_lock.release()
 
     def _terminal_scope(self):return 'FIXED_NATIVE_SINGLE_TGID'
 

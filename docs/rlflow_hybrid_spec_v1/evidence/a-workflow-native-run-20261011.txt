@@ -1,0 +1,66 @@
+A original native execution/archive bridge, 2026-10-11
+Base f3afcba on hybrid-v1. Full original Goal ACTIVE.
+No real model/API/G/GPU generation. No real credential access: tests use isolated
+NOT_A_TOKEN synthetic cache and intercept G before model exec. A contract unapproved.
+GPU/B/C/instinctRL HOLD unchanged; USER package-lock.json untouched/unstaged.
+
+Behavior: accounted FIRST_ENGINEER/INDEPENDENT_REVIEW exact original lease/launch;
+first REGISTER_NO_HANDOFF -> start -> current original guard -> leave writer ->
+Source poll/collect -> finally original STOP -> Source issued cap AND whole-event
+SETTLED terminal/usage/result/current reservation/actual Pool FREE/all FD proof.
+Failure latches original sequence, no restart, new session or G retry. Completed
+repeat rechecks original cap/terminal and returns frozen DATA, no condition authority.
+Run does not stage credentials or mint launch consent.
+
+Original session 1060 / final output e86fd6, naturally exit0:
+PYTHONPATH=. PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q tests/test_hybrid_a_workflow_native_run.py
+6 passed in 21.75s (initial input version).
+Actual Python gate G intercepted -> original full STOP/UNKNOWN/Pool0/reaped process,
+all Source FD and cache descriptors closed; second call no redispatch or Store/Pool
+mutation. Copied launch denied before sequence or effects; host synthetic cache intact.
+Pure success/failure/entry freeze flow is explicitly NOT source qualification.
+
+Original session 24672 / final output 5e2111, naturally exit0:
+PYTHONPATH=. PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q tests/test_hybrid_native_model_launch.py tests/test_hybrid_native_model_result.py
+22 passed, 1 existing Starlette/AnyIO deprecation warning in 39.83s.
+
+Independent readonly narrow review /root/finite_app_review_63 identified direct MUSTs:
+initial while-entry-only deadline could admit a late audited cap; fixed same original
+strong deadline root sampled after guard/poll/collect and at Source issue entry/final.
+Final deadline helper performs _issued/proc identity IO: all such IO now precedes the
+last PURE owner/physical/STOP freeze checks immediately before cap registration.
+Only both sequence AND strong root absent may use legacy low-level collection;
+cleared/foreign sequence with root fails closed. Root binds sequence/lease/launch.
+Primary execution and failed STOP retain cause/note, no completion.
+Final independent diff confirmation: both residual MUSTs closed, no new confirmed MUST.
+
+Affected-only deterministic fixes, no repeated actual G-interception test:
+Output 290bc9 exit0:
+PYTHONPATH=. PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q tests/test_hybrid_a_workflow_native_run.py -k pure
+9 passed, 1 deselected in 0.09s.
+Includes same deadline crossing in guard/poll/collect and primary+STOP failure chain.
+Output 144668 exit0:
+PYTHONPATH=. PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q tests/test_hybrid_a_workflow_native_run.py -k final_issue
+4 passed, 10 deselected in 0.09s.
+Deliberately synthetic provenance: preflight then owner/physical/STOP/deadline reject
+before Source cap registration; NOT actual model/result/account qualification.
+Output 8d6141 exit0:
+PYTHONPATH=. PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q tests/test_hybrid_a_workflow_native_run.py -k 'after_identity or strong_deadline'
+5 passed, 14 deselected in 0.09s.
+Stop injected after final helper identity sample -> zero cap, three freeze domains.
+Strong root remains but sequence cleared/copied -> deadline bypass denied.
+
+Final compileall three Python files and git diff --check exit0.
+Final SHA256:
+5609b64e4619f7c68faf25da9e3fe8d57bbe51db0fd8991740121e2dc1bb161d rlflow/hybrid_native_model_runtime.py
+0426e8ea725637225104defb805a6acbf4f406a47ef81521eaa51b966db6c487 rlflow/hybrid_native_model_source.py
+b2722e44cbc38317af982a3cc403eccdedd1282e2b7daee98511b1ffde24bb38 tests/test_hybrid_a_workflow_native_run.py
+becc7e2a36dfcad4ffe934b5ff2f0f68187611d6c0641bd63d81367651cfbf09 USER package-lock.json
+
+No full-suite or final all-19 test rerun claimed. Initial unchanged adverse path and
+affected deterministic delta evidence retained separately; no jobs remain live.
+Real Engineer/Reviewer generation and source/usage success remain NOT_EXECUTED.
+First nonpreset task NOT_EXECUTED. No ConditionEvidence or autonomous continuation.
+Next direct local work: machine+real Review evidence conditional acceptance CAS,
+then one demand-driven continuation; other recovery enhancements deferred.
+Pending A execution approval blocks actual calls only, not local implementation.
