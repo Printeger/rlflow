@@ -1,5 +1,7 @@
 # 实施计划与依赖
 
+Checkpoint77 FINAL：已交付安装态原结果冷读→相同console→真实只读宿主kill/reopen，新token/项目范围/无写入口/原业务事实不变均验收。它不完成执行崩溃恢复：下一Checkpoint78必须先核原UNKNOWN、提交身份、预算预留与reconcile协议，再用全新隔离安装态实际失败交付保留预留、无重复worker/结算、迟到旧权/结果拒绝的可观察闭环；恢复只使用原可信身份，不从JSON/PID构造cap。先确认依赖与已有原失败证据，选择必要差量验证，禁止再叠仅准备组件或重复正常执行。原native/独立产品Reviewer/strictOS/invoice/B1/长期与完整T22T23/M0–M5保持；无新权限决定阻塞，paid/GPU/生产预算边界未变。77交付与37分轮/实装证据见 HYBRID_COLD_RESULT_HOST.md，下方为历史。
+
 Checkpoint76 FINAL：已交付安装后的原固定CPU实验/工程执行→原机器结果→request-only console→可靠STOP消费链，不再依赖测试导入。验收是实际执行数值/状态、原source保护、working修补、进程/FD/Pool物理证据以及完整退出，最终72246 exit0和必要64pass已满足；详细范围见 HYBRID_INSTALLED_FIXTURE.md。下一Checkpoint77明确交付安装态关闭后可信原历史读取与异常状态呈现；验收包括冷读保留原结果及Review缺口、拒绝坏来源、无worker重启或重复RUN、未知清理不虚假FREE/退款、不重建历史能力。不新增Supervisor或只叠准备组件。native/独立产品Reviewer/严格OS/费用账单及长期验收仍需按原依赖单独闭合；无新增阻塞决策，本轮收尾不扩功能。原权限/预算和USERlock保持，下方为历史。
 
 Checkpoint75 FINAL：安装态原 Core SDK→真实目标cwd console建议→人类HTTP DRAFT接纳→完全关闭/重启→同原ADOPTED已交付；Core1、worker/model/GPU0，旧token401，不导入测试模块。新16case及末3+1受影响分轮通过，必要五模块107pass23.83s；High四MUST与包装差量关闭，非独立重复测试或新全库声明。原schema漏包真实故障仅修package data，18原字节全匹配；finalwheel9eaaeaf…3674，实际安装链终态525502 exit0。358 final身份输入及失败诊断见HYBRID_CORE_HOST.md/evidence/checkpoint-75-tests.txt。Core-only existing附着，不初始化/恢复/迁移，不接有限执行/结果报告，不采纳FREE历史execution；原角色/短token合同不变。下一76交付安装态原有限执行→可信结果→可靠STOP消费链，不只加准备组件。完整Goal active，native/产品Reviewer/strictOS-quota/invoice/B1/T22/T23/长期M5缺口保留，无新增需用户决定的阻塞。USERlock未改未stage；下方为历史。

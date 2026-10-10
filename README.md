@@ -35,6 +35,8 @@ rlflow_standalone/
 
 ## Hybrid v1 开发中
 
+执行关闭后的原结果消费见 [安装态只读宿主](docs/hybrid-v1/HYBRID_COLD_RESULT_HOST.md)。新进程读取原机器结果和验收缺口，不恢复运行能力或注册写入口。
+
 安装后的 model-free 固定工程/实验与原 STOP 验证见 [安装态固定执行](docs/hybrid-v1/HYBRID_INSTALLED_FIXTURE.md)。入口为 `python -m rlflow.isolated_finite_example`，仅创建全新私有 fixture，并逐项目确认原 scope；不等于通用项目、独立产品 Review、冷重启执行或完整发布验收。
 
 完整需求见 [PRD](docs/hybrid-v1/PRD.md)，实施状态见 [PROGRESS](docs/hybrid-v1/PROGRESS.md)，验收证据见 [系统验证记录](docs/hybrid-v1/IMPLEMENTATION_VALIDATION.md)。当前已有严格 v1 协议、同事务只读观测桥、有界快照/SSE、实际只读 Dashboard、CORE_STATUS 日志与绑定CPU工具返回；资源遥测、完整 Dashboard/Hybrid 工程科研闭环及发布验收尚未完成。工具返回不表示模型启动或任务成功，未知历史和费用不显示为0。

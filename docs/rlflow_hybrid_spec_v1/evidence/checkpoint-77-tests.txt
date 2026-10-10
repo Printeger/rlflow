@@ -1,0 +1,142 @@
+Checkpoint77 original installed cold result hosting
+2026-10-10; base fbd38058bc646a7488c124e908c78272de0d6c21.
+Reconstructed evidence index of actual tool events, not a combined raw log.
+Goal remains active; original PRD/M0-M5 acceptance and all permissions unchanged.
+
+DELIVERED BEHAVIOR
+Trusted ColdResultRegistration -> Store.attach_existing (RO/noDDL/recover) ->
+original cold Cpu/Candidate/Delivery full-source proof -> original client report
+DTO -> scoped GET and installed request-only console. No writable inbox,
+Core/control services, Runtime/Pool reconstruction or historical cap adoption.
+Original report conversion extracted to read_public; old inbox still authorizes
+before and after, with unchanged original report schema and current-source check.
+Cold execution UNKNOWN/resource NOT_OBSERVED, conditions0/independentReviewmissing.
+Canonical private root/runtime/DB identity, epoch/Registry/source/Store fields
+pinned; pure original PID/source/closing guard before Auth/SQL/inherited locks.
+Dedicated bounded ControlPool follows real future capacity after waiter cancel;
+closing rejects new requests and retains shielded actual drain.
+
+NECESSARY REGRESSION (COMPOSITE37 DISTINCT CASES, NOT ONE FULL GREEN RUN)
+R1 actual argv:
+env PYTHONPATH=/home/mint/rl_dev/rlflow_standalone PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q tests/test_hybrid_cold_result_host.py tests/test_client_execution_report_codec.py tests/test_client_execution_report_guards.py
+Original21567 terminaldb1351 exit1: 30passed,2failed,1 existing anyio warning,
+35.77s. Both failures new cold token parsing: request-only original token method
+is request, not bearer. Scope/header valid but auth401; held reads never entered.
+Only cold parser fixed to original request-or-bearer lookup; AuthStore unchanged.
+R2 actual argv same env + pytest two failed exact cases:
+tests/test_hybrid_cold_result_host.py::test_cold_no_writes_routes_or_migration
+tests/test_hybrid_cold_result_host.py::test_held_reads_keep_capacity_after_waiter_cancel_and_drain
+48af4e exit1:1pass/1fail in0.44s. Capacity/drain passed. Route test reached all
+expected routes/401 but test's own final Store.audit called intentionally forbidden
+Store.connect. Different failure/root cause, not repeated auth failure. Restore
+original connect ONLY after complete host drain for final test audit; during all
+startup/HTTP/drain writable connects stayed forbidden. No product gate weakened.
+R3 only that exact route case c3a9c5 exit0:1pass0.30s/1 old warning.
+Added new exact malformed-projection/protectedroot and late Auth revoke cases:
+abc932 exit0 2pass0.40s. Real new test DB corrupted, NOT checkpoint76 source.
+Initial captured Store/root-before-Auth negative a42d8f exit0 1pass0.29s.
+Final guards changed to pin Store fields and root/runtime inode, so final relevant
+argv same env + pytest captured_Store_rebinding, cold_no_writes, held_reads,
+real_malformed_source exact functions in tests/test_hybrid_cold_result_host.py:
+84a428 exit0 6pass0.77s/1 old warning. Captured test parameterized root/epoch/copy;
+copy uses actual SQLite online backup then replaces same Store db AND identity,
+must reject503 before forbidden Auth. Other finalguard-dependent routes,
+malformedsource/protectedroot503 and canceledwaiter429/drain503 reverified.
+Late revoke401 source unchanged, original codec/source-damage/late-revoke/shared
+report-pool/original STOP old cases unchanged; reuse R1 passes, do not repeat.
+37case composite covers13 new host cases +24 original report cases; not a new
+full repository or browser run. No removed tests, relaxed schema or fake runtime.
+
+INDEPENDENT HIGH REVIEW
+Existing authorized finite_app_review_63 only read code, no tests or writes.
+Design retained cold-vs-recovery distinction and bounded pool requirements.
+MUST: mutable same Store object could redirect db/identity to same-epoch copy
+while old root still appeared original. Fixed captured root/db/_existing_identity/
+store_epoch and root/runtime devino checks before Auth and after read. Actual
+copy/root/epoch negatives above. Final verdict no remaining MUST; original
+reader/store/Registry exact binding retained. Not product independent Review.
+
+ACTUAL INSTALLED CONSUMER
+Source archived checkpoint-77-installed-consumer.py, exact executed temp source
+/tmp/rlflow-cp77-installed-2m1D9l/consumer.py
+SHA b838e4de0c428503f5e3442120b20fa20fe66421127730651be9655a5c466682.
+Explicit fixed original startup Registry uses installed fixed fixture profile
+function only; no PreparationService/adapter/init/runtime/pool owner is constructed.
+Both original roots explicitly pinned, epochs read-only confirmed9223e3:
+CPU /tmp/rlflow-cp76-accepted-IwQiuo/rlflow-host-fixture-l9mb_5dg/projects/isolated_cpu/rlflow-guarded-fixture-5327uli7/store
+epoch store_e4be72b76cef4dc699c8fe49575b7046, state21.
+Engineering /tmp/rlflow-cp76-accepted-IwQiuo/rlflow-host-fixture-l9mb_5dg/projects/isolated_engineering/rlflow-guarded-fixture-mbvmkqer/store
+epoch store_b27645d1126446489bd0a546e0dc320d, state22.
+These were original checkpoint76 actual CPU/engineering exec/STOP histories; no
+new CPU/engineering worker or model/GPU run, no edits to original history.
+
+First candidate sdist a98c24/build406b39/install125029 exit0:
+wheel c0a33384b5370abb1f1e800abe586e92c76ebdfb602ae907cd379b6b7542ea5f,
+site /tmp/rlflow-cp77-installed-2m1D9l/site. Actual12122 terminal5067f6 exit0.
+This candidate predated captured Store MUST; not final exact-source qualification.
+Following MUST code change, necessary final installation used NEW target (no
+overwrite of prior source/site). Finalsdist14d053/buildad43e1/install082ac7 exit0.
+Source archive /tmp/rlflow-cp77-final-MSieXe/sdist/rlflow_standalone-0.2.0.tar.gz
+SHA a61e88cf6678c86dbd5a60b3c16bac3ac17918fd3d2db54b0e39fdc5b1a22ea7.
+Wheel /tmp/rlflow-cp77-final-MSieXe/wheels/rlflow_standalone-0.2.0-py3-none-any.whl
+SHA196dd73ef95dc382eaf0d71408e8fad9c69c1cda87c85c3756998b66845b1e96,
+size1106052. Fresh single site with existing fixed dependencies, not arbitrary
+mixed system installs or pristine dependency resolution.
+Final original closed inventory ZIP comparison610028 exit0:336 original files
+byte-identical. First diagnostic663279 exit1 imported _inventory from wrong module;
+read actual definition/context manager ed9f2d/6fd58d, corrected diagnostic only.
+No wheel/source rebuild or consumer repeat due to diagnostic import mistake.
+Post-build README/guide are outside original canonical release inventory.
+
+Final actual argv cwd /tmp/rlflow-cp77-final-MSieXe:
+env PYTHONPATH=/tmp/rlflow-cp77-final-MSieXe/site PYTHONDONTWRITEBYTECODE=1 /home/mint/rl_dev/rlflow_standalone/.venv/bin/python /tmp/rlflow-cp77-installed-2m1D9l/consumer.py
+Original29643 terminalf663da exit0 after second complete shutdown, not printed
+summary alone. Two fresh installed cold subprocesses, child audit hook rejects
+any subprocess start. Parent uses actual loopback GET and4 installed console
+calls outside checkout. Tokens exchanged only through privately consumed pipes,
+never forwarded to tool logs, argv or repo. No tests/tests.* imports in any consumer.
+First read host SIGKILL/wait=-9 (no in-flight execution); second fresh auth/host
+reads then normal complete lifespan drain exit0. Not execution process recovery.
+Core business hashes include complete bounded fixture events/projection/meta/
+observation events/projection/counters/snapshot_due before/after and unchanged;
+original budget commitments are within projection. No claim all FS bytes unchanged:
+SQLite may maintain WAL/SHM. Missing/unsettled exposures not refunded/reset.
+
+Final summary assertions/output:
+installed_site=/tmp/rlflow-cp77-final-MSieXe/site, cold_processes2,
+first_read_host_killed=true, second_host_drained=true, old_token401,
+foreign_scope404, mutation_routes404, original_business_unchanged=true,
+worker_restarts0, tests_importedfalse, executionUNKNOWN, resourceNOT_OBSERVED,
+Goal_completedfalse, execution_crash_recoveryNOT_PROVEN.
+CPU source cpu_assessment_6fbc9dc36ab7f07214ddd3486d798e8b27e73000043e4ce03ee0533825d5e998
+source hash sha256:4b151d49a9ea41b030d56e40ef64d8e38c24084d6f0bf913b36d00b9d078b402,
+raw384/MACHINE_VERIFIED, original recordedversion20; result hash
+sha256:44a9f624f4d7e56c4ccffe358812b791d8c2aa89765b6fa8832b299b57700bf7.
+Engineering source candidate_output_result_a19ada1ddc96917d0f30487da52a2288241dbd9531d0e34e38cd0db6b08b8785
+source hash sha256:1bb6900724f878ebd08919cb672f7d6d9f3148a3c79643bdbf6f9d807c2ff586,
+raw3/machine21/MACHINE_ACCEPTED_PENDING_REVIEW, original recordedversion20;
+result hash sha256:2cf202b182643774b52f2374e49d5fc0f9fcb1165fea4cf7dfa66bb3be82f57a.
+Second process source DTO/overall asof versions exactly equal first. Real time
+consent already expired -> HISTORICAL_ONLY/UNAVAILABLE_AS_OF; conditions satisfied0,
+independentReviewNOT_PERFORMED, Goalfalse. No clock/fake approval/expiry renewal.
+
+IDENTITY AND REMAINING GAPS
+379 final runtime/test/build/JS hashes checkpoint-77-inputs.sha256, after final
+consumer and docs check07ee4c exit0 all match. README/docs not runtime inventory.
+USER package-lock.json SHA becc7e2a36dfcad4ffe934b5ff2f0f68187611d6c0641bd63d81367651cfbf09
+unchanged/untracked/unstaged. No paid model/GPU/production migration/push.
+This is installed cold original history + read-host restart safety, not A22
+execution crash recovery, lease adoption, stopped-process current observation,
+native product execution/independent product Review/strictOS/provider invoice/
+B1/24h8h/T22T23/full M0-M5. Do not mark Goal complete.
+Next78 actual isolated installed failure/reconcile acceptance: unknown submission
+must preserve reservation/exposure, avoid duplicate execution and reject late
+authority/result; recovery must use original verified identities, not JSON/PID
+adoption. Determine supported original protocol before extending any capability.
+No new user-decision blocker for safe diagnostics; original permissions remain.
+
+FINAL STATIC CHECKS
+compileall -q rlflow:13209a exit0; py_compile new test and archived consumer:
+9fa204 exit0; pip check81447e exit0 no broken requirements; all379 final input
+hashes3dd97d exit0; archived consumer exact hash and USERlock d73909 unchanged;
+git diff --check631509 exit0. No live test/consumer session remains.

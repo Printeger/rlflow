@@ -74,7 +74,20 @@ class ExecutionReport:
     def read(self,key,*,token,method):
         validate_schema(ID,key);self.pure();inbox=self.discovery.inbox
         inbox._authorize(token,method)
-        value=self.reader.inspect(key)
+        result=read_public(self.reader,key)
+        self.pure();inbox._authorize(token,method)
+        return result
+
+
+def read_public(reader,key):
+        """Same original DTO without constructing a writable inbox or owner.
+
+        Authentication belongs to the enclosing trusted transport. This SDK
+        read is neither authority nor evidence of current process cleanup.
+        """
+        if type(reader) is not DeliveryEvidenceReader:raise TypeError('original delivery reader required')
+        validate_schema(ID,key);reader._original()
+        value=reader.inspect(key)
         if value is None:raise ControlError(404,'NOT_FOUND','original delivery result not found')
         context=value['machine_context']
         fields=('as_of_state_version','goal_ref','contract_revision','proposal_sha256','source_coverage',
@@ -83,16 +96,16 @@ class ExecutionReport:
             'model_call_enabled','condition_evidence_write_enabled')
         result={name:value[name] for name in fields}
         result.update(schema_version='1.0',profile='ORIGINAL_DELIVERY_CLIENT_REPORT',
-            project_id=inbox.project_id,data_mode=inbox.data_mode,store_epoch=inbox.store_epoch,
+            project_id=reader.project_id,data_mode=reader.data_mode,store_epoch=reader.store_epoch,
             authority='NOT_AUTHORITY',execution_enabled=False,current_execution_status='UNKNOWN',
             resource_release_status='NOT_OBSERVED',
             conditions=[{n:c[n] for n in ('id','required','verification_sha256','status')} for c in value['conditions']],
             source={**{n:context[n] for n in ('result_sha256','configuration_sha256','original_proposal_sha256',
                 'recorded_state_version','raw_item_count','machine_case_count','machine_status','evidence_role')},
                 'kind':context['source_kind'],'id':context['source_id'],'sha256':context['source_sha256']})
-        try:validate_public(result,inbox.project_id,self.reader.kind,key,inbox.data_mode)
+        try:validate_public(result,reader.project_id,reader.kind,key,reader.data_mode)
         except ProtocolError:raise Conflict('original client report source invalid') from None
         if len(canonical(result))>64*1024:raise Conflict('bounded client report required')
-        self.reader.check_current(value['as_of_state_version'])
-        self.pure();inbox._authorize(token,method)
+        reader.check_current(value['as_of_state_version'])
+        reader._original()
         return result

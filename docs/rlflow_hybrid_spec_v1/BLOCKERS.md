@@ -1,5 +1,7 @@
 # 阻塞与证据缺口
 
+Checkpoint77 FINAL：冷结果宿主范围无剩余MUST、无新增需用户决定阻塞。已证明安装态原正常STOP历史在全新只读宿主及其强制结束后重开可读，未证明执行控制进程/活动worker崩溃、UNKNOWN预算恢复或原reconcile完整闭环，不能将本轮计为A22完成。历史machine verified不代替独立产品Review/条件门，执行UNKNOWN、资源NOT_OBSERVED、费用UNKNOWN不改变。单一新target与既有固定依赖，不宣称任意混装或完整安装资格。原native产品运行、Reviewer、严格OS/账单/B1/24h8h/T22T23/M0–M5缺口保持；下一78有界隔离诊断原失败/恢复协议、保留预留并拒重复执行。需新增付费/系统权限时提出具体问题，不从本轮只读权限推导扩权。37case分轮及实装终态见 evidence/checkpoint-77-tests.txt，USERlock未改未stage，下方为历史。
+
 Checkpoint76 FINAL：本切片没有未解决MUST或新增需用户决定的阻塞。安装态固定两项目执行、可信原结果与物理STOP已实际终态exit0；未完成项仍是独立产品Review/条件证据、通用native产品执行、严格OS配额、provider invoice、B1、24h/8h和完整T22/T23/M0–M5。新的隔离target沿用固定已安装依赖，不证明任意混装环境或全新依赖解析。逐项目原scope确认属于合成human fixture，不代替生产审批。原费用UNKNOWN、历史执行UNKNOWN不因本次成功变成零/可接管。下一77以可信冷读取及异常状态、不重复执行为验收，无需扩大paid/GPU/生产权限；若后续native/Reviewer/OS切片需要权限，提出具体方案再请求用户决定。失败与实际64pass/终态/377身份见 evidence/checkpoint-76-tests.txt，USERlock未改未stage，下方为历史。
 
 Checkpoint75 FINAL：安装态原 Core SDK→真实目标cwd console建议→人类HTTP DRAFT接纳→完全关闭/重启→同原ADOPTED已交付；Core1、worker/model/GPU0，旧token401，不导入测试模块。新16case及末3+1受影响分轮通过，必要五模块107pass23.83s；High四MUST与包装差量关闭，非独立重复测试或新全库声明。原schema漏包真实故障仅修package data，18原字节全匹配；finalwheel9eaaeaf…3674，实际安装链终态525502 exit0。358 final身份输入及失败诊断见HYBRID_CORE_HOST.md/evidence/checkpoint-75-tests.txt。Core-only existing附着，不初始化/恢复/迁移，不接有限执行/结果报告，不采纳FREE历史execution；原角色/短token合同不变。下一76交付安装态原有限执行→可信结果→可靠STOP消费链，不只加准备组件。完整Goal active，native/产品Reviewer/strictOS-quota/invoice/B1/T22/T23/长期M5缺口保留，无新增需用户决定的阻塞。USERlock未改未stage；下方为历史。
