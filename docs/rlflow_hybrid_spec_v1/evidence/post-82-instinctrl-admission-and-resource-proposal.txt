@@ -1,0 +1,142 @@
+POST-82 READONLY RESEARCH / RESOURCE PROPOSAL — NOT AUTHORIZATION
+Date: 2026-10-10. Product baseline: f54f1fbf057e41ab45b0c0ce3c93fab149e4b745.
+This archive is not a new functional checkpoint, autonomous-loop acceptance,
+GPU admission, Commander/Executor claim, or release of a protected HOLD.
+Original full engineering/science Goal and acceptance standards remain active.
+
+OBSERVED CURRENT INTEGRATION BASELINE
+Formal instinctRL HEAD: 6f6dee3da72d0b0202846b330adcaeeec8ee7bc3.
+Frozen blackwell worktree HEAD: e438c4ccef72b088c95db6f01b049f74a1921180.
+Current order: instinctRL_coordination/commander/CURRENT_ORDER.md,
+UNIFIED-H1-R3/A0009-RESOURCE-WINDOW, HOLD, EXECUTABLE_NOW=NONE,
+IMPLEMENTATION_AUTHORIZED=NO, live starts=0, training=false.
+No GPU query/run, CLI/workload import, training, state migration or writes in
+instinctRL, its worktrees/runtime/coordination were performed in this research.
+Historical A0007 unused allowance is not new authority; sealed D000x failures
+and already passed CPU reviews must not be reopened as part of this work.
+
+Exact pending proposal reference:
+commander/drafts/UNIFIED-H1-R3_A0009_REVIEW_AND_D0006_REQUEST.md
+P-4d1bffeeda49b4d2, proposal SHA256:
+4d1bffeeda49b4d2fab7596b12392acb9aeb7aa535c58f94d66d7f70d0491e26.
+CPU candidate HEAD: 824b811b5b7e17de5c09b08a2ad0e42705e6ef89.
+Product HEAD: 2248ebb380260af86536f78b70e1235fcb401a7a.
+Workload HEAD: fd47dd321d571c4d6c983048f77bb3913e7e7b01.
+Config SHA256: 824feeb87fccb33ddb5b56b401b6591688b042606fda7d45f4d5f92c041f110b.
+
+INDEPENDENT READONLY FINDINGS
+Existing High reviewer /root/finite_app_review_63 read current contracts and
+candidate sources; no runtime or tests were requested or performed.
+1. rlflow/execution_adapter.py:348 and hybrid_working_plan_service.py:89
+   reject general starts. hybrid_host_pool.py:830 accepts only exact fixed
+   fixture/native-diagnostic owners. H1 JSON authorization cannot borrow those
+   grants. A new original registered owner must bind Goal/epoch, source/config,
+   executable/argv/cwd, reservation and actual producer before effects.
+2. A0009 workload training_workloads/unified_h1/local_dispatch.py:51,125
+   returns on leader reap, not proof that every descendant/helper is gone.
+   This is a new complete-managed-scope admission gap, not retroactive rejection
+   of the previous owned-process-group contract. Leader exit/timeout is not FREE.
+3. rlflow seven-dimensional cumulative budget and H1 starts/ticks/transitions/
+   updates/resets/checkpoints need a trusted actual producer settlement chain.
+   Failed starts count; missing usage retains exposure; revisions/restarts do
+   not reset either budget. GPU availability observations are not a hard quota.
+4. Product checkpoint_h1.py:241 validates model/optimizer/RNG/counters, but
+   workload backend.py:304 resumes with fresh environment reset. Distinguish
+   durable report/ledger recovery, old scope cleanup, and a NEW checkpoint-based
+   execution consuming new start/init allowance. No cold capability adoption.
+5. evaluation.py:64 fixes seeds and 32-sample denominator including failures.
+   Independent scientific review must bind raw trace/checkpoints, frozen method,
+   actor restrictions and current contract before ConditionEvidence/continuation.
+   rlflow hybrid_delivery_evidence.py:174 still reports missing independent
+   review and conditions. Machine PASS alone is not science/autonomous acceptance.
+
+HOST READONLY FEASIBILITY, NOT CONTAINMENT QUALIFICATION
+Current process is in /user.slice/user-1000.slice/session-2326.scope.
+User manager ControlGroup is /user.slice/user-1000.slice/user@1000.service,
+owned by mint; cgroup.kill/events/procs files exist. No unit or cgroup was created,
+modified or killed. A user-scoped containment route is worth verifying in the
+next implementation, but file existence does not prove delegated launch,
+non-escape, complete STOP, GPU-context release, or permission to alter the user
+manager/any existing unit. Never kill a parent/shared cgroup.
+
+NEXT FUNCTIONAL SLICE / ACCEPTANCE (NOT YET DELIVERED)
+Priority: original trusted local Runner + explicit configured real task,
+candidate output and complete managed-scope STOP. Use a nonpreset engineering
+task and configurable experiment; fixed add/pi profiles do not count.
+Accept only original executable/source/config bindings, action-before-budget,
+actual execution/results, stopped descendants plus all held FDs before FREE,
+and durable recovery without replaying uncertain effects. Include queued/pre-G/
+running STOP, lost launch return, fact-write failure and restart UNKNOWN.
+If containment cannot prevent escape or prove empty, refuse strict launch or
+retain UNKNOWN; do not silently replace full STOP with leader termination.
+Then: real model Engineer -> separate read-only Reviewer -> original current
+ConditionEvidence -> bounded autonomous continuation. Actual model validation
+awaits explicit account/soft-budget choice and a qualified execution route.
+Later: current H1 conditional precise main, configurable scientific acceptance,
+checkpoint new-start recovery and multi-scope/long-run qualification.
+
+ONE CONSOLIDATED RESOURCE CEILING PROPOSAL — PENDING USER DECISION
+Scope: NEW rlflow product validation and later separately created instinctRL
+validation Goal only. Existing Codex development/review work is not a product
+model execution and no old product budget is reset/refunded by this proposal.
+Model: gpt-6.1-sol, at most 40 product sessions total: <=32 Medium Engineer/
+routine sessions and <=8 independent High Reviewer/complex-analysis sessions.
+Totals include any separately authorized A0009 3 Sol calls; no nested uncounted
+model calls, no different model, no automatic fallback or account switch.
+Observed cumulative input <=4,000,000 tokens, output <=256,000 tokens; reserve
+20 percent for final review/recovery. Token enforcement explicitly SOFT_APPROVED,
+not hard_required; final usage missing => UNKNOWN and no next model session.
+Per-session action timeout <=300s, bounded by remaining shared wall allowance.
+Account proposal: current user-selected ChatGPT workspace login only; allow its
+included usage and already owned credits, but no API key billing, new purchase,
+top-up, workspace/account change. This is NOT a monetary hard cap or assurance
+that only free/included usage will be spent. User must explicitly accept this
+soft-token/pre-owned-credit risk, or real model execution stays disabled.
+
+Total cumulative managed action wall <=43,200s (12h), including concurrent
+scopes by summed actual producer time, not merely elapsed project time.
+GPU <=32,400 device-seconds (9h on one approved device); no parallel GPU scopes.
+Experiment starts <=16 total: <=12 CPU and <=4 GPU. Checkpoint continuation is
+a new start. Retries <=1 overall, and zero retries for the current D0006 stage.
+Retries consume start/time quotas, never reset/refund a failed attempt.
+These are proposed cumulative limits, not claims that current backend can
+enforce them. An action cannot launch until its required enforcement and
+trusted actual accounting/STOP are qualified; UNKNOWN blocks stage release.
+
+STAGED RELEASE WITHIN THAT CEILING
+A. Real nonpreset CPU/model loop and Runner/STOP/recovery qualification.
+B. Current separately authorized A0009 CPU review: <=3 model calls, <=1800s;
+   then ONLY if its original decision gates and signed current order allow it,
+   D0006 main <=1 GPU start, <=3600s action wall, retry=0, init ticks10,
+   total transitions35520, PPO updates4, checkpoint writes2, original method/
+   actor/resource-window/runtime/cleanup thresholds unchanged. No synthetic
+   boot/reset smoke substituted for this precise main mode.
+C. Up to 3 remaining GPU starts / 28,800 device-seconds for separately frozen
+   scientific/recovery/long-run contracts after B and Runner qualification.
+   Exact experiment schemas, source/config/method/runtime identities and
+   scientific conditions must be fixed in that new validation Goal before
+   release. This ceiling does not authorize unknown experiment methods, R4/R5,
+   actor privilege changes, changed thresholds or the current protected HOLD.
+All stages: project-isolated writable workspace only, protected product/runtime
+read-only, no production migration/global installs/push. STOP closes new starts
+before cleanup; incomplete cleanup retains pool occupancy and budget exposure.
+
+OFFICIAL MODEL-CAPABILITY REFERENCES (READ, NO MODEL CALLS)
+https://learn.chatgpt.com/docs/non-interactive-mode
+Documents JSONL turn events/usage and schema output; event DTO alone is not an
+original trusted producer and a timeout is not a hard token/fee guarantee.
+https://learn.chatgpt.com/docs/config-file/config-reference
+Documents forced login/workspace binding and context window; no hard output
+quota established by this read. Context window is not spending permission.
+https://learn.chatgpt.com/docs/pricing
+Included usage / credits differ from API pricing; local reviews use general
+usage. Do not quote API token prices as a ChatGPT subscription spending limit.
+https://developers.openai.com/api/docs/models/gpt-6.1-sol
+Confirms model/reasoning options; API price tables do not prove CLI billing caps.
+
+HANDOFF CONDITION
+Long-run admission has NOT been achieved. Deliver qualified version, evidence,
+integration steps and remaining checklist, plus the requested other-window
+instinctRL Goal prompt, only once actual admission evidence exists. Until then
+no executable GPU/long-run prompt that implies authorization/readiness.
+This research changed no executable inputs; no passed tests/reviews were rerun.
