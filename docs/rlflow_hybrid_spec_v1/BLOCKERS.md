@@ -1,5 +1,7 @@
 # 阻塞与证据缺口
 
+2026-10-11 通用CPU候选规则限制已修并实际验证JSON指标PASS/FAIL+完整STOP；仍未打通同A原审批。确证剩余阻断：旧CPU profile只收单工具/零模型审批；live constructor/ledger只收Native model；Budget runtime独占且shutdown不清指针；无原Engineer parent→CPU grant/pins/新plan派生和CPUstage累计时间接线。应按受保护顺序交接和新reservation/Workspace/WorkingPlan修，不借重绑/旧fixture/仅hash资格。其他恢复后置，首真实task NOT_EXECUTED；本地无权限阻塞，实际A小额合同待批，GPU/B/C/instinctRL HOLD不变。
+
 2026-10-11 result/candidate仅内存的直接缺口已本地补为原terminal持久事实路径；尚无真实模型正向归档实证。剩余首闭环最小实现为同 A workflow 受管未知candidate CPU grant、不同原 Evaluator会话/Reviewer parent派生、机器+Review条件CAS接纳和一次未完成需求接续。不能用 fixture CPU/开发期High/纯重放给 live 条件资格。首真实task NOT_EXECUTED；本地代码继续无需运行批准，实际A合同待批仅限调用，GPU/B/C/instinctRL HOLD保持，其他恢复增强后置。
 
 2026-10-11 原 BaseOwner/安装/Pool/WorkingPlan 固定 fixture 的直接链缺口已本地补为显式新建 live 域，原 REGISTER/NO_HANDOFF STOP/冷回放通过；没有生产迁移、实际生成或 A 完成。下一最小开发缺口为原 result/candidate 持久化、同 workflow 受管 CPU、新不同 Evaluator 派生、条件 CAS 和一次未完成需求接续；其他恢复增强后置。本地实现无权限阻塞；仅实际模型调用等待已提出的小额 A 合同批准，GPU/B/C/instinctRL HOLD 不变。首真实 task NOT_EXECUTED，无新增用户决定。

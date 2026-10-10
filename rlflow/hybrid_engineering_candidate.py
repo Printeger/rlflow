@@ -11,7 +11,7 @@ import json
 import re
 
 from .hybrid_goals import digest
-from .hybrid_local_cpu_profile import validate_spec
+from .hybrid_local_cpu_profile import validate_spec,validate_acceptance
 from .store import Conflict, canonical
 
 MAX_BYTES = 49152
@@ -139,7 +139,7 @@ if done.returncode != 0:
 '''
 
 
-def verification_spec(candidate, *, checks, stdout, seconds=10, limits=None):
+def verification_spec(candidate, *, checks, stdout=None, acceptance=None, seconds=10, limits=None):
     """Freeze candidate AND externally chosen checks before CPU approval.
 
     Changing the candidate, tests or rule requires a new spec/grant. This does
@@ -147,6 +147,8 @@ def verification_spec(candidate, *, checks, stdout, seconds=10, limits=None):
     Output matching is machine verification only; exit status is checked by
     the existing result service. Caller must supply checks from the contract,
     never trust tests/expected output suggested in the Engineer patch.
+    Supply either legacy stdout or one closed acceptance rule. JSON metrics
+    and stderr policy remain exactly the externally approved criteria.
     """
     if type(candidate) is not Candidate:
         raise PermissionError('exact bounded candidate data required')
@@ -154,7 +156,13 @@ def verification_spec(candidate, *, checks, stdout, seconds=10, limits=None):
     raw_checks = _text(checks)
     if not raw_checks or len(raw_checks) > 8192:
         raise Conflict('bounded frozen acceptance script required')
-    _text(stdout)
+    if acceptance is None:
+        _text(stdout)
+        rule={'method':'EXACT_STDOUT_UTF8','stdout':stdout,'stderr_empty':True}
+    else:
+        if stdout is not None:
+            raise Conflict('one original CPU acceptance rule required; no stdout override')
+        rule=validate_acceptance(acceptance)
     payload = canonical({'files': files, 'checks': checks,
         'candidate_binding': {'base_sha256': candidate.base_sha256,
             'patch_sha256': candidate.patch_sha256, 'output_sha256': candidate.output_sha256}}).decode('utf-8')
@@ -162,4 +170,4 @@ def verification_spec(candidate, *, checks, stdout, seconds=10, limits=None):
         'inputs': {'candidate.json': payload}, 'seconds': seconds,
         'limits': {'memory_max': 67108864, 'cpu_max': '100000 100000', 'pids_max': 12}
                   if limits is None else limits,
-        'acceptance': {'method': 'EXACT_STDOUT_UTF8', 'stdout': stdout, 'stderr_empty': True}})
+        'acceptance': rule})

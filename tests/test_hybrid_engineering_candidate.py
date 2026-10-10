@@ -65,6 +65,52 @@ def test_scope_before_base_duplicate_collision_and_bounds_reject():
             transform(files, _patch(files, edits), allowed_paths=['pkg/a.py', 'missing', 'pkg'])
 
 
+def test_candidate_freezes_generic_contract_acceptance_and_rejects_override():
+    files={'parser.py':'def parse(text):\n return text.splitlines()\n'}
+    candidate=transform(files,_patch(files,[_edit('parser.py',files['parser.py'],
+        'def parse(text):\n return [row for row in text.splitlines() if row]\n')]),allowed_paths=['parser.py'])
+    criteria={'method':'JSON_METRICS_RANGE','metrics':{'cases':{'min':2,'max':2}},'stderr_empty':True}
+    spec=verification_spec(candidate,checks='print("checks")',acceptance=criteria)
+    criteria['metrics']['cases']['min']=0
+    assert spec['acceptance']['metrics']['cases']=={'min':2,'max':2}
+    with pytest.raises(Conflict,match='no stdout override'):
+        verification_spec(candidate,checks='print("checks")',stdout='checks\n',acceptance=criteria)
+    with pytest.raises(Conflict):
+        verification_spec(candidate,checks='print("checks")',acceptance={'method':'UNDECLARED','stderr_empty':True})
+
+
+@pytest.mark.parametrize('matching',[True,False])
+def test_actual_candidate_generic_metrics_rule_pass_and_fail_in_managed_cpu(tmp_path,matching):
+    # Isolated synthetic local task, NOT actual model output or A workflow.
+    tmp_path.chmod(0o700)
+    files={'parser.py':'def parse(text):\n return text.splitlines()\n'}
+    candidate=transform(files,_patch(files,[_edit('parser.py',files['parser.py'],
+        'def parse(text):\n return [row for row in text.splitlines() if row]\n')]),allowed_paths=['parser.py'])
+    checks=('from parser import parse\nimport json\n'
+        'assert parse("alpha\\n\\nbeta\\n")==["alpha","beta"]\n'
+        'assert parse("")==[]\nprint(json.dumps({"cases":2}),flush=True)\n')
+    count=2 if matching else 3
+    spec=verification_spec(candidate,checks=checks,acceptance={'method':'JSON_METRICS_RANGE',
+        'metrics':{'cases':{'min':count,'max':count}},'stderr_empty':True})
+    with isolated_session(tmp_path,spec,approved=True,
+            confirmation_reader=lambda p,c:'APPROVE '+c['scope_hash']) as session:
+        runtime=session['runtime'];lease=session['lease'];attempt=runtime._issued(lease)
+        row=runtime.sources._issued(attempt['source']);runtime.start(lease)
+        end=time.monotonic()+15
+        while row['task_closed'] is None:
+            runtime.poll(lease)
+            assert time.monotonic()<end
+            time.sleep(.02)
+        result=runtime.collect_local_result(lease)
+        assert result['machine_acceptance']['status']==('PASS' if matching else 'FAIL')
+        runtime.stop_to_terminal(lease)
+        proof=attempt['terminal']['configured_local_result']
+        assert proof==result
+        assert runtime.pool.snapshot()['occupied']==0
+        assert runtime._current(attempt)['status']=='SETTLED'
+        assert runtime.store.audit()==runtime.store.replay()
+
+
 def test_actual_arbitrary_candidate_runs_only_in_managed_cpu_scope(tmp_path):
     tmp_path.chmod(0o700)
     before = 'def normalize(rows):\n return rows\n'

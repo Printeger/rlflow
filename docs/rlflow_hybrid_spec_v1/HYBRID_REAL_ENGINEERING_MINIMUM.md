@@ -1,5 +1,7 @@
 # 首个真实工程自主闭环：最小交付清单
 
+2026-10-11 同workflow CPU接线定位：已补原candidate helper不能表达已批准 JSON_METRICS_RANGE 的缺口，实际managed CPU按原指标范围分别PASS/FAIL，原stdout回归通过；不是A自主任务。接下来不能另批零模型CPU或复用已结算Engineer计划：需原持久Engineer terminal（live/SETTLED/完整usage/result/原事件与history links）→原envelope checks/acceptance/candidate/pins派生CPU binding→原新reservation/Workspace/plan/claim/lease→前Owner全部STOP/FREE/FD退休后的受保护顺序交接→唯一CPUparent/stage+预算/窗口→原managed结果持久化，供不同Evaluator父证明。旧CPU/profile/live限制不宽泛放开；UNKNOWN/过期/改candidate/checks/pins/重复stage均拒。后续Reviewer/条件CAS/一次接续与首次非预设实任务仍必需，task NOT_EXECUTED；A模型调用待原合同批准，GPU/B/C/HOLD保持。
+
 2026-10-11 原result/candidate持久化已本地接进完整STOP的原usage同terminal event，原canonical消息/候选变换可重放，历史旧facts不晋升；cap前和finalframe归档门超界走UNKNOWN清理。下一最小清单收敛为：同A workflow未知candidate受管CPU验收→原parents派生不同Evaluator真实会话/Review→机器与Review条件CAS接纳→基于未完成需求一次接续。正向真实归档待实机；最终交付依然必须有非预设实际需求/修改/测试/产品独立Review/条件接纳/接续/用量，目前 task NOT_EXECUTED。小额 A 未批准不调用，GPU/B/C/HOLD不变，其他恢复后置。
 
 2026-10-11 显式 fresh live 域已本地打通原登记/不放行 STOP/冷回放，旧 fixture action 与非 native 执行器不晋升；新 create_live 仅创建隔离原件，无迁移。必要回归74pass、新 live1pass，开发期独立审查无确证 MUST。下一最小实装清单仍是：原 result/candidate 持久事实（不是内存 cap）→同 workflow 受管 CPU 候选验收→新不同 Evaluator 原执行/评审→机器条件+Review 的 CAS 接纳→一次未完成需求接续。最终验收报告须有非预设真实任务、实际修改/测试、产品独立 Review、条件接纳/接续与用量；当前 task NOT_EXECUTED。小额 A 合同未批准不调用，GPU/B/C/instinctRL HOLD 保持，其他恢复增强后置。

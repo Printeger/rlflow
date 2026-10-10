@@ -1,5 +1,7 @@
 # 开发决策记录
 
+2026-10-11 A envelope 已允许 JSON 指标验收，而候选 verification_spec 原先强制固定 stdout。复用现有闭合 validate_acceptance，把同一外部批准规则冻结进 spec，不新增方法、不改阈值、不相信模型自选测试。acceptance/stdout 二选一，原 stdout 默认路径保持；真实执行由原受管 CPU runner 完成，机器FAIL不因任务exit0而变PASS。其余同workflow接线采用顺序受保护Owner handoff，不临时清 Budget._fixture_runtime，不重绑Store服务，不用旧已结算reservation/WorkingPlan。父原event/完整history links、same live Goal/epoch/approval/envelope/known usage/result必须先成立，普通CPU/V1不升级。
+
 2026-10-11 原结果与财务终态同原事件持久化，避免仅保内存 candidate cap。新 optional native_model_result 不重写旧事实、不授历史来源/独立性/条件资格；只能 exact Source 已登记自然exit0/full-audit result、完整STOP原usage及 Guard发行重核进入writer。保存 Source 原 canonical消息（不是任意JSON重算hash）、完整候选及批准paths，原approval回放重算变换。归档 admission 提前于cap发行，用原同snapshot Budget entry/heads做尺寸预检；8KiB用于STOP command/固定hash/version/时间扩展，最终 exact frame仍核原256KiB门。超界保守永久撤 Source结算发行，移result/usage→UNKNOWN，不放宽格式上限且物理STOP/FREE仍按原完整证明进行。正向真实归档仍待授权实证，纯消息/候选不冒充 actual task。
 
 2026-10-11 显式新建 live 域而非 fixture 晋升：Store 原合法 data_mode 是 live|fixture，历史“REAL”仅语义描述，不另增 enum。create_live 只创建全新私有目录/数据库/epoch；live installation 使用不同 action 和必需 profile，旧 schema/actions/事实 bytes 不改。bootstrap/WorkingPlan/Pool 是闭 fixture 与闭 live 两分支，原 metadata 与事件仍须一致；Runtime 再按 exact NativeModelOwner 和 accounted A workflow 双门拒绝旧 V1/普通执行器。live 表示数据域，不表示运行批准、成功来源、条件接纳或自主闭环；本片只验证原登记/不放行 STOP。通用 CPU live workflow 仍需独立原 parents，不能把 fixture CPU 条件直接搬入 live。

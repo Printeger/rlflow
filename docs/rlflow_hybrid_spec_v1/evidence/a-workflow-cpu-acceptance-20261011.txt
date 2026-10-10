@@ -1,0 +1,55 @@
+A workflow prerequisite: original generic CPU candidate acceptance /2026-10-11
+Base e6baad7, hybrid-v1. Local CPU behavior, NOT model or same-A qualification.
+
+Confirmed direct bug: A_ENGINEERING_WORKFLOW_V2 permits JSON_METRICS_RANGE but
+verification_spec forced EXACT stdout. New acceptance keyword reuses existing
+closed validate_acceptance/deepcopy; legacy stdout unchanged, dual rule override
+refused. Candidate/checks/payload runner and approved kernel scope unchanged.
+
+First original command (no model/real credentials/GPU):
+PYTHONPATH=. PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q tests/test_hybrid_engineering_candidate.py -k 'generic_contract or generic_metrics'
+91093/output7de18f terminal exit1:
+2 failed,1 passed,13 deselected in30.84s.
+Pure rule freeze/invalid rule/stdout override denial PASSED, not repeated.
+Both actual managed tasks/STOP executed but new test failed on None result:
+test omitted collect_local_result before source FDs close and wrong result key.
+After two related failures inspected actual collect/terminal-extra/result schema;
+fixed test to collect before STOP, machine_acceptance assertion, terminal==result.
+Did not loosen any product gate or blindly rerun unchanged command.
+
+Only affected failures and necessary old stdout path regression:
+PYTHONPATH=. PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q tests/test_hybrid_engineering_candidate.py -k 'generic_metrics or actual_arbitrary_candidate'
+64904/outputac26fa natural terminal exit0:
+3 passed,13 deselected in51.25s.
+Actual isolated synthetic parser candidate in managed CPU scope, externally
+specified checks output {"cases":2}; approved range2→PASS,range3→FAIL (exit0
+does not force PASS). Both collect原 output/result, freeze terminal result,
+complete managed STOP, SETTLED, Pool0, audit=replay. Legacy EXACT stdout candidate
+run remains passing. These are synthetic local CPU cases, NOT the first real
+nonpreset Engineer task, model output, independent product Review or condition.
+
+Readonly independent finite_app_review_63 narrow review: no confirmed MUST.
+No duplicate reviewer tests/models. Actual original test sessions terminal;
+compileall/diff check passed, user package-lock.json untouched SHA256:
+becc7e2a36dfcad4ffe934b5ff2f0f68187611d6c0641bd63d81367651cfbf09.
+
+Read-only crossmodule diagnosis retained for NEXT same-workflow implementation:
+1 original Budget point/event/whole history proof of Engineer live SETTLED known
+  usage/durable result, same Goal/epoch/approval/envelope; never caller Candidate.
+2 approved envelope checks/full acceptance/seconds/limits + actual module pins
+  hash; replay candidate transformation and freeze CPU spec.
+3 new explicit workflow parent LocalCpuGrant/binding and Source spec branch;
+  old zero-model/CPU/V1 does not upgrade.
+4 protected sequential owner handoff only after all prior attempts STOP/FREE/
+  Source FDs retired, atomic next exact owner binding; no temporary pointer clear,
+  no duplicate Budget/Store rebinding. New reservation/Workspace/WorkingPlan/
+  claim/lease/HANDOFF, no settled Engineer plan reuse.
+5 unique CPU parent/stage, charge full CPU wall ceiling, preserve model counts
+  and original workflow time/window, final effects gate rechecks parents.
+6 live exact CPU only with original derivation; full managed STOP/result
+  archive is later Reviewer parent, PASS is not Review/condition qualification.
+Also original whole-entry size admission must retain STOP UNKNOWN fallback.
+
+First actual engineering task NOT_EXECUTED; Goal ACTIVE. Local code continues,
+actual model A run requires existing small contract approval. GPU/B/C/instinctRL
+HOLD unchanged; other recovery enhancements remain deferred.
