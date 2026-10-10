@@ -241,7 +241,7 @@ class NativeModelSourceOwner(FixtureUsageSourceOwner):
                 raise Conflict('original generating gate materials changed')
         return result
 
-    def _packet_step(self, source, *, finish=False, candidate=False):
+    def _packet_step(self, source, *, finish=False, candidate=False, result=False):
         """One original FD step, never an EOF/account/settlement assertion."""
         attempt = self._issued(source)
         with self._lock:
@@ -260,9 +260,13 @@ class NativeModelSourceOwner(FixtureUsageSourceOwner):
                     prior=self._packet_completed.setdefault(id(source),completed)
                     if completed!=prior or reader.transcript.message!=prior[0]:
                         raise Conflict('original audited packet output changed')
-                if not candidate:return state
+                if not candidate and not result:return state
                 if not state['data_complete']:
                     raise Conflict('original full packet audit required before candidate data')
+                audited=json.loads(self._packet_completed[id(source)][1])
+                if result:return audited  # fresh data copy; never a usage receipt
+                if 'failure_event' in audited:
+                    raise Conflict('failed model observation cannot produce candidate data')
                 if original[5] is None:
                     raise PermissionError('original workflow candidate paths required')
                 # Neither the model nor this API chooses input bytes, edit
@@ -297,6 +301,14 @@ class NativeModelSourceOwner(FixtureUsageSourceOwner):
         Original producer/account/EOF and settlement gates remain mandatory.
         """
         return self._packet_step(source,candidate=True)
+
+    def packet_result_data(self, source):
+        """Frozen audited hashes/observed usage/failure DATA; no authority.
+
+        Failure data does not prove final CLI state or EOF, and never permits
+        a candidate, known-cost settlement, refund or another model session.
+        """
+        return self._packet_step(source,result=True)
 
     def poll(self, source):
         self._issued(source)

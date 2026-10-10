@@ -93,7 +93,8 @@ class _HeldPacketReader:
         try:
             stamp = self._check()
             if self.audit is None:
-                if self.transcript.state != 'DONE' or self.tail or self.transcript.offset != stamp[2]:
+                if (self.transcript.state not in ('DONE','FAILURE_OBSERVED') or
+                        self.tail or self.transcript.offset != stamp[2]):
                     raise Conflict('complete consumed packet data required')
                 self.audit = {'stamp': stamp, 'offset': 0, 'hash': hashlib.sha256(),
                     'decoder':PacketTranscript(role=self._origin[0],candidate_sha256=self._origin[1]),

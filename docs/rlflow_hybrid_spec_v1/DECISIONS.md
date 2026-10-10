@@ -1,5 +1,7 @@
 # 开发决策记录
 
+2026-10-11 失败不是解码损坏或免费执行：Codex CLI官方文档只列turn.failed/error，未建立失败完整计数/EOF保证。保留原事件hash的FAILURE_OBSERVED数据可独立FD重放，禁止因此授成功候选/Review，失败payload声称usage不作为结算。packet_result_data仅冻结审计数据copy，Source/Budget的资格门保持。错误可能非terminal，上游额外suffix本受限单turn仍拒，不自动retry/新调用。尚缺可信publisher/原结算，不以本失败观察切片替代首个真实任务。证据a-native-failure-observation-20261011.txt。
+
 2026-10-11 原审计候选：原source公开的数据接线不接受caller files/allowed_paths/EOF参数；允许路径从登记已核原Registry spec冻结，不信可变grant row，source独立保留原reader/transcript与原packet/schema/路径。完整FD前缀审计须独立decoder重放实际bytes并比较，冻结audit消息/result，拒同对象message替换；仅按冻结audit消息及原schema/snapshot变换。返回纯Candidate而非凭证，不执行检查/写项目/发Reviewer或结算。turn.completed和数据审计不能证明账户、原生产者或EOF；这些资格仍须原runtime与可信publisher实现，不借fixture成功或hash匹配晋升。证据a-workflow-candidate-source-20261011.txt。
 
 2026-10-11原workflow登记配额与窗口：不建立脱离原Budget的计数helper状态；原Goal HEAD及immutable predecessor在同一预算CAS延续，保守消耗已登记slot和整个reservation ceiling，不借no-handoff STOP refund业务次数。登记前read-only issuer先拒重复，最终仍以原writer为准；只计first Engineer，其余阶段必须新原parent接线后才开放。Clock最终用已核expected_heads纯检查；prepare也须同事务原_heads/tip/_point证明可变投影来源，不能缺workflow就跳过。窗口过期不阻原安全STOP。显式accounting_version/limits成对，新owner必有，历史旧无版本仅按原未qualified语义重算，禁止回填/资格升级。证据a-workflow-registration-budget-20261011.txt。

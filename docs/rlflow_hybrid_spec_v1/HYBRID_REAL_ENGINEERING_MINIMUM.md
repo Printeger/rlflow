@@ -1,5 +1,7 @@
 # 首个真实工程自主闭环：最小交付清单
 
+2026-10-11 失败来源数据补齐：成功之外原turn.failed/error可完整审计保存失败hash/未知usage，失败即使携合法PATCH/ACCEPT也不得候选或Review；错误观察不是实际CLI exit/EOF。下一仍须原账户+producer/EOF资格+usage publisher/原结算接线，并扩原workflowCPU/Evaluator/条件CAS/接续，不能仅凭此数据结果派发角色。首次真实任务NOT_EXECUTED，A合同待批只限制调用，GPU/B/C/HOLD不变。
+
 2026-10-11 接线缩减：原held stdout全prefix审计与原workflow grant快照/schema/路径到Candidate数据现可实际调用，拒caller换reader/越界/追加；仅合成数据验证、不具来源资格。下一最小实现为原账户/实际生产者+EOF/usage可信publisher及原结算，再同workflowCPUgrant、不同Evaluator、原条件CAS与一次接续；既有counter/STOP必须贯穿。首次真实task仍NOT_EXECUTED；A额度待批不阻本地实现，GPU/B/C/HOLD不变。
 
 2026-10-11 next：原first Engineer计数/保守reservation累计时间/窗口/唯一首登记已持久入Budget，projection来源与最终sample门实装，过期STOP仍独立；其他阶段未启用。最小剩余继续原实际账户+producer-ready-G+output/usage可信publisher及settlement→未知candidate workflowCPU→不同原Evaluator→条件CAS接纳→一次未完成需求接续。各阶段须扩展同原counter和受管时间、不得从fixture/Develop High审查伪造parents。实际first task NOT_EXECUTED；A合同未批准不调用、GPU/B/C/HOLD不变。

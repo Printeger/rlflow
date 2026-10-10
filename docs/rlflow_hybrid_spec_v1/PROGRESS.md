@@ -1,5 +1,7 @@
 # Hybrid v1 开发进度
 
+2026-10-11 原失败观测接线：turn.failed/error现可经heldFD独立重放归档FAILURE_OBSERVED及原事件hash/输出hash/保守usage；不作exit/EOF/完整用量或成功，失败自报计数忽略/complete=false，不发候选或Review。原packet_result_data返回冻结结果副本，无来源/结算写权；失败后suffix/retry仍锁存拒。shared41pass.11s；原failure+success2pass25.14s（93696自然terminal）；末failure-latch/Evaluator合法ACCEPT后失败及state重置仍拒7pass.06s。High无新增确证MUST，compile/diff/USERlock通过，证据a-native-failure-observation-20261011.txt。本地进展不是首个真实任务；原账户/producer/EOF+usage publisher结算→workflowCPU/独立Evaluator/条件CAS/接续仍待实现，调用只待小额A合同批准，GPU/B/C/HOLD不变，Goal ACTIVE。
+
 本切片FINAL：原29615自然结束2pass25.30s，独立High两项MUST及REGISTER retry出处补门均关闭，无新增确证MUST；compile/diff/USERlock通过。所有本轮测试terminal、无重复原handle/模型/GPU运行；归档并提交本地source实现快照，非A或98验收关闭。首次真实任务仍NOT_EXECUTED，下一原producer/EOF/usage可信publisher与结算继续本地开发，Goal ACTIVE。
 
 2026-10-11 原输出→候选接线：原source现可有限全prefix独立解码审计，再按原packet/schema与原Registry批准路径生成Candidate数据；原reader/transcript身份及audit消息/result独立冻结。首3 setup errors漏fixture，修后3pass37.71s；High两项MUST（同对象message绕过、可变grant-row路径）修为实际FD重放/冻结及allocation同份config对原grant.config_hash门，message前后/row污染+正例4pass56.00s，耐久REGISTER allocation故障后Registry漂移retry拒+正例2pass25.30s。越界/替换/追加锁存，原STOP Pool0/allFDclosed/audit=replay；最后shared35pass.09s，V1 affected2pass20.54s，不重跑不受影响已过项。不是实际模型来源/可信结算/真实任务结果，launch/publication仍deny；证据a-workflow-candidate-source-20261011.txt，末窄复审收尾中。下一原账户/producer/EOF+可信用量publisher结算→workflowCPU/独立Evaluator/条件CAS/接续。A额度待批不阻本地开发，GPU/B/C/HOLD不变，Goal ACTIVE。

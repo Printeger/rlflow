@@ -116,6 +116,32 @@ def test_durable_register_retry_cannot_capture_changed_registry_paths(original,m
     assert owner.store.audit()==owner.store.replay()
 
 
+def test_original_failure_data_audit_does_not_publish_or_authorize_candidate(original,monkeypatch):
+    owner,lease,source,row=registered(original,monkeypatch)
+    events=[{'type':'thread.started','thread_id':'synthetic_failed'},
+        {'type':'turn.started'},{'type':'turn.failed','error':{'message':'synthetic failure'},
+            'usage':{'input_tokens':50,'cached_input_tokens':0,'output_tokens':2}}]
+    raw=b''.join(canonical(event)+b'\n' for event in events)
+    os.write(row['fds']['write'],raw)
+    versions=(owner.store.version(),owner.pool.snapshot()['version'])
+    assert owner.sources.poll_packet_data(source)['offset']==len(raw)
+    assert owner.sources.finish_packet_data(source)['data_complete']
+    data=owner.sources.packet_result_data(source)
+    assert data['failure_event']['type']=='turn.failed' and data['output_sha256'] is None
+    assert not data['usage']['complete'] and data['usage']['input_tokens'] is None
+    assert not data['source_authenticated'] and not data['settlement_enabled']
+    data['usage']['complete']=True
+    assert not owner.sources.packet_result_data(source)['usage']['complete']
+    assert (owner.store.version(),owner.pool.snapshot()['version'])==versions
+    with pytest.raises(PermissionError):owner.sources.seal(source)
+    with pytest.raises(Conflict,match='failed model observation'):
+        owner.sources.candidate_data(source)
+    owner.stop_to_terminal(lease)
+    assert owner.pool.snapshot()['occupied']==0
+    assert all(fd is None for fd in row['fds'].values())
+    assert owner.store.audit()==owner.store.replay()
+
+
 @pytest.mark.parametrize('damage',['unapproved_path','replacement_reader'])
 def test_original_candidate_refusal_latches_and_stop_remains_available(original,monkeypatch,damage):
     owner,lease,source,row=registered(original,monkeypatch)

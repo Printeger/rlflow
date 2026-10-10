@@ -1,0 +1,62 @@
+A native failure observation slice; base7816247, NOT real model execution
+No credential reads/model/API/GPU calls; launch/publication qualifications DENY.
+
+Behavior delivered:
+PacketTranscript now distinguishes malformed/forbidden data from an observed
+turn.failed or error. The latter is FAILURE_OBSERVED, NOT final producer exit,
+authentic EOF, success or known cost. HeldPacketReader can independently replay
+and freeze the entire consumed prefix containing this failure observation.
+Failure record contains original event type/hash, observed output hash (null
+without output) and conservative usage totals. Failure event's own usage claims
+are ignored by the existing Accumulator; complete remains false, unknown fields
+remain null. No inferred zero cost, clipped usage or settlement/refund.
+Source packet_result_data exposes a fresh copy of frozen audited result DATA;
+it publishes no authenticated source or usage receipt. Candidate and Reviewer
+decoding require DONE AND no failure event. Valid final patch/ACCEPT text before
+failure is not candidate/Review. Mutating state alone cannot erase failure.
+After a failure event any suffix/retry/success event still fails closed/latches;
+an error can be nonterminal in upstream implementations, so this bounded local
+observation must never be described as definitive CLI termination.
+
+Official docs checked before failure event implementation:
+https://learn.chatgpt.com/docs/non-interactive-mode
+Official JSONL event list includes turn.failed/error; fetched page did not
+establish complete counters for failure or actual CLI EOF/exit. OpenAI Docs
+skill informed conservative failure observation, not billing/source authority.
+Did not borrow different app-server/Agents API failure semantics.
+
+Actual commands (unset PYTHONPATH, PYTEST_DISABLE_PLUGIN_AUTOLOAD=1):
+bdd688:
+  pytest tests/test_hybrid_native_model_failure_data.py
+    tests/test_hybrid_native_model_stream.py tests/test_hybrid_native_packet_reader.py
+  41 passed .11s; new failure parsing plus changed shared finite audit/decoder.
+9724ba / original session93696 / 9782ad:
+  pytest tests/test_hybrid_a_workflow_candidate_source.py
+    -k 'failure_data or original_audited'
+  2 passed/6 deselected25.14s; original handle naturally terminal/no restart.
+  Synthetic original stdout failure audit -> immutable returned-copy result,
+  usage incomplete/null even failure payload claims counters; no Store/Pool
+  mutation/producer/publication, candidate refused, original STOP Pool0,
+  all FDs closed/audit==replay. No HANDOFF was attempted, so that physical STOP
+  does not constitute evidence of actual failed-model cost settlement.
+  Original success candidate audited/append-refusal/STOP remains passing.
+7ee553 after explicit failure-latch guard:
+  pytest tests/test_hybrid_native_model_failure_data.py:7 passed .06s.
+  Includes valid Evaluator ACCEPT followed by failure, then state='DONE',
+  still refused; only affected tests rerun. No test failure this slice.
+Independent High read-only review: no new confirmed MUST in failure parsing,
+audit/frozen result/candidate/Review/UNKNOWN/STOP impact scope. No tests run by
+reviewer, not a product Evaluator. Its last note was before original session
+terminal delivery; session93696 is now exit0 as recorded above.
+Compile/diff passed; unrelated USER lock unchanged/unstaged:
+becc7e2a36dfcad4ffe934b5ff2f0f68187611d6c0641bd63d81367651cfbf09.
+
+Remaining minimal chain:
+Actual original account/producer-ready-G/complete scoped stdout+EOF qualification
+and usage publisher -> protected original known/UNKNOWN settlement -> same
+workflow candidate CPU/trusted checks -> distinct original Evaluator -> original
+condition CAS -> one autonomous next packet. Failure-observation data alone
+must not supply any of those qualification parents. Actual task NOT_EXECUTED;
+Reviewer/conditional acceptance/continuation NOT_PROVEN. Existing A contract
+awaits approval only for actual runtime, not code; GPU/B/C/instinctRL HOLD
+unchanged. Goal ACTIVE, not A/98/full-suite/install/recovery/long-run closure.

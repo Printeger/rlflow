@@ -1,5 +1,7 @@
 # 需求包离线校验报告
 
+2026-10-11 原失败观测：new/shared41pass.11s，原93696 failure/success接线2pass25.14s/自然terminal；末纯failure/Evaluator7pass.06s。合成turn.failed审计+冻结copy+缺账未知+候选拒、STOP Pool0/allFDclosed/audit=replay通过，无真实CLI/生产者/EOF/用量结算资格。High无新增确证MUST，compile/diff/USERlock通过；原证据evidence/a-native-failure-observation-20261011.txt。不是A/98/首个真实任务或全库验收，Goal ACTIVE。
+
 原candidate source末审已关闭全部确证MUST；原29615终态exit0/2pass25.30s。所有本轮原handles自然结束，无模型/GPU调用。属于本地数据接线提交，不是首个真实任务/产品独立Review/A/98或全库验收；证据a-workflow-candidate-source-20261011.txt。
 
 2026-10-11 原candidate source：首3 setup errors .08s漏fixture已诊断修；首原接线3pass37.71s。High同message与可变路径MUST修后实际FD独立解码重放/冻结及config hash来源门：前后message/row污染+正例4pass56.00s；最后耐久REGISTER丢allocation+Registry漂移retry拒/STOP与正例2pass25.30s。合成审计→原范围candidate，无来源/结算资格；各原STOP Pool0/allFDclosed/audit=replay。最后shared35pass.09s、旧V1 affected2pass20.54s，compile/diff/USERlock通过；末窄复审收尾中，见evidence/a-workflow-candidate-source-20261011.txt。不报告真实任务完成，不关闭A/98或全Goal，Goal ACTIVE。
