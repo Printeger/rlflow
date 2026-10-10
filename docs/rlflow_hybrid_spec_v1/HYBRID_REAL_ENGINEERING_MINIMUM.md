@@ -1,5 +1,7 @@
 # 首个真实工程自主闭环：最小交付清单
 
+2026-10-11 next：原first Engineer计数/保守reservation累计时间/窗口/唯一首登记已持久入Budget，projection来源与最终sample门实装，过期STOP仍独立；其他阶段未启用。最小剩余继续原实际账户+producer-ready-G+output/usage可信publisher及settlement→未知candidate workflowCPU→不同原Evaluator→条件CAS接纳→一次未完成需求接续。各阶段须扩展同原counter和受管时间、不得从fixture/Develop High审查伪造parents。实际first task NOT_EXECUTED；A合同未批准不调用、GPU/B/C/HOLD不变。
+
 2026-10-11推进：首workflow Engineer原manifest→冻结packet/schema→原grant/登记与fresh/historical重算已可实际STOP并coldreplay，不再仅审批数据。下一先补原stage/角色quota/controlled累计时长与唯一首stage消耗，再完成真实原账户/生成source/settlement及后续candidateCPU/Evaluator/条件CAS/接续。所有release仍拒，FIRST_ENGINEER不代表once-only证明；首次真实任务NOT_EXECUTED。现有小额A合同待批只限制实际调用，不阻本地实现，GPU/B/C/HOLD不变。
 
 2026-10-11审批表达已本地接通：新A_ENGINEERING_WORKFLOW_V2原Registry/ApprovalService可冻结一次model+CPU契约，历史回放验证同envelope，明确Engineer PATCH与独立Evaluator REVIEW输出、可信验收、双向protected边界、配额/修复/接续限制；仍execution_qualified=false。下一直接实现原受保护事实派生逐次packet/grant（含parent key/hash/version和原新reservation/Controller/CAS/STOP），而非继续仅增加准备组件。原账户/生成来源、结算、产品独立Review、条件CAS/接续和首个真实任务仍全部必需，当前NOT_EXECUTED；小额A运行合同未经批准不调用，GPU/B/C/instinctRL HOLD不变。

@@ -286,7 +286,8 @@ def validate_original_links(value, lookup):
             ready=lookup(SECTIONS[1],origin['working_plan_ready']['key'])
             if intent is None or ready is None:raise Conflict('original workflow plans missing')
             binding,_,_=first_engineer(record['contract']['proposal'],approval['registry_witness'],
-                origin['program_sha256'],intent,ready,frozen['workflow']['files'])
+                origin['program_sha256'],intent,ready,frozen['workflow']['files'],
+                accounted='accounting_version' in frozen['workflow'])
         else:binding=approved_binding(record['contract']['proposal'],approval['registry_witness'],origin['program_sha256'])
         binding.update(grant_id=origin['native_model']['grant_id'],
             **{k:sources[k] for k in ('proposal_hash','approval_hash','config_hash','scope_hash')})

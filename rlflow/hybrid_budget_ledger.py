@@ -47,6 +47,8 @@ FIXTURE_RESERVATION={**RESERVATION_DATA,'status':enum('HELD','UNKNOWN','SETTLED'
     'fixture_runtime':FIXTURE_RUNTIME}
 HEADS=(obj({**GOAL_DATA,**POINTER}),{'oneOf':[obj({**RESERVATION_DATA,**POINTER}),
     obj({**FIXTURE_RESERVATION,**POINTER})]},obj({**PROJECT_DATA,**POINTER}))
+from .hybrid_a_workflow_accounting import HEAD as WORKFLOW_HEAD
+HEADS[0]['properties']['workflow']=WORKFLOW_HEAD
 nullable=lambda schema:{'oneOf':[schema,{'type':'null'}]}
 ENTRY=obj({'schema_version':{'const':'1.0'},'request':REQUEST,'request_hash':HASH,
     'policy_source':SOURCES,'policy':POLICY,'preparation':PREPARATION_REF,'controller':CONTROLLER_REF,
@@ -163,6 +165,9 @@ def derived_heads(value):
         reservation={**reservation,'status':decision}
     if (value['decision'],value['reason'])!=(decision,reason):raise Conflict('budget decision differs from exact arithmetic')
     goal={'scope':owner,'policy':value['policy'],'policy_source':value['policy_source'],'balance':changed}
+    from .hybrid_a_workflow_accounting import advance as workflow_advance
+    workflow=workflow_advance(value,None if previous is None else previous.get('workflow'))
+    if workflow is not None:goal['workflow']=workflow
     new=validate_balances(changed)
     project=_head_base(prior_project) if prior_project is not None else {
         'project_id':owner['project_id'],'data_mode':owner['data_mode'],

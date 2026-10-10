@@ -37,6 +37,13 @@ BINDING['properties']['workflow'] = obj({'profile':{'const':'A_ENGINEERING_WORKF
     'intent':obj({'key':ID,'hash':HASH}),'ready':obj({'key':ID,'hash':HASH}),
     'files':{'type':'object','minProperties':1,'maxProperties':32,
              'additionalProperties':{'type':'string','maxLength':49152}}})
+from .hybrid_a_workflow_accounting import LIMITS as WORKFLOW_LIMITS
+BINDING['properties']['workflow']['properties']['limits']=WORKFLOW_LIMITS
+# Preserve historical unqualified first-source facts from 194699e. New owners
+# always issue the explicit accounting version; no runtime upgrade is inferred.
+BINDING['properties']['workflow']['properties']['accounting_version']={'const':'A_REGISTRATION_CEILINGS_V1'}
+BINDING['properties']['workflow']['dependentRequired']={
+    'limits':['accounting_version'],'accounting_version':['limits']}
 
 
 def validate_spec(spec):

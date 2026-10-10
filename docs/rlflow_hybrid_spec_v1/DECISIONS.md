@@ -1,5 +1,7 @@
 # 开发决策记录
 
+2026-10-11原workflow登记配额与窗口：不建立脱离原Budget的计数helper状态；原Goal HEAD及immutable predecessor在同一预算CAS延续，保守消耗已登记slot和整个reservation ceiling，不借no-handoff STOP refund业务次数。登记前read-only issuer先拒重复，最终仍以原writer为准；只计first Engineer，其余阶段必须新原parent接线后才开放。Clock最终用已核expected_heads纯检查；prepare也须同事务原_heads/tip/_point证明可变投影来源，不能缺workflow就跳过。窗口过期不阻原安全STOP。显式accounting_version/limits成对，新owner必有，历史旧无版本仅按原未qualified语义重算，禁止回填/资格升级。证据a-workflow-registration-budget-20261011.txt。
+
 2026-10-11首workflow派生沿用原生成runtime登记，不另建仅helper证据账本：显式V2 workflow出处扩展存INTENT/READY引用与匹配原清单的有限files，fresh及历史validator都从原审批/原plan重算packet/schema/binding。旧V1 approved_binding仍原exact合同，不能借V2 issuer改role/schema。按floor总soft/CLI slots分配初始reservation以保留原finalization reserve；这是soft预留切片，不限制供应商请求数或硬封费用。后续原usage超额/缺计数不得剪裁/补零。FIRST_ENGINEER为出处阶段非唯一阶段消耗证明，实际release继续deny直到原quota/time/阶段账本和生成资格接通。证据a-workflow-first-source-20261011.txt。
 
 2026-10-11 A workflow V2 原审批边界：新增明确adapter而非升级V1；审批固定账户、模型、总额度、原程序hash声明、可信CPU验收、候选路径及角色schema，未知生成candidate留给原受保护事实逐次派生。原Registry.resolve确认和历史回放同时校验此闭合范围；原ApprovalService继续只产生LEASE_VALIDATION_PENDING。登记及声明hash不证明账户、实际程序或运行资格，不会把caller JSON变成来源。必需deterministic和independent_review条件不可降optional；可写候选与保护路径双向重叠均拒。两个High为共享总配额，REVISE耗尽时必须停止，不能额外调用；一次接续仅证明下一任务派发，不保证其完整闭环。下一必须实现原facts→新grant/reservation→Controller/CAS/STOP和历史验证，不以contract登记代替纵向交付。证据evidence/a-workflow-envelope-20261011.txt。

@@ -1,0 +1,65 @@
+A original registration budget slice; not actual model/task completion
+Base 194699e; real model/API/GPU calls zero; all generating release gates DENY.
+
+Delivered:
+Original Goal budget HEAD carries a closed workflow accounting disposition.
+FIRST_ENGINEER REGISTER charges medium1/high0 and the entire managed wall
+reservation ceiling (310s normal case) against approved controlled total.
+Every RESERVE/cleanup/other original budget entry carries this state; STOP does
+not refund registration counts or the conservative time charge. A second first
+registration is rejected in original derived_heads/CAS; original issuer now
+also refuses another first grant before creating it. Counters are not proof of
+actual elapsed time or provider calls. Final pure original Controller sample
+checks workflow window/quota using the already-proven expected Goal HEAD.
+
+Compatibility:
+New grant workflow accounting_version=A_REGISTRATION_CEILINGS_V1 and limits
+are closed paired fields derived from original approval. Historical 194699e
+unqualified first-source facts without accounting version retain their old
+derivation/accounting semantics; no in-place counter backfill or implicit
+qualification. New live owner always issues accounted bindings and will not
+accept old unversioned grant as a new accounted one. V1 unaffected.
+
+Commands/results (PYTHONPATH removed, PYTEST_DISABLE_PLUGIN_AUTOLOAD=1):
+29b901 / 40755 / 6b2a57: pytest test_hybrid_a_workflow_derivation.py
+  1 passed14.98s: new accounting original registration/STOP/cold replay.
+4e67e1 / 48176 / 2f658b: pytest test_hybrid_a_workflow_accounting.py
+  test_hybrid_a_workflow_derivation.py: 9 passed14.93s; conservative charge,
+  duplicate stage arithmetic refusal, role/time/closed quotas, exact boundary.
+f984c9 / 80766 / 03f25f: new original short-window gate/STOP1pass12.82s.
+beb4fb / 88913 / bc4796: pytest tests/test_hybrid_budget_ledger.py
+  tests/test_hybrid_native_model_budget.py tests/test_hybrid_budget_service.py
+  86 passed73.41s/1 old Starlette warning; original process terminal, no restart.
+
+Independent High found1 MUST: prepare_native_gate's fresh window read raw Goal
+projection and skipped absent workflow, without original HEAD/event proof.
+Fixed to same original Controller db/ReadBudget Budget._heads→indexed tip→
+_point→derived_heads verification; absence only allowed before first commit
+under exact original active REGISTER guard/pre-version. STOP safety path did
+not acquire a window requirement.
+e02968 / 34020 / f22f23: new corruption test1fail10.71s; test SQL used wrong
+  projection column key. Read schema; corrected object_key, no product gate
+  relaxation and no same-command blind repeat.
+61b6ab / 21858 / ad4a37: only affected original window case
+  1pass/1deselected13.22s. Delete workflow/lower medium/change start projection
+  each refused prepare before any gate allocations; restored original bytes,
+  exact20s expiry refused; original STOP completed/Pool0/allFDclosed/audit=replay.
+bfb9b9: accounting version change, only affected pure8pass.06s.
+0976fb / 54937 / 3ce99a: added original issuer repeated-first refusal after STOP,
+  only affected original registration case1pass/1deselected15.66s; no extra
+  opaque grant/Store or Pool version changes; counts retained through cold replay.
+High final read-only: original source-window MUST closed; no new confirmed
+  MUST in registration accounting/window/STOP/history scope. Did not run tests,
+  not product independent Review. New role/CPU phases are not enabled here.
+Compile/diff checks passed; unrelated USER package-lock.json unchanged and
+unstaged: becc7e2a36dfcad4ffe934b5ff2f0f68187611d6c0641bd63d81367651cfbf09.
+
+Next required vertical behavior:
+Original actual account/producer-ready-G and protected output/usage source
+publisher→trusted settlement→unknown candidate workflow CPU verification→
+independent original Evaluator→condition CAS→one autonomous next packet.
+Other role/CPU/repair/continuation stage transitions must extend original
+accounting with authenticated parents; they remain refused, not counted done.
+First non-preset real task NOT_EXECUTED; no A/98/full-Goal closure. Small A
+runtime contract pending approval; GPU/B/C/instinctRL HOLD unchanged; local
+development unblocked and original Goal ACTIVE. No full-suite claim.

@@ -14,7 +14,7 @@ from .hybrid_working_plan import intent_key, result_key
 from .store import Conflict
 
 
-def first_engineer(proposal, config, program_sha256, intent, ready, files):
+def first_engineer(proposal, config, program_sha256, intent, ready, files,*,accounted=True):
     approval=validate_approval(proposal,config)
     spec=config['tools']['native_model']['definition']['spec']; files=_snapshot(files)
     if (program_sha256!=spec['model_gate_sha256'] or
@@ -46,4 +46,8 @@ def first_engineer(proposal, config, program_sha256, intent, ready, files):
             'envelope_sha256':approval['envelope_sha256'],
             'intent':{'key':intent_key(intent['request']),'hash':digest(intent)},
             'ready':{'key':result_key(ready['request']),'hash':digest(ready)},'files':files})
+    if accounted:
+        binding['workflow'].update(accounting_version='A_REGISTRATION_CEILINGS_V1',
+            limits={field:spec[field] for field in
+                ('medium_sessions','high_sessions','controlled_seconds','wall_seconds')})
     return binding, packet, schema

@@ -1,5 +1,7 @@
 # 需求包离线校验报告
 
+2026-10-11原workflow登记预算：先原accounted1pass14.98s、8pure+actual9pass14.93s、窗口原1pass12.82s；共享预算三文件原88913自然terminal86pass73.41s/1旧warning。High rawprojection窗口MUST修后新增SQL列名测试fail10.71s定位为object_key，保留门定向actual1pass13.22s（删/降/改投影拒+20s expiry拒+originalSTOP Pool0/allFDclosed）；version affectedpure8pass.06s；新增原issuer STOP后重复首grant拒/版本与grant数不变、coldreplay定向1pass15.66s。High源码关闭/no新增MUST；compile/diff/USERlock通过，证据a-workflow-registration-budget-20261011.txt。无真实模型/task/产品Review/条件接续/A或全库验收声明，Goal ACTIVE。
+
 2026-10-11首Engineer来源接线：原setup error预算head2.27s定位fulltoken reservation触finalization reserve，保留产品门改每session预留；corrected单项actual原fixture grant/register/fullSTOP/no-handoffSETTLED/Pool0/allFDclosed/coldreplay1pass14.64s。原files与历史parent hash篡改拒、V1不借V2、无subprocess。共享MODEL_BINDING/Budget/Runtime变化必要回归原28282自然terminal21pass/3deselected/1旧warning105.87s，未重启。compile/diff/USERlock检查通过；命令/失败证据a-workflow-first-source-20261011.txt。不是实际模型、task、Review或A完成；阶段quota/time及后续parents仍缺，Goal ACTIVE。
 
 2026-10-11 V2原审批切片：新profile首失败已定位为测试owner误重绑和definition alias，保留原门/逐项detached修后12affectedpass2.85s；6原spec负例已首pass未重复。共享Registry/Authority77pass5.28s；required conditions新affected3pass.88s；V1变候选/Evaluator原拒绝1pass5.06s证明兼容而非A完成。High保护路径后代重叠MUST双向修复，affected正/负3pass.89s；compile/diff/USERlock检查通过，完整命令/失败记录见evidence/a-workflow-envelope-20261011.txt。实际模型任务、产品Review/结算/条件接续NOT_EXECUTED；不虚称全量或关闭98/A。Goal ACTIVE。

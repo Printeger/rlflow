@@ -102,6 +102,11 @@ class NativeModelOwner(FixtureRuntimeOwner):
         with self.store.read_connection() as db:
             db.execute('BEGIN');read=ReadBudget(db,PREPARATION_READ_BYTES)
             loaded=self.budget._load(db,self._ready_for_bundle(bundle)['request']['goal_ref'],read)
+            captured=ready['source_context']['budget_reservation']
+            request={**captured['scope'],'action':'MARK_UNKNOWN','reservation_id':captured['reservation_id']}
+            head,_,_=self.budget._heads(db,request,read,self.budget._metadata(db))
+            if head is not None and 'workflow' in head:
+                raise Conflict('workflow first Engineer already registered; no new first grant')
             from .hybrid_a_workflow_derivation import first_engineer
             _,packet,schema=first_engineer(loaded['record']['contract']['proposal'],
                 json.loads(self.plans.registry._raw),self.program_hash,intent,ready,files)
@@ -124,12 +129,41 @@ class NativeModelOwner(FixtureRuntimeOwner):
         expected.update(grant_id=grant.id, **{k:loaded[k] for k in ('proposal_hash','approval_hash','config_hash','scope_hash')})
         if row['attempt'] is not attempt or canonical(expected) != grant.raw:
             raise Conflict('current original generating approval differs')
+        if 'workflow' in frozen:
+            from .hybrid_a_workflow_accounting import check_window
+            active=self.controller._token_active
+            if active is None:raise PermissionError('original workflow Controller transaction required')
+            captured=attempt['ready']['source_context']['budget_reservation']
+            request={**captured['scope'],'action':'MARK_UNKNOWN','reservation_id':captured['reservation_id']}
+            version=self.budget._metadata(active[0])
+            head,_,_=self.budget._heads(active[0],request,active[2],version)
+            if head is None:raise Conflict('original workflow Goal head missing')
+            if 'workflow' in head:
+                if head['workflow']['approval_sha256']!=loaded['approval_hash']:
+                    raise Conflict('original workflow approval changed; no counter reset')
+                now,_=self.controller._sample()
+                check_window(head['workflow'],frozen['workflow'],now)
+            else:
+                guard=self._active
+                if (guard is None or guard.attempt is not attempt or guard.db is not active[0] or
+                        json.loads(guard.raw)['request']['fixture_runtime']['phase']!='REGISTER_NO_HANDOFF' or
+                        json.loads(guard.raw)['request']['expected_state_version']!=version):
+                    raise Conflict('registered workflow counters missing; no window bypass')
         if attempt['source'] is not None:
             with self.sources._lock:self.sources._physical(self.sources._issued(attempt['source']))
 
     def start(self, lease):
         self._issued(lease)
         raise PermissionError('native account/ELF/sandbox launch qualification not implemented; no model handoff')
+
+    def _final_deadlines(self,guard,now,mono):
+        super()._final_deadlines(guard,now,mono)
+        frozen=json.loads(guard.attempt['native_model_grant'].raw)
+        if 'workflow' in frozen:
+            from .hybrid_a_workflow_accounting import check_window
+            from .hybrid_budget_ledger import SECTIONS as BUDGET
+            head=next(iter(guard.expected_heads[BUDGET[1]].values()))
+            check_window(head['workflow'],frozen['workflow'],now)
 
     def prepare_native_gate(self, lease):
         """Prepare original private no-auth materials; not execution consent."""

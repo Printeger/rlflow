@@ -1,5 +1,7 @@
 # 阻塞与证据缺口
 
+2026-10-11 first Engineer原登记次数、保守累计时间和窗口门已接原Budget/finalsample，重复first/投影篡改/期限耗尽拒，安全STOP独立完成。其他角色/CPU/修复/接续尚未启用，须原生成/机器/Review/条件parents扩展同账本，不凭此声称全workflow。最高剩余是原账户/producer-ready-G/output+usage publisher及可信结算，继而真实未知candidateCPU/独立Evaluator/条件CAS接续。无新增用户决定阻塞本地实现；小额A未经批准不调用模型，GPU/B/C/instinctRL HOLD不变。
+
 2026-10-11首workflow Engineer已接原grant→登记→STOP→coldreplay，不再仅登记envelope；仍未生成真实模型输出。下一直接门是原workflow stage/角色配额与controlled总时长账本、唯一firststage，再接真实source/结算→任意candidate CPU→独立Evaluator→条件CAS/接续。FIRST_ENGINEER标记不是once-only证据；不凭caller父JSON发后续grant、不开放任何模型运行。本地无新用户选择阻塞，已提出A小额运行合同待批，GPU/B/C/instinctRL HOLD不变。
 
 2026-10-11更新：V2一次workflow envelope已可经原Registry/ApprovalService持久化并冷回放，旧V1不升级；这仅消除审批合同表达缺口，尚未连接保护来源派生新packet/grant和历史runtime核验。原账户/生产者、可信结算、不同原会话Review、条件CAS及首次真实任务仍缺；控制总时长/角色配额尚需原账本实际消费门。不把execution_qualified=false登记当执行资格，不增加每步人工审批。无新增用户决定阻塞本地开发；实际模型运行仍只待已提出小额A合同批准，GPU/B/C/instinctRL HOLD不变。
