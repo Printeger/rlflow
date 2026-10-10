@@ -1,5 +1,7 @@
 # 开发决策记录
 
+2026-10-11 Reviewer未知candidate输入必须来自原执行CPU的完整STOP/SETTLED/FREE终态及原Engineer持久结果，不能用caller JSON/开发期High/同hash发grant。纯from_cpu只重放DATA，原Owner核wholeevent/全部history/currentApproval/pins/FD/Pool后封存lease/cap/raw；重复消费全重证。跨新reservation的policy_source snapshot source_version必然推进，沿现有Budget guard只排除source_version/evaluated_at，其他所有字段（含批准/作用域/epoch/expiry）一致，不能把快照序号误作合同批准身份。当前材料不是新Owner/high grant或条件，后续仍须不同角色plan/原新会话和同账本配额，不借FIRST_ENGINEER旧计划升级。
+
 2026-10-11 自动CPU桥复用原受保护服务，不重新生成批准、不收caller候选/checks；唯一CPU stage、原window/累计余量前移reserve前，最终REGISTER原CAS仍在。异常latch而非泛化恢复；已完成重复读用强tuple(sequence/lease/canonical结果)，不走可变缓存快路。独立审查确认STOP必须封闭准备，不仅禁止spawn：每一原准备步骤使用短admission→原组件/Pool锁序，段内exact-live/永久freeze及句柄强留；shutdown/safety先freeze再等当前准备段，不能等整个sequence/RUN。此锁仅覆盖新增桥，不替代原Controller/source最终效果门；暂不增加长期恢复。
 
 2026-10-11 CPU 同 Budget handoff 只承认原 normal shutdown 后的强留退休 tuple（原 root/source/Workspace 完整回执 digest），不相信可变 retired 布尔值或 Safety/UNKNOWN 退休。child 在原预算绑定安装点强留，lost constructor return 重取同 child；没有清指针窗口。close CAS 重链须先核 current token，再于同读快照证明 fact/event 双不存在及原 Workspace 前驱完全未变；已有 COMMIT 保留 exact 请求，部分来源不一致强拒。累计 CPU reservation 收取完整 task_seconds+10，STOP 不退款、不重置 A 窗口。测试合成 model publisher 与真实 CPU 执行证据严格分开，不能把 parser 演示算成首真实任务。

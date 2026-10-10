@@ -1,0 +1,47 @@
+A original CPU -> independent Reviewer parent material, 2026-10-11
+Base bd8e612; candidate is containing commit.
+No model grant/Owner transfer/role-plan/high quota enabled in this slice.
+New actual protected CPU lease + full terminal/FREE/FD/current Budget/approval
+proof -> frozen Evaluator/high packet/schema/spec, CPU+Engineer parent refs.
+Pure from_cpu never authenticates sources. Native G intercepted and model
+Source explicitly synthetic; actual CPU only, not real task qualification.
+
+All pytest: PYTHONPATH=. PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q
+71492 / 6d6529: tests/test_hybrid_a_workflow_review.py
+exit1: 1 failed / 1 existing warning / 57.70s.
+CPU completed actual checks, STOP/SETTLED/FREE. New material guard wrongly
+required full policy_source equality across original new reservations.
+Read-only original DB diagnosis c3ffad:
+only difference source_version Engineer7 -> CPU21; snapshots expected to advance.
+Fix matches existing Core Budget identity guard: exclude only source_version
+and evaluated_at, retain ALL other policy source keys and values including
+approval/config/scope/expiry/epoch. Not an approval or acceptance relaxation.
+Original DB path used only read-only sqlite mode=ro, no credentials inspected.
+
+f04f3e: tests/test_hybrid_a_workflow_cpu.py -k 'not actual'
+exit0: 18 passed / 1 deselected / 1 existing warning / 0.24s.
+Required original pure derivation reused by new Reviewer consumer.
+91115: only original failed Reviewer-parent integration rerun after diagnosis.
+a9dce8 exit0: 1 passed / 1 existing warning / 85.12s.
+Actual managed CPU PASS/fullSTOP/SETTLED/Pool0/audit==replay. Same cap repeat,
+freshcopy consumption, copy Owner/cap/cross-lease denial, mutable result cache
+denial, UNKNOWN/wrong parent/machine FAIL/wrong candidate/changed epoch DATA
+rejection all keep Store/Pool versions unchanged. No Reviewer model executed.
+Final compileall/diff exit0, USER lock unchanged SHA
+becc7e2a36dfcad4ffe934b5ff2f0f68187611d6c0641bd63d81367651cfbf09.
+All sessions terminal; no ongoing test restarted or duplicate full regression.
+
+Independent finite_app_review_63 original narrow review no confirmed MUST:
+exact lease/Source terminal/allFD/Pool FREE/current Reservation, durable CPU
+and Engineer history/current approval/pins/acceptance/candidate equality,
+last sample window/TTL, exact cap/freshcopy consumption checked read-only.
+Development review is not a product independent model Reviewer.
+Final 5-line policy identity differential independently confirmed no new
+MUST: same as original Budget/Runtime guard, complete remaining keyset/value
+comparison retained; approval/scope/expiry not relaxed. No duplicate test.
+
+Still required: same-Budget CPU -> new Native Owner retirement/handoff,
+Evaluator role plan/candidate binding, independent actual session/high counters,
+authentic Review/usage, condition acceptance CAS and unmet-requirement continuation.
+Real nonpreset task NOT_EXECUTED; full Goal ACTIVE, model A contract awaits
+approval for actual calls only. GPU/B/C/instinctRL HOLD unchanged.

@@ -162,6 +162,7 @@ class FixtureRuntimeOwner:
             self._workflow_cpu_admission_lock=threading.RLock()
             self._workflow_cpu_sequence=None
             self._workflow_cpu_completed=None
+            self._workflow_review_inputs={}
             self._engineering_units = self._execution_units  # Original SDK compatibility, same registry.
             diagnostic = type(self) is NativeDiagnosticOwner
             local_cpu = type(self) is LocalCpuRunnerOwner

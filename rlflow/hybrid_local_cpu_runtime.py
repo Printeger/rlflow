@@ -19,6 +19,12 @@ class LocalCpuGrant:
     raw: bytes
 
 
+@dataclass(frozen=True,eq=False)
+class LocalCpuReviewerInput:
+    """Original settled CPU parents/material; NOT a model execution grant."""
+    raw: bytes
+
+
 class LocalCpuRunnerOwner(FixtureRuntimeOwner):
     def shutdown(self):
         self._actual();self._safety_freeze=True
@@ -48,6 +54,65 @@ class LocalCpuRunnerOwner(FixtureRuntimeOwner):
 
     def issue_cpu_trial_grant(self,*args,**kwargs):raise PermissionError('no fixed CPU grant upgrade')
     def issue_engineering_patch_grant(self,*args,**kwargs):raise PermissionError('no fixed engineering grant upgrade')
+
+    def prepare_workflow_reviewer_input(self,lease):
+        from .hybrid_a_workflow_review import from_cpu
+        from .hybrid_budget_ledger import entry_key
+        from .hybrid_goals import digest
+        from .store import sha
+        attempt=self._issued(lease)
+        if self._workflow_handoff is None:raise PermissionError('original A CPU handoff required')
+        with self.pool._lock,self._lock:
+            self._check_terminal(attempt)
+            parent=attempt['entries'].get('FIXTURE_SCOPE_STOPPED')
+            if parent is None or parent['decision']!='SETTLED':
+                raise Conflict('original settled CPU terminal required')
+            self._verify_pool_link(attempt,'FIXTURE_FREE',parent)
+            with self.pool._transaction() as db:
+                free=self.pool._point(db,'fixture_free_'+sha([attempt['claim_value']['key'],lease.id]))
+                if free is None or free['payload']['project_fact_hash']!=digest(parent):
+                    raise Conflict('original CPU committed FREE required')
+            with self.store.read_connection() as db:
+                db.execute('BEGIN');read=ReadBudget(db,PREPARATION_READ_BYTES)
+                if self.budget._point(db,entry_key(parent['request']),read)!=parent:
+                    raise Conflict('original CPU parent whole event changed')
+                self.budget._dependencies(db,parent,read)
+                loaded=self.budget._load(db,parent['request']['goal_ref'],read)
+                self._workflow_cpu_material(loaded)
+                engineer=json.loads(self._workflow_handoff_raw[1])
+                material=from_cpu(loaded['record']['contract']['proposal'],
+                    json.loads(self.plans.registry._raw),parent,engineer)
+                probe={k:parent['request'][k] for k in ('project_id','data_mode','goal_ref','store_epoch','reservation_id')}
+                probe['action']='MARK_UNKNOWN'
+                head,_,_=self.budget._heads(db,probe,read,self.budget._metadata(db))
+            from .hybrid_a_workflow_accounting import check_window
+            now,_=self.controller._sample()
+            check_window(head['workflow'],attempt['origin']['local_cpu']['workflow'],now)
+            if head['workflow'].get('candidate_cpu_entry')!=entry_key(attempt['entries']['REGISTER_NO_HANDOFF']['request']):
+                raise Conflict('original registered CPU stage required')
+            raw=canonical(material)
+            from .hybrid_authority import timestamp
+            final_now,_=self.controller._sample()
+            check_window(head['workflow'],attempt['origin']['local_cpu']['workflow'],final_now)
+            if not now<=final_now<timestamp(loaded['expires_at']):
+                raise Conflict('original Reviewer input current approval expired or clock regressed')
+            original=self._workflow_review_inputs.get(id(lease))
+            if original is not None:
+                if original[0] is not lease or original[2]!=raw or original[1].raw!=original[2]:
+                    raise Conflict('original Reviewer input changed')
+                return original[1]
+            cap=LocalCpuReviewerInput(raw)
+            self._workflow_review_inputs[id(lease)]=(lease,cap,raw)
+            return cap
+
+    def _issued_workflow_reviewer_input(self,lease,cap):
+        row=self._workflow_review_inputs.get(id(lease))
+        if (type(cap) is not LocalCpuReviewerInput or row is None or row[0] is not lease or
+                row[1] is not cap or row[2]!=cap.raw):
+            raise PermissionError('same-original CPU Reviewer input required')
+        if self.prepare_workflow_reviewer_input(lease) is not cap:
+            raise Conflict('original Reviewer input changed')
+        return json.loads(row[2])
 
     def execute_workflow_cpu(self,token):
         """Derive and execute the single original A candidate CPU stage.
