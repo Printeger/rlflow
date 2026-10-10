@@ -1,0 +1,119 @@
+Original goal continuation after commit 8f1be1f; previous turn was progress.
+Attachment reread completely ec50c4; actual get_goal ACTIVE, not redefined.
+Only USER package-lock untracked on entry, untouched/unstaged.
+
+New fixed hybrid_native_model_gate.py replaces nonexecuting runtime module as
+new NativeModelOwner program pin. Every fresh generating approval must bind
+the new gate hash; no old grant upgraded. Actual start/_runtime_spawn/release
+still unconditional deny. New gate has no credential acquisition.
+Hash-pinned old diagnostic helper (unchanged SHA256
+7321930320afbbd1451f0dcef669826fd5263a215f71cd162697aa18204ecb31)
+supplies fixed root-owned ELF identity and existing Landlock/seccomp/no-new-TGID
+restrictions. New code checks closed readonly packet/schema/config material;
+copies consumed packet/schema into write/grow/shrink sealed kernel memfds.
+Sandbox-ready goes to separate FD; G/control input never becomes model context.
+Only after G would sealed packet become stdin and same PID exec fixed held ELF,
+with bounded alarm and explicit private env; no caller argv/API/proxy/env fallback.
+Ready explicitly account_qualified=false/network PARTIAL. Not account, native
+usage, reviewer, settlement or condition evidence. Builtin provider retries are
+not qualified or promised zero; no configuration override is such proof.
+
+Official OpenAI Docs skill reread ec50c4; official scoped search turn110search*,
+markdown open failed unsupported content-type (turn111view0/1/2), changed fetch
+method to HTML (turn112view0/1/2 plus actual matching page content view3/4/5):
+https://learn.chatgpt.com/docs/cli/reference
+https://learn.chatgpt.com/docs/auth
+https://learn.chatgpt.com/docs/config-file/config-reference
+Confirmed stdin '-' / schema / ignore-user-config auth behavior / forced
+ChatGPT-workspace logout-on-mismatch / stable shell_tool option. New auth-private
+and work are original private sibling directories, never existing credential
+home. No auth read, login/CLI manual, actual model or remote provider call.
+
+53522: PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest
+ tests/test_hybrid_native_model_gate.py -q
+naturally terminal exit0 7 passed 1.26s (fc0b5f/d4b4d3).
+Actual Linux kernel positive uses real installed ELF only for readonly identity
+hashing; gate receives EOF, NEVER G, writes original sandbox-ready then exits126
+before Codex exec. stdout/stderr empty, auth-private/work empty. Four corrupt
+packet/helper/extra-config/ELFhash negatives never ready, no native exec.
+Explicit argv/env test and actual sealed memfd write/growth refusal included.
+Test subsequently renamed to avoid implying zero builtin retries; assertions
+unchanged, no unchanged suite rerun. Independent High gate review no confirmed
+MUST, noted transport retry/source/account qualification remains open.
+
+89470: PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest
+ tests/test_hybrid_native_model_runtime.py::test_original_generating_grant_registers_frozen_source_but_cannot_launch -q
+naturally terminal exit0 1 passed 10.89s (5f98ee/629f39); fresh new gate pin
+registers through original ledger/source, actual model launch still deny and
+original no-handoff STOP/SETTLED/Pool0/allFDclosed/audit=replay unchanged.
+
+Original prepare_native_gate added: actual Pool + original Controller
+token_transaction/_held/_fresh rechecks same WorkingPlan/material/source/
+approved grant and only original REGISTER_NO_HANDOFF phase; no event/version
+mutation. Source retains one-attempt original ELF/config/helper/ready FDs,
+private empty auth-private/work. Strong independent _gate_bindings freeze raw
+config/helper, actual ELFstamp and directory chains, _physical checks all.
+Partial failures retain known original participants, no allocation replacement;
+independent STOP closes them even if prepare failed. No FD/argv/auth capability
+returned, prepared/execution_qualified=false only.
+
+98584: PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest
+ tests/test_hybrid_native_model_runtime.py -k 'original_gate_materials or original_partial_gate' -q
+naturally terminal 2 failed,15 deselected 17.31s (237759/a3c84e).
+Both same root cause: new method supplied ordinary read snapshot to _fresh;
+original Controller correctly requires its held token_transaction. Diagnosed
+original check/token_transaction/start pattern before rerun; did NOT weaken
+Controller, schema, authority or test assertions. Switched to original held
+transaction + final fresh recheck; no blind identical rerun.
+48038: same affected command after integration fix, naturally terminal exit0
+2 passed,15 deselected 20.64s (bc63cf/02fb94). Positive actual original synthetic
+DEV approval/register→private no-auth materials→same result on duplicate→
+no Popen/no Store or Pool version changes→original full STOP/Pool0/allFDclosed/
+audit=replay. Injected helper allocation failure retains original binary/config
+FDs; no replacement; original STOP still fully closes/releases.
+
+Compile four changed modules/diff exit0 (345e10); old helper hash unchanged;
+USER lock unchanged SHA256
+becc7e2a36dfcad4ffe934b5ff2f0f68187611d6c0641bd63d81367651cfbf09.
+All above sessions terminal; no duplicate test restarts. Further independent
+source/transaction review outcome will be appended before handoff.
+Real model task/modifications/product Reviewer/condition acceptance/continuation
+NOT_EXECUTED; this is A local implementation WIP, not A/checkpoint98 acceptance.
+Remaining direct dependency: original credential-owner/source producer/ready/G
+and actual stdout/EOF/usage publisher+settlement, independent Evaluator,
+protected condition CAS/acceptance and one autonomous continuation. GPU/B/C/
+instinctRL HOLD unchanged. A narrow contract pending blocks actual model run,
+not ordinary local implementation; Goal remains ACTIVE.
+
+Final Source narrow review confirmed one MUST: borrowing _read_bounded and
+pin_binary could lose an unreturned temporary FD on exceptional close, allowing
+later row-only cleanup to FREE while that original input stayed open. Fixed
+without changing old shared helpers: newSource immediately registers EVERY
+original opened ELF ancestor O_PATH/ELF/helper input before fstat/hash. Inputs
+remain independently retained until cleanup, no hidden temporary close path.
+Physical checks original FD/path/ancestor and ELF stamp; fork closes extras;
+cleanup independently attempts all inputs after original producer/base cleanup;
+unknown identity/mismatch/close failure keeps UNKNOWN. Original Runtime terminal
+checks extra descriptors too, so row FDs being None cannot fake full closure.
+
+29929: PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest
+ tests/test_hybrid_native_model_runtime.py -k 'original_gate_materials or original_partial_gate or original_gate_input_close' -q
+naturally terminal exit0 3 passed,15 deselected 31.50s (500214/585b86).
+Two affected prior prepare cases plus new injected real helper close fault:
+actual unclosed original helper reader remains strongly held, STOP UNKNOWN,
+Pool1; restore original close implementation, then same original STOP completes,
+all original input/row FDs closed, Pool0. No repeated unchanged no-G gate tests.
+5309: PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest
+ tests/test_hybrid_native_model_runtime.py::test_failed_elf_pin_keeps_original_unreturned_fd_until_close -q
+naturally terminal exit0 1 passed 10.03s (9f302b/90d6b3).
+Actual original readonly ELF open then injected bad magic makes pin fail BEFORE
+return/attempt.binary assignment. Exact opened ELF retained. Injected close fault
+keeps UNKNOWN/Pool1; only successful original FD cleanup permits terminal/Pool0.
+
+High finite_app_review_63 independently closed this MUST, including immediate
+registration/fork/independent cleanup/terminal extra-FD checks, no other confirmed
+MUST in the changed boundary. No test/auth/provider calls by independent agent.
+Current compile four modules/diff pass, old helper/USERlock hashes unchanged
+(6f3513). No original live test session remains. Snapshot commit is local A WIP,
+not a completed A/checkpoint98. Actual real task and downstream review/condition/
+continuation results remain NOT_EXECUTED. No new user decision blocks code.

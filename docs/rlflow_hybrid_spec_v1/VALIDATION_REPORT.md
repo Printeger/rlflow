@@ -1,5 +1,9 @@
 # 需求包离线校验报告
 
+末窄审临时FD MUST修后，仅受影响原prepare/partial/真实helper closefault原29929三项通过31.50s；实际ELF pin失败尚未返回FD+原closefault新5309一项通过10.03s。未清FD时UNKNOWN/Pool1，只有原FD实际成功关闭才完整STOP/FREE；新owner terminal和fork均覆盖extras。High关闭/no remaining MUST，compile/diff/USERlock/旧helperhash通过；全部原session terminal，未重复无变更7项gate。证据a-native-gate-wip-20261010.txt，snapshot不是A/98或真实任务完成。
+
+本轮A gate仅no-G资格：原session53522自然terminal7pass1.26s（实际kernel ready/EOF126、材料负例、显式env、封存拒写）；原新程序pin登记89470自然1pass10.89s。sourceprepare首98584两case同controller-held-transaction失败2fail17.31s，根因定位后接原事务/guard，仅48038受影响2pass20.64s，完整no-spawn/private材料/幂等/partial清理/STOP/FREE/audit。不重复已过gate，非真实模型/账户/用量/Reviewer/条件接续验收；详evidence/a-native-gate-wip-20261010.txt。编译/diff/USERlock/旧helperhash通过；Goal ACTIVE，82历史全量失败保留。
+
 末窄审新增1项MUST（来源physical/reader核验在try外可恢复后继续）已锁存original source：新原登记test_packet_source_failure_latches_after_bytes_restored_and_reader_replaced独立原session3325自然terminal，1pass9.00s；High源码关闭，无剩余确证MUST。编译changed modules/diff通过，USER package-lock仍原SHA，不暂存。此本地实现快照非A/98验收，真实task仍NOT_EXECUTED。
 
 2026-10-10 A生成原接线验证：初原登记2pass32.79s；handoff/packet组首1fail6pass+1teardownerror10.52s为错误假设HANDOFF无producer可伪终态，保持原guard不变，改为保UNKNOWN/Pool1的负例仅1pass10.70s。独立三MUST修后原源/部分分配受影响7pass7deselected66.91s；必要共享旧fixture stop-before-spawn与diagnostic copygrant2pass19.60s。本轮新增held-FD数据读取8pass.07s；增强并发growth隐藏旧prefix篡改的真实全audit负例+原source接线2pass10.95s。不同版本结果不合并为单次全module绿，不重复旧已过项；无真实模型/账户/产品Review/结算资格，首个工程task NOT_EXECUTED，A/98未关闭。完整命令/原session/tool/失败诊断见evidence/a-native-model-wip-20261010.txt；Goal当前ACTIVE，82历史全量失败保留。

@@ -1,5 +1,7 @@
 # 阻塞与证据缺口
 
+最新直接缺口缩减：固定native gate与原no-auth启动材料已本地实装，实际无G在内核限制后退出126、原材料正常/partial清理验证通过。仍缺原credential持有者/账户验证、实际producer-ready-G与原stdout/EOF用量publisher/结算；新gate的account=false ready或未发送G试验不能替代。独立Evaluator、条件CAS/接续与首个非预设真实工程task仍未完成。无新增用户决定阻塞本地开发；已提出A运行合同未答不调用模型，GPU/B/C/instinctRL HOLD不变，Goal ACTIVE。
+
 2026-10-10最新核对：原Goal ACTIVE，本地代码实现无新增用户决定阻塞；下方blocked为历史记录。新exact生成owner/source登记、冻结原packet/schema与部分分配清理已实现；原held stdout FD有界读取和全prefix审计为数据能力，不能证明模型/账户/EOF。剩余直接链路缺口：固定同PID ELF gate/原credential持有者与ready/producer证明；完整原计数的可信publisher及一次结算；独立产品Evaluator；条件publisher+Core CAS接纳/自主接续；首个非预设真实任务。start/spawn/release及模型source poll/seal仍拒绝，不能以REGISTER或调用decoder代替。已提出A合同未答仅阻止真实运行，不阻止上述本地实现；GPU/B/C/instinctRL HOLD未改变，不读取auth、不调用模型。
 
 2026-10-10当前：运行授权不阻塞生成来源/结算/Reviewer/条件接续的必要本地实现。新生成预算分支与封闭packet解码已验证，但新exact模型owner/账户及原FD输出来源、可信结算、独立产品Evaluator、条件CAS/接续仍缺；模型task NOT_EXECUTED。首次真实A只待已提出的当前ChatGPT账户8CLI会话、输入40万/输出3.2万soft token、每会话300s、墙钟90min/累计受管60min合同答复，不再以旧整包B/C或GPU合同为前置。不读取auth或调用模型/GPU；B/C与instinctRL HOLD不变。原Goal追踪器get仍blocked且工具无resume状态，本地继续，不重建Goal、不冒报ACTIVE。

@@ -3,6 +3,7 @@ import hashlib
 import json
 import os
 import stat
+from pathlib import Path
 
 from .hybrid_fixture_materials import _write_new
 from .hybrid_usage_source import FixtureUsageSourceOwner, FixtureUsageSource, SOURCE_FILES
@@ -14,6 +15,8 @@ class NativeModelSourceOwner(FixtureUsageSourceOwner):
         self._model_bindings = {}
         self._packet_readers = {}
         self._packet_failures = set()
+        self._gate_bindings = {}
+        self._gate_inputs = {}
         super().__init__(pool)
 
     def _actual(self):
@@ -23,10 +26,118 @@ class NativeModelSourceOwner(FixtureUsageSourceOwner):
         super()._actual()
 
     def _source_files(self):
-        return {**SOURCE_FILES, 'packet':'packet.json', 'schema':'output.schema.json'}
+        return {**SOURCE_FILES, 'packet':'packet.json', 'schema':'output.schema.json',
+            'config':'launch.json','helper':'kernel-helper.py',
+            'ready_read':'sandbox.jsonl','ready_write':'sandbox.jsonl'}
 
     def _readonly_source_keys(self):
-        return super()._readonly_source_keys() | {'packet','schema'}
+        return super()._readonly_source_keys() | {'packet','schema','config','helper','ready_read'}
+
+    def _check_binary(self, attempt):
+        row = attempt['binary']; info = os.fstat(row['fd'])
+        stamp = (info.st_dev,info.st_ino,info.st_size,info.st_mtime_ns,info.st_ctime_ns)
+        if stamp != row['stamp']:raise Conflict('original generating ELF changed')
+
+    def _open_gate_input(self, source, path, flags):
+        # Retain immediately after open, BEFORE any fallible identity/hash IO.
+        fd = os.open(path,flags|os.O_NOFOLLOW|os.O_CLOEXEC|os.O_NONBLOCK)
+        row = {'fd':fd,'identity':None,'path':str(path)}
+        self._gate_inputs.setdefault(id(source),[]).append(row)
+        info = os.fstat(fd); row['identity'] = (info.st_dev,info.st_ino)
+        return fd
+
+    def _pin_gate_binary(self, source):
+        from .hybrid_native_diagnostic_gate import NATIVE
+        previous = self._open_gate_input(source,'/',os.O_PATH|os.O_DIRECTORY)
+        current_path=''
+        for part in Path(NATIVE).parts[1:-1]:
+            fd = os.open(part,os.O_PATH|os.O_DIRECTORY|os.O_NOFOLLOW|os.O_CLOEXEC,dir_fd=previous)
+            current_path += '/'+part
+            row = {'fd':fd,'identity':None,'path':current_path}
+            self._gate_inputs[id(source)].append(row)
+            info = os.fstat(fd); row['identity'] = (info.st_dev,info.st_ino)
+            if info.st_uid!=0 or info.st_mode&0o022:raise Conflict('original immutable ELF ancestors required')
+            previous = fd
+        fd = os.open('codex',os.O_RDONLY|os.O_NOFOLLOW|os.O_CLOEXEC|os.O_NONBLOCK,dir_fd=previous)
+        row = {'fd':fd,'identity':None,'path':NATIVE}; self._gate_inputs[id(source)].append(row)
+        info = os.fstat(fd); row['identity'] = (info.st_dev,info.st_ino)
+        if (not stat.S_ISREG(info.st_mode) or info.st_uid!=0 or info.st_mode&0o022 or
+                not 0<info.st_size<=512*1024**2 or os.pread(fd,4,0)!=b'\x7fELF'):
+            raise Conflict('fixed root-owned bounded generating ELF required')
+        value=hashlib.sha256(); offset=0
+        while offset<info.st_size:
+            block=os.pread(fd,min(1024**2,info.st_size-offset),offset)
+            if not block:raise Conflict('original generating ELF truncated')
+            value.update(block); offset+=len(block)
+        stamp=(info.st_dev,info.st_ino,info.st_size,info.st_mtime_ns,info.st_ctime_ns)
+        after=os.fstat(fd)
+        if stamp!=(after.st_dev,after.st_ino,after.st_size,after.st_mtime_ns,after.st_ctime_ns):
+            raise Conflict('original generating ELF changed during pin')
+        return {'fd':fd,'stamp':stamp,'sha256':'sha256:'+value.hexdigest()}
+
+    def _extra_fork_descriptors(self, attempt):
+        return tuple(row['fd'] for row in self._gate_inputs.get(id(attempt['source']),[]) if row['fd'] is not None)
+
+    def _cleanup_attempt(self, attempt):
+        errors=[]
+        try:super()._cleanup_attempt(attempt)
+        except (OSError,Conflict) as error:errors.append(error)
+        for row in self._gate_inputs.get(id(attempt['source']),[]):
+            if row['fd'] is None:continue
+            try:
+                info=os.fstat(row['fd'])
+                if row['identity'] is None or (info.st_dev,info.st_ino)!=row['identity']:
+                    raise Conflict('original generating input FD identity unknown/reused')
+                os.close(row['fd']); row['fd']=None
+            except (OSError,Conflict) as error:errors.append(error)
+        if errors:
+            attempt['status']='UNKNOWN'
+            raise Conflict('original generating input cleanup incomplete') from errors[0]
+
+    def _prepare_model_gate(self, owner, lease):
+        """Private original materials only. No process, auth read or G."""
+        from .hybrid_native_model_runtime import NativeModelOwner
+        from .hybrid_native_model_gate import FIELDS, HELPER_SHA256
+        from .hybrid_runtime_boundary import directory_chain
+        if type(owner) is not NativeModelOwner or owner.sources is not self:
+            raise PermissionError('original same-owner generating gate required')
+        runtime = owner._issued(lease); source = runtime['source']; attempt = self._issued(source)
+        with self._lock:
+            self._physical(attempt)
+            prior = self._gate_bindings.get(id(source))
+            if prior is not None:return {'prepared':True,'execution_qualified':False}
+            if attempt.get('model_gate_entered'):
+                raise Conflict('original gate material outcome UNKNOWN; no replacement')
+            attempt['model_gate_entered'] = True
+            try:
+                binding = json.loads(runtime['native_model_grant'].raw)
+                binary = self._pin_gate_binary(source); attempt['binary'] = binary
+                if binary['sha256'] != binding['binary_sha256']:
+                    raise Conflict('original approved generating ELF differs')
+                config = {key:binding[key] for key in FIELDS}; config_raw = canonical(config)
+                helper_fd = self._open_gate_input(source,Path(__file__).with_name('hybrid_native_diagnostic_gate.py'),os.O_RDONLY)
+                info=os.fstat(helper_fd)
+                if not stat.S_ISREG(info.st_mode) or info.st_size>16384:
+                    raise Conflict('original bounded regular kernel helper required')
+                helper_raw = os.pread(helper_fd,16385,0)
+                if len(helper_raw)>16384 or hashlib.sha256(helper_raw).hexdigest()!=HELPER_SHA256:
+                    raise Conflict('original hash-pinned kernel helper differs')
+                for name in ('auth-private','work'):(attempt['path']/name).mkdir(mode=0o700)
+                for key,name,raw,flags in (('config','launch.json',config_raw,os.O_RDONLY),
+                        ('helper','kernel-helper.py',helper_raw,os.O_RDONLY),
+                        ('ready_read','sandbox.jsonl',b'',os.O_RDONLY)):
+                    _write_new(attempt['path']/name,raw)
+                    fd = os.open(attempt['path']/name,flags|os.O_NOFOLLOW|os.O_NONBLOCK|os.O_CLOEXEC)
+                    attempt['fds'][key] = fd; info = os.fstat(fd)
+                    attempt['identities'][name] = [info.st_dev,info.st_ino]
+                fd = os.open(attempt['path']/'sandbox.jsonl',os.O_WRONLY|os.O_APPEND|os.O_NOFOLLOW|os.O_NONBLOCK|os.O_CLOEXEC)
+                attempt['fds']['ready_write'] = fd
+                self._gate_bindings[id(source)] = (source,config_raw,helper_raw,binary['stamp'],
+                    directory_chain(attempt['path']/'auth-private'),directory_chain(attempt['path']/'work'))
+                self._physical(attempt)
+                return {'prepared':True,'execution_qualified':False}
+            except BaseException:
+                attempt['status'] = 'UNKNOWN'; raise
 
     def start_fixture(self, *args, **kwargs):raise PermissionError('generating source cannot run fixture')
     def _runtime_spawn(self, *args, **kwargs):raise PermissionError('native generating launch unqualified')
@@ -73,6 +184,14 @@ class NativeModelSourceOwner(FixtureUsageSourceOwner):
 
     def _physical(self, attempt):
         result = super()._physical(attempt)
+        for row in self._gate_inputs.get(id(attempt['source']),[]):
+            if row['fd'] is None:raise Conflict('original generating input closed before terminal')
+            info=os.fstat(row['fd']); current=os.stat(row['path'],follow_symlinks=False)
+            if row['identity'] is None or (info.st_dev,info.st_ino)!=row['identity'] or (current.st_dev,current.st_ino)!=row['identity']:
+                raise Conflict('original generating input FD/path rebound')
+            if stat.S_ISDIR(info.st_mode) and (info.st_uid!=0 or info.st_mode&0o022):
+                raise Conflict('original immutable generating input ancestor changed')
+        if attempt.get('binary') is not None:self._check_binary(attempt)
         original = self._model_bindings.get(id(attempt['source']))
         if original is not None:
             source, source_raw, owner, lease, grant, grant_raw, packet_raw, schema_raw = original
@@ -94,6 +213,16 @@ class NativeModelSourceOwner(FixtureUsageSourceOwner):
                     raise Conflict('original frozen generating packet/schema changed')
         elif 'native_model' in json.loads(attempt['source'].raw):
             raise Conflict('original generating source publication missing')
+        gate = self._gate_bindings.get(id(attempt['source']))
+        if gate is not None:
+            from .hybrid_runtime_boundary import directory_chain
+            source,config_raw,helper_raw,binary_stamp,home_chain,work_chain = gate
+            if (source is not attempt['source'] or attempt['binary']['stamp'] != binary_stamp or
+                    os.pread(attempt['fds']['config'],8193,0) != config_raw or
+                    os.pread(attempt['fds']['helper'],16385,0) != helper_raw or
+                    directory_chain(attempt['path']/'auth-private') != home_chain or
+                    directory_chain(attempt['path']/'work') != work_chain):
+                raise Conflict('original generating gate materials changed')
         return result
 
     def poll_packet_data(self, source):

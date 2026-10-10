@@ -103,6 +103,20 @@ class NativeModelOwner(FixtureRuntimeOwner):
         self._issued(lease)
         raise PermissionError('native account/ELF/sandbox launch qualification not implemented; no model handoff')
 
+    def prepare_native_gate(self, lease):
+        """Prepare original private no-auth materials; not execution consent."""
+        attempt = self._issued(lease)
+        with self.pool._lock:
+            def final():self._fresh(context[0],context[1],attempt)
+            with self.controller.token_transaction(attempt['token'],read_bytes=PREPARATION_READ_BYTES,
+                    _commit_context=self._held,_before_commit=final) as context:
+                db,read,_ = context
+                self._fresh(db,read,attempt)
+                current = self._current(attempt)
+                if current['fixture_runtime']['phase'] != 'REGISTER_NO_HANDOFF':
+                    raise Conflict('original no-handoff registration required for gate materials')
+                return self.sources._prepare_model_gate(self,lease)
+
     def _check_spawn_gate(self, attempt):
         self._issued(attempt['lease'])
         raise PermissionError('unqualified native generating spawn denied')
@@ -128,6 +142,7 @@ class NativeModelOwner(FixtureRuntimeOwner):
     def _check_terminal(self, attempt):
         retained = self._retained_source(attempt)
         if retained is not None and (retained['status'] != 'CLOSED' or
+                self.sources._extra_fork_descriptors(retained) or
                 any(fd is not None for fd in retained['fds'].values()) or
                 retained['producer'] is not None and (retained['producer'].poll() is None or
                     retained['producer'].stdin is not None and not retained['producer'].stdin.closed)):

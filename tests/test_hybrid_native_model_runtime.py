@@ -25,17 +25,24 @@ OUTPUT_SCHEMA = {'type':'object','properties':{'edits':{'type':'array'}},
 PACKET = None
 
 
+def actual_binary_hash():
+    from rlflow.hybrid_native_diagnostic import pin_binary
+    row=pin_binary()
+    try:return row['sha256']
+    finally:os.close(row['fd'])
+
+
 def generating_bound(config):
     global PACKET
     _, proposal = bound(config)
     proposal.update(goal_kind='engineering', objective='Implement the approved normalization behavior')
     PACKET = dict(role='Engineer',files=FILES,objective=proposal['objective'],conditions=proposal['global_conditions'])
-    import rlflow.hybrid_native_model_runtime as runtime_module
+    import rlflow.hybrid_native_model_gate as runtime_module
     gate_hash = 'sha256:'+hashlib.sha256(Path(runtime_module.__file__).read_bytes()).hexdigest()
     spec = dict(profile=PROFILE,role='Engineer',model='gpt-6.1-sol',effort='medium',
         account_mode='CHATGPT_CURRENT_WORKSPACE_ONLY',workspace_id='12345678-1234-1234-1234-123456789012',
         packet_sha256=digest(PACKET),output_schema_sha256=digest(OUTPUT_SCHEMA),candidate_sha256=digest(FILES),
-        binary_sha256='sha256:'+'a'*64,gate_sha256=gate_hash,
+        binary_sha256=actual_binary_hash(),gate_sha256=gate_hash,
         model_input_tokens=1000,model_output_tokens=100,seconds=10,
         token_enforcement='SOFT_APPROVED',network_enforcement='PARTIAL_NOT_QUALIFIED',
         model_tools=False,api_billing=False,account_switch=False,gpu_enabled=False)
@@ -142,6 +149,107 @@ def test_packet_source_failure_latches_after_bytes_restored_and_reader_replaced(
     owner.stop_to_terminal(lease)
     assert owner.pool.snapshot()['occupied']==0
     assert all(fd is None for fd in row['fds'].values())
+
+
+def test_original_gate_materials_freeze_without_auth_or_spawn(model_runtime,monkeypatch):
+    owner,bundle,token,observation,claim=model_runtime
+    grant=owner.issue_native_model_grant(bundle,token,observation,packet=PACKET,output_schema=OUTPUT_SCHEMA)
+    lease=owner.register(bundle,token,observation,claim,request_key='model',scenario='native_model',native_model_grant=grant)
+    def forbidden(*args,**kwargs):pytest.fail('material preparation must never spawn')
+    monkeypatch.setattr('subprocess.Popen',forbidden)
+    versions=(owner.store.version(),owner.pool.snapshot()['version'])
+    result=owner.prepare_native_gate(lease)
+    assert result=={'prepared':True,'execution_qualified':False}
+    assert owner.prepare_native_gate(lease)==result
+    row=owner.sources._issued(owner._issued(lease)['source'])
+    assert list((row['path']/'auth-private').iterdir())==[]
+    assert list((row['path']/'work').iterdir())==[]
+    assert row['producer'] is None and not row['launch_entered']
+    assert (owner.store.version(),owner.pool.snapshot()['version'])==versions
+    with pytest.raises(PermissionError):owner.start(lease)
+    owner.stop_to_terminal(lease)
+    assert owner.pool.snapshot()['occupied']==0 and all(fd is None for fd in row['fds'].values())
+    assert owner.store.audit()==owner.store.replay()
+
+
+def test_original_partial_gate_materials_keep_fds_for_independent_stop(model_runtime,monkeypatch):
+    owner,bundle,token,observation,claim=model_runtime
+    grant=owner.issue_native_model_grant(bundle,token,observation,packet=PACKET,output_schema=OUTPUT_SCHEMA)
+    lease=owner.register(bundle,token,observation,claim,request_key='model',scenario='native_model',native_model_grant=grant)
+    import rlflow.hybrid_native_model_source as module
+    original=module._write_new
+    def fail(path,raw):
+        if path.name=='kernel-helper.py':raise OSError('injected helper allocation failure')
+        return original(path,raw)
+    monkeypatch.setattr(module,'_write_new',fail)
+    with pytest.raises(OSError,match='injected'):owner.prepare_native_gate(lease)
+    row=owner.sources._issued(owner._issued(lease)['source'])
+    assert row['binary']['fd'] is not None and row['fds']['config'] is not None
+    with pytest.raises(Conflict,match='no replacement'):owner.prepare_native_gate(lease)
+    owner.stop_to_terminal(lease)
+    assert owner.pool.snapshot()['occupied']==0 and all(fd is None for fd in row['fds'].values())
+
+
+def test_original_gate_input_close_failure_retains_unknown_until_original_close(model_runtime,monkeypatch):
+    owner,bundle,token,observation,claim=model_runtime
+    grant=owner.issue_native_model_grant(bundle,token,observation,packet=PACKET,output_schema=OUTPUT_SCHEMA)
+    lease=owner.register(bundle,token,observation,claim,request_key='model',scenario='native_model',native_model_grant=grant)
+    import rlflow.hybrid_native_model_source as module
+    original_write=module._write_new
+    def fail(path,raw):
+        if path.name=='kernel-helper.py':raise OSError('injected prepare failure')
+        return original_write(path,raw)
+    monkeypatch.setattr(module,'_write_new',fail)
+    with pytest.raises(OSError,match='prepare failure'):owner.prepare_native_gate(lease)
+    source=owner._issued(lease)['source']; row=owner.sources._issued(source)
+    helper=owner.sources._gate_inputs[id(source)][-1]
+    assert helper['path'].endswith('hybrid_native_diagnostic_gate.py')
+    fd=helper['fd']; original_close=os.close
+    def fail_close(target):
+        if target==fd:raise OSError('injected original helper close failure')
+        return original_close(target)
+    monkeypatch.setattr(os,'close',fail_close)
+    with pytest.raises(Conflict):owner.stop_to_terminal(lease)
+    assert helper['fd']==fd and os.fstat(fd)
+    assert owner._current(owner._issued(lease))['status']=='UNKNOWN'
+    assert owner.pool.snapshot()['occupied']==1
+    monkeypatch.setattr(os,'close',original_close)
+    owner.stop_to_terminal(lease)
+    assert helper['fd'] is None
+    assert not owner.sources._extra_fork_descriptors(row)
+    assert owner.pool.snapshot()['occupied']==0 and all(fd is None for fd in row['fds'].values())
+
+
+def test_failed_elf_pin_keeps_original_unreturned_fd_until_close(model_runtime,monkeypatch):
+    owner,bundle,token,observation,claim=model_runtime
+    grant=owner.issue_native_model_grant(bundle,token,observation,packet=PACKET,output_schema=OUTPUT_SCHEMA)
+    lease=owner.register(bundle,token,observation,claim,request_key='model',scenario='native_model',native_model_grant=grant)
+    from rlflow.hybrid_native_diagnostic_gate import NATIVE
+    original_read=os.pread; binary=os.stat(NATIVE)
+    def bad_magic(fd,size,offset):
+        info=os.fstat(fd)
+        if size==4 and (info.st_dev,info.st_ino)==(binary.st_dev,binary.st_ino):return b'BAD!'
+        return original_read(fd,size,offset)
+    with monkeypatch.context() as injected:
+        injected.setattr(os,'pread',bad_magic)
+        with pytest.raises(Conflict,match='generating ELF required'):owner.prepare_native_gate(lease)
+    source=owner._issued(lease)['source']; row=owner.sources._issued(source)
+    assert row.get('binary') is None  # pin never returned, yet original FD retained.
+    retained=owner.sources._gate_inputs[id(source)][-1]
+    assert retained['path']==NATIVE
+    fd=retained['fd']; original_close=os.close
+    def failed_close(target):
+        if target==fd:raise OSError('injected unreturned ELF close failure')
+        return original_close(target)
+    monkeypatch.setattr(os,'close',failed_close)
+    with pytest.raises(Conflict):owner.stop_to_terminal(lease)
+    assert retained['fd']==fd and os.fstat(fd)
+    assert owner.pool.snapshot()['occupied']==1
+    assert owner._current(owner._issued(lease))['status']=='UNKNOWN'
+    monkeypatch.setattr(os,'close',original_close)
+    owner.stop_to_terminal(lease)
+    assert retained['fd'] is None and not owner.sources._extra_fork_descriptors(row)
+    assert owner.pool.snapshot()['occupied']==0
 
 
 def test_original_handoff_without_producer_proof_retains_budget_and_pool(model_runtime):

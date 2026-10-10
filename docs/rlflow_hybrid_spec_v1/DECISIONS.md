@@ -1,5 +1,9 @@
 # 开发决策记录
 
+末审直接STOP缺陷处理：不借内部finally-close失败无法交回原FD的pin/read helper。新Source为每次本片open立即强登记，身份未知不采纳/不假关闭，成功身份核后独立close；所有输入含祖先FD纳fork与终态门。只修当前直接接线所引入的闭包问题，不扩旧恢复工作；原共享diagnostic helper未改。
+
+新生成gate使用单独程序hash/fresh approval，不再将非执行runtime模块当gate。复用旧kernel helper但先核固定完整hash再加载，未改旧diagnostic helper；packet/schema经内核sealed copy后供CLI，不能借mode0600说等待G期间内容不可写。私有auth-private与work只准备empty目录，不指向现有auth home；显式env不继承API/proxy/账户fallback。原Source准备使用Controller.token_transaction+完整_held+final fresh，而非自行提供read snapshot给原guard；相同失败两case先根因诊断再改接线，不改校验器。Builtin provider retry仍未资格，argv没有retry override不证明零retry；ready不升级账号/用量/Review/条件权限。
+
 2026-10-10 A生成接线：原授权绑定packet里的角色、候选manifest、真实任务objective/conditions，不用含自身合同hash的WorkingPlan packet造成递归hash；原source发布后独立强留source/grant raw与original identity，不以mutable model_allocated标记决定完整性。部分分配未返回source也必须清理原claim强留的FD，闭包失败保UNKNOWN/占槽。HANDOFF无producer的初测试假设违反原终态来源，改诊断/负例，不放松原NO_HANDOFF门。新增held-FD reader全prefix分步审计，检测并发增长隐藏的旧prefix改写；helper与poll_packet_data始终data-only，fixture poll/seal在生成source明确拒绝。OpenAI Docs只读核对CLI/auth/config：ignore-user-config仍用CODEX_HOME认证、forced登录/workspace不匹配会logout/exit；未来必须隔离原凭据持有与可写会话目录，不能直接运行或改当前auth home。官方选项不证明账户/重试/transport资格，未编造硬次数/费用封顶。
 
 2026-10-10 A WIP：生成profile与零模型diagnostic授权分离；缺原计数的生成handoff不能借物理STOP结零token。CLI声明的chatgpt.com allowlist和workspace UUID仍未证明实际账户/目的地/网络资格，registration.execution_qualified=false；不开放旧start deny或原owner allowlist。PacketTranscript仅有限数据解码，原stdout/producer/account/packet/EOF/STOP和独立Review仍需exact owner证明。最终message进入MESSAGE锁定状态，不接受后续item更新洗掉原输出。按用户拆阶段，先A小额CPU合同，B/C/GPU/HOLD不变；本地代码开发不等运行批准。其余恢复后置，先接真实生成纵向链。

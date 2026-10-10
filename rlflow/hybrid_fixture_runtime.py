@@ -136,7 +136,7 @@ class FixtureRuntimeOwner:
             local_cpu = type(self) is LocalCpuRunnerOwner
             native_model = type(self) is NativeModelOwner
             self.program = Path(__file__).with_name('hybrid_local_runner_service.py' if local_cpu else
-                'hybrid_native_model_runtime.py' if native_model else
+                'hybrid_native_model_gate.py' if native_model else
                 'hybrid_native_diagnostic_gate.py' if diagnostic else 'hybrid_runtime_fixture.py')
             # Exact protected program, not any caller command or plan rewriting.
             raw = _read_bounded(self.program, 16384)

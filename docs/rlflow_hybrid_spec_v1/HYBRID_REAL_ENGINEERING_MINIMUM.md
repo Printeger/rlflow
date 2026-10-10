@@ -1,5 +1,7 @@
 # 首个真实工程自主闭环：最小交付清单
 
+最新实现边界：新fixed native gate已真实在Linux内核限制下no-G退出，不执行Codex；原source/controller事务可冻结ELF/config/helper/ready和empty私有会话目录并独立清理正常/partial分配。实际输入会经sealed memfd防等待G期间篡改，G不作模型上下文。第1项剩原账户/credential-owner、原生产者与ready/G接通和完整stdout/EOF；第2–5项仍缺原用量publisher结算、独立Evaluator、条件CAS接纳/接续及真实任务结果。start/spawn/release仍deny，不能用no-G证据计真实任务或A闭环完成。
+
 2026-10-10最新：原Goal当前工具核对ACTIVE；历史blocked不再是现状态。本地exact生成owner/source已实现原登记、冻结packet/schema与独立物理绑定、部分分配FD闭包；held原stdout有限数据读取/全prefix审计已接线，但source/account/usage qualification仍false，实际start/spawn/release和source poll/seal拒绝。下面第1项仅完成登记/材料与读取部分，不能标完成；第2–5项仍缺真实publisher/独立Evaluator/条件CAS接续/非预设实任务。其他恢复后置，未以运行许可暂停这些本地实现。
 
 2026-10-10 A阶段续作（WIP，尚未完成新checkpoint）：用户明确本地生成来源、结算、Reviewer、条件证据和接续实现不等待运行批准。当前新增生成型独立合同/预算分支及有限CLI packet解码：旧零模型授权不升级；handoff后缺原用量，物理STOP仍UNKNOWN/全预留；原BudgetService拒所有caller JSON runtime动作。单thread/单turn/无tools的结构化Engineer输出可进入96任意候选变换；Evaluator输出校验同candidate hash与无未解MUST。decoder为数据，source_authenticated/settlement/condition均false，不是原来源或独立Review。
