@@ -99,6 +99,9 @@ class _FixtureRuntimeGuard:
 class FixtureRuntimeOwner:
     """Protected startup profile: exact fixed local CPU protocol participant."""
     def __init__(self, pool, membership, plans):
+        from .hybrid_native_diagnostic import NativeDiagnosticOwner
+        if type(self) not in (FixtureRuntimeOwner, NativeDiagnosticOwner):
+            raise TypeError('closed protected runtime owner type required')
         if type(pool) is not HostPoolOwner or type(plans) is not WorkingPlanService:
             raise TypeError('fixed original Pool/WorkingPlan owners required')
         with pool._lock, _registry:
@@ -119,18 +122,24 @@ class FixtureRuntimeOwner:
             self._control_service = None
             self._safety_freeze = False
             self._cpu_grants = {}; self._cpu_results = {}
+            self._diagnostic_grants = {}
             self._engineering_grants = {}; self._engineering_results = {}
             self._candidate_materials = {}
             self._execution_units = {}
             self._start_materials = None
             self._engineering_units = self._execution_units  # Original SDK compatibility, same registry.
-            self.program = Path(__file__).with_name('hybrid_runtime_fixture.py')
+            diagnostic = type(self) is NativeDiagnosticOwner
+            self.program = Path(__file__).with_name('hybrid_native_diagnostic_gate.py' if diagnostic else 'hybrid_runtime_fixture.py')
             # Exact protected program, not any caller command or plan rewriting.
             raw = _read_bounded(self.program, 16384)
             self.program_raw = raw; self.program_hash = 'sha256:' + hashlib.sha256(raw).hexdigest()
             self._cpu_evaluator = Path(__file__).with_name('hybrid_cpu_trial.py')
             self._cpu_evaluator_hash = 'sha256:' + hashlib.sha256(_read_bounded(self._cpu_evaluator, 16384)).hexdigest()
-            self.sources = FixtureUsageSourceOwner(pool)
+            if diagnostic:
+                from .hybrid_native_diagnostic_source import NativeDiagnosticSourceOwner
+                self.sources = NativeDiagnosticSourceOwner(pool)
+            else:
+                self.sources = FixtureUsageSourceOwner(pool)
             self.budget._fixture_runtime = self; _owners[id(self)] = self
 
     def _actual(self):
@@ -142,7 +151,11 @@ class FixtureRuntimeOwner:
         self._actual()
         if type(lease) is not FixtureExecutionLease or self._leases.get(id(lease), {}).get('lease') is not lease:
             raise PermissionError('actual original fixture Task/Attempt/Lease required')
-        return self._leases[id(lease)]
+        attempt=self._leases[id(lease)]
+        if type(self) is FixtureRuntimeOwner and attempt['origin']['kind'] not in (
+                'PROTOCOL_CONFORMANCE','LOCAL_CPU_NUMERICAL_TRIAL','LOCAL_CPU_PATCH_PROPOSAL'):
+            raise PermissionError('fixed fixture owner cannot operate another kind')
+        return attempt
 
     def _unit_check(self, attempt):
         unit = self._execution_units.get(id(attempt['lease']))
@@ -263,15 +276,20 @@ class FixtureRuntimeOwner:
             raise PermissionError('actual original same-plan CPU trial grant required')
         return row
 
-    def register(self, bundle, token, observation, claim, *, request_key, scenario='complete', cpu_grant=None,engineering_grant=None):
+    def register(self, bundle, token, observation, claim, *, request_key, scenario='complete', cpu_grant=None,engineering_grant=None,diagnostic_grant=None):
         """REGISTER/CANCEL compete on the ONE original ReservationHEAD CAS."""
         from .hybrid_protocol import ID, validate_schema
         from .hybrid_runtime_fixture import SCENARIOS
+        from .hybrid_native_diagnostic import NativeDiagnosticOwner
         self._actual(); self.controller._refuse_nested_writer()
         if self._safety_freeze: raise Conflict('fixture runtime permanently frozen for physical cleanup')
         self.controller._issued(token); original_claim = self.pool._issued_claim(claim)
         validate_schema(ID, request_key)
-        if type(scenario) is not str or scenario not in SCENARIOS|{'engineering_patch'}: raise Conflict('fixed CPU protocol scenario required')
+        diagnostic = type(self) is NativeDiagnosticOwner
+        if (type(scenario) is not str or scenario not in SCENARIOS|{'engineering_patch','native_diagnostic'} or
+                diagnostic != (scenario == 'native_diagnostic') or not diagnostic and diagnostic_grant is not None):
+            raise Conflict('closed runtime profile/owner required')
+        diagnostic_row = self._issued_diagnostic_grant(diagnostic_grant,bundle,token,observation) if diagnostic else None
         cpu_row = self._issued_cpu_grant(cpu_grant, bundle, token, observation) if scenario == 'cpu_trial' else None
         if scenario != 'cpu_trial' and cpu_grant is not None:
             raise PermissionError('CPU trial grant cannot upgrade a protocol capability')
@@ -281,13 +299,14 @@ class FixtureRuntimeOwner:
             previous = self._attempts.get(request_key)
             if previous is not None:
                 if any(previous[name] is not value for name, value in
-                       (('bundle', bundle), ('token', token), ('observation', observation), ('claim', claim))) or previous['scenario'] != scenario or previous.get('cpu_grant') is not cpu_grant or previous.get('engineering_grant') is not engineering_grant:
+                       (('bundle', bundle), ('token', token), ('observation', observation), ('claim', claim))) or previous['scenario'] != scenario or previous.get('cpu_grant') is not cpu_grant or previous.get('engineering_grant') is not engineering_grant or previous.get('diagnostic_grant') is not diagnostic_grant:
                     raise Conflict('original fixture runtime request key reused')
                 attempt = previous
             else:
                 if cpu_row is not None and cpu_row['attempt'] is not None:
                     raise Conflict('original CPU trial grant already belongs to another attempt')
                 if engineering_row is not None and engineering_row['attempt'] is not None:raise Conflict('original engineering grant already used')
+                if diagnostic_row is not None and diagnostic_row['attempt'] is not None:raise Conflict('original diagnostic grant already used')
                 if len(self._attempts) >= 32: raise Conflict('finite original fixture runtime attempts exceeded')
                 if original_claim['payload']['member_id'] != self.membership.id:
                     raise PermissionError('fixture runtime original Pool claim membership differs')
@@ -309,16 +328,20 @@ class FixtureRuntimeOwner:
                     from .hybrid_engineering_patch import KIND,AUTHORIZATION
                     binding=json.loads(engineering_grant.raw)
                     origin.update(kind=KIND,authorization=AUTHORIZATION,program_sha256=binding['program_sha256'],engineering_patch=binding)
+                if diagnostic_row is not None:
+                    from .hybrid_native_diagnostic import KIND, AUTHORIZATION
+                    origin.update(kind=KIND,authorization=AUTHORIZATION,native_diagnostic=json.loads(diagnostic_grant.raw))
                 lease = FixtureExecutionLease(origin['lease_id'], canonical(origin))
                 attempt = {'lease': lease, 'origin': origin, 'bundle': bundle, 'token': token,
                     'observation': observation, 'claim': claim, 'scenario': scenario,
                     'intent': intent, 'ready': ready, 'claim_value': original_claim, 'entries': {}, 'source': None,
                     'spawn_entered': False, 'release_entered': False, 'started_ack': None,
                     'producer_identity': None, 'terminal': None, 'spawn_monotonic': None,
-                    'cpu_grant': cpu_grant,'engineering_grant':engineering_grant}
+                    'cpu_grant': cpu_grant,'engineering_grant':engineering_grant,'diagnostic_grant':diagnostic_grant}
                 self._attempts[request_key] = attempt; self._leases[id(lease)] = attempt
                 if cpu_row is not None: cpu_row['attempt'] = attempt
                 if engineering_row is not None:engineering_row['attempt']=attempt
+                if diagnostic_row is not None:diagnostic_row['attempt']=attempt
             # Strong original attempt retained BEFORE all cross-database writes.
         # Runtime owner lock must NOT precede Store/Controller/Workspace locks.
         with self.pool._lock:
@@ -366,6 +389,7 @@ class FixtureRuntimeOwner:
         if current != wh or record != captured['observation']:
             raise Conflict('fixture runtime current original Workspace lineage changed')
         loaded = self.budget._load(db, fact['request']['goal_ref'], read)
+        if attempt.get('diagnostic_grant') is not None:self._fresh_diagnostic(loaded,attempt)
         sources = source_binding(loaded)
         if attempt['cpu_grant'] is not None:
             row = self._issued_cpu_grant(attempt['cpu_grant'], attempt['bundle'], attempt['token'], attempt['observation'])
@@ -593,6 +617,14 @@ class FixtureRuntimeOwner:
         if original['request']['expected_state_version'] != version:
             raise Conflict('fixture runtime uncertain original phase CAS changed')
         guard = _FixtureRuntimeGuard(self, db, read, attempt, original, cleanup=cleanup)
+        previous_guard = self._active
+        if (not cleanup and previous_guard is not None and previous_guard.owner is self and
+                previous_guard.db is db and previous_guard.read is read and
+                previous_guard.attempt is attempt and previous_guard.thread == threading.get_ident()):
+            # Only the PROCESS/RELEASE batch's same held snapshot may reuse
+            # historical expansion. _fresh still rereads the exact fact/event,
+            # all current HEADs, authority, physical witnesses and deadlines.
+            guard._workspace_proved = getattr(previous_guard, '_workspace_proved', None)
         guard.preparation, guard.plan_witness, guard.bootstrap = preparation, plan_witness, bootstrap
         guard.dependencies = self.budget._dependencies(db, original, read)
         self._active = guard; guard.check()
@@ -857,7 +889,7 @@ class FixtureRuntimeOwner:
     def _check_terminal(self, attempt):
         proof = attempt['terminal']
         if (proof is None or proof['lease_id'] != attempt['lease'].id or
-                proof['scope'] != 'FIXED_CPU_SINGLE_PARTICIPANT' or
+                proof['scope'] != self._terminal_scope() or
                 proof['program_sha256'] != attempt['origin']['program_sha256']):
             raise PermissionError('original fixed fixture terminal proof required')
         if attempt['source'] is not None:
@@ -888,6 +920,12 @@ class FixtureRuntimeOwner:
         if (info.st_dev,info.st_ino)!=row['stamp'][:2]:
             raise Conflict('engineering input FD identity uncertain; retain UNKNOWN')
         os.close(fd);row['fd']=None
+
+    def _terminal_scope(self):
+        return 'FIXED_CPU_SINGLE_PARTICIPANT'
+
+    def _terminal_extra(self,attempt):
+        return {'no_descendants_in_fixed_program': True}
 
     def collect_engineering_patch(self,lease):
         """Sealed source only, no caller patch/claim or candidate mutation."""
@@ -1000,10 +1038,7 @@ class FixtureRuntimeOwner:
                     if source['runtime'] is not attempt:
                         raise PermissionError('original same-lease participant cleanup required')
                     if process is not None and process.poll() is None:
-                        if identity(process.pid)!=source['producer_identity']:
-                            raise Conflict('fixture STOP original live identity differs')
-                        self.sources._check_pidfd(source,live=True)
-                        signal.pidfd_send_signal(source['fds']['pidfd'],signal.SIGTERM)
+                        self.sources._signal_original(source,signal.SIGTERM)
                         try:process.wait(timeout=.2)
                         except subprocess.TimeoutExpired:pass
                     self.sources.stop_fixture(attempt['source'])
@@ -1044,10 +1079,10 @@ class FixtureRuntimeOwner:
             if attempt['terminal'] is None:
                 self._stop_original_participant(lease)
                 wall = 0 if attempt['spawn_monotonic'] is None else math.ceil(time.monotonic() - attempt['spawn_monotonic'])
-                attempt['terminal'] = {'scope': 'FIXED_CPU_SINGLE_PARTICIPANT', 'lease_id': lease.id,
+                attempt['terminal'] = {'scope': self._terminal_scope(), 'lease_id': lease.id,
                     'program_sha256': attempt['origin']['program_sha256'], 'producer': attempt['producer_identity'],
                     'all_original_source_fds_closed': True, 'original_participant_reaped': True,
-                    'no_descendants_in_fixed_program': True, 'arbitrary_tree_stop': False,
+                    **self._terminal_extra(attempt), 'arbitrary_tree_stop': False,
                     'wall_seconds': wall, 'synthetic_tokens_settled': False}
                 self._check_terminal(attempt)
         # Never hold Runtime lock before the project writer.

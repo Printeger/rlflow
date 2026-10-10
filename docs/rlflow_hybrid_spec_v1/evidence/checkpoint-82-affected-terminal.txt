@@ -1,0 +1,62 @@
+Original2786 terminalcb17f9 exit1;1failed/77passed/2warnings652.03s.
+Original392 frozen inputSHA dd05333a5cc7778af1177e323dc0051599b211cd6ced58224874e0a3610c07e2.
+Pre-terminal source/native progress chunks separately retained by orchestrator;
+this file is exact terminal output, not a reconstructed complete stdout stream.
+actual_original_gate_timing shared_project_0 [{'phase': '_runtime_spawn', 'began_ns': 1568170171589811, 'ended_ns': 1568170423318951}, {'phase': '_register_release', 'began_ns': 1568170628941209, 'ended_ns': 1568172432522202}, {'phase': '_check_release_gate', 'began_ns': 1568172765299032, 'ended_ns': 1568173010600630}, {'phase': '_runtime_release', 'began_ns': 1568172764578149, 'ended_ns': 1568173010607240}]
+actual_authenticated_final_kernel_usage shared_project_0 {'status': 'KNOWN', 'source': 'LINUX_WAIT4', 'scope': 'FIXED_PARTICIPANT_LIFETIME', 'exit_code': 0, 'cpu_user_us': 10360, 'cpu_system_us': 2302, 'peak_rss_bytes': 100126720, 'reaped_at': '2026-10-10T08:20:34.825Z'}
+actual_original_gate_timing shared_project_1 [{'phase': '_runtime_spawn', 'began_ns': 1568183794048299, 'ended_ns': 1568184114945498}, {'phase': '_register_release', 'began_ns': 1568184340545327, 'ended_ns': 1568186326983213}, {'phase': '_check_release_gate', 'began_ns': 1568186672659678, 'ended_ns': 1568186991047485}, {'phase': '_runtime_release', 'began_ns': 1568186671925954, 'ended_ns': 1568186991054615}]
+actual_authenticated_final_kernel_usage shared_project_1 {'status': 'KNOWN', 'source': 'LINUX_WAIT4', 'scope': 'FIXED_PARTICIPANT_LIFETIME', 'exit_code': 0, 'cpu_user_us': 9751, 'cpu_system_us': 3250, 'peak_rss_bytes': 105238528, 'reaped_at': '2026-10-10T08:20:48.831Z'}
+.
+=================================== FAILURES ===================================
+___ test_original_exit_during_identity_check_reaps_without_signaling_foreign ___
+
+source_owner = (<rlflow.hybrid_usage_source.FixtureUsageSourceOwner object at 0x75e0f43f2f60>, PoolMembership(id='member_c6dc485df7ea...84917527,"recorded_wall":1791619837.6982176},"pool_id":"pool_3415d26d48e14016817835b8adfd4ab5","slot":0,"version":2}'))
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x75e0f4cd2e70>
+
+    def test_original_exit_during_identity_check_reaps_without_signaling_foreign(source_owner,monkeypatch):
+        owner,member,claim=source_owner;source=owner.start_fixture(member,claim,'linger')
+        until(owner,source,lambda value:value['usage']['input_tokens']==100)
+        attempt=owner._issued(source);producer=attempt['producer'];checks=[]
+        with monkeypatch.context() as patch:
+            patch.setattr(source_module,'identity',lambda pid:None)
+            patch.setattr(source_module.signal,'pidfd_send_signal',lambda *args:pytest.fail('must not signal mismatched identity'))
+            with pytest.raises(Conflict,match='identity uncertain'):owner._signal_original(attempt,signal.SIGKILL)
+            assert producer.poll() is None
+            def exited(pid):
+                assert pid==producer.pid;checks.append(pid)
+                producer.kill();assert producer.wait(timeout=2)==-signal.SIGKILL
+                return None
+            patch.setattr(source_module,'identity',exited)
+>           assert owner.stop_fixture(source)['closed']
+
+tests/test_hybrid_usage_source.py:169: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+rlflow/hybrid_usage_source.py:540: in stop_fixture
+    attempt = self._issued(source)
+rlflow/hybrid_usage_source.py:137: in _issued
+    self._actual()
+rlflow/hybrid_usage_source.py:131: in _actual
+    if not self._live or os.getpid() != self.process['pid'] or identity(os.getpid()) != self.process:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+pid = 1601013
+
+    def exited(pid):
+>       assert pid==producer.pid;checks.append(pid)
+E       AssertionError: assert 1601013 == 1601038
+E        +  where 1601038 = <Popen: returncode: None args: ['/home/mint/rl_dev/rlflow_standalone/.venv/b...>.pid
+
+tests/test_hybrid_usage_source.py:165: AssertionError
+=============================== warnings summary ===============================
+.venv/lib/python3.12/site-packages/starlette/testclient.py:37
+  /home/mint/rl_dev/rlflow_standalone/.venv/lib/python3.12/site-packages/starlette/testclient.py:37: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = typing.Callable[[], typing.ContextManager[anyio.abc.BlockingPortal]]
+
+tests/test_hybrid_native_diagnostic.py::test_original_native_inflight_stop_sources_fork_and_readback
+  /home/mint/rl_dev/rlflow_standalone/tests/test_hybrid_native_diagnostic.py:61: DeprecationWarning: This process (pid=1601013) is multi-threaded, use of fork() may lead to deadlocks in the child.
+    read,write=os.pipe();pid=os.fork()
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_hybrid_usage_source.py::test_original_exit_during_identity_check_reaps_without_signaling_foreign
+1 failed, 77 passed, 2 warnings in 652.03s (0:10:52)

@@ -1,0 +1,168 @@
+Original63081 terminal828824 exit1,1failed/1passed/1warning71.93s.
+Preterminal real gate timestamps archived in checkpoint-82-tests.txt.
+One disposable fixture session credential redacted, no production secret.
+=================================== FAILURES ===================================
+_ test_disconnected_prepare_waiter_still_hands_off_STOP_and_final_read_does_not_block_loop _
+
+event = <threading.Event at 0x7801db88a120: set>
+
+    async def wait_event(event):
+        async with asyncio.timeout(5):
+>           while not event.is_set(): await asyncio.sleep(.01)
+
+tests/test_hybrid_agent_stop_requests.py:222: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+delay = 0.01, result = None
+
+    async def sleep(delay, result=None):
+        """Coroutine that completes after a given time (in seconds)."""
+        if delay <= 0:
+            await __sleep0()
+            return result
+    
+        loop = events.get_running_loop()
+        future = loop.create_future()
+        h = loop.call_later(delay,
+                            futures._set_result_unless_cancelled,
+                            future, result)
+        try:
+>           return await future
+E           asyncio.exceptions.CancelledError
+
+/usr/lib/python3.12/asyncio/tasks.py:665: CancelledError
+
+The above exception was the direct cause of the following exception:
+
+requested_application = (<rlflow.hybrid_host_execution.HostExecutionService object at 0x7801dbf5fe30>, [<rlflow.hybrid_cpu_execution_unit.CpuT...d667350>), <fastapi.applications.FastAPI object at 0x7801db88a5a0>, '[REDACTED_ISOLATED_FIXTURE_SESSION]', ...)
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7801dd8152e0>
+
+    def test_disconnected_prepare_waiter_still_hands_off_STOP_and_final_read_does_not_block_loop(requested_application, monkeypatch):
+        from rlflow.hybrid_agent_stop_requests import FiniteStopRequests
+        from rlflow.hybrid_agent_requests import AgentRequestService
+        host, units, services, observers, app, token, headers = requested_application
+        agent, _ = services[0].auth.issue_request_token(Principal('disconnect_stop_agent', 'agent',
+            {'viewer'}, {s.project_id for s in services}), ttl=60)
+        with TestClient(app, base_url=ORIGIN) as client:
+            client.cookies.set('rlflow_session', token)
+            base, saved, _ = suggestion(client, services, agent)
+            prepared = threading.Event(); release_prepare = threading.Event()
+            reading = threading.Event(); release_read = threading.Event()
+            original_prepare = FiniteStopRequests.prepare
+            original_execute = FiniteStopRequests.execute
+            original_get = AgentRequestService.get
+            original_list = AgentRequestService.list
+            lists_started = threading.Event(); release_lists = threading.Event(); count = []; count_lock = threading.Lock()
+            def held_list(self, *a, **kw):
+                with count_lock:
+                    count.append(True)
+                    if len(count) == 2: lists_started.set()
+                assert release_lists.wait(5)
+                return original_list(self, *a, **kw)
+            def held_prepare(self, *a, **kw):
+                result = original_prepare(self, *a, **kw)
+                assert all(u._cancelled.is_set() for u in units)
+                prepared.set(); assert release_prepare.wait(5)
+                return result
+            def handed_off(self, *a, **kw):
+                # This is the actual independently admitted STOP worker, not the
+                # cancelled HTTP waiter or prepare-only latch. Ordinary read holds
+                # prove handoff isolation; they need not span the full Core cleanup.
+                assert app.state.finite_host_stop_pool.pending >= 1
+                assert all(u._cancelled.is_set() for u in units)
+                release_lists.set()
+                return original_execute(self, *a, **kw)
+            def held_get(self, *a, **kw):
+                if kw.get('method') == 'session':
+                    reading.set(); assert release_read.wait(5)
+                return original_get(self, *a, **kw)
+            monkeypatch.setattr(FiniteStopRequests, 'prepare', held_prepare)
+            monkeypatch.setattr(FiniteStopRequests, 'execute', handed_off)
+            monkeypatch.setattr(AgentRequestService, 'get', held_get)
+            monkeypatch.setattr(AgentRequestService, 'list', held_list)
+            forward = next(r.endpoint for r in app.routes if getattr(r, 'path', None) ==
+                '/api/v1/projects/{project_id}/agent-requests/{request_id}/forward-stop')
+            profile = next(r.endpoint for r in app.routes if getattr(r, 'path', None) == '/api/v1/finite-host')
+            def request_for(path, body=None):
+                raw = json.dumps(body).encode() if body is not None else b''
+                async def receive(): return {'type': 'http.request', 'body': raw, 'more_body': False}
+                return Request({'type': 'http', 'method': 'POST' if body else 'GET', 'path': path,
+                    'query_string': b'', 'headers': [(b'cookie', ('rlflow_session='+token).encode()),
+                        (b'origin', ORIGIN.encode()), (b'x-csrf-token', headers['X-CSRF-Token'].encode()),
+                        (b'content-type', b'application/json')], 'app': app}, receive)
+            async def wait_event(event):
+                async with asyncio.timeout(5):
+                    while not event.is_set(): await asyncio.sleep(.01)
+            async def disconnected():
+                waiter = asyncio.create_task(forward(request_for(base, {
+                    'request_hash': saved['request_hash'], 'resume_cleanup': False}),
+                    services[0].project_id, saved['request_id']))
+                try:
+                    await wait_event(prepared)
+                    waiter.cancel()
+                    with pytest.raises(asyncio.CancelledError): await waiter
+                    release_prepare.set()
+                    await wait_event(reading)
+                    # Final receipt read is deliberately blocked in its finite
+                    # worker, yet this SAME event loop can serve the original route.
+                    reply = await asyncio.wait_for(profile(request_for('/api/v1/finite-host')), .5)
+                    assert reply.status_code == 200
+                    assert host.pool.snapshot()['occupied'] == 0
+                finally:
+                    release_prepare.set(); release_read.set()
+                    await app.state.agent_request_stop_drain()
+            with ThreadPoolExecutor(max_workers=4) as ordinary:
+                ordinary_reads = [ordinary.submit(client.get, base) for _ in range(4)]
+                try:
+                    assert lists_started.wait(2)  # Both Goal/inbox workers held.
+>                   asyncio.run(disconnected())
+
+tests/test_hybrid_agent_stop_requests.py:245: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib/python3.12/asyncio/runners.py:194: in run
+    return runner.run(main)
+/usr/lib/python3.12/asyncio/runners.py:118: in run
+    return self._loop.run_until_complete(task)
+/usr/lib/python3.12/asyncio/base_events.py:687: in run_until_complete
+    return future.result()
+tests/test_hybrid_agent_stop_requests.py:232: in disconnected
+    await wait_event(reading)
+tests/test_hybrid_agent_stop_requests.py:221: in wait_event
+    async with asyncio.timeout(5):
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <Timeout [expired]>
+exc_type = <class 'asyncio.exceptions.CancelledError'>
+exc_val = CancelledError(), exc_tb = <traceback object at 0x7801db911ac0>
+
+    async def __aexit__(
+        self,
+        exc_type: Optional[Type[BaseException]],
+        exc_val: Optional[BaseException],
+        exc_tb: Optional[TracebackType],
+    ) -> Optional[bool]:
+        assert self._state in (_State.ENTERED, _State.EXPIRING)
+    
+        if self._timeout_handler is not None:
+            self._timeout_handler.cancel()
+            self._timeout_handler = None
+    
+        if self._state is _State.EXPIRING:
+            self._state = _State.EXPIRED
+    
+            if self._task.uncancel() <= self._cancelling and exc_type is exceptions.CancelledError:
+                # Since there are no new cancel requests, we're
+                # handling this.
+>               raise TimeoutError from exc_val
+E               TimeoutError
+
+/usr/lib/python3.12/asyncio/timeouts.py:115: TimeoutError
+=============================== warnings summary ===============================
+.venv/lib/python3.12/site-packages/starlette/testclient.py:37
+  /home/mint/rl_dev/rlflow_standalone/.venv/lib/python3.12/site-packages/starlette/testclient.py:37: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = typing.Callable[[], typing.ContextManager[anyio.abc.BlockingPortal]]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_hybrid_agent_stop_requests.py::test_disconnected_prepare_waiter_still_hands_off_STOP_and_final_read_does_not_block_loop
+1 failed, 1 passed, 1 warning in 71.93s (0:01:11)

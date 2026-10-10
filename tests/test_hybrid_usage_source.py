@@ -152,6 +152,27 @@ def test_actual_fixture_stop_reaps_original_producer_but_never_refunds_pool(sour
     assert owner.pool.snapshot()['occupied'] == 1
 
 
+def test_original_exit_during_identity_check_reaps_without_signaling_foreign(source_owner,monkeypatch):
+    owner,member,claim=source_owner;source=owner.start_fixture(member,claim,'linger')
+    until(owner,source,lambda value:value['usage']['input_tokens']==100)
+    attempt=owner._issued(source);producer=attempt['producer'];checks=[];original_identity=source_module.identity
+    with monkeypatch.context() as patch:
+        patch.setattr(source_module,'identity',lambda pid:None if pid==producer.pid else original_identity(pid))
+        patch.setattr(source_module.signal,'pidfd_send_signal',lambda *args:pytest.fail('must not signal mismatched identity'))
+        with pytest.raises(Conflict,match='identity uncertain'):owner._signal_original(attempt,signal.SIGKILL)
+        assert producer.poll() is None
+        def exited(pid):
+            if pid!=producer.pid:return original_identity(pid)
+            assert pid==producer.pid;checks.append(pid)
+            producer.kill();assert producer.wait(timeout=2)==-signal.SIGKILL
+            return None
+        patch.setattr(source_module,'identity',exited)
+        assert owner.stop_fixture(source)['closed']
+    assert checks==[producer.pid] and producer.returncode==-signal.SIGKILL
+    assert all(fd is None for fd in attempt['fds'].values())
+    assert owner.pool.snapshot()['occupied']==1  # Source is not a terminal/refund authority.
+
+
 def test_actual_fork_child_closes_source_and_pipe_but_preserves_parent_source(source_owner, monkeypatch):
     owner, member, claim = source_owner; source = owner.start_fixture(member, claim, 'partial')
     until(owner, source, lambda _: bool(owner._issued(source)['tail']))

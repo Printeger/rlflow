@@ -1,5 +1,11 @@
 # 安装态固定工程与实验执行
 
+## 新原生诊断入口（Checkpoint82 安装态已实测）
+
+在同样的全新隔离私有父目录，可运行 `python -m rlflow.isolated_native_diagnostic --parent "$isolated_parent" --approve-isolated-local-diagnostic`。命令标志只允许准备；展示 proposal 后必须输入本次精确 `APPROVE <scope_hash>`。不要在生产目录运行，不接受旧 lease/PID/任意程序。固定本机原生 ELF 必须满足原路径/root-owned/hash 身份规则，Linux x86_64 必须实际支持 seccomp 与 Landlock，缺能力直接拒绝。
+
+此入口通过原 SDK 启动真实 native CLI，但使用无凭据、零模型/GPU额度、本地不生成模型的 HTTP 接收器。原 stdout 与沙箱 receipt 分离，随后原 STOP/reap/FD关闭/PoolFREE并原账本冷读。token/cost UNKNOWN，网络 `PARTIAL`；不是产品 Reviewer、真实模型执行或通用 native RUN。82 当前 sdist→wheel→私有 site 共346payload与源码逐字节相等；checkout 外安装态 public CLI、原进程 STOP/FREE 与 SDK 退出后的独立冷读均已实测。精确 stdin 使用 synthetic fixture 确认，不冒称真人模型授权；证据见 evidence/checkpoint-82-installed-output.txt、checkpoint-82-tests.txt。原全量4失败与后续必要受影响复验分别保存，未把全库结果重标全绿。
+
 本入口让安装后的 rlflow 用原 SDK 建立两个全新隔离 fixture 项目，经分别确认原批准范围，运行原固定 CPU 实验与加法修补，通过真实 HTTP 和已安装 console 读取结果，再调用原有限全集 STOP。它不导入仓库测试模块，不伪造时钟、版本或模型目录，也不启动 Codex 模型执行。
 
 ## 安装与运行

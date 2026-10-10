@@ -1,0 +1,313 @@
+Checkpoint82 FINAL / bounded non-generating native diagnostic ONLY, zero model/GPU
+ALL original full/targeted/installed processes are TERMINAL; no LIVE run remains.
+Final staged default diff--check reports preserved pytest traceback trailing
+spaces in the three exact terminal archives and one blank EOF line in new
+NativeOwner (NON_BLOCKING style). Preserve exact raw logs/frozen executable
+bytes rather than edit qualified inputs for style. Earlier non-staged check
+did not inspect untracked new files; no claim stageddefault fully clean.
+Scoped source/doc check excludes exact raw terminal archives and disables ONLY
+blank-at-eof; retains all other whitespace/error checks. No runtime/test change.
+Independent narrow High final delta: no newly confirmed blocking MUST; evidence
+qualifies this original20s-gate native diagnostic/STOP/coldread scope ONLY.
+Old fixed Engineering3s/126 precise branch remains a pressure qualification gap,
+does not invalidate distinct20s diagnostic but full-suiteGREEN/performance/native
+modelEngineer/Reviewer/autonomy/humanapproval are explicitly NOT claimed.
+77passed original affected cases +1 separately corrected race test passed;
+not one combined78pass invocation. Final installedpublicCLI and afterexit
+coldread passed. All lower CURRENT/LIVE/WIP sections are immutable chronology.
+CURRENT: original full39902 TERMINAL 002e2c exit1, 4 failed /2532 passed /
+FINAL LOCAL SLICE EVIDENCE (NOT full M0-M5/B1/model qualification)
+Original2786 ->cb17f9 terminal exit1:77passed/1failed/2warnings652.03s.
+Only failed NEW race test intercepted parent owner identity, not a product
+failure. Restrict injection to original child PID; original27711 ->79126c
+terminal exit0:1passed1.65s. NO repeat of the77unchanged passed cases.
+Same held transaction workspace memo/current source changes exercised across
+whole Source/Runtime/Native modules and real shared/cancel/changedcandidate/
+HTTP/kernel scopes. All original four failing cases now targeted pass; retain
+original full4fail, do NOT relabel whole invocation green. Engineering finite
+G pressure remains a diagnostic/qualification limitation, not solved merely
+by successful samples; child3s and expected exit0 unchanged.
+Current source release392 SHA e44f7f68797315581b70ba8e595cdde2105533ab79ae811c096ddb070fe51d9e.
+Historical2786 input SHA dd05333a5cc7778af1177e323dc0051599b211cd6ced58224874e0a3610c07e2
+retained unchanged; only test_hybrid_usage_source.py child injection differs.
+Final sdists5c70f2/wheele16cab/install8e44de all exit0, no new dependencies.
+Retained /tmp/rlflow-cp82-final-gQ5XY6;346non-distinfo payload bytes EXACT
+current checkout==wheel==isolated site. Historical earlier package not replaced.
+sdist SHA71d4cd039089fa178025649842e758e82acf67df9a9fea7c8fc0c8f4efd34c85
+wheel SHA46dc28b231424bc2ec6f069a0789c53930b067c58052de8fef953240e8505724
+Installed PUBLIC CLI8091 actual terminal exit0 outsidecheckout, import asserted
+private installedsite. Exact scopedstdin approval SYNTHETIC ISOLATED FIXTURE,
+not human/model approval. NativePID1602257/starttime156831790; original native
+stdout2100/thread.started +sandboxreceipt +oneheldlocalrequest. OriginalSTOP
+actualreap/allsourceFDsclose/Pooloccupied1->0/wall4, originalpersisted12..18.
+No testsimports/fakeclocks/model/GPU; usage/token/costUNKNOWN, networkPARTIAL.
+Actual output archived checkpoint-82-installed-output.txt.
+Independent coldread AFTER SDK exit: first4b73f3 TypeError missing mandatory
+attach_existing project_id/data_mode; diagnosed actual signature, no worker or
+code change. Correct b9ed8d exit0:ORIGINAL_EVENT_VERIFIED/12..18/STOP historical,
+currentUNKNOWN/controlsfalse/no testsimports. Not current-control resurrection.
+2722dc compileall/pipcheck/diff exit0; no live scopedtest/CLIworker observed.
+USER package-lockSHA remains becc7e2a36dfcad4ffe934b5ff2f0f68187611d6c0641bd63d81367651cfbf09,
+untracked/unstaged. No model/GPU/globalinstall/productionmigration/push.
+New user priority: full autonomous real nonpreset Engineer->independentReviewer
+->ConditionEvidence->autonomouscontinuation; configurable generalLocalRunner,
+budget/fullmanagedSTOP/longrecovery. Fixed add/pi do NOT qualify autonomous
+completion. Readonly instinctRL integration study authorized; qualified version,
+evidence/integrationsteps/gaps then separateCodex validationGoal prompt later.
+One consolidated concrete model/GPU/time/experiment contract to propose after
+requirements study; prior unanswered2Reviewer question is NOT consent and must
+not be separately repeated. No instinctRL execution/GPU/migration authorized.
+Current delta validation ORIGINAL2786 LIVE, no restart or source/test edits.
+Scope: whole affected Source/Runtime/Native modules, actual shared CPU384 and
+engineering one-write/STOP/FREE, isolated cancel and changed-candidate pre-G,
+two original failed HTTP/kernel cases. Final392-input manifest newly retained
+checkpoint-82-final-inputs.sha256 (historical original manifest untouched).
+New real exit-race injection case has failure marker: static inspection sees
+test monkeypatch identity(None) also covers owner._actual parent-PID identity;
+this is test injection scope, not justification to weaken owner identity.
+Wait original2786 terminal before restricting injection to original childPID.
+Independent narrow High sees no new MUST in sameDB workspace historical memo
+or handoff/read test delta. Clarification: PRD NFR11 is 10s grace then escalate,
+NOT fullcleanup/readback≤10s guarantee; reading10s is harness watchdog only.
+Prepare5s is NOT dispatch1s qualification. Old full G pressure not yet closed;
+no phase with exit126 accepted. No model/GPU or production changes/commit.
+Timing63081 ->828824 TERMINAL exit1:1 failed/1 passed/1 warning71.93s.
+HTTP now fails wait_event(reading), NOT ordinary200: final read starts only
+after original full two-scope STOP, so former generic5s watchdog mixes scopes.
+PRD NFR-11 explicitly cleanup10s vs dispatch1s. Narrow test harness now final
+reading watchdog10s; synthetic holds5s, handoff proof/alllatches, profile.5s
+and four200 unchanged. This is disclosed harness correction, no runtime grace
+or acceptance target increased. No arbitrary429 allowance.
+Actual CPU spawn .244734s/register1.853871s/checkrelease.245505s;
+Engineering spawn.322050s/register2.041915s/checkrelease.324188s, exit0.
+Engineering parent spawn-entry to G3.263177s; child initialized later, but tiny
+margin explains sensitivity. Static High finds repeated historical expansion;
+minimal Runtime shares only already-proved workspace historical bytes between
+PROCESS/RELEASE guards in SAME held DB/read/attempt/thread transaction.
+_fresh still rereads original fact/event/currentHEAD/Auth/Registry/FD/STOP/TTL;
+no cache of Pool success/current authorities, no new TTL, gate3s unchanged.
+Original full4fail record remains visible. Necessary delta regression pending.
+Focused58683 ->c6687e TERMINAL exit0:10 passed/1 warning146.48s.
+New accepted-fstat fault now proves UNKNOWN even after independent test close,
+no adoption/FREE/refund; source physical HTTP and six late-effect boundaries
+including original STOP-RELEASE pass. Original disconnected STOP and real
+engineering/kernel final case pass in this run; no claim their timing issue
+is thereby resolved. High narrow root evidence confirms held-list five-second
+barrier spans unnecessary full two-scope STOP and can expire (likely503, old
+aggregate trace lacks per-response body). Fix test barrier handoff ordering,
+retain five seconds/all200; collect actual native gate timing for engineering.
+32 skipped /5 warnings,6257.53s. Original immutable inputs and full traceback
+retained; lower LIVE entries are chronological history, not current state.
+Four failures: strict HTTP source bytes; disconnected STOP ordinary read200;
+STOP poll/identity exit race; actual Engineering exit126 before ACK/result.
+Readonly High confirms STOP race; Source _signal_original now only actual
+original Popen reap may resolve a mismatch/ESRCH. Otherwise deny signaling.
+SQLite GC-only actual diagnosis 49e1a5 reproduces DB/WAL checkpoint without
+business change:4 events/version4 remain. Test holds original readonly source
+connection; physical byte invariance not relaxed. No global Core refactor.
+Original targeted52463 terminal output lost across context; process absent,
+lastfailed records new accepted-fstat test failed. Do not claim green.
+Narrow diagnostic2342 ->68a197 exit1,1 failed/1 error9.81s identifies test
+shutdown_safety wrongly demanded success after unknown-identity externalclose;
+product correctly refuses UNKNOWN even for closed FD. Test now explicitly
+expects incomplete safety/SDK cleanup and never FREE/refund. No identity reset.
+Original focused58683 LIVE, covers new fault and the four original failures;
+engineering child adds bounded gate-rejection monotonic stderr diagnostics,
+keeps gate3s and exit0 requirement. HTTP four reads still must all return200,
+now capture actual codes/bodies for root cause, no arbitrary429 allowance.
+Final current packaging/installed consumer/affected regression/commit pending.
+2026-10-10 base7523423f501a6bb7dc7dfe63b7b50540583c4619. Goal ACTIVE.
+Reconstructed actual output index, NOT one combined green test invocation.
+
+DELIVERY / ACCEPTANCE
+Fresh original isolated SDK approval/Registry/WorkingPlan/workspace/budget/Pool.
+Closed LOCAL_NATIVE_DIAGNOSTIC original opaque grant; no generic RUN enabled.
+Actual root-owned fixed native ELF SHA
+9a820c17865fa825d04db416818679a9d63bd72e50835c396f496e5684626c9c.
+Same PID/start-time/pidfd gate->exec, protected original binary FD, no Node wrapper.
+Linux x86_64 seccomp denies new processes, clone3 ENOSYS/thread-clone permitted;
+Landlock execute only original ELF, private home/work write, no_new_privs.
+Actual ready receipt binds granted directory FD IDs, binary/config/PID/nonce;
+original frozen source/config/lease bindings reject mutable-row laundering.
+Credential-empty private CLI config, tools/plugins/MCP/hooks disabled; localhost
+non-generating diagnostic receiver. Network enforcement PARTIAL, not hard egress.
+Original stdout inode + native /proc/PID/exe + thread.started proves native exec;
+HTTP receiver requests alone NEVER proof of PID/started/tokens/usage.
+Explicit STOP original pidfd reap/all named FDs/listener/accepted socket/thread
+close before terminal/FREE; uncertain/lost-return/writer failure retains UNKNOWN.
+Opaque original partial allocation row remains reachable even before source cap
+escapes. Original descriptor identity mismatch never closes foreign reused FD.
+Cold TaskReader timeline derived from original durable records.
+Public SDK approval flag alone insufficient: stdin exact APPROVE <scopehash>.
+Test confirmation callbacks are synthetic fixture approval, NOT real human Review.
+CodexExecAdapter.start/WorkingPlanService.start still unconditional PermissionError.
+
+ACTUAL CLI SMOKES / TERMINAL
+29954->2f0da4 exit1: sandbox succeeded, CLI model catalog missing shell_type.
+Diagnosed actual catalog schema, added required disabled tools metadata.
+4178->c42eb8 exit0: native PID1581462, local held request1, stdout prefix2100,
+all usage countersNone/costUNKNOWN; explicit STOP/reap/FDclose wall4 Pool1->0,
+original versions12..18 cold timeline, tests importsfalse. Pre-scope-prompt
+fix smoke proves execution only, NOT real human approval/final installed acceptance.
+Initial wrong ELF path and /tmp non-private parent denied pre-worker; no repeat.
+
+PYTEST / TERMINAL / 11 DISTINCT CASES SPLIT
+Prefix PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q
+Without prefix local ROS plugin failed before collection (missing lark), no install.
+Module tests/test_hybrid_native_diagnostic.py.
+27924->3536f2 exit1: 7pass/1fail/1forkwarning82.50s. Writer STOP failure
+physically stopped scope but subsequent START returned old observation; Native
+early STOP/freeze rejection fixed, no guard relaxation and no new worker launched.
+4168->257570 exit0: 3pass/1forkwarning26.78s: affected writer-failure,
+actual kernel new-process negatives/threads positive/foreign exec denied,
+necessary actual native/fork/readback after original directory-FD proof changes.
+89406->1eb810 exit0: 2pass16.57s: original Thread.start partial cleanup and
+new actual foreign listener-FD reuse retains UNKNOWN/occupied1/no terminal,
+foreign FD untouched; test restores ONLY original socket before safety cleanup,
+still no historical FREE/refund.
+91833->a3f265 exit0: 1pass8.63s: original grant copy/old kind denied and
+wrong ELF held stdout FD rejected by child binary identity verifier.
+60224->01ab17 exit0: 1pass8.61s: actual socket.settimeout exception before
+thread start; test strong Server reference prevents GC masking, actual FD -1,
+no Popen/G, FREE only after original close.
+Other initial passing cases: same-inode config+mutable row laundering before
+HANDOFF(no IO); lost original Popen return UNKNOWN/no adopt/noFREE; incomplete
+headers/body explicit boundedSTOP(two params); original cap copy/kind denials.
+
+INDEPENDENT HIGH
+Existing authorized finite_app_review_63 readonly/no tests/no edits.
+Concrete MUST fixed: immutable config/lease, actual Landlock directory FD IDs,
+exact approval prompt, bounded receiver STOP and fork-atomic accept/registration,
+source copy denial, binary pin/raw gate, truthful pre-exec/no-G proof, partial
+source-none cleanup before FREE, immediate original Server retention before IO.
+Last narrow followup confirms all confirmed MUST closed. Not product Reviewer.
+NEW NARROW MUST FOUND DURING FROZEN FULL (not a repeated unchanged review):
+Actual Server.get_request accept returns original socket, then fstat before
+registering accepted participant. fstat OSError can exit serve; HTTPServer's
+get_request failure does not shutdown_request, external strong socket survives,
+terminal sees acceptedNone/old closed row and could FREE. Existing independent
+High readonly narrow followup CONFIRMED. No edit/test while original39902 LIVE.
+After original full terminal: retain (connection,None) immediately on accept,
+before all IO/stop branch; replace identity only on original successful fstat;
+unknown identity explicit UNKNOWN/no resample/adopt/foreignclose, independent
+other original cleanup and fork handling. Add one actual targeted fstat failure,
+external original strong reference, bounded STOP UNKNOWN/occupied1 evidence.
+Narrow diagnostic b809ba read actual Python3.12 BaseServer implementation:
+_handle_request_noblock catches get_request OSError and simply returns, without
+shutdown_request. Native serve can then iterate again. Minimal known fix must
+also latch receiver_stop/UNKNOWN on acquisition IO failure, preventing another
+accept from overwriting retained unknown original socket; physical fresh gate
+must reject unknown accepted identity before new HANDOFF/Popen/G. No change
+while frozen full; this is the same confirmed participant-retention MUST.
+Final closure/installation/commit remain blocked on this minimal known fix;
+NOT blocked Goal (original full still progressing). Prior closed MUST stay closed.
+
+NECESSARY FULL REGRESSION / LIVE
+Central Runtime ledger/Pool/source owner and fork boundary changed, so one full
+suite is justified; no repeated unchanged browser/Node/80 execution reviews.
+39902 launched once, dcd223 initial..., no terminal yet, no duplicate/restart.
+57488c one early failure marker, original process continues; await actual traceback
+before diagnosis/retry. No source/test edits during run.
+Continuation journal: original39902 still LIVE at df499a, last printed percentage
+19%, two failure markers total (second cc955a), subsequent cases continue. Skips
+present, exact final counts/reasons pending original terminal output. No restart,
+parallel test, source edits, installed worker or commit. Continue ONLY original
+39902 via write_stdin; do not launch another full run. Final narrow High closure
+and all11 distinct new case evidence above are terminal, do not repeat unchanged.
+Frozen manifest/USER lock/diff checks remain clean on this continuation handoff.
+Next verified-wait turn: 4ba0b1 confirms original39902 LIVE, 0b37f7 passes
+22%/25%, 280cba passes28%/30%/33%, dc9fcd still LIVE with subsequent cases
+completing. Still exactly two observed failure markers, no terminal/traceback.
+No duplicate/full restart, code/test edits, installed worker or commit. Frozen
+input manifest and diff checks passed again. Continue original39902; use large
+max_output_tokens for final traceback, do not diagnose from progress dots alone.
+Further continuation: 4d6b4e revalidates original39902 LIVE, 8c062b/99f2f0/
+31417c/e449ac/906150/c839e2/3863fe all same live handle with subsequent
+completed cases, last percentage33%, still two failure markers, no terminal.
+This turn also changes next action with newly confirmed accepted-socket MUST
+documented above; wait is NOT a blocker and no code/test input was edited.
+Next: original39902 terminal -> exact traceback/root causes -> only known minimal
+accepted-socket fix/test plus any confirmed failures -> necessary affected
+regression -> current sdist/wheel reinstall/actual installed SDK consumer ->
+final physical/source/evidence/USERlock checks ->82 commit. Do not restart full.
+Further verified-wait continuation: 1ee774 revalidates original39902 LIVE;
+ed7f03 reaches36%; 452a73/20b02b/6a38c3/38f835/6c8c25 same handle,
+subsequent cases continue, no terminal. Still two observed failure markers;
+known accepted-socket MUST remains pending full terminal, not edited prematurely.
+No new test/worker/review, no runtime/test edits, no commit. Only original39902
+may be polled; final traceback must be read at large output budget. All original
+M0-M5/authority/USERlock boundaries retained. Waiting does not count as blocked.
+Latest verified wait: 86c527/1a656d/e49881 confirm original39902 LIVE;
+e61ed5 reaches39% and continues. Two observed failure markers, no terminal or
+traceback yet. No source/test edits, duplicate run, model/GPU, or commit. Known
+accepted-socket MUST still awaits this original full terminal before minimal fix.
+Next verified wait: 509107/a38127/6f1c6b/23c708/c3be90 all confirm
+original39902 still LIVE with more completed cases, last printed39%; no terminal
+or new failure marker. Frozen code/tests, no other test/worker/model/GPU/commit.
+Resume only this original handle; known minimal fix still pending its terminal.
+Further verified wait: 311c75/4e206d/7a0734/3c6567 confirm original39902
+LIVE and more completed cases. Last printed39%, two failure markers, no terminal
+or traceback. No code/test edit, other test/worker, restart, model/GPU or commit.
+Latest wait continuation: bb5f0e/e33f7b/8bd29f/205a82 confirm original39902
+still LIVE with more completed cases; no new failure marker or terminal. Last
+printed39%, inputs remain frozen. Resume original39902 only; prior known fixes,
+original M0-M5 acceptance and authority remain unchanged, 82 not committed.
+Next continuation: ab754f confirms original39902 LIVE; 437037 reaches42%
+and emits THIRD observed failure marker. 79e313/17502a same live handle,
+subsequent cases continue, no terminal or traceback. Do not infer shared root
+cause from progress markers; original full not restarted, all inputs frozen.
+82 requires all confirmed failures diagnosed/resolved plus accepted-socket MUST,
+affected-only verification and final installed execution before commit.
+Further verified wait: c6c974/58b0f7 confirm original39902 LIVE;
+d3b264 reaches44%; 8bace2 same live handle with more completed cases. Still
+three observed failure markers, no terminal/traceback, code/tests frozen.
+No restart or extra execution/review/model/GPU/commit. Original full must finish
+before accepted-socket fix and before deciding failure-specific revalidation.
+Latest verified wait: 133f90 confirms original39902 LIVE even with empty new
+output, followed by completed cases48596a/5ad950/4507c2; 65f1bb reaches47%
+and continues. Three observed failure markers, no terminal or traceback.
+Code/tests remain frozen; no restart, duplicate tests, model/GPU or commit.
+Next verified wait: d31413 original39902 emits FOURTH failure marker at47%,
+still LIVE; bc0227/26e831/c7119a/a98f7e reach50%/53%/56%/58%/61%/64%.
+414b45/620bd9/538eb7 same original live handle, further cases continue, no
+terminal or traceback. Use large output budget (32000) for complete final errors.
+No full restart/source/test edits/extra execution/model/GPU/commit. The original
+full must reach terminal before minimal known fix and failure-specific reruns.
+Latest verified wait: 3f60ec/916622 confirm original39902 LIVE; e91480
+reaches67%; 11cadf continues completed cases on same handle. Four observed
+failure markers, no terminal or traceback. No code/test edits, duplicate run,
+extra worker/review/model/GPU/commit. Only original39902 may be continued.
+Further verified wait: 6d2d8e reaches70%, 2106c3/81cc78 same live handle,
+d5b41e reaches72% and continues. Four observed failure markers, no terminal or
+traceback. No restart, source/test edit, duplicate tests, model/GPU or commit.
+Resume original39902 only; preserve full output budget for final traceback.
+Latest verified wait: f9f3b1 confirms original39902 LIVE with empty new output;
+1e4bc0 emits completed cases, a39317 remains LIVE with empty output, then80cd1f
+emits further completed cases. Last printed72%, four observed failure markers,
+no terminal/traceback. No restart/code/test edits/extra execution/model/GPU/commit.
+Input manifest checkpoint-82-inputs.sha256 SHA
+a8d5120cf63022afd20b02aea7335ff6aee3ecb193f0e06247797a17b05bdd1b.
+All code/tests/release inputs frozen until actual terminal. Installed consumer
+and final commit pending. No full qualification yet.
+
+PACKAGING / TERMINAL / NOT EXECUTION
+Original setuptools78.1.0, no new dependency/global install.
+Retained /tmp/rlflow-cp82-package-VD1tQU.
+5b0f87 sdist exit0. a4b76e wheel attempt exit1: build cwd was extraction
+parent, diagnosed flat-layout discovery; no source/package-policy changes.
+7cace1 wheel from exact extracted sdist source cwd exit0.
+dc2812 isolated --no-index --no-deps --no-compile target install exit0;
+ALL346 non-dist-info wheel payload bytes equal checkout AND actual site.
+sdist SHA36793fd7e3206eb4977a90dad539f5a4153c9953ee9dce431476d630ff4f6c8b
+wheel SHAf9d9dea7be7263f46631b75d30c1326f4bda718e07b0199a725168ec3cf189f2
+0974a2 compileall/pip check/diff/quiet frozen manifest checks exit0.
+Not a new installed execution or full install/dependency qualification.
+
+REMAINING / AUTHORITY
+No actual model call/token accounting/provider cost/product Review/ConditionEvidence;
+T13/A05/A06/A23/native-model strictOS global network/process tree, invoice,
+B1/long soak/full M0-M5 remain NOT_PROVEN. All model/token/GPU budgets0.
+No paid service/GPU/global dependencies/push/production mutation. Pending bounded
+real Reviewer account/included-quota permission question unanswered, no consent.
+USER untracked package-lock untouched/unstaged SHA
+becc7e2a36dfcad4ffe934b5ff2f0f68187611d6c0641bd63d81367651cfbf09.

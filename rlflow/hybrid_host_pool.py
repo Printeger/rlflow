@@ -828,8 +828,9 @@ All model, child process and native delegation handoff remain denied.
     def _fixture_runtime_change(self, owner, lease, action, project_value):
         """Exact original Runtime proof, not a caller stopped/refund boolean."""
         from .hybrid_fixture_runtime import FixtureRuntimeOwner
+        from .hybrid_native_diagnostic import NativeDiagnosticOwner
         from .hybrid_host_pool_ledger import RUNTIME_ACTIONS
-        if type(owner) is not FixtureRuntimeOwner or owner.pool is not self or action not in RUNTIME_ACTIONS:
+        if type(owner) not in (FixtureRuntimeOwner,NativeDiagnosticOwner) or owner.pool is not self or action not in RUNTIME_ACTIONS:
             raise PermissionError('actual original fixed fixture Runtime owner required')
         attempt = owner._issued(lease); claim = self._issued_claim(attempt['claim'])
         owner._verify_pool_link(attempt, action, project_value)

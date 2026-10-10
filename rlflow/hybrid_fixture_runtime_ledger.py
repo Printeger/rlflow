@@ -32,9 +32,17 @@ CPU_ORIGIN = obj({**PROTOCOL_ORIGIN['properties'], 'kind': {'const': CPU_KIND},
 ENGINEERING_ORIGIN=obj({**PROTOCOL_ORIGIN['properties'],'kind':{'const':ENGINEERING_KIND},
     'authorization':{'const':ENGINEERING_AUTHORIZATION},'scenario':{'const':'engineering_patch'},
     'engineering_patch':ENGINEERING_BINDING})
+DIAGNOSTIC_KIND='LOCAL_NATIVE_DIAGNOSTIC'
+DIAGNOSTIC_BINDING=obj({'profile':{'const':'FIXED_NATIVE_LOCAL_DIAGNOSTIC_V1'},
+    'binary_sha256':HASH,'evaluator_sha256':HASH,'command_sha256':HASH,'resource_sha256':HASH,
+    'grant_id':ID,'proposal_hash':HASH,'approval_hash':HASH,'config_hash':HASH,'scope_hash':HASH})
+DIAGNOSTIC_ORIGIN=obj({**PROTOCOL_ORIGIN['properties'],'kind':{'const':DIAGNOSTIC_KIND},
+    'authorization':{'const':'LOCAL_NON_GENERATING_DIAGNOSTIC_ONLY'},
+    'scenario':{'const':'native_diagnostic'},'native_diagnostic':DIAGNOSTIC_BINDING})
 ORIGIN={'type':'object','if':{'properties':{'kind':{'const':'PROTOCOL_CONFORMANCE'}},'required':['kind']},
     'then':PROTOCOL_ORIGIN,'else':{'if':{'properties':{'kind':{'const':CPU_KIND}},'required':['kind']},
-    'then':CPU_ORIGIN,'else':ENGINEERING_ORIGIN}}
+    'then':CPU_ORIGIN,'else':{'if':{'properties':{'kind':{'const':DIAGNOSTIC_KIND}},'required':['kind']},
+    'then':DIAGNOSTIC_ORIGIN,'else':ENGINEERING_ORIGIN}}}
 nullable = lambda schema: {'oneOf': [schema, {'type': 'null'}]}
 CONTROL_BODY = obj({'action': enum('START_FIXED_CPU', 'STOP_FIXED_SCOPE'),
     'task_id': ID, 'expected_state_version': COUNT})
@@ -179,6 +187,17 @@ def validate_original_links(value, lookup):
     from .hybrid_working_plan import SECTIONS, validate_record, validate_links
     from .hybrid_budget_ledger import SECTIONS as BUDGET
     request = value['request']; runtime = request['fixture_runtime']; origin = runtime['origin']
+    if origin['kind']==DIAGNOSTIC_KIND:
+        from .hybrid_native_diagnostic import approved_binding
+        from .hybrid_goals import SECTIONS as GOALS
+        from .hybrid_authority import SECTIONS as AUTHORITY
+        sources=value['policy_source'];record=lookup(GOALS[0],sources['contract_key']);approval=lookup(AUTHORITY[0],sources['approval_key'])
+        if record is None or approval is None:raise Conflict('diagnostic original approval missing')
+        binding=approved_binding(record['contract']['proposal'],approval['registry_witness'],
+            origin['program_sha256'],origin['native_diagnostic']['evaluator_sha256'],origin['native_diagnostic']['binary_sha256'])
+        binding.update(grant_id=origin['native_diagnostic']['grant_id'],
+            **{k:sources[k] for k in ('proposal_hash','approval_hash','config_hash','scope_hash')})
+        if canonical(binding)!=canonical(origin['native_diagnostic']):raise Conflict('diagnostic original approved profile binding differs')
     if origin['kind']==ENGINEERING_KIND:
         from .hybrid_engineering_patch import approved_binding
         from .hybrid_goals import SECTIONS as GOALS

@@ -4,6 +4,8 @@ import select
 import subprocess
 import sys
 import os
+import sqlite3
+from contextlib import closing
 import pytest
 import httpx
 from rlflow.observation import enable, ObservationReader
@@ -91,7 +93,12 @@ def test_finite_real_http_concurrency_matches_outbox(tmp_path):
     source=Store(tmp_path/'source');enable(source,'project_http_small',data_mode='fixture')
     for i in range(1,5):
         source.transact_objects('USAGE_OBSERVED',str(i),[('usage','fixed')],lambda s,v=i:s.setdefault('usage',{}).update(fixed={'input_tokens':v}))
-    result=measure_http(source.db,tmp_path/'probe',tasks=2,min_events=4,phases=((2,1),))
+    # Keep the live fixture WAL owned for the measured interval. A SQLite
+    # context manager commits but does not close; GC of setup connections can
+    # otherwise checkpoint the source bytes without any business mutation.
+    with closing(sqlite3.connect(source.db.as_uri()+'?mode=ro',uri=True)) as pin:
+        pin.execute('SELECT version FROM projection_meta').fetchone()
+        result=measure_http(source.db,tmp_path/'probe',tasks=2,min_events=4,phases=((2,1),))
     assert result['public_events']==2 and result['source_unchanged'] and not result['full_B1_pass']
     assert len(result['raw']['writes'])==2 and len(result['raw']['queries'])==4
     assert all(len(rows)==2 for rows in result['raw']['receivers'])

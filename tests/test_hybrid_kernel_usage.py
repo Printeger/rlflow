@@ -116,10 +116,22 @@ def test_authenticated_actual_results_publish_only_explicit_final_sample(applica
         client.cookies.set('rlflow_session',token)
         for unit,service,observer in zip(units,services,observers):
             url=f'/api/v1/projects/{service.project_id}/telemetry'
-            response=client.post(path(service)+'/commands',headers=headers,json=start(service))
+            gate_times=[]
+            def timed(name,call):
+                def observed(*args,**kwargs):
+                    began=time.monotonic_ns()
+                    try:return call(*args,**kwargs)
+                    finally:gate_times.append({'phase':name,'began_ns':began,'ended_ns':time.monotonic_ns()})
+                return observed
+            with monkeypatch.context() as patch:
+                for target,name in ((unit.runtime.sources,'_runtime_spawn'),(unit.runtime,'_register_release'),
+                                    (unit.runtime.sources,'_runtime_release'),(unit.runtime,'_check_release_gate')):
+                    patch.setattr(target,name,timed(name,getattr(target,name)))
+                response=client.post(path(service)+'/commands',headers=headers,json=start(service))
+            print('actual_original_gate_timing',service.project_id,gate_times,flush=True)
             assert response.status_code==202,response.text
             attempt=unit._actual();row=unit.runtime.sources._issued(attempt['source'])
-            capture=row['kernel_usage'];assert capture.snapshot()['exit_code']==0
+            capture=row['kernel_usage'];assert capture.snapshot()['exit_code']==0, (gate_times,(row['path']/'stderr.log').read_text())
             # Reading an older slot cannot upgrade it from the completed reap.
             assert client.get(url).json()['workers'][0]['final_usage'] is None
             version=unit.runtime.store.version()

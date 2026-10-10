@@ -1,5 +1,15 @@
 # 固定 CPU Runtime：Checkpoint 44
 
+## Checkpoint82：独立的原生 CLI 诊断（验收收尾中）
+
+新增 `NativeDiagnosticOwner`、`NativeDiagnosticSourceOwner` 与原 opaque grant 的封闭 `LOCAL_NATIVE_DIAGNOSTIC` kind，不把旧 CPU/工程 grant 升级为 native 权限。实际同 PID 的 gate→原 root-owned ELF exec，分别读取原 stdout 与 sandbox receipt；实际 `thread.started`、pidfd、`/proc/PID/exe` 和原固定 ELF 身份共同证明原生启动。接收本地 HTTP 请求本身不证明启动或用量。
+
+Linux x86_64 seccomp 禁止新进程、允许同 TGID 内部线程；Landlock 限制执行至原 ELF，私有 home/work 才可写。配置无凭据，工具/插件/hooks/MCP 禁用，只向原 localhost 非模型接收器请求。网络标记 `PARTIAL`，不宣称硬 egress 隔离或允许实际模型执行；原两条通用 start 仍无条件拒绝。
+
+原 STOP 必须 reap 原参与者、关闭原 named/source/pidfd/listener/accepted socket 并确认线程退出，才能写固定 native single-TGID scope 终态和 Pool FREE。原 Popen 返回丢失、持久 STOP 写失败、部分分配或 FD 被复用时，不接管新身份，不关 foreign FD，保留 UNKNOWN/占槽。token/cost 始终 UNKNOWN；仅真实 wall 可按原账本结算。
+
+11 个 distinct case 分轮通过，High 最后窄差量闭合；必要全库原39902仍 LIVE，发行/安装态消费/commit 待验收。完整证据见 [82记录](evidence/checkpoint-82-tests.txt)。这不替代 T13、独立产品 Reviewer、实际模型用量或全局严格 OS 验收。
+
 本切片实际执行一个受保护的固定 CPU 程序，打通原来源、登记、真实进程、原 ACK、STOP、回收与资源释放。它不是 Codex/native WorkingPlan 执行器，也不证明任意执行树、模型计费、工程任务或科研闭环完成。完整 Goal 的验收合同不变。
 
 ## 交付行为

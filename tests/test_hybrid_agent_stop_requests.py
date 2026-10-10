@@ -176,6 +176,7 @@ def test_disconnected_prepare_waiter_still_hands_off_STOP_and_final_read_does_no
         prepared = threading.Event(); release_prepare = threading.Event()
         reading = threading.Event(); release_read = threading.Event()
         original_prepare = FiniteStopRequests.prepare
+        original_execute = FiniteStopRequests.execute
         original_get = AgentRequestService.get
         original_list = AgentRequestService.list
         lists_started = threading.Event(); release_lists = threading.Event(); count = []; count_lock = threading.Lock()
@@ -190,11 +191,20 @@ def test_disconnected_prepare_waiter_still_hands_off_STOP_and_final_read_does_no
             assert all(u._cancelled.is_set() for u in units)
             prepared.set(); assert release_prepare.wait(5)
             return result
+        def handed_off(self, *a, **kw):
+            # This is the actual independently admitted STOP worker, not the
+            # cancelled HTTP waiter or prepare-only latch. Ordinary read holds
+            # prove handoff isolation; they need not span the full Core cleanup.
+            assert app.state.finite_host_stop_pool.pending >= 1
+            assert all(u._cancelled.is_set() for u in units)
+            release_lists.set()
+            return original_execute(self, *a, **kw)
         def held_get(self, *a, **kw):
             if kw.get('method') == 'session':
                 reading.set(); assert release_read.wait(5)
             return original_get(self, *a, **kw)
         monkeypatch.setattr(FiniteStopRequests, 'prepare', held_prepare)
+        monkeypatch.setattr(FiniteStopRequests, 'execute', handed_off)
         monkeypatch.setattr(AgentRequestService, 'get', held_get)
         monkeypatch.setattr(AgentRequestService, 'list', held_list)
         forward = next(r.endpoint for r in app.routes if getattr(r, 'path', None) ==
@@ -207,8 +217,8 @@ def test_disconnected_prepare_waiter_still_hands_off_STOP_and_final_read_does_no
                 'query_string': b'', 'headers': [(b'cookie', ('rlflow_session='+token).encode()),
                     (b'origin', ORIGIN.encode()), (b'x-csrf-token', headers['X-CSRF-Token'].encode()),
                     (b'content-type', b'application/json')], 'app': app}, receive)
-        async def wait_event(event):
-            async with asyncio.timeout(5):
+        async def wait_event(event, timeout=5):
+            async with asyncio.timeout(timeout):
                 while not event.is_set(): await asyncio.sleep(.01)
         async def disconnected():
             waiter = asyncio.create_task(forward(request_for(base, {
@@ -219,7 +229,11 @@ def test_disconnected_prepare_waiter_still_hands_off_STOP_and_final_read_does_no
                 waiter.cancel()
                 with pytest.raises(asyncio.CancelledError): await waiter
                 release_prepare.set()
-                await wait_event(reading)
+                # Reading follows the full original two-scope cleanup. Use
+                # PRD NFR-11's 10s cleanup watchdog, not the unrelated 5s
+                # synthetic hold/handoff watchdog. Dispatch/latch, hold5s,
+                # same-loop .5s profile and all-four200 remain unchanged.
+                await wait_event(reading, timeout=10)
                 # Final receipt read is deliberately blocked in its finite
                 # worker, yet this SAME event loop can serve the original route.
                 reply = await asyncio.wait_for(profile(request_for('/api/v1/finite-host')), .5)
@@ -234,7 +248,8 @@ def test_disconnected_prepare_waiter_still_hands_off_STOP_and_final_read_does_no
                 assert lists_started.wait(2)  # Both Goal/inbox workers held.
                 asyncio.run(disconnected())
             finally: release_lists.set()
-            assert all(job.result(timeout=5).status_code == 200 for job in ordinary_reads)
+            replies=[job.result(timeout=5) for job in ordinary_reads]
+            assert all(reply.status_code == 200 for reply in replies), [(r.status_code,r.text) for r in replies]
         result = client.get(base+'/'+saved['request_id'], headers={'Authorization': 'Bearer '+agent})
         assert result.status_code == 200 and result.json()['status'] == 'STOPPED_AS_OF_RETURN'
         validate_public(result.json(), services[0].project_id)

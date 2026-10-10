@@ -1,0 +1,255 @@
+Original39902 ->002e2c exit1, 4failed/2532passed/32skipped/5warnings6257.53s.
+Actual original terminal output; two isolated fixture session tokens redacted.
+No duplicate run or restart. Not a green whole suite.
+..... [ 95%]
+........................................................................ [ 98%]
+................................................                         [100%]
+=================================== FAILURES ===================================
+_______________ test_finite_real_http_concurrency_matches_outbox _______________
+
+tmp_path = PosixPath('/tmp/pytest-of-mint/pytest-667/test_finite_real_http_concurre0')
+
+    def test_finite_real_http_concurrency_matches_outbox(tmp_path):
+        source=Store(tmp_path/'source');enable(source,'project_http_small',data_mode='fixture')
+        for i in range(1,5):
+            source.transact_objects('USAGE_OBSERVED',str(i),[('usage','fixed')],lambda s,v=i:s.setdefault('usage',{}).update(fixed={'input_tokens':v}))
+>       result=measure_http(source.db,tmp_path/'probe',tasks=2,min_events=4,phases=((2,1),))
+
+tests/test_acceptance_http_v1.py:94: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance_http_v1.py:224: in measure_http
+    result=summarize(store,source,manifest,plan,raw,packet['identity'],log,exit_code)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+store = <rlflow.store.Store object at 0x7853f8e9ad20>
+source = PosixPath('/tmp/pytest-of-mint/pytest-667/test_finite_real_http_concurre0/source/runtime/research.db')
+manifest = {'core_version': 5, 'cursor': 'store_30f6a8cdefbb4003aa19488b56c2830c:6', 'source': '/tmp/pytest-of-mint/pytest-667/test_finite_real_http_concurre0/source/runtime/research.db', 'source_events': 4, ...}
+plan = [{'index': 0, 'offset': 0.0, 'phase': 0}, {'index': 1, 'offset': 0.5, 'phase': 0}]
+raw = {'connections': [[{'content_type': 'text/event-stream; charset=utf-8', 'cursor': 'store_30f6a8cdefbb4003aa19488b56c283...n': [{'index': 0, 'offset': 0.0, 'phase': 0}, {'index': 1, 'offset': 0.5, 'phase': 0}], 'pre_cleanup_alive': True, ...}
+record = {'boot_id': 'fa257cc3-1204-4e6f-88a5-a8a2ea7743aa', 'pgid': 1582998, 'pid': 1582998, 'starttime': '156018266'}
+log = PosixPath('/tmp/pytest-of-mint/pytest-667/test_finite_real_http_concurre0/probe/api.log')
+exit_code = -15
+
+    def summarize(store,source,manifest,plan,raw,record,log,exit_code):
+        """Validate the final database before reducing any successful samples."""
+        if log.stat().st_size or owns(record) or stopped(store.root):raise RuntimeError('API diagnostic, live child or STOP')
+        if raw.get('pre_cleanup_alive') is not True or exit_code not in (0,-15):raise RuntimeError('API abnormal exit or unproven planned cleanup')
+        with store.connect() as db:
+            core_count=db.execute('SELECT count(*) FROM events').fetchone()[0]
+            expected=[{'event':json.loads(body),'key':key,'digest':digest,'core_version':version,'source_event_id':event_id} for body,key,digest,version,event_id in db.execute(
+                'SELECT o.envelope,e.idempotency_key,o.digest,e.new_state_version,e.event_id FROM observation_events o JOIN events e ON e.event_id=o.source_event_id WHERE o.seq>? ORDER BY o.seq',(int(manifest['cursor'].rsplit(':',1)[1]),))]
+        by_key={row['key']:row for row in raw['writes']}
+        if len(by_key)!=len(plan) or core_count!=manifest['core_version']+len(plan) or store.version()!=core_count:raise RuntimeError('missing writes/core versions')
+        if len(raw['writes'])!=len(plan):raise RuntimeError('duplicate write samples')
+        for planned in plan:
+            write=by_key.get(f'http-{planned["index"]}')
+            if write is None or any(write[k]!=planned[k] for k in ('index','phase','offset')) or write.get('duplicate') is not False or write.get('version')!=manifest['core_version']+planned['index']+1:
+                raise RuntimeError('write plan/version mismatch')
+        if {r['key'] for r in expected}!=set(by_key):raise RuntimeError('public outbox omits planned writes')
+        for actual in expected:
+            payload=actual['event']['payload']
+            if actual['core_version']!=by_key[actual['key']]['version'] or payload['source_state_version']!=actual['core_version'] or payload['source_event_id']!=public_id(actual['source_event_id']):
+                raise RuntimeError('public/core source mismatch')
+        latencies=[]
+        for index,rows in enumerate(raw['receivers']):
+            if len(rows)!=len(expected):raise RuntimeError('missing public events')
+            for received,actual in zip(rows,expected):
+                if received['event']!=actual['event'] or hashlib.sha256(canonical(actual['event'])).hexdigest()!=actual['digest']:raise RuntimeError('outbox/body mismatch')
+                write=by_key[actual['key']]
+                latencies.append({'client':index,'phase':write['phase'],'seq':actual['event']['seq'],
+                    'submit_to_frame_ms':1000*(received['received']-write['submitted']),
+                    'commit_return_to_frame_ms':1000*(received['received']-write['returned'])})
+        records=store.objects('tasks')
+        if len(records)!=manifest['tasks'] or any(value!=fixture_task(key) for key,value in records):raise RuntimeError('fixture tasks changed')
+>       if fingerprint(Path(source).resolve())!=manifest['source_fingerprint'] or store.objects('sessions'):raise RuntimeError('source/session changed')
+E       RuntimeError: source/session changed
+
+tests/acceptance_http_v1.py:261: RuntimeError
+----------------------------- Captured stdout call -----------------------------
+{"manifest": {"source": "/tmp/pytest-of-mint/pytest-667/test_finite_real_http_concurre0/source/runtime/research.db", "source_fingerprint": {"db": "e3ba06536f7dbba337dee3c1c5f01b43660ce276abb54c5cee2d5defc5b970aa", "wal": "d67d140b4f9026fe325e85f4acad0f5d98a2ec94891926ac05f11096efb15d6a", "wal_bytes": 795192}, "source_events": 4, "tasks": 2, "core_version": 5, "cursor": "store_30f6a8cdefbb4003aa19488b56c2830c:6"}, "api_identity": {"pid": 1582998, "pgid": 1582998, "starttime": "156018266", "boot_id": "fa257cc3-1204-4e6f-88a5-a8a2ea7743aa"}, "phases": [[2, 1]], "sse_options": "production defaults", "scope": "single archived fixture; HTTP transport only"}
+{"failure": "RuntimeError", "raw": {"plan": [{"index": 0, "phase": 0, "offset": 0.0}, {"index": 1, "phase": 0, "offset": 0.5}], "writes": [{"index": 0, "phase": 0, "offset": 0.0, "key": "http-0", "planned": 1560182.97956116, "submitted": 1560182.979935857, "returned": 1560183.023278465, "version": 6, "duplicate": false}, {"index": 1, "phase": 0, "offset": 0.5, "key": "http-1", "planned": 1560183.47956116, "submitted": 1560183.481572666, "returned": 1560183.493300246, "version": 7, "duplicate": false}], "queries": [{"client": 1, "planned": 1560182.97956116, "issued": 1560182.980220908, "path": "/api/v1/projects/project_http_small/snapshot", "returned": 1560183.00242213, "status": 200, "bytes": 1387}, {"client": 0, "planned": 1560182.97956116, "issued": 1560182.981405554, "path": "/api/v1/projects/project_http_small/snapshot", "returned": 1560183.002013958, "status": 200, "bytes": 1387}, {"client": 1, "planned": 1560183.47956116, "issued": 1560183.48060285, "path": "/api/v1/projects/project_http_small/objects?kind=task&limit=50", "returned": 1560183.485214645, "status": 200, "bytes": 612}, {"client": 0, "planned": 1560183.47956116, "issued": 1560183.481153723, "path": "/api/v1/projects/project_http_small/objects?kind=task&limit=50", "returned": 1560183.485577057, "status": 200, "bytes": 612}], "receivers": [[{"received": 1560183.124029833, "event": {"causation_id": null, "correlation_id": "ref_18bc861f539b21126d2a1b1e36299abbeba7e06b65623defa4d20e5aa24e0c78", "data_mode": "fixture", "entity": {"id": "legacy_observer", "kind": "control", "version": 7}, "event_id": "evt_ef0b451dafb54589850f2135b525a0e0", "occurred_at": "2026-10-10T06:07:24.632Z", "payload": {"counters": [{"count": 2, "kind": "task", "status": "DONE"}, {"count": 1, "kind": "usage", "status": "UNKNOWN"}], "enabled": false, "paused": false, "removed": [], "source_event_id": "ref_18bc861f539b21126d2a1b1e36299abbeba7e06b65623defa4d20e5aa24e0c78", "source_event_type": "USAGE_OBSERVED", "source_state_version": 6, "upsert": [{"actual_cost": null, "actual_cost_status": "UNKNOWN", "cached_tokens": null, "id": "ref_992a93455c71fedd36ac9bbc439952c041cf61445958472af479269b8d873513", "input_tokens": 6, "kind": "usage", "observability": "PARTIAL", "output_tokens": null, "source_status": null, "state": null, "usage_status": "PARTIAL", "version": 5}]}, "project_id": "project_http_small", "recorded_at": "2026-10-10T06:07:24.632Z", "schema_version": "1.0", "seq": 7, "source": {"id": "legacy_bridge_v1", "kind": "core"}, "store_epoch": "store_30f6a8cdefbb4003aa19488b56c2830c", "type": "legacy.observed"}, "cursor": "store_30f6a8cdefbb4003aa19488b56c2830c:7"}, {"received": 1560183.629291013, "event": {"causation_id": null, "correlation_id": "ref_c125636d6cbc9987cfc77b98545b4046d820a3867955c3981588da69c3d1fb5f", "data_mode": "fixture", "entity": {"id": "legacy_observer", "kind": "control", "version": 8}, "event_id": "evt_2b45895d9106409996f34b9d109ef0d6", "occurred_at": "2026-10-10T06:07:25.096Z", "payload": {"counters": [{"count": 2, "kind": "task", "status": "DONE"}, {"count": 1, "kind": "usage", "status": "UNKNOWN"}], "enabled": false, "paused": false, "removed": [], "source_event_id": "ref_c125636d6cbc9987cfc77b98545b4046d820a3867955c3981588da69c3d1fb5f", "source_event_type": "USAGE_OBSERVED", "source_state_version": 7, "upsert": [{"actual_cost": null, "actual_cost_status": "UNKNOWN", "cached_tokens": null, "id": "ref_992a93455c71fedd36ac9bbc439952c041cf61445958472af479269b8d873513", "input_tokens": 7, "kind": "usage", "observability": "PARTIAL", "output_tokens": null, "source_status": null, "state": null, "usage_status": "PARTIAL", "version": 6}]}, "project_id": "project_http_small", "recorded_at": "2026-10-10T06:07:25.096Z", "schema_version": "1.0", "seq": 8, "source": {"id": "legacy_bridge_v1", "kind": "core"}, "store_epoch": "store_30f6a8cdefbb4003aa19488b56c2830c", "type": "legacy.observed"}, "cursor": "store_30f6a8cdefbb4003aa19488b56c2830c:8"}], [{"received": 1560183.123246149, "event": {"causation_id": null, "correlation_id": "ref_18bc861f539b21126d2a1b1e36299abbeba7e06b65623defa4d20e5aa24e0c78", "data_mode": "fixture", "entity": {"id": "legacy_observer", "kind": "control", "version": 7}, "event_id": "evt_ef0b451dafb54589850f2135b525a0e0", "occurred_at": "2026-10-10T06:07:24.632Z", "payload": {"counters": [{"count": 2, "kind": "task", "status": "DONE"}, {"count": 1, "kind": "usage", "status": "UNKNOWN"}], "enabled": false, "paused": false, "removed": [], "source_event_id": "ref_18bc861f539b21126d2a1b1e36299abbeba7e06b65623defa4d20e5aa24e0c78", "source_event_type": "USAGE_OBSERVED", "source_state_version": 6, "upsert": [{"actual_cost": null, "actual_cost_status": "UNKNOWN", "cached_tokens": null, "id": "ref_992a93455c71fedd36ac9bbc439952c041cf61445958472af479269b8d873513", "input_tokens": 6, "kind": "usage", "observability": "PARTIAL", "output_tokens": null, "source_status": null, "state": null, "usage_status": "PARTIAL", "version": 5}]}, "project_id": "project_http_small", "recorded_at": "2026-10-10T06:07:24.632Z", "schema_version": "1.0", "seq": 7, "source": {"id": "legacy_bridge_v1", "kind": "core"}, "store_epoch": "store_30f6a8cdefbb4003aa19488b56c2830c", "type": "legacy.observed"}, "cursor": "store_30f6a8cdefbb4003aa19488b56c2830c:7"}, {"received": 1560183.629732806, "event": {"causation_id": null, "correlation_id": "ref_c125636d6cbc9987cfc77b98545b4046d820a3867955c3981588da69c3d1fb5f", "data_mode": "fixture", "entity": {"id": "legacy_observer", "kind": "control", "version": 8}, "event_id": "evt_2b45895d9106409996f34b9d109ef0d6", "occurred_at": "2026-10-10T06:07:25.096Z", "payload": {"counters": [{"count": 2, "kind": "task", "status": "DONE"}, {"count": 1, "kind": "usage", "status": "UNKNOWN"}], "enabled": false, "paused": false, "removed": [], "source_event_id": "ref_c125636d6cbc9987cfc77b98545b4046d820a3867955c3981588da69c3d1fb5f", "source_event_type": "USAGE_OBSERVED", "source_state_version": 7, "upsert": [{"actual_cost": null, "actual_cost_status": "UNKNOWN", "cached_tokens": null, "id": "ref_992a93455c71fedd36ac9bbc439952c041cf61445958472af479269b8d873513", "input_tokens": 7, "kind": "usage", "observability": "PARTIAL", "output_tokens": null, "source_status": null, "state": null, "usage_status": "PARTIAL", "version": 6}]}, "project_id": "project_http_small", "recorded_at": "2026-10-10T06:07:25.096Z", "schema_version": "1.0", "seq": 8, "source": {"id": "legacy_bridge_v1", "kind": "core"}, "store_epoch": "store_30f6a8cdefbb4003aa19488b56c2830c", "type": "legacy.observed"}, "cursor": "store_30f6a8cdefbb4003aa19488b56c2830c:8"}]], "reconnects": [[{"cursor": "store_30f6a8cdefbb4003aa19488b56c2830c:7", "time": 1560183.124029833}], [{"cursor": "store_30f6a8cdefbb4003aa19488b56c2830c:7", "time": 1560183.123246149}]], "connections": [[{"cursor": "store_30f6a8cdefbb4003aa19488b56c2830c:6", "reconnected": false, "status": 200, "content_type": "text/event-stream; charset=utf-8", "opened": 1560182.869136847}, {"cursor": "store_30f6a8cdefbb4003aa19488b56c2830c:7", "reconnected": true, "status": 200, "content_type": "text/event-stream; charset=utf-8", "opened": 1560183.126111594}], [{"cursor": "store_30f6a8cdefbb4003aa19488b56c2830c:6", "reconnected": false, "status": 200, "content_type": "text/event-stream; charset=utf-8", "opened": 1560182.869436009}, {"cursor": "store_30f6a8cdefbb4003aa19488b56c2830c:7", "reconnected": true, "status": 200, "content_type": "text/event-stream; charset=utf-8", "opened": 1560183.125946763}]], "receiver_errors": [null, null], "last_frames": [["id: store_30f6a8cdefbb4003aa19488b56c2830c:8", "event: domain", "data: {\"causation_id\":null,\"correlation_id\":\"ref_c125636d6cbc9987cfc77b98545b4046d820a3867955c3981588da69c3d1fb5f\",\"data_mode\":\"fixture\",\"entity\":{\"id\":\"legacy_observer\",\"kind\":\"control\",\"version\":8},\"event_id\":\"evt_2b45895d9106409996f34b9d109ef0d6\",\"occurred_at\":\"2026-10-10T06:07:25.096Z\",\"payload\":{\"counters\":[{\"count\":2,\"kind\":\"task\",\"status\":\"DONE\"},{\"count\":1,\"kind\":\"usage\",\"status\":\"UNKNOWN\"}],\"enabled\":false,\"paused\":false,\"removed\":[],\"source_event_id\":\"ref_c125636d6cbc9987cfc77b98545b4046d820a3867955c3981588da69c3d1fb5f\",\"source_event_type\":\"USAGE_OBSERVED\",\"source_state_version\":7,\"upsert\":[{\"actual_cost\":null,\"actual_cost_status\":\"UNKNOWN\",\"cached_tokens\":null,\"id\":\"ref_992a93455c71fedd36ac9bbc439952c041cf61445958472af479269b8d873513\",\"input_tokens\":7,\"kind\":\"usage\",\"observability\":\"PARTIAL\",\"output_tokens\":null,\"source_status\":null,\"state\":null,\"usage_status\":\"PARTIAL\",\"version\":6}]},\"project_id\":\"project_http_small\",\"recorded_at\":\"2026-10-10T06:07:25.096Z\",\"schema_version\":\"1.0\",\"seq\":8,\"source\":"], ["id: store_30f6a8cdefbb4003aa19488b56c2830c:8", "event: domain", "data: {\"causation_id\":null,\"correlation_id\":\"ref_c125636d6cbc9987cfc77b98545b4046d820a3867955c3981588da69c3d1fb5f\",\"data_mode\":\"fixture\",\"entity\":{\"id\":\"legacy_observer\",\"kind\":\"control\",\"version\":8},\"event_id\":\"evt_2b45895d9106409996f34b9d109ef0d6\",\"occurred_at\":\"2026-10-10T06:07:25.096Z\",\"payload\":{\"counters\":[{\"count\":2,\"kind\":\"task\",\"status\":\"DONE\"},{\"count\":1,\"kind\":\"usage\",\"status\":\"UNKNOWN\"}],\"enabled\":false,\"paused\":false,\"removed\":[],\"source_event_id\":\"ref_c125636d6cbc9987cfc77b98545b4046d820a3867955c3981588da69c3d1fb5f\",\"source_event_type\":\"USAGE_OBSERVED\",\"source_state_version\":7,\"upsert\":[{\"actual_cost\":null,\"actual_cost_status\":\"UNKNOWN\",\"cached_tokens\":null,\"id\":\"ref_992a93455c71fedd36ac9bbc439952c041cf61445958472af479269b8d873513\",\"input_tokens\":7,\"kind\":\"usage\",\"observability\":\"PARTIAL\",\"output_tokens\":null,\"source_status\":null,\"state\":null,\"usage_status\":\"PARTIAL\",\"version\":6}]},\"project_id\":\"project_http_small\",\"recorded_at\":\"2026-10-10T06:07:25.096Z\",\"schema_version\":\"1.0\",\"seq\":8,\"source\":"]], "start": 1560182.97956116, "query_plan": [{"client": 0, "planned": 1560182.97956116, "path": "/api/v1/projects/project_http_small/snapshot"}, {"client": 0, "planned": 1560183.47956116, "path": "/api/v1/projects/project_http_small/objects?kind=task&limit=50"}, {"client": 1, "planned": 1560182.97956116, "path": "/api/v1/projects/project_http_small/snapshot"}, {"client": 1, "planned": 1560183.47956116, "path": "/api/v1/projects/project_http_small/objects?kind=task&limit=50"}], "pre_cleanup_alive": true}}
+_ test_disconnected_prepare_waiter_still_hands_off_STOP_and_final_read_does_not_block_loop _
+
+requested_application = (<rlflow.hybrid_host_execution.HostExecutionService object at 0x7853f8e18cb0>, [<rlflow.hybrid_cpu_execution_unit.CpuT...8d54f80>), <fastapi.applications.FastAPI object at 0x7853f26370e0>, '<redacted isolated fixture session token>', ...)
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7853f8d56d80>
+
+    def test_disconnected_prepare_waiter_still_hands_off_STOP_and_final_read_does_not_block_loop(requested_application, monkeypatch):
+        from rlflow.hybrid_agent_stop_requests import FiniteStopRequests
+        from rlflow.hybrid_agent_requests import AgentRequestService
+        host, units, services, observers, app, token, headers = requested_application
+        agent, _ = services[0].auth.issue_request_token(Principal('disconnect_stop_agent', 'agent',
+            {'viewer'}, {s.project_id for s in services}), ttl=60)
+        with TestClient(app, base_url=ORIGIN) as client:
+            client.cookies.set('rlflow_session', token)
+            base, saved, _ = suggestion(client, services, agent)
+            prepared = threading.Event(); release_prepare = threading.Event()
+            reading = threading.Event(); release_read = threading.Event()
+            original_prepare = FiniteStopRequests.prepare
+            original_get = AgentRequestService.get
+            original_list = AgentRequestService.list
+            lists_started = threading.Event(); release_lists = threading.Event(); count = []; count_lock = threading.Lock()
+            def held_list(self, *a, **kw):
+                with count_lock:
+                    count.append(True)
+                    if len(count) == 2: lists_started.set()
+                assert release_lists.wait(5)
+                return original_list(self, *a, **kw)
+            def held_prepare(self, *a, **kw):
+                result = original_prepare(self, *a, **kw)
+                assert all(u._cancelled.is_set() for u in units)
+                prepared.set(); assert release_prepare.wait(5)
+                return result
+            def held_get(self, *a, **kw):
+                if kw.get('method') == 'session':
+                    reading.set(); assert release_read.wait(5)
+                return original_get(self, *a, **kw)
+            monkeypatch.setattr(FiniteStopRequests, 'prepare', held_prepare)
+            monkeypatch.setattr(AgentRequestService, 'get', held_get)
+            monkeypatch.setattr(AgentRequestService, 'list', held_list)
+            forward = next(r.endpoint for r in app.routes if getattr(r, 'path', None) ==
+                '/api/v1/projects/{project_id}/agent-requests/{request_id}/forward-stop')
+            profile = next(r.endpoint for r in app.routes if getattr(r, 'path', None) == '/api/v1/finite-host')
+            def request_for(path, body=None):
+                raw = json.dumps(body).encode() if body is not None else b''
+                async def receive(): return {'type': 'http.request', 'body': raw, 'more_body': False}
+                return Request({'type': 'http', 'method': 'POST' if body else 'GET', 'path': path,
+                    'query_string': b'', 'headers': [(b'cookie', ('rlflow_session='+token).encode()),
+                        (b'origin', ORIGIN.encode()), (b'x-csrf-token', headers['X-CSRF-Token'].encode()),
+                        (b'content-type', b'application/json')], 'app': app}, receive)
+            async def wait_event(event):
+                async with asyncio.timeout(5):
+                    while not event.is_set(): await asyncio.sleep(.01)
+            async def disconnected():
+                waiter = asyncio.create_task(forward(request_for(base, {
+                    'request_hash': saved['request_hash'], 'resume_cleanup': False}),
+                    services[0].project_id, saved['request_id']))
+                try:
+                    await wait_event(prepared)
+                    waiter.cancel()
+                    with pytest.raises(asyncio.CancelledError): await waiter
+                    release_prepare.set()
+                    await wait_event(reading)
+                    # Final receipt read is deliberately blocked in its finite
+                    # worker, yet this SAME event loop can serve the original route.
+                    reply = await asyncio.wait_for(profile(request_for('/api/v1/finite-host')), .5)
+                    assert reply.status_code == 200
+                    assert host.pool.snapshot()['occupied'] == 0
+                finally:
+                    release_prepare.set(); release_read.set()
+                    await app.state.agent_request_stop_drain()
+            with ThreadPoolExecutor(max_workers=4) as ordinary:
+                ordinary_reads = [ordinary.submit(client.get, base) for _ in range(4)]
+                try:
+                    assert lists_started.wait(2)  # Both Goal/inbox workers held.
+                    asyncio.run(disconnected())
+                finally: release_lists.set()
+>               assert all(job.result(timeout=5).status_code == 200 for job in ordinary_reads)
+E               assert False
+E                +  where False = all(<generator object test_disconnected_prepare_waiter_still_hands_off_STOP_and_final_read_does_not_block_loop.<locals>.<genexpr> at 0x7853f84d1b10>)
+
+tests/test_hybrid_agent_stop_requests.py:237: AssertionError
+_ test_last_effect_proof_expiry_or_stop_never_enters_popen_or_g[STOP-RELEASE_INTENT] _
+
+runtime = (<rlflow.hybrid_fixture_runtime.FixtureRuntimeOwner object at 0x7853f26f8d40>, WorkingPlanBundle(id='working_plan_bd09...'gpu_device_seconds': 0, 'model_input_tokens': 0, ...}, 'data_mode': 'fixture', 'expected_state_version': 7, ...}, ...)
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7853f2628a70>
+boundary = 'RELEASE_INTENT', late = 'STOP'
+
+    @pytest.mark.parametrize('boundary', ['HANDOFF_UNKNOWN', 'RELEASE_INTENT'])
+    @pytest.mark.parametrize('late', ['utc', 'mono', 'STOP'])
+    def test_last_effect_proof_expiry_or_stop_never_enters_popen_or_g(runtime, monkeypatch, boundary, late):
+        owner, _, _, _, _, _, utc, mono = runtime
+        lease = register(runtime); attempt = owner._issued(lease); final = owner._final_effect_gate; reached = []
+        def changed(guard):
+            if json.loads(guard.raw)['request']['fixture_runtime']['phase'] == boundary:
+                reached.append(True)
+                if late == 'utc': utc[0] += timedelta(seconds=30)
+                elif late == 'mono': mono[0] += 30 * 10**9
+                else: (owner.store.root / 'STOP').touch()
+            return final(guard)
+        with monkeypatch.context() as patch:
+            patch.setattr(owner, '_final_effect_gate', changed)
+            with pytest.raises(Conflict): owner.start(lease)
+        assert reached and not attempt['release_entered']
+        if boundary == 'HANDOFF_UNKNOWN':
+            assert not attempt['spawn_entered']
+            owner.shutdown_safety()
+            assert owner.pool.snapshot()['occupied'] == 1
+        else:
+            assert attempt['spawn_entered']
+>           owner.stop_to_terminal(lease)
+
+tests/test_hybrid_fixture_runtime.py:325: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+rlflow/hybrid_fixture_runtime.py:1075: in stop_to_terminal
+    self._stop_original_participant(lease)
+rlflow/hybrid_fixture_runtime.py:1047: in _stop_original_participant
+    if error is not None:raise error
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <rlflow.hybrid_fixture_runtime.FixtureRuntimeOwner object at 0x7853f26f8d40>
+lease = FixtureExecutionLease(id='fixture_lease_e0570617e53a4bad812fed75dcf7f6b0', raw=b'{"attempt_id":"fixture_attempt_03aa3d...499f6a0d6ed9790b3d2027","key":"working_plan_ready_05d61c4119a5c7e9c923c2c7b1cf222126ee3f639dcc0def7029c7fb98a3703e"}}')
+
+    def _stop_original_participant(self, lease):
+        """Original cap physical cleanup only. No Store/Pool facts or refunds."""
+        attempt=self._issued(lease)
+        with self.pool._lock,self._lock:
+            error=None
+            try:
+                if attempt['source'] is not None:
+                    source=self.sources._issued(attempt['source']);process=source['producer']
+                    if source['runtime'] is not attempt:
+                        raise PermissionError('original same-lease participant cleanup required')
+                    if process is not None and process.poll() is None:
+                        if identity(process.pid)!=source['producer_identity']:
+>                           raise Conflict('fixture STOP original live identity differs')
+E                           rlflow.store.Conflict: fixture STOP original live identity differs
+
+rlflow/hybrid_fixture_runtime.py:1034: Conflict
+_____ test_authenticated_actual_results_publish_only_explicit_final_sample _____
+
+application = (<rlflow.hybrid_host_execution.HostExecutionService object at 0x7853f265fa70>, [<rlflow.hybrid_cpu_execution_unit.CpuT...815d2b0>), <fastapi.applications.FastAPI object at 0x7853f82ceab0>, '<redacted isolated fixture session token>', ...)
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7853f26f9490>
+
+    def test_authenticated_actual_results_publish_only_explicit_final_sample(application,monkeypatch):
+        host,units,services,observers,app,token,headers=application
+        with TestClient(app,base_url=ORIGIN) as client:
+            client.cookies.set('rlflow_session',token)
+            for unit,service,observer in zip(units,services,observers):
+                url=f'/api/v1/projects/{service.project_id}/telemetry'
+                response=client.post(path(service)+'/commands',headers=headers,json=start(service))
+                assert response.status_code==202,response.text
+                attempt=unit._actual();row=unit.runtime.sources._issued(attempt['source'])
+>               capture=row['kernel_usage'];assert capture.snapshot()['exit_code']==0
+E               assert 126 == 0
+
+tests/test_hybrid_kernel_usage.py:122: AssertionError
+----------------------------- Captured stdout call -----------------------------
+actual_authenticated_final_kernel_usage shared_project_0 {'status': 'KNOWN', 'source': 'LINUX_WAIT4', 'scope': 'FIXED_PARTICIPANT_LIFETIME', 'exit_code': 0, 'cpu_user_us': 11605, 'cpu_system_us': 1055, 'peak_rss_bytes': 483221504, 'reaped_at': '2026-10-10T07:16:32.977Z'}
+=============================== warnings summary ===============================
+.venv/lib/python3.12/site-packages/starlette/testclient.py:37
+  /home/mint/rl_dev/rlflow_standalone/.venv/lib/python3.12/site-packages/starlette/testclient.py:37: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = typing.Callable[[], typing.ContextManager[anyio.abc.BlockingPortal]]
+
+tests/test_hybrid_core_host.py::test_real_fork_lifespan_does_not_unlock_parent_pin
+  /home/mint/rl_dev/rlflow_standalone/tests/test_hybrid_core_host.py:121: DeprecationWarning: This process (pid=1582991) is multi-threaded, use of fork() may lead to deadlocks in the child.
+    pid=os.fork()
+
+tests/test_hybrid_fixture_runtime_control.py::test_actual_fork_with_inherited_locked_auth_denies_before_sql_and_parent_still_works
+  /home/mint/rl_dev/rlflow_standalone/tests/test_hybrid_fixture_runtime_control.py:350: DeprecationWarning: This process (pid=1582991) is multi-threaded, use of fork() may lead to deadlocks in the child.
+    child = os.fork()
+
+tests/test_hybrid_fixture_runtime_reads.py::test_default_api_disabled_and_auth_scope_closed_queries
+  /home/mint/rl_dev/rlflow_standalone/.venv/lib/python3.12/site-packages/starlette/testclient.py:437: DeprecationWarning: Setting per-request cookies=<...> is being deprecated, because the expected behaviour on cookie persistence is ambiguous. Set cookies directly on the client instance instead.
+    return super().request(
+
+tests/test_hybrid_native_diagnostic.py::test_original_native_inflight_stop_sources_fork_and_readback
+  /home/mint/rl_dev/rlflow_standalone/tests/test_hybrid_native_diagnostic.py:61: DeprecationWarning: This process (pid=1582991) is multi-threaded, use of fork() may lead to deadlocks in the child.
+    read,write=os.pipe();pid=os.fork()
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_acceptance_http_v1.py::test_finite_real_http_concurrency_matches_outbox
+FAILED tests/test_hybrid_agent_stop_requests.py::test_disconnected_prepare_waiter_still_hands_off_STOP_and_final_read_does_not_block_loop
+FAILED tests/test_hybrid_fixture_runtime.py::test_last_effect_proof_expiry_or_stop_never_enters_popen_or_g[STOP-RELEASE_INTENT]
+FAILED tests/test_hybrid_kernel_usage.py::test_authenticated_actual_results_publish_only_explicit_final_sample
+4 failed, 2532 passed, 32 skipped, 5 warnings in 6257.53s (1:44:17)

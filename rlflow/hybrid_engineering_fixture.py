@@ -28,7 +28,13 @@ def run(parent,nonce,candidate_fd):
     resource.setrlimit(resource.RLIMIT_CPU,(2,2))
     resource.setrlimit(resource.RLIMIT_AS,(128*1024**2,128*1024**2))
     resource.setrlimit(resource.RLIMIT_FSIZE,(1024**2,1024**2))
-    if not select.select([0],[],[],3)[0] or os.read(0,1)!=b'G':raise SystemExit(126)
+    gate_began=time.monotonic_ns()
+    readable=bool(select.select([0],[],[],3)[0])
+    released=readable and os.read(0,1)==b'G'
+    if not released:
+        os.write(2,(json.dumps({'diagnostic':'engineering.G.rejected','readable':readable,
+            'gate_began_ns':gate_began,'gate_end_ns':time.monotonic_ns()},sort_keys=True)+'\n').encode())
+        raise SystemExit(126)
     def emit(value):
         remaining=json.dumps(value,sort_keys=True,separators=(',',':')).encode()+b'\n'
         while remaining:

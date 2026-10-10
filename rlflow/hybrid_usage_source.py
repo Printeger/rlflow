@@ -33,6 +33,7 @@ POLL_BYTES = 65536
 POLL_LINES = 128
 POLL_NODES = 32768
 MAX_FILE = 16 * 1024**2
+SOURCE_FILES = {'read':'events.jsonl','write':'events.jsonl','stderr':'stderr.log','program':'program.py'}
 _owners = {}
 _registry = threading.RLock()
 _fork_quarantine = []
@@ -58,11 +59,17 @@ class _RuntimeStartedObservation:
 
 def _prepare_fork():
     _registry.acquire()
-    for owner in _owners.values(): owner._lock.acquire()
+    for owner in _owners.values():
+        owner._lock.acquire()
+        for attempt in owner._attempts.values():
+            if attempt.get('receiver_lock') is not None:attempt['receiver_lock'].acquire()
 
 
 def _parent_fork():
-    for owner in reversed(tuple(_owners.values())): owner._lock.release()
+    for owner in reversed(tuple(_owners.values())):
+        for attempt in reversed(tuple(owner._attempts.values())):
+            if attempt.get('receiver_lock') is not None:attempt['receiver_lock'].release()
+        owner._lock.release()
     _registry.release()
 
 
@@ -73,12 +80,25 @@ def _child_fork():
         for attempt in owner._attempts.values():
             descriptors = set(fd for fd in attempt['fds'].values() if fd is not None)
             process = attempt['producer']
+            server=attempt.get('server')
+            if server is not None:
+                _fork_quarantine.append(server)
+                if server.socket.fileno()>=0:descriptors.add(server.socket.fileno())
+            accepted=attempt.get('accepted')
+            if accepted is not None:
+                connection,original=accepted;_fork_quarantine.append(connection)
+                if original is not None and connection.fileno()>=0:
+                    try:
+                        info=os.fstat(connection.fileno())
+                        if (info.st_dev,info.st_ino)==original:descriptors.add(connection.fileno())
+                    except OSError:pass  # Independently retire other known FDs.
             if process is not None:
                 _fork_quarantine.append(process)
                 if process.stdin is not None and not process.stdin.closed: descriptors.add(process.stdin.fileno())
             for fd in descriptors:
                 try: os.close(fd)
                 except OSError: pass
+            if attempt.get('receiver_lock') is not None:attempt['receiver_lock']=threading.RLock()
         owner._lock = threading.RLock()
     _owners.clear(); _registry = threading.RLock()
 
@@ -133,21 +153,25 @@ class FixtureUsageSourceOwner:
                     raise Conflict('original fixture usage file replaced')
             for name, fd in attempt['fds'].items():
                 if fd is None or name == 'pidfd': continue
+                if name == 'binary':
+                    self._check_binary(attempt); continue
                 info = os.fstat(fd)
-                file_name = {'read': 'events.jsonl', 'write': 'events.jsonl',
-                             'stderr': 'stderr.log', 'program': 'program.py'}[name]
+                file_name = self._source_files()[name]
                 original = attempt['identities'][file_name]
                 flags = fcntl.fcntl(fd, fcntl.F_GETFL)
                 if (not stat.S_ISREG(info.st_mode) or info.st_uid != os.geteuid() or info.st_nlink != 1 or
                         stat.S_IMODE(info.st_mode) != 0o600 or [info.st_dev, info.st_ino] != original or
-                        os.get_inheritable(fd) or (name in ('read', 'program') and flags & os.O_ACCMODE != os.O_RDONLY) or
-                        (name not in ('read', 'program') and (flags & os.O_ACCMODE != os.O_WRONLY or not flags & os.O_APPEND))):
+                        os.get_inheritable(fd) or (name in ('read', 'program','config','ready_read') and flags & os.O_ACCMODE != os.O_RDONLY) or
+                        (name not in ('read', 'program','config','ready_read') and (flags & os.O_ACCMODE != os.O_WRONLY or not flags & os.O_APPEND))):
                     raise Conflict('original private fixture source descriptor differs')
         read_fd = attempt['fds']['read']
         if read_fd is None: raise Conflict('original fixture usage reader closed')
         info = os.fstat(read_fd)
         if info.st_size > MAX_FILE: raise Conflict('finite original usage file bound exceeded')
         return (info.st_size, info.st_mtime_ns, info.st_ctime_ns)
+
+    def _source_files(self):
+        return SOURCE_FILES
 
     def _allocate(self, membership, claim, scenario, member):
         """Internal allocation only. Strong original attempt precedes file IO."""
@@ -226,7 +250,9 @@ class FixtureUsageSourceOwner:
     def _runtime_allocate(self, owner, lease):
         """Only the exact bound Runtime's original attempt can allocate."""
         from .hybrid_fixture_runtime import FixtureRuntimeOwner
-        if type(owner) is not FixtureRuntimeOwner or owner.sources is not self:
+        from .hybrid_native_diagnostic import NativeDiagnosticOwner
+        from .hybrid_native_diagnostic_source import NativeDiagnosticSourceOwner
+        if (type(owner),type(self)) not in ((FixtureRuntimeOwner,FixtureUsageSourceOwner),(NativeDiagnosticOwner,NativeDiagnosticSourceOwner)) or owner.sources is not self:
             raise PermissionError('fixed original fixture Runtime source binding required')
         runtime = owner._issued(lease); claim = runtime['claim']
         with self._lock:
@@ -262,6 +288,9 @@ class FixtureUsageSourceOwner:
             if hashlib.sha256(os.pread(attempt['fds']['program'], 16385, 0)).hexdigest() != runtime['origin']['program_sha256'].removeprefix('sha256:'):
                 raise Conflict('fixed original CPU program changed before handoff')
             extra=() if runtime.get('engineering_grant') is None else (owner._engineering_input(runtime),)
+            native = runtime.get('diagnostic_grant') is not None
+            if native:
+                extra=self._native_spawn_material(owner,attempt)
             owner._check_spawn_gate(runtime)
             attempt['launch_entered'] = True; attempt['status'] = 'START_UNKNOWN'
             runtime['spawn_entered'] = True; runtime['spawn_monotonic'] = time.monotonic()
@@ -284,6 +313,7 @@ class FixtureUsageSourceOwner:
                 attempt['fds']['pidfd'] = os.pidfd_open(process.pid, 0)
                 pin = os.fstat(attempt['fds']['pidfd']); attempt['pidfd_identity'] = [pin.st_dev, pin.st_ino]
                 attempt['status'] = 'READING'
+                if native:self._wait_ready(owner,attempt)
                 return attempt['producer_identity']
             except BaseException:
                 attempt['status'] = 'UNKNOWN'; raise
@@ -447,14 +477,26 @@ class FixtureUsageSourceOwner:
             if len(raw) > 4096 or ('Pid:\t' + str(attempt['producer_identity']['pid']) + '\n').encode() not in raw:
                 raise Conflict('original fixture pidfd target differs')
 
+    def _signal_original(self, attempt, sig):
+        """Signal only the pinned live child; an original reap resolves exit races."""
+        process = attempt['producer']
+        if process.poll() is not None: return
+        if identity(process.pid) != attempt['producer_identity']:
+            if process.poll() is not None: return
+            raise Conflict('original fixture cleanup identity uncertain')
+        try:
+            self._check_pidfd(attempt, live=True)
+            signal.pidfd_send_signal(attempt['fds']['pidfd'], sig)
+        except (Conflict, ProcessLookupError):
+            if process.poll() is None: raise
+
     def _cleanup_attempt(self, attempt):
         """Also reaches known pre-Popen partial allocations without source caps."""
         process = attempt['producer']
         if process is not None and process.poll() is None:
-            if identity(process.pid) != attempt['producer_identity']:
-                attempt['status'] = 'UNKNOWN'; raise Conflict('original fixture cleanup identity uncertain')
-            self._check_pidfd(attempt, live=True)
-            signal.pidfd_send_signal(attempt['fds']['pidfd'], signal.SIGKILL)
+            try: self._signal_original(attempt, signal.SIGKILL)
+            except (Conflict, OSError):
+                attempt['status'] = 'UNKNOWN'; raise
             try: process.wait(timeout=2)
             except subprocess.TimeoutExpired:
                 attempt['status'] = 'UNKNOWN'; raise Conflict('finite original fixture cleanup incomplete') from None
@@ -465,10 +507,11 @@ class FixtureUsageSourceOwner:
             try:
                 if name == 'pidfd': self._check_pidfd(attempt, live=False)
                 else:
-                    info = os.fstat(fd); key = {'read': 'events.jsonl', 'write': 'events.jsonl',
-                        'stderr': 'stderr.log', 'program': 'program.py'}[name]
-                    if [info.st_dev, info.st_ino] != attempt['identities'][key]:
-                        raise Conflict('original fixture cleanup descriptor reused')
+                    if name == 'binary':self._check_binary(attempt)
+                    else:
+                        info = os.fstat(fd); key = self._source_files()[name]
+                        if [info.st_dev, info.st_ino] != attempt['identities'][key]:
+                            raise Conflict('original fixture cleanup descriptor reused')
                 os.close(fd); attempt['fds'][name] = None
             except (OSError, Conflict) as error: errors.append(error)
         if process is not None and process.stdin is not None and not process.stdin.closed:
