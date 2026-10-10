@@ -1,5 +1,9 @@
 # 阻塞与证据缺口
 
+93 FINAL：High io_uring 与 RestartForceExitStatus 两项 MUST 均修并静态关闭，无剩余确证 MUST；最后原typed(aiai)解析门/负例与实际fullSTOP-FREE-alias25pass14.94s。原分轮产品失败与修复证据保留，下方待审/未提交为历史。所有测试terminal，当前compile/diff/USERlock通过，无新active unit；归档并进入本记录所属checkpoint提交。仅交付实际producer边界，完整coldFREE/预算Pool收敛与长期/自治/instinctRL资格仍未完成，Goal ACTIVE，不调用未批准模型/GPU。
+
+93 已实际关闭keeper新增producer入口与非预期topology/manager生产者放行，原配置fork/setsid/fullSTOP/FREE及父死签名cold保持。仍未持久原顶层scope/transport/policy，不能从此warm限制冷释放UNKNOWN/占槽；下一原完整signed闭scope证据与安全预算/Pool对账。模型/GPU集中合同未答不调用，真实自治/strictquota/长期资格/instinctRL准入仍缺，本地实现无新需用户决定阻塞。
+
 92 闭合warm原wire回执返回丢失后的完整STOP/结算/FREE，真decode丢失仍UNKNOWN。父死冷恢复尚缺原service顶层scope/transport/closed-producer policy绑定及可信完整终态，必须与预算/Pool跨账本恢复安全收敛；91 task签名不能替代。真实模型/GPU集中合同未答不调用；strictquota/科研自治/长期恢复及instinctRL准入仍缺，无新增需用户决定的本地实现阻塞。
 
 91 闭合有原PROCESS公钥的父崩溃任务日志/退出证据恢复及成对篡改拒绝，4实际case+49必要合同/partial收尾通过，High全部MUST关闭。仍缺同原完整manager scope终态与UNKNOWN/Pool占槽安全收敛协议；报告缺失/PROCESS未持久不能凭签名补业务STOP/FREE。真实模型/GPU集中合同未答不调用，strictquota/长跑/完整自治/instinctRL准入仍未完成；本地恢复协议实现无新增用户选择阻塞。

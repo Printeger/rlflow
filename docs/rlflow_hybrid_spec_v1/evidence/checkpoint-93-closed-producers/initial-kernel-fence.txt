@@ -1,0 +1,1 @@
+{"receipt": {"new_processes": "DENIED", "new_threads": "DENIED", "exec": "DENIED"}, "denied": [56, 57, 58, 59, 322, 435, 450], "original_child_fork_exec": true}

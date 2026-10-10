@@ -8,6 +8,7 @@ TASK_EMPTY does not imply that the keeper/service/whole managed scope stopped.
 import os
 from pathlib import Path
 import re
+import stat
 import threading
 import time
 
@@ -173,6 +174,28 @@ class OriginalTaskScope:
         for fd in (*self._fds.values(), self._task, self._control, self._root): os.close(fd)
         self._closed = True
 
+    def check_single_keeper(self):
+        """Exact held topology; reject extra scope, never adopt/kill by name.
+
+        Task descendants may still run in task. Root is empty, control contains
+        only this original keeper, and neither child has further cgroups.
+        This observation is NOT whole-scope STOP and is not a cold capability.
+        """
+        self.check()
+        for directory,expected in ((self._root,{'control','task'}),
+                                   (self._control,set()),(self._task,set())):
+            children=set()
+            with os.scandir(directory) as entries:
+                for index,entry in enumerate(entries):
+                    if index>=256:raise RuntimeError('bounded original scope topology required')
+                    if stat.S_ISDIR(entry.stat(follow_symlinks=False).st_mode):children.add(entry.name)
+            if children!=expected:raise RuntimeError('original scope contains additional cgroups')
+        for directory,expected in ((self._root,[]),(self._control,[str(self._pid)])):
+            fd=self._temporary(directory,'cgroup.procs',os.O_RDONLY)
+            try:
+                if _read(fd).split()!=expected:raise RuntimeError('original scope contains additional producers')
+            finally:self._close_temporary(fd)
+
     def task_empty(self):
         self.check()
         lines = dict(line.split() for line in _read(self._fds['cgroup.events']).splitlines())
@@ -203,6 +226,7 @@ class OriginalTaskScope:
         # routes. This fragment never creates a Pool cancellation tombstone.
         if not self._closing:
             if not self.task_empty(): raise RuntimeError('populated original task cannot be closed')
+            self.check_single_keeper()
             self._closing = True
         if (os.getpid() != self._pid or threading.get_ident() != self._thread or
                 _start(self._pid) != self._start or

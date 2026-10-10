@@ -15,6 +15,7 @@ import threading
 from .hybrid_local_runner_cgroup import OriginalTaskScope, _inode, _start
 from .hybrid_local_runner_keeper import FiniteCpuKeeper
 from .hybrid_local_runner_signature import Signer
+from .hybrid_local_runner_sandbox import close_keeper_producers
 
 
 def _emit(value):
@@ -105,6 +106,8 @@ def serve(config_path, expected_sha256):
         keeper = FiniteCpuKeeper(scope)
         ready = keeper.prepare_gate(config['code'], config['work'],
                                     sources[0][0], sources[1][0], seconds=config['seconds'])
+        close_keeper_producers()  # Task is already forked/confined; no new keeper producers.
+        scope.check_single_keeper()
         receipt={'type': 'local_cpu.ready', 'config_sha256': expected_sha256,
                'keeper': keeper_identity, 'task': ready}
         if publication is not None:

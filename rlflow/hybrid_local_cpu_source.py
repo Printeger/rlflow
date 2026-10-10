@@ -225,7 +225,7 @@ class LocalCpuSourceOwner(FixtureUsageSourceOwner):
                 '--property=NoNewPrivileges=yes','--property=RestrictNamespaces=yes',
                 '--property=KillMode=control-group','--property=SendSIGKILL=yes','--property=TimeoutStopSec=2',
                 '--property=RuntimeMaxSec='+str(spec['seconds']+5),'--property=RemainAfterExit=yes',
-                '--property=CollectMode=inactive-or-failed',
+                '--property=CollectMode=inactive-or-failed','--property=Restart=no',
                 str(Path('/usr/bin/python3').resolve()),'-I','-S','-c',script]
             row['command']=command
             owner._check_spawn_gate(runtime)
@@ -296,6 +296,7 @@ class LocalCpuSourceOwner(FixtureUsageSourceOwner):
             if runtime['release_entered']:return
             self._physical(row);self._check_pidfd(row,live=True)
             value=row['manager'].snapshot()
+            row['manager'].check_closed_producers()
             if value['MainPID']!=row['producer_identity']['pid']:raise Conflict('original keeper no longer live before G')
             pipe=os.fstat(row['producer'].stdin.fileno())
             if [pipe.st_dev,pipe.st_ino]!=row['stdin_identity']:raise Conflict('original G transport changed')
@@ -355,6 +356,7 @@ class LocalCpuSourceOwner(FixtureUsageSourceOwner):
                 attempt('trusted_task_report',observe_task)
             if manager is not None and manager.bound is not None:
                 proof=attempt('original_manager_stop',manager.stop)
+                attempt('closed_producer_policy',manager.check_closed_producers)
             else:errors.append(('manager_binding',Conflict('original manager scope UNKNOWN; no adoption')))
             def kernel_terminal():
                 if self._kernel_terminals.get(id(row)) is row:return

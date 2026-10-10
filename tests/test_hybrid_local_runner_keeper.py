@@ -10,7 +10,7 @@ import pytest
 
 @pytest.mark.parametrize('release', [False, True, 'bad_ready', 'lost_fork',
                                      'wrong_owner', 'pidfd_signal', 'close_fault',
-                                     'control_eof', 'producer_exit'])
+                                     'control_eof', 'producer_exit','extra_scope'])
 def test_original_keeper_blocks_pre_g_and_closes_release_after_stop(tmp_path, release):
     root=str(Path(__file__).resolve().parents[1])
     python=str(Path('/usr/bin/python3').resolve(strict=True))
@@ -63,6 +63,12 @@ try:
   assert ready['pid']==keeper._producer
 finally:os.read=read;os.fork=fork
 assert not pathlib.Path({str(work/'actual.txt')!r}).exists()
+if {release!r}=='extra_scope':
+ os.mkdir('unrelated',dir_fd=scope._root)
+ try:keeper.release_gate()
+ except RuntimeError as error:assert 'additional cgroups' in str(error)
+ else:raise RuntimeError('G despite extra managed scope')
+ assert not keeper._released
 if {release!r} is True:
  keeper.release_gate()
  deadline=time.monotonic()+3
@@ -131,6 +137,12 @@ if {release!r}=='close_fault':
  assert keeper._ready==failed_fd and keeper._pidfd is None and keeper._gate is None
  assert not keeper._closed
  os.fstat(failed_fd)
+if {release!r}=='extra_scope':
+ try:keeper.close_stopped_task()
+ except RuntimeError as error:assert 'additional cgroups' in str(error)
+ else:raise RuntimeError('closed proof despite extra managed scope')
+ assert not keeper._closed and not scope._closing
+ os.rmdir('unrelated',dir_fd=scope._root)  # Original test-created EMPTY group only.
 closed=keeper.close_stopped_task()
 assert closed['keeper_protocol_handles_closed'] and not closed['whole_scope_stopped']
 os.close(out);os.close(err)

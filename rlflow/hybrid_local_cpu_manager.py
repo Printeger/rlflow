@@ -51,6 +51,7 @@ def _library():
         'sd_bus_message_read_array':([P,C.c_char,C.POINTER(P),C.POINTER(C.c_size_t)],C.c_int),
         'sd_bus_message_enter_container':([P,C.c_char,C.c_char_p],C.c_int),
         'sd_bus_message_exit_container':([P],C.c_int),
+        'sd_bus_message_at_end':([P,C.c_int],C.c_int),
         'sd_bus_add_match':([P,C.POINTER(P),C.c_char_p,CALLBACK,P],C.c_int),
         'sd_bus_process':([P,P],C.c_int),
         'sd_bus_wait':([P,C.c_uint64],C.c_int),
@@ -85,6 +86,7 @@ class OriginalServiceManager:
         self.stop_entered=False;self.stop_job=None;self.stop_receipt=None
         self._stop_wire_entered=False
         self._stop_nonce=uuid.uuid4().hex
+        self._closed_producer_terminal=None
         self.stopped_raw=None
         self.events=[];self.callback_error=None;self.closed=False
         self.observed_snapshots=[]
@@ -218,6 +220,65 @@ class OriginalServiceManager:
             raise Conflict('original manager Invocation replaced; no adoption')
         return result
 
+    def _empty_property(self,name,signature,interface):
+        self._check_socket();reply=P()
+        try:
+            _ok(self.lib.sd_bus_get_property(self.bus,self.destination.encode(),self.unit_path.encode(),
+                interface,name.encode(),None,C.byref(reply),b'a'+signature))
+            if _ok(self.lib.sd_bus_message_enter_container(reply,b'a',signature))!=1:
+                raise Conflict('original manager producer array missing')
+            if _ok(self.lib.sd_bus_message_at_end(reply,0))!=1:
+                raise Conflict('original manager additional producer policy: '+name)
+            _ok(self.lib.sd_bus_message_exit_container(reply))
+        finally:
+            if reply.value:self.lib.sd_bus_message_unref(reply)
+
+    def _empty_restart_force(self):
+        self._check_socket();reply=P()
+        try:
+            _ok(self.lib.sd_bus_get_property(self.bus,self.destination.encode(),self.unit_path.encode(),
+                SERVICE,b'RestartForceExitStatus',None,C.byref(reply),b'(aiai)'))
+            if _ok(self.lib.sd_bus_message_enter_container(reply,b'r',b'aiai'))!=1:
+                raise Conflict('original restart-force structure missing')
+            for _ in range(2):
+                if _ok(self.lib.sd_bus_message_enter_container(reply,b'a',b'i'))!=1:
+                    raise Conflict('original restart-force array missing')
+                if _ok(self.lib.sd_bus_message_at_end(reply,0))!=1:
+                    raise Conflict('original forced restart producer policy differs')
+                _ok(self.lib.sd_bus_message_exit_container(reply))
+            if _ok(self.lib.sd_bus_message_at_end(reply,0))!=1:
+                raise Conflict('original restart-force structure differs')
+            _ok(self.lib.sd_bus_message_exit_container(reply))
+        finally:
+            if reply.value:self.lib.sd_bus_message_unref(reply)
+
+    def check_closed_producers(self):
+        """Admission/final proof gate, NEVER a prerequisite to safety STOP."""
+        self._actual()
+        from .store import canonical
+        def terminal_context():
+            return canonical({'creator':self.creator,'destination':self.destination,'unit':self.unit,
+                'keeper':self.bound,'socket_identity':self.fd_identity,'stop_intent':self._stop_nonce,
+                'source_sha256':hashlib.sha256(self.row['source'].raw).hexdigest(),
+                'stopped_sha256':None if self.stopped_raw is None else hashlib.sha256(self.stopped_raw).hexdigest()})
+        if self.closed:
+            if (self.stopped_raw is None or self._closed_producer_terminal is None or
+                    self._closed_producer_terminal!=terminal_context()):
+                raise Conflict('original terminal producer policy UNKNOWN')
+            return
+        self._check_socket()
+        if self.unit_path is None:raise Conflict('original manager unit binding required')
+        if self._property('Restart',b's',SERVICE)!='no' or self._property('NRestarts',b'u',SERVICE)!=0:
+            raise Conflict('original manager restart producer policy differs')
+        self._empty_restart_force()
+        for name in ('ExecCondition','ExecStartPre','ExecStartPost','ExecReload','ExecStop','ExecStopPost'):
+            self._empty_property(name,b'(sasbttttuii)',SERVICE)
+        for name in ('OnFailure','OnSuccess','Triggers','TriggeredBy'):
+            self._empty_property(name,b's',UNIT)
+        # Only a successful FINAL check after original full STOP can support
+        # same-owner retry on the subsequently closed connection. Never ready/G.
+        if self.stopped_raw is not None:self._closed_producer_terminal=terminal_context()
+
     def bind_ready(self,keeper):
         self._check_socket()
         if self.bound is not None:raise Conflict('original keeper cannot be rebound')
@@ -225,6 +286,7 @@ class OriginalServiceManager:
         # object alive through job completion; auto-unref on original bus close.
         self._call('RefUnit',b's',self.unit.encode());self.unit_referenced=True
         value=self.snapshot()
+        self.check_closed_producers()
         if (value['InvocationID']!=keeper['invocation_id'] or value['MainPID']!=keeper['pid'] or
                 value['ExecMainPID']!=keeper['pid']):
             raise Conflict('original keeper/manager ready identity differs')

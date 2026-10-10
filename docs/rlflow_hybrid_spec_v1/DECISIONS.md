@@ -1,5 +1,9 @@
 # 开发决策记录
 
+93 FINAL：High io_uring 与 RestartForceExitStatus 两项 MUST 均修并静态关闭，无剩余确证 MUST；最后原typed(aiai)解析门/负例与实际fullSTOP-FREE-alias25pass14.94s。原分轮产品失败与修复证据保留，下方待审/未提交为历史。所有测试terminal，当前compile/diff/USERlock通过，无新active unit；归档并进入本记录所属checkpoint提交。仅交付实际producer边界，完整coldFREE/预算Pool收敛与长期/自治/instinctRL资格仍未完成，Goal ACTIVE，不调用未批准模型/GPU。
+
+93 生产者闭包必须实际限制：只在task先fork后给keeper内核fence，既不继承到候选也不留keeper新线程/exec/io_uring入口；root exact两个子组/control独原keeper，异常最后proof拒而非先阻断安全kill/reap。manager noRestart/空辅助与后续触发只作admission/final门，不置于STOP前置；只有after fullSTOP成功策略可绑定原context复用closed连接，ready/G不缓存。此原warm结果不持久不升coldFREE，下一需原scope/transport/policyPROCESS前持久签名闭包和跨账本对账，详HYBRID_LOCAL_CPU_CLOSED_PRODUCERS.md。
+
 92 仅完整原wire decode回执可恢复caller Exception，immutable context须含decoded job本身，不只依赖frozen dataclass；保留先于return/unref，同原manager/socket/source/Invocation/intent每次核验，永不重发。fatal BaseException透传，真正decode丢失不借JobRemoved补cap。receipt在Source整体退休preflight后撤，alias失败全保留。冷父死不复原旧job能力，完整scope缺口另列，不以GC/任务签名FREE。详HYBRID_LOCAL_CPU_STOP_REPLY_RECOVERY.md。
 
 91 原inode不代表内容认证：独立MUST证明成对改报告/hash/输出可伪机器PASS，改为task fork/sandbox之后才生成内存私钥、原ready公钥G前持久、domain Ed25519签完整报告，冷仅原事件公钥验真。源路径/inodeHANDOFF前绑定，partial不发布；NONBLOCK拒FIFO，来源旧inode与本次opened FD清理身份分离。失去原managerjob的报告只证明任务证据，不退款、不FREE、无cold控制。分轮证据区分未签/最终签名版本，不改原验收合同。详HYBRID_LOCAL_CPU_EVIDENCE_RECOVERY.md。

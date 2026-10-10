@@ -1,0 +1,31 @@
+{
+  "ready": {
+    "pid": 1618431,
+    "sandbox": "CPU_LOCAL_LANDLOCK_SECCOMP",
+    "source_sha256": "03a19d27da5026f810cc293562f1ca12dc5ad77c3083925b28520af1d294c842",
+    "starttime": "158290959"
+  },
+  "stopped": {
+    "task_empty": true,
+    "whole_scope_stopped": false,
+    "cpu_stat": "usage_usec 946\nuser_usec 946\nsystem_usec 0\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0",
+    "memory_peak": 1048576,
+    "keeper_still_live": true,
+    "reaped": [
+      {
+        "pid": 1618431,
+        "status": 9
+      }
+    ],
+    "release_attempted": false,
+    "handoff_unknown": false,
+    "stop_latched": true,
+    "protocol_cleanup_unknown": false
+  },
+  "closed": {
+    "task_handles_closed": true,
+    "whole_scope_stopped": false,
+    "keeper_protocol_handles_closed": true,
+    "stop_latched": true
+  }
+}

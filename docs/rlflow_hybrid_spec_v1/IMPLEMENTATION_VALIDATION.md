@@ -1,5 +1,9 @@
 # 系统实施验收记录
 
+93 FINAL：High io_uring 与 RestartForceExitStatus 两项 MUST 均修并静态关闭，无剩余确证 MUST；最后原typed(aiai)解析门/负例与实际fullSTOP-FREE-alias25pass14.94s。原分轮产品失败与修复证据保留，下方待审/未提交为历史。所有测试terminal，当前compile/diff/USERlock通过，无新active unit；归档并进入本记录所属checkpoint提交。仅交付实际producer边界，完整coldFREE/预算Pool收敛与长期/自治/instinctRL资格仍未完成，Goal ACTIVE，不调用未批准模型/GPU。
+
+93 首内核/extra_scope/Core actual3pass14.98s；加manager策略13pass/1fail28.44s，parentSIGKILL原signedcold/Pool1通过，normal完整STOP后aliasretry重复closed RPC产品回归。修原postSTOP cache+High io_uring MUST后受影响14pass14.89s，purecache5pass.03s，实际manager_close1pass15.52s；不重复已过父死/extra_scope。详HYBRID_LOCAL_CPU_CLOSED_PRODUCERS.md与checkpoint-93-closed-producers/，非完整coldFREE/全库/新安装/自治/长跑。
+
 92 定向实机首2pass35.10s；High job binding MUST修后原caller-loss完整STOP/FREE/cold及alias退休回归通过，合并14pass/1fail31.12s（纯fixture缺snapshot）；修test仅单项1pass0.03s。真decode-lossUNKNOWN原实机证据保留，无受影响不重复。High末窄无MUST，详HYBRID_LOCAL_CPU_STOP_REPLY_RECOVERY.md/evidence/checkpoint-92-stop-reply/。非coldFREE/自治/全库/安装或长跑资格。
 
 91 原任务证据恢复：实际签名父SIGKILL/原正常STOP-FREE/no-handoff/deadline84597/e999f5 4pass65.30s；最终异常read-cleanup修后4747/5e24da 49pass9.09s（48pure与真实partial allocation无派发清理），current公开CLI61c1cf exit0同原signed冷恢复，无执行。首未签28866/c4f4fd 1fail2pass45.62s测试缺事务，修1137/60c453 1pass13.54s只为未签版；不冒签名最终资格。High认证/partial/FIFO/FD MUST全闭，compile/diff/USERlock检查通过，无live。证据checkpoint-91-crash-recovery/及HYBRID_LOCAL_CPU_EVIDENCE_RECOVERY.md。UNKNOWN/占槽/无controls不变，任务报告不是managed scope STOP/结算/科研独立Review/自治/安装或长跑资格。

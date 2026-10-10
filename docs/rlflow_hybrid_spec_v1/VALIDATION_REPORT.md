@@ -1,5 +1,9 @@
 # 需求包离线校验报告
 
+93 FINAL：High io_uring 与 RestartForceExitStatus 两项 MUST 均修并静态关闭，无剩余确证 MUST；最后原typed(aiai)解析门/负例与实际fullSTOP-FREE-alias25pass14.94s。原分轮产品失败与修复证据保留，下方待审/未提交为历史。所有测试terminal，当前compile/diff/USERlock通过，无新active unit；归档并进入本记录所属checkpoint提交。仅交付实际producer边界，完整coldFREE/预算Pool收敛与长期/自治/instinctRL资格仍未完成，Goal ACTIVE，不调用未批准模型/GPU。
+
+93 定向实际原keeper kernelfence与G/close拓扑拒通过，候选fork/exec/setsid不缩减；真实manager closed-producer typed policy及原completeSTOP/FREE/cold无回归。分轮3pass、13pass/1fail产品closed-RPC回归、修后14pass、5purecache、1actualmanager_close，证据与命令HYBRID_LOCAL_CPU_CLOSED_PRODUCERS.md/checkpoint-93-closed-producers/。父SIGKILL签名cold仍UNKNOWN/Pool1，完整冷协议/严格quota/自治/长跑未获资格，不重标82历史全量。
+
 92 实施验证：同原已decoded STOP receipt caller-loss实际一次STOP/完整terminal/SETTLED/PoolFREE/no doublecharge/cold通过；真实decode-loss仍UNKNOWN/占槽。首2pass35.10s，job绑定MUST修后14pass/1testfixture fail31.12s，修夹具只单项1pass0.03s；High关闭MUST。完整命令与分版本证据见HYBRID_LOCAL_CPU_STOP_REPLY_RECOVERY.md及checkpoint-92-stop-reply/，不重标82全量，不称父死完整冷恢复或自主闭环。
 
 91 定向实施验证：原任务签名证据恢复已实机父SIGKILL验证，含真实setsid后代终态、cold fresh CLI和报告/输出成对篡改拒绝；正常完整STOP/FREE/nohandoff/deadline共4pass65.30s。最终read FD差量49pass9.09s、原signed当前CLI同值exit0，High全部确证MUST关闭。分版本首失败及完整边界见HYBRID_LOCAL_CPU_EVIDENCE_RECOVERY.md和evidence/checkpoint-91-crash-recovery/；UNKNOWN/占槽不自动释放，不称长期恢复、真实模型自主闭环、安装或全库/长跑资格。82历史全量4fail/2532pass/32skip未重标。

@@ -13,6 +13,36 @@ import platform
 import stat
 
 
+def close_keeper_producers():
+    """Irreversible no-fork/no-exec fence on the trusted, post-fork keeper.
+
+    Install ONLY after its confined task has already forked. This deliberately
+    does not restrict that original task's existing fork/exec capabilities.
+    It is not a task sandbox or proof that the manager scope is terminal.
+    """
+    if platform.machine()!='x86_64' or len(os.listdir('/proc/self/task'))!=1:
+        raise RuntimeError('single-threaded verified x86_64 keeper required')
+    libc=ctypes.CDLL(None,use_errno=True)
+    class Filter(ctypes.Structure):
+        _fields_=[('code',ctypes.c_ushort),('jt',ctypes.c_ubyte),
+                  ('jf',ctypes.c_ubyte),('k',ctypes.c_uint)]
+    class Program(ctypes.Structure):
+        _fields_=[('length',ctypes.c_ushort),('filters',ctypes.POINTER(Filter))]
+    rows=[(0x20,0,0,4),(0x15,1,0,0xc000003e),(6,0,0,0x80000000),
+          (0x20,0,0,0),(0x45,0,1,0x40000000),(6,0,0,0x80000000)]
+    # All process/thread creation and image replacement, not just os.fork.
+    for number in (56,57,58,59,322,425,426,427,435):
+        rows.extend([(0x15,0,1,number),(6,0,0,0x50000|errno.EPERM)])
+    # Unknown future syscall interfaces require requalification.
+    rows.extend([(0x35,0,1,450),(6,0,0,0x50000|errno.EPERM),(6,0,0,0x7fff0000)])
+    filters=(Filter*len(rows))(*(Filter(*row) for row in rows))
+    program=Program(len(rows),filters)
+    for args in ((38,1,0,0,0),(22,2,ctypes.byref(program),0,0)):
+        result=libc.prctl(*args)
+        if result!=0:raise OSError(ctypes.get_errno(),'original keeper producer fence failed')
+    return {'new_processes':'DENIED','new_threads':'DENIED','exec':'DENIED'}
+
+
 def confine(executable_fds, readonly_fds, work_fd):
     """Restrict this process and all future descendants; failures must be fatal.
 

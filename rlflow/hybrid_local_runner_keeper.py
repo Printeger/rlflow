@@ -168,6 +168,7 @@ class FiniteCpuKeeper:
             raise RuntimeError('original gate release unavailable')
         if time.monotonic() >= self._deadline:
             raise TimeoutError('original gate execution deadline passed')
+        self.scope.check_single_keeper()
         if (_inode(self._gate) != self._gate_identity or _inode(self._pidfd) != self._pidfd_identity or
                 _start(self._producer) != self._starttime):
             raise RuntimeError('original live gate identity changed')

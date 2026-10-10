@@ -1,0 +1,20 @@
+Checkpoint93 base816e650; checkout .venv; zero model/GPU; bounded local CPU only.
+#1 env PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q tests/test_hybrid_local_keeper_fence.py tests/test_hybrid_local_runner_keeper.py::test_original_keeper_blocks_pre_g_and_closes_release_after_stop[extra_scope] tests/test_hybrid_local_cpu_runtime.py::test_actual_configured_core_task_result_managed_stop_budget_and_free
+95896/3f9d05 exit0: 3 passed in 14.98s. First keeper fence (before io_uring MUST), topology and actual full Core STOP/FREE.
+#2 env PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q tests/test_hybrid_local_cpu_producer_policy.py tests/test_hybrid_local_cpu_runtime.py::test_actual_configured_core_task_result_managed_stop_budget_and_free tests/test_hybrid_local_cpu_parent_crash.py::test_owner_crash_retires_physical_service_without_forging_budget_terminal
+83645/c9bc58 exit1: 1 failed,13 passed in28.44s. FAIL actual_core after full STOP/FREE, alias source.shutdown retry sees closed manager socket at new policy gate:
+check_closed_producers -> _check_socket -> Conflict original manager connection unavailable;
+test expected retirement row alias, got original configured CPU partial cleanup retained.
+Root cause product regression; cached original post-STOP policy context fix (not admission cache). Parent crash passed, archive task-recovery/Pool1.
+#3 env PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q tests/test_hybrid_local_keeper_fence.py tests/test_hybrid_local_cpu_producer_policy.py tests/test_hybrid_local_cpu_runtime.py::test_actual_configured_core_task_result_managed_stop_budget_and_free
+2009/4e96f5 exit0: 14 passed in14.89s. Final io_uring denial and postSTOP-cache, actual full STOP/FREE/alias retry.
+#4 env PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q tests/test_hybrid_local_cpu_producer_policy.py::test_closed_connection_needs_same_original_post_stop_policy
+aff40a exit0:5 passed in0.03s. Pure cache context negative guards, no execution claims.
+#5 env PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q tests/test_hybrid_local_cpu_runtime.py::test_actual_bound_manager_stop_survives_other_participant_failure[manager_close]
+49551/df1852 exit0:1 passed in15.52s. Actual affected closed-manager partial retry; all terminal.
+Compile changed six production modules/three tests and git diff --check exit0.
+USER untracked package-lock.json unchanged SHA256 becc7e2a36dfcad4ffe934b5ff2f0f68187611d6c0641bd63d81367651cfbf09, not staged.
+Read-only systemctl: exactly four old failed rlflow units 373d5b/606bc0/826ea9/e1e192, no new active unit; no reset-failed or deletion.
+#6 env PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q tests/test_hybrid_local_cpu_producer_policy.py tests/test_hybrid_local_cpu_runtime.py::test_actual_configured_core_task_result_managed_stop_budget_and_free
+82639/856c79 exit0:25 passed in14.94s. High RestartForceExitStatus MUST fixed via typed(aiai) empty two arrays/closed structure. Six parser negative faults plus policybadroute/cacheguards, actual normal STOP/FREE/repeat alias cleanup. final-force-policy-core-terminal.json is this source version; final-core-terminal.json is #3 before final force gate, not same version.
+Independent High io_uring and forced-restart MUST identified, fixed and final static narrow review closed, no remaining confirmed MUST. Reviewer did not run tests/write. Does not certify cold FREE.

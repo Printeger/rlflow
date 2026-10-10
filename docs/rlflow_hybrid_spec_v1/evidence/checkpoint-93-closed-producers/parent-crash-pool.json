@@ -1,0 +1,18 @@
+{
+  "pool_id": "pool_55e7ecb5d37d445283f2e0dae973a3d4",
+  "version": 4,
+  "capacity": 3,
+  "occupied": 1,
+  "heads": [
+    {
+      "key": "fixture_handoff_unknown_4dd8ce97f76d548fd65ccb076fdc06b8b4d3e454ccdd89870e310df2f28524b7",
+      "version": 4,
+      "state": "FIXTURE_HANDOFF_UNKNOWN",
+      "claim_key": "claim_f5014d3536064cc7a7d3859d1feebb177e568fd6f729131c41152d0357cab49e"
+    },
+    null,
+    null
+  ],
+  "execution_enabled": false,
+  "release_enabled": false
+}
