@@ -140,9 +140,15 @@ class Accumulator:
             total = sum(values) if values else None
             if total is not None and total >= 2**63: raise Conflict('finite aggregate usage counter bound exceeded')
             result[field] = total
-        result['complete'] = bool(groups) and not self.failed and not self.active and all(
+        # Filtering unobserved threads is appropriate for known-prefix math,
+        # not for completeness. A newly observed session without any actual
+        # usage must retain unknown exposure, even with a completed parent.
+        # Parent-inclusive accounting is an explicit protected semantics,
+        # not permission to erase an unaccounted participant from the scope.
+        covered = all(value['observations'] for value in self.aggregate.values())
+        result['complete'] = bool(groups) and covered and not self.failed and not self.active and all(
             all(value is not None for value in group['latest'].values()) if self.semantics == 'cumulative'
-            else not group['incomplete'] for group in groups)
+            else not group['incomplete'] for group in self.aggregate.values())
         result.update(actual_cost_status='UNKNOWN', actual_cost=None, semantics=self.semantics,
                       settlement_enabled=False)
         return result

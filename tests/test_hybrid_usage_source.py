@@ -272,6 +272,54 @@ def completed(input_=100, output=10, cached=20, event_id='turn'):
             'usage': {'input_tokens': input_, 'output_tokens': output, 'cached_input_tokens': cached}}
 
 
+@pytest.mark.parametrize('semantics', ['cumulative', 'per_turn'])
+@pytest.mark.parametrize('inclusive', [False, True])
+def test_unaccounted_thread_cannot_be_filtered_into_complete_usage(semantics, inclusive):
+    accumulator=Accumulator(semantics)
+    feed(accumulator, {'type':'thread.started','thread_id':'parent'}, {'type':'turn.started'}, completed())
+    kwargs={'inclusive_parent':'parent'} if inclusive else {}
+    assert accumulator.totals(**kwargs)['complete']
+    def child(event):
+        offset=accumulator.sources.get('child_source',{}).get('offset',-1)+1
+        accumulator.accept('child_source',offset,canonical(event)+b'\n')
+    child({'type':'thread.started','thread_id':'child'})
+    unknown=accumulator.totals(**kwargs)
+    assert unknown['input_tokens']==100 and not unknown['complete']
+    assert unknown['actual_cost'] is None and not unknown['settlement_enabled']
+    child({'type':'turn.started'})
+    assert not accumulator.totals(**kwargs)['complete']
+    child(completed(0,0,0,event_id='actual_zero'))
+    # A literal actual zero is distinguishable from absent counters. It does
+    # not add parent-inclusive counters or invent a second model receipt.
+    known=accumulator.totals(**kwargs)
+    assert known['complete'] and known['input_tokens']==100
+
+
+@pytest.mark.parametrize('semantics', ['cumulative', 'per_turn'])
+@pytest.mark.parametrize('inclusive', [False, True])
+@pytest.mark.parametrize('missing', ['absent', 'empty', 'partial'])
+def test_incomplete_participant_counters_never_hidden_by_inclusive_parent(semantics,inclusive,missing):
+    accumulator=Accumulator(semantics)
+    feed(accumulator,{'type':'thread.started','thread_id':'parent'},{'type':'turn.started'},completed())
+    kwargs={'inclusive_parent':'parent'} if inclusive else {}
+    def child(event):
+        offset=accumulator.sources.get('child_source',{}).get('offset',-1)+1
+        accumulator.accept('child_source',offset,canonical(event)+b'\n')
+    child({'type':'thread.started','thread_id':'child'})
+    child({'type':'turn.started'})
+    event={'type':'turn.completed','event_id':'incomplete'}
+    if missing!='absent':event['usage']={'input_tokens':7} if missing=='partial' else {}
+    child(event)
+    known=accumulator.totals(**kwargs)
+    assert not known['complete']
+    assert known['input_tokens']==(107 if missing=='partial' and not inclusive else 100)
+    child({'type':'turn.started'})
+    child(completed(7 if missing=='partial' else 0,0,0,event_id='next_complete'))
+    # Qualified cumulative final counters can cover prior incomplete snapshots;
+    # per-turn counters cannot retroactively settle an uncounted earlier turn.
+    assert accumulator.totals(**kwargs)['complete'] is (semantics=='cumulative')
+
+
 @pytest.mark.parametrize('counts', [(True, 10, 20), (-1, 10, 20), (100, 10, 101), (2**63, 10, 20)])
 def test_invalid_or_overflowing_counter_math_denied(counts):
     accumulator = Accumulator('cumulative')

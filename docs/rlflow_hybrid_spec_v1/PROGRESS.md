@@ -1,5 +1,7 @@
 # Hybrid v1 开发进度
 
+97：真实模型用量依赖核查发现并修复complete误报：主参与者完整+额外无计数线程原会complete=true；inclusive又可隐藏子线程部分缺计数。现全部参与者核完整，求和语义不变/已知prefix不补零；累计末完整可补原快照，逐轮缺账永久保守。首affected36pass33.05s；High同类MUST修后仅16new/affectedpure+1actualparentinclusive=17pass/31deselected1.95s，不重复其他35通过项，独立MUST关闭、compile/diff/USERlock通过，证据checkpoint-97-usage-completeness.txt。这是已确认直接用量安全缺口，不扩冷恢复；source仍fixture-only/settlementfalse，不称真实模型结算、首次工程任务、产品Review或自主接续。下一生成型original source/profile与独立预算分支；集中合同未答不调模型/GPU，Goal ACTIVE。
+
 96：任意有限文本补丁已可冻结成独立候选，并在现原批准受管CPU范围物化/独立子进程执行可配置验收，不写原项目/不在Core exec模型代码。实际正例SUCCEEDED/PASS与打印匹配文本后断言失败的NONZERO/FAIL均完整STOP/SETTLED/Pool0/allFDclosed。首11purepass/1actualfail14.49s（新wrapper sys.exit0误触旧keeper异常），仅受影响正例修后1pass15.47s；最终metadata+新负例1pass15.84s，旧pure不重复。独立High无确证源码MUST，原结果离线补核成功退出/机器PASS；compile/diff/USERlock/无新active通过，证据checkpoint-96-arbitrary-candidate/。仅关闭承接任意候选的实际验收缺口，不是首个真实模型任务/独立产品Review/条件接续；数据transform不授写权，实际source与晋升/CAS尚缺，集中合同未答不启模型/GPU。下一优先新生成native profile+原用量结算→Reviewer/条件接续，其他恢复后置，原Goal ACTIVE。
 
 95 FINAL：94提交1382d80。实际父SIGKILL原signedscope→protected当前Pool物理退役→同slot新claim→旧请求不干扰，旧Project version/UNKNOWN/全额预留不变，不假旧FREE/Job/结算。内联签名证据支持原report移走后冷审计；copy/subclass/stale/busy/close失败不退役；COMMIT前失败占槽/后丢返回确认唯一记录。最后实机1pass22.95s，旧Pool31pass98.63s/accounting3pass61.36s/capture2pass.07s；分轮变更复验不当四项资格，High无剩余MUST，compile/diff/USERlock/无新active通过，证据checkpoint-95-physical-retirement/进入所属提交。无全库/安装/长跑/模型自治声明。依用户最新要求，下一真实非预设Engineer→独立产品Reviewer→条件证据→自主接续；最小缺口见HYBRID_REAL_ENGINEERING_MINIMUM.md，其他恢复增强后置，仅直接阻断本链或确证安全问题前移。首次模型工程任务NOT_EXECUTED，集中合同未答不启模型/GPU，原Goal ACTIVE。

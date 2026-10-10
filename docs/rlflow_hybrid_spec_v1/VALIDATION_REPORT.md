@@ -1,5 +1,7 @@
 # 需求包离线校验报告
 
+97：tool1025a8实际复现数学complete误报；首全affectedsource模块36pass33.05s，High发现inclusive部分缺账同类MUST。原回归结束后修allparticipants，最终只选16affected/new纯协议+1actualparentinclusive源=17pass/31deselected1.95s；原35无影响case不重复，不伪一次48全绿。独立源码MUST关闭，compile/diff/USERlock通过，详evidence/checkpoint-97-usage-completeness.txt。模型/GPU0、source仍fixture-only/settlementfalse，不关闭真实模型Engineer/Reviewer/条件接续；82历史全量失败保留，Goal ACTIVE。
+
 96实际验收：任意替换/新增/删除协议与原输入/允许路径/容量门11pure通过；新包装层SystemExit0真实失败保留并修复后，仅受影响正例1pass15.47s，原结果SUCCEEDED/PASS；最终spec含候选metadata的新负例1pass15.84s，打印匹配文本仍NONZERO/FAIL。两原受管scope完整STOP/SETTLED/Pool0/allFDclosed，原结果仍ReviewNOT_PROVEN/conditionfalse。High无确证源码MUST，原结果离线补核成功退出/机器PASS，不伪新pytest；compile/diff/USERlock/无新active检查通过。详HYBRID_ARBITRARY_ENGINEERING_CANDIDATE.md/evidence/checkpoint-96-arbitrary-candidate/。真实模型任务未执行，未称安装/全库/自主闭环/长跑通过；82历史4fail/2532pass/32skip保留，Goal ACTIVE。
 
 95 FINAL：认证原scope物理退役与真实槽位复用已交付，预算UNKNOWN/全额预留零改，独立状态不假FREE/Job/结算。实际最后1pass22.95s；必要旧Pool31pass98.63s、accounting3pass61.36s、capture2pass.07s；High MUST均关闭，编译/差量/USERlock/无新active通过。不同原774/777事件、公钥与签名内联证据归档checkpoint-95-physical-retirement/，不互换、不称全ledger字节seal或新全库。首个真实非预设模型工程任务仍NOT_EXECUTED；下一优先实装Engineer/产品Reviewer/ConditionEvidence/接续，其他恢复增强后置；完整Goal active/集中合同未答，不调用模型/GPU。

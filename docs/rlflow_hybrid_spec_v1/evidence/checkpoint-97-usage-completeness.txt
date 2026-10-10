@@ -1,0 +1,43 @@
+Checkpoint97: confirmed completeness undercount prerequisite, not native model qualification.
+Prior9be9929, USER package-lock unchanged/unstaged SHA
+becc7e2a36dfcad4ffe934b5ff2f0f68187611d6c0641bd63d81367651cfbf09.
+
+Read original Goal attachment before work toolf5223e;working tree only USERlock.
+Deterministic BEFORE reproduction tool1025a8 exit0, Accumulator per_turn:
+main thread.started ->turn.started ->turn.completed usage100/10/cached20,
+then distinct child source thread.started without usage.
+Actual result was complete=true input100/output10/cached20 despite unaccounted child.
+This is parser-math evidence,not real-model stdout/source/ledger or receipt.
+
+First fix:require every participant observations>0 before complete.
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest tests/test_hybrid_usage_source.py -q
+login=false;original session89277/de0795 ->757a46 exit0/36passed33.05s.
+Includes original actual synthetic CPU producer3semantics,original FD/source
+and partial/dedup/fork/cleanup checks;all production model/GPU sessions0.
+Four new cases cumulative/per_turn ×inclusive/all show absent child prevents
+complete;actual zero counters are distinct from absent, known-prefix unchanged.
+
+Independent High found same-class MUST:inclusive parent groups could still
+hide child completed with absent/empty/partial counters after observations1.
+Waited original89277 terminal before changing source;no live input modifications.
+Final completeness checks ALL aggregate participants;inclusive controls ONLY
+summation. covered short-circuit prevents no-observation latest=None access.
+Added12cases3missingforms×2semantics×2scope;later cumulative complete counters
+can cover earlier incomplete snapshot,per-turn missing earlier turn stays incomplete.
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest tests/test_hybrid_usage_source.py -q -k 'unaccounted_thread or incomplete_participant or (actual_producer_incremental and parent_inclusive)'
+login=false;original session67116/47cd30 ->764dc4 exit0:
+17passed/31deselected1.95s. Explicit selection is changed-path16pure + actual
+parent-inclusive originalsource regression;not17realmodels or all48rerun.
+Prior unaffected35 cases not repeated or relabelled final-version execution.
+Independent High final correspondingMUSTclosed/no new narrowMUST;no tests by reviewer.
+
+py_compile exact modified module/test +gitdiffcheck tool5e773e exit0.
+No Source/Authority/Runtime/Pool/Budget ledger changes. No API/provider account
+auth read,model/GPU/paid call,production migration,push or restoration expansion.
+Known-prefix totals remain partial observations;completefalse must not drive
+future settlement/refund/autonomous next. All cost remainsUNKNOWN;
+Accumulator still settlement_enabledfalse and cannot confer provenance.
+Historical82 full4failed/2532passed/32skipped not reclassified.
+Original generating source/kind/authorization,realCLI semantics qualification,
+session/budget settlement,Reviewer,ConditionEvidence/CAS and first nonpreset
+real engineering task remain incomplete. Consolidated resource contract pending.

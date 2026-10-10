@@ -1,5 +1,7 @@
 # 开发决策记录
 
+97：已知prefix求和与全scope完整性分离，不能借groups过滤把未计账参与者当零。包括parent-inclusive在内，complete须每个已观察参与者实际有完整计数；inclusive只去双计。cumulative与per-turn修复规则不同，原source/math不能自授settlement。High同类MUST在首回归terminal后仅修受影响分支，原35无影响case不重复。此修直接阻断未来模型安全结算，符合95后仅直接链路/确证安全边界优先，不前移其他恢复增强。
+
 96：不将 fixed AFTER/父Core exec扩展成任意代码执行。封闭替换/新增/删除先校验允许路径和原hash，内存canonical冻结；可配置验收经已有fresh configured CPU完整批准执行，原项目不改。任意candidate/checks/rule/hash均进spec，变更需新原授权；pure Candidate不是ModelReceipt。共享验收子进程仍有恶意绕过语义风险，机器PASS只作执行观察，必须另真实独立Review/受保护条件接纳。新wrapper的成功sys.exit0误触旧异常门已修正常返回，不改旧keeper标准；正负原证据不同输入版本保留。其他恢复增强后置，真实生成profile/财务settlement为下一直接缺口。
 
 95：容量物理退役与财务结算分离。原REGISTER/Project事件、公钥与实际kernel闭包由exact当前registered Pool内部核验；新LOCAL_CPU_PHYSICALLY_RETIRED和可复用判据不伪FIXTURE_FREE。完整有限signed envelope内联避免临时report删除破坏Pool回放；实际slot flock取得/关闭后才追加，失败原FD强留/不隐式重试，commit丢返回原key幂等不碰新claim。预算UNKNOWN全预留/磁盘责任不退款。95后用户明确优先真实工程模型链，其他恢复增强后置，见HYBRID_REAL_ENGINEERING_MINIMUM.md。

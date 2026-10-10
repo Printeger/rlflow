@@ -1,5 +1,7 @@
 # 阻塞与证据缺口
 
+97关闭数学complete误报的直接安全缺口；模型原来源/profile、真实CLI语义资格与生成型预算settlement仍缺，不能拿原fixture math或旧STOP零模型结算代替。96任意候选验收已交付，最终Working晋升/CAS、真实独立Evaluator、条件publisher/接续和首个非预设实任务仍未实现。集中资源合同仍未批准，不启模型/GPU、不读取认证资料、不解除instinctRL HOLD；本地必要实现继续，完整Goal ACTIVE。
+
 96关闭固定候选验收入口缺口：任意文本候选已实际在受管CPU物化/执行，不在Core执行。仍缺真实模型 exact source/kind/授权及原CLI用量结算（旧STOP零模型math不可借用）、最终Working writer晋升、独立只读产品Evaluator、条件publisher/CAS/自主接续与首个非预设实任务。共享检查进程的机器PASS非抗恶意证明，不升条件；未重开冷恢复或扩展功能。集中模型账户/额度合同未答仍阻塞真实调用，但不阻塞本地实现；不重复索权、不启GPU、不解instinctRL HOLD，原Goal ACTIVE。
 
 95已实际让认证父死scope退役后复用硬件slot，原预算UNKNOWN与预留保留。下一最小直接缺口：native真实Engineer执行+原生用量/全集STOP、独立只读产品Reviewer、版本绑定条件证据与Core接续、首个非预设实任务验收。两原start仍deny，产品Review/条件未实现，首次真实任务未运行；不是95测试可代替。集中模型/账户/额度合同未答不调用模型/GPU；本地实现继续，不新增生产权限。其他恢复增强后置，严格quota/科研/长跑/instinctRL资格仍未完成。

@@ -1,5 +1,7 @@
 # 原来源有限用量观察（Checkpoint 43）
 
+97修复已复现完整性漏账：不能过滤无计数线程后称complete，也不能在parent-inclusive时隐藏子线程缺失/空/部分计数。完整性核验全部已观察参与者，inclusive仅影响求和；已知prefix显示不变，不将缺失补零。cumulative末完整总计可覆盖原缺失快照，per-turn旧轮缺失不能被新轮完整数抹去。原实际三语义回归及新负门已定向验证，详evidence/checkpoint-97-usage-completeness.txt。此处仍SOURCE_ONLY/settlementfalse，不证明真实模型scope/CLI计数或驱动实际预算结算；不能把此补强当首次模型任务完成。
+
 交付行为：保护 startup 的 FixtureUsageSourceOwner 从同一原 HostPool Membership/Claim 创建私有来源，保留一次原 attempt、实际 Popen/PID/start/boot/PGID/pidfd、直接 stdout 文件 FD 和原 stdin 管道。固定有限 CPU producer 直接追加 JSONL，不通过 caller Path、JSON、FD 或 capture_output 导入。原能力对象才可 poll/seal/cleanup；启动不确定不重复 Popen，不收养历史进程，不退还占用。fixture 不执行模型、工具、GPU 或生产迁移。
 
 每次 poll 最多读取 64KiB（包括尾锚与 partial tail 校验），最多解析 128 行/32768 节点；每行最多 16KiB/4096 节点/32 层。文件上限 16MiB，64 threads/4096 稳定事件，最多 32 owners/每 owner 32 sources。只消费完整 JSONL，partial 不推进，缺计数不是零。每 poll 的回滚只复制有界线程状态，不复制全部事件历史。旧 stable-ID 重放不重复计数，也不能关闭后来 active turn；同 ID 改计数、累计回退、cached>input、overflow、重复键/非法 Unicode 等拒绝并隔离。
