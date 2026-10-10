@@ -1,0 +1,134 @@
+Checkpoint 76 installed original finite execution consumer
+Date: 2026-10-10. Base: a22737b5fe655c47e4112a25a57f82cb6a98ad5e.
+This is a reconstructed index of actual tool outputs, not a combined raw log.
+Original M0-M5 requirements and permissions remain unchanged. No production
+migration, paid model invocation, GPU, global installation, or push.
+
+DELIVERY AND ACCEPTANCE
+Public installed module rlflow.isolated_finite_example creates only two new
+private disposable fixed fixtures. Each proposal and original scope hash needs
+exact stdin confirmation. Original installed SDK -> real human HTTP RUN ->
+installed request-only console execution-report -> original whole finite STOP.
+Original source/evaluator, inventory, policy, schema and approval gates unchanged.
+Must observe CPU raw384/MACHINE_VERIFIED; engineering raw3/AST21/
+MACHINE_ACCEPTED_PENDING_REVIEW; missing independent review and Goal false;
+physical reap and FD closures, original Pool occupied0; full cleanup exit0.
+No import of tests or tests.*, fake clock/version/model catalog, or exec model.
+
+FINAL ACCEPTED ARTIFACT
+Source archive /tmp/rlflow-cp76-accepted-IwQiuo/sdist/rlflow_standalone-0.2.0.tar.gz
+SHA256 a3aec5abd7de63c249df25f975f5f0aeccd506f93f07c148e7bc81b32733ad4d
+Wheel /tmp/rlflow-cp76-accepted-IwQiuo/wheels/rlflow_standalone-0.2.0-py3-none-any.whl
+SHA256 52a77a8fbbc36419e4f726cf421f3a444142aefb903e3ec8687020d572db5e32
+Size 1100090. Original sdist->wheel build e2f962 exit0; installation 6efaf6 exit0.
+Fresh target /tmp/rlflow-cp76-accepted-IwQiuo/site; existing fixed dependencies.
+Not a pristine dependency-resolution or arbitrary mixed site-packages proof.
+ZIP original closed inventory comparison 381c57 exit0:
+334 original release files / 3774349 bytes, each original file byte-identical.
+Build helper copies only original four top files. MANIFEST.in retains helper and
+top materials in sdist; no relocated releases.ROOT or reduced inventory.
+README/guide updated after artifact build, excluded from original release domain;
+no claim that post-build documentation bytes are in that source archive.
+
+FINAL REAL CONSUMER (NO RESTART OR DUPLICATE)
+cwd /tmp/rlflow-cp76-accepted-IwQiuo
+argv:
+env PYTHONPATH=/tmp/rlflow-cp76-accepted-IwQiuo/site PYTHONDONTWRITEBYTECODE=1 /home/mint/rl_dev/rlflow_standalone/.venv/bin/python -m rlflow.isolated_finite_example --parent /tmp/rlflow-cp76-accepted-IwQiuo --approve-isolated-fixed-fixture
+PTY session72246. Both original scope confirmations supplied separately:
+APPROVE sha256:e6de7d2bda8e8160a39c7ecab50845dcd9d0137be636dcb8f85b93b9d3b40812
+APPROVE sha256:1924c26322f7085719d7e65f41f827724641421bed6e63c3e93035bb45bdd918
+Input events a275df and 10e4e4. Each displayed complete original proposal,
+scope hash, and consent_ttl_seconds300 before confirmation. Flag alone does not
+approve. This synthetic disposable human fixture is not production user consent.
+Original AuthStore default900 and request token cap300 unchanged; short original
+Controller/Workspace/claim60 created only after both installation/preparation.
+Final terminal 0728b6 exit0, stdout:
+{"installed_package": "/tmp/rlflow-cp76-accepted-IwQiuo/site", "tests_imported": false, "real_clocks": true, "real_native_version_only": true, "results": [{"kind": "CPU_TRIAL", "raw": 384, "cases": 0}, {"kind": "ENGINEERING", "raw": 3, "cases": 21}], "original_STOP": true, "pool_occupied": 0, "model_calls": 0, "GPU_starts": 0, "product_review": "NOT_PERFORMED", "Goal_completed": false}
+Exit0 occurred AFTER independent finally cleanup, not just printed summary.
+Installed module asserts original highest recorded_at_state_version source,
+exact machine statuses, no Core writes on report, token absent from console output.
+Original STOP status ORIGINAL_SCOPES_STOPPED_AS_OF_RETURN; every unit cancelled;
+source producer.returncode already set (no poll to reap), all source FDs/pidfd
+None, every Pool slot closed/all FDs None, engineering input/writer FDs None,
+material.write_entered, working AFTER and original source BEFORE. No syscall
+instrumentation claim: this does not count exact pwrite calls independently.
+Finally independently attempts all original owners after all-unit latch; unknown
+cleanup retained as error, never fake FREE/refund. Server thread drain included.
+Actual native CLI0.161.0 a74608 and real cached gpt-6.1-sol/medium fcefba.
+Only version/catalog preparation; no native generation. Model/GPU starts zero
+does not certify provider invoice or fee zero; original cost UNKNOWN persists.
+
+NECESSARY REGRESSION AND FAILURE CLEANUP
+argv (checkout cwd):
+env PYTHONPATH=/home/mint/rl_dev/rlflow_standalone PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q tests/test_hybrid_fixture_materials.py tests/test_hybrid_installation_service.py tests/test_isolated_finite_example.py
+Original session98576 terminal5779ea exit0: 64 passed in 59.77s, no warnings.
+Helper first targeted test a04b3e exit0: 1 passed in0.19s, later included in64.
+Helper injection is a fake cleanup interface with a REAL ordinary child and FD,
+not a fabricated original Runtime capability or original failure-path proof.
+It checks first failure preserved, later child terminated/waited and FD closed,
+all-latch before cleanup and independent Pool close. Original Core/Runtime/UI
+unchanged; reuse existing evidence, no new full-repository/browser-run claim.
+After regression only installed consumer selection/proof assertions and new
+initial consent TTL changed; final actual installed execution covers those.
+
+DEVELOPMENT FAILURES AND CHANGED DIAGNOSIS (ALL RETAINED)
+1. First direct wheel cbea18b09041129f509c76d4ad925e7b6add370929c806a4e259be263ae266a1,
+   f90490 build/16e8ee install exit0; temp standalone consumer81354 terminal9622c1
+   exit1 BEFORE worker. Original workspace stage default30 differed from record60.
+   Explicit stage60 only; did not weaken original observation check or clock.
+2. Revised temp consumer58809 terminal35199e exit1 after real CPU run. Probe
+   assumed exactly one assessment; original raw+machine domain has two rows.
+   Original DB readonly diagnosis786ad9 confirmed separate keys. Selected actual
+   source contract instead of suppressing original record or changing evaluator.
+3. High MUST: a first finally exception could abandon other owners. Added
+   independent close_fixture attempts plus helper real-child/FD failure test.
+   Prepared both costly fixtures before any short execution cohort. Packaged
+   module replaced standalone copy; strengthened physical cleanup checks.
+   Candidate9fdb3fd3e07326ba34863071e7100ca9622194fa01d3c3752c8ad783b4460179
+   d09440/dac1af build/install exit0; installed52134 terminalbe655b exit0 CPU384,
+   engineering3/21, Pool0. This earlier runtime used poll and hash-first source:
+   not reused as proof of final pure-returncode or exact CPU machine status.
+4. High proof precision: use max recorded_at_state_version, exact machine status,
+   pure returncode not poll. MANIFEST.in added for source archive build support.
+   Old source-archive wheel5006f312c381d0665971e78c7044c1a7d3b81ba608db4426b510aae8c1e5cfc4
+   bfbe58 build only; no installed-execution claim.
+5. Precision source-archive candidate63fc94a3bd67b1cd82415a520442ba72badee1ec195b934981c8b4e2167ad0ce,
+   09dc99/20dd9b build/install exit0; actual82005 terminal0ebd37 exit1 BEFORE
+   worker: preparation current consent unavailable. Readonly DB87eecd:
+   CPU approval03:55:20.157665Z expiry03:56:20.157665Z, workspace03:56:19.747782Z,
+   CPU assessments0. First60s consent expired during second human/prepare wait.
+   Original gate correctly rejected. New fixture requests original300s wall
+   budget as INITIAL TTL, displayed before exact scope consent, within original
+   1..86400 contract. No extension of old consent, automatic renewal or fake time.
+   Final accepted52a77 candidate and current72246 above are the changed diagnostic
+   run; no same failed candidate blindly repeated.
+
+INDEPENDENT STATIC REVIEW AND EVIDENCE IDENTITY
+Existing authorized High finite_app_review_63 read-only delta review: no remaining
+MUST after independent cleanup, late cohorts, pure physical witnesses, original
+record-version and machine-status selection, sdist material, explicit new initial
+300s consent. Reviewer did NOT rerun pytest/consumer or write product files.
+Static verdict required actual72246 terminal and final frozen identity; both met.
+377 final runtime/test/build/JS inputs archived checkpoint-76-inputs.sha256;
+final post-terminal check92324a exit0 all match. No runtime edits during live run.
+Own checkout build dir moved recoverably to /tmp/rlflow-cp76-install-oRM9mJ/checkout-build,
+not deleted; no cleanup/migration of original fixture history. USER root
+package-lock.json SHA becc7e2a36dfcad4ffe934b5ff2f0f68187611d6c0641bd63d81367651cfbf09
+untouched/untracked/unstaged.
+
+REMAINING GAPS AND NEXT ACCEPTANCE
+This delivered fixed installed end-to-end execution/STOP, not complete native
+product execution, independent product Review/condition evidence, strict OS
+cgroup/quota, provider invoice, B1,24h/8h or full T22/T23/M0-M5. Goal active.
+Next77: installed cold trusted history/abnormal-state reads, without restarting
+workers, adopting historical capabilities, false FREE/refund or duplicate RUN.
+No new user-decision blocker for that safe bounded next slice; original paid/
+Reviewer/OS authority boundaries remain. No feature expansion during closeout.
+
+FINAL STATIC CHECKS AFTER ARCHIVE
+.venv/bin/python -m compileall -q rlflow: 5a82e8 exit0.
+.venv/bin/python -m py_compile build_support.py tests/test_isolated_finite_example.py:
+3b7f5f exit0. .venv/bin/python -m pip check: 150dc3 exit0, no broken requirements.
+git diff --check: a1cf95 exit0.
+sha256sum --check --quiet docs/rlflow_hybrid_spec_v1/evidence/checkpoint-76-inputs.sha256:
+f7ba68 exit0. Source/runtime/test/build identity still unchanged after all docs.

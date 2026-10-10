@@ -12,11 +12,15 @@ dependencies = ["jsonschema==4.23.0", "tiktoken==0.9.0", "PyYAML==6.0.2", "fasta
 rlflow = "rlflow.cli:main"
 
 [tool.setuptools.packages.find]
-include = ["rlflow*", "schemas"]
+include = ["rlflow*", "schemas", "roles", "tests*"]
+
+[tool.setuptools.cmdclass]
+build_py = "build_support.ControlBuild"
 
 [tool.setuptools.package-data]
 rlflow = ["hybrid_schemas/*.json", "static/*", "skills/rlflow/SKILL.md"]
 schemas = ["*.json"]
+roles = ["*.md", "*.toml"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
