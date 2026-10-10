@@ -1,0 +1,9 @@
+node --test web_checks/fixture-panel.test.mjs
+Original terminal chunk be79bb: exit 0, 16 tests / 16 pass / 0 fail,
+duration_ms 81.13777. No repetition after unchanged UI passed.
+
+node --test web_checks/local-cpu-view.test.mjs
+Terminal chunk 11cba4: exit 0, 1 test / 1 pass / 0 fail,
+duration_ms 66.213554.
+Uses archived actual authenticated public-task.json, rejects 13 malformed or
+capability-inflated variants. Display consistency only, not a source proof.

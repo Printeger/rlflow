@@ -1,0 +1,16 @@
+Checkpoint 87 independent incremental read-only review
+Reviewer: /root/finite_app_review_63. No reviewer tests, writes or new agents.
+Initial MUST: public LocalCpu source proofs used asyncio.to_thread's unbounded
+default executor; cancelled HTTP waiters did not impose finite worker capacity.
+Repair: independent ControlPool(2), source read + check_current one actual job;
+slots retained until worker terminal; entry/end authentication; lifespan drain;
+separate from fixed START and STOP capacity.
+Final static verdict: capacity MUST closed, no other confirmed new MUST.
+Sanitized projection removes managed proof; exact reader type gate and local
+kind fixed-control isolation preserved. Historical results do not imply live
+status, independent product Review or ConditionEvidence.
+Test wiring finding: new module needed native_setup fixture import. Old test
+needed fresh app startup after previous lifespan permanently closed workers.
+Both corrected after original run terminal; no active test input modified.
+Final affected run: 3 passed, 38.73s; initial 8 passed retained, not rerun.
+This development review is NOT the independent product/scientific Reviewer.

@@ -181,6 +181,10 @@ def test_sql_key_byte_bound_and_post_read_revocation(runtime, monkeypatch):
         auth.revoke(headers['Authorization'].split(' ', 1)[1])
         return result
     monkeypatch.setattr(reader, 'task', revoked)
+    # The previous application's lifespan drained and permanently closed its
+    # workers. A new server lifetime needs fresh startup-bound read capacity.
+    app = create_app([Project(reader.project_id, str(owner.store.root), 'fixture')], auth,
+                     origin=ORIGIN, fixture_task_readers={reader.project_id: reader})
     with TestClient(app, base_url=ORIGIN) as client:
         assert client.get(base+'/'+selector(owner, lease), headers=headers).status_code == 401
 

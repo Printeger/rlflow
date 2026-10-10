@@ -1,0 +1,62 @@
+.                                                               [100%]
+==================================== ERRORS ====================================
+_ ERROR at setup of test_http_cancel_keeps_read_capacity_stop_independent_and_lifespan_drains _
+file /home/mint/rl_dev/rlflow_standalone/tests/test_hybrid_fixture_read_capacity.py, line 12
+  def test_http_cancel_keeps_read_capacity_stop_independent_and_lifespan_drains(runtime, monkeypatch):
+file /home/mint/rl_dev/rlflow_standalone/tests/test_hybrid_fixture_runtime.py, line 30
+  @pytest.fixture
+  def runtime(tmp_path, native_setup, request, monkeypatch):
+E       fixture 'native_setup' not found
+>       available fixtures: cache, capfd, capfdbinary, caplog, capsys, capsysbinary, doctest_namespace, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, runtime, tmp_path, tmp_path_factory, tmpdir, tmpdir_factory
+>       use 'pytest --fixtures [testpath]' for help on them.
+
+/home/mint/rl_dev/rlflow_standalone/tests/test_hybrid_fixture_runtime.py:30
+=================================== FAILURES ===================================
+_______________ test_sql_key_byte_bound_and_post_read_revocation _______________
+
+runtime = (<rlflow.hybrid_fixture_runtime.FixtureRuntimeOwner object at 0x72e15354df70>, WorkingPlanBundle(id='working_plan_d054...'gpu_device_seconds': 0, 'model_input_tokens': 0, ...}, 'data_mode': 'fixture', 'expected_state_version': 7, ...}, ...)
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x72e1518b1460>
+
+    def test_sql_key_byte_bound_and_post_read_revocation(runtime, monkeypatch):
+        owner = runtime[0]; lease = register(runtime)
+        reader, app, auth, headers, base = setup(runtime)
+        huge_key = 'a' * (2*1024**2)
+        with owner.store.connect() as db:
+            db.execute('INSERT INTO projection(section,object_key,value,version) VALUES(?,?,?,?)',
+                       (SECTIONS[2], huge_key, '{}', owner.store.version()))
+        try:
+            with pytest.raises(Conflict): reader.tasks(limit=1)
+            with TestClient(app, base_url=ORIGIN) as client:
+                assert client.get(base+'?limit=1', headers=headers).status_code == 503
+        finally:
+            with owner.store.connect() as db:
+                db.execute('DELETE FROM projection WHERE section=? AND object_key=?', (SECTIONS[2], huge_key))
+        task = reader.task
+        def revoked(*args, **kwargs):
+            result = task(*args, **kwargs)
+            auth.revoke(headers['Authorization'].split(' ', 1)[1])
+            return result
+        monkeypatch.setattr(reader, 'task', revoked)
+        with TestClient(app, base_url=ORIGIN) as client:
+>           assert client.get(base+'/'+selector(owner, lease), headers=headers).status_code == 401
+E           assert 503 == 401
+E            +  where 503 = <Response [503 Service Unavailable]>.status_code
+E            +    where <Response [503 Service Unavailable]> = get((('/api/v1/projects/project_fixture/fixture-tasks' + '/') + 'budget_reservation_89a6bb0574a5c3b97861df033f6e38aa541df97e356ca9b83f13d011a8a57b51'), headers={'Authorization': 'Bearer 1NwGRyX600rufAmeicdQR7dGeTci3Wsk1ZvbMeUEcrY'})
+E            +      where get = <starlette.testclient.TestClient object at 0x72e1516c91f0>.get
+E            +      and   'budget_reservation_89a6bb0574a5c3b97861df033f6e38aa541df97e356ca9b83f13d011a8a57b51' = selector(<rlflow.hybrid_fixture_runtime.FixtureRuntimeOwner object at 0x72e15354df70>, FixtureExecutionLease(id='fixture_lease_0bf575918dab498a9e77040e061cd644', raw=b'{"attempt_id":"fixture_attempt_99d0a8...8bfc4567ba878cdfa4b5a5","key":"working_plan_ready_b7fef75c9a0c2ce70fa87f4b09839e33062289d301aa8a6887046e3485a42b43"}}'))
+
+tests/test_hybrid_fixture_runtime_reads.py:185: AssertionError
+=============================== warnings summary ===============================
+.venv/lib/python3.12/site-packages/starlette/testclient.py:37
+  /home/mint/rl_dev/rlflow_standalone/.venv/lib/python3.12/site-packages/starlette/testclient.py:37: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = typing.Callable[[], typing.ContextManager[anyio.abc.BlockingPortal]]
+
+tests/test_hybrid_fixture_runtime_reads.py::test_default_api_disabled_and_auth_scope_closed_queries
+  /home/mint/rl_dev/rlflow_standalone/.venv/lib/python3.12/site-packages/starlette/testclient.py:437: DeprecationWarning: Setting per-request cookies=<...> is being deprecated, because the expected behaviour on cookie persistence is ambiguous. Set cookies directly on the client instance instead.
+    return super().request(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_hybrid_fixture_runtime_reads.py::test_sql_key_byte_bound_and_post_read_revocation
+ERROR tests/test_hybrid_fixture_read_capacity.py::test_http_cancel_keeps_read_capacity_stop_independent_and_lifespan_drains
+1 failed, 8 passed, 2 warnings, 1 error in 81.92s (0:01:21)

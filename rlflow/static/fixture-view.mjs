@@ -1,4 +1,5 @@
 // Consistency checks only. Neither historical DTOs nor discovery grant execution.
+import {localTaskKeys,checkLocalTaskExtras,checkLocalDetail} from './local-cpu-view.mjs';
 const id=v=>typeof v==='string' && /^[A-Za-z0-9][A-Za-z0-9_.:-]{0,159}$/.test(v);
 const count=v=>Number.isSafeInteger(v) && v>=0;
 const closed=(v,keys)=>v!==null && typeof v==='object' && !Array.isArray(v) && Object.keys(v).sort().join()===keys.slice().sort().join();
@@ -8,7 +9,9 @@ export const phases=['REGISTER_NO_HANDOFF','HANDOFF_UNKNOWN','PROCESS_REGISTERED
 function scope(v,s){if(!v || v.schema_version!=='1.1' || v.project_id!==s.project || v.data_mode!=='fixture' || s.mode!=='fixture' || v.store_epoch!==s.epoch || !count(v.as_of_state_version) || v.execution_enabled!==false)fail();}
 const taskKeys=['id','attempt_id','reservation_id','kind','authorization','recorded_phase','recorded_at_state_version','current_execution_status','controls_available','source_coverage','model_enabled','native_execution_enabled','candidate_write_enabled','delegation_enabled','actual_cost_status','synthetic_tokens_settled','arbitrary_tree_stop','resource_release_status','recorded_wall_seconds'];
 function task(v,version){
-  if(!closed(v,taskKeys) || !['id','attempt_id','reservation_id'].every(k=>id(v[k])) || v.kind!=='PROTOCOL_CONFORMANCE' || v.authorization!=='LOCAL_PROTOCOL_ONLY' || !phases.includes(v.recorded_phase) || !count(v.recorded_at_state_version) || v.recorded_at_state_version>version || v.current_execution_status!=='UNKNOWN' || v.source_coverage!=='ORIGINAL_EVENT_VERIFIED' || v.actual_cost_status!=='UNKNOWN' || v.resource_release_status!=='NOT_OBSERVED' || !['controls_available','model_enabled','native_execution_enabled','candidate_write_enabled','delegation_enabled','synthetic_tokens_settled','arbitrary_tree_stop'].every(k=>v[k]===false) || (v.recorded_phase==='FIXTURE_SCOPE_STOPPED' ? !count(v.recorded_wall_seconds) : v.recorded_wall_seconds!==null))fail();
+  const local=v?.kind==='LOCAL_CONFIGURED_CPU';
+  if(!closed(v,local?[...taskKeys,...localTaskKeys]:taskKeys) || !['id','attempt_id','reservation_id'].every(k=>id(v[k])) || (local ? v.authorization!=='ORIGINAL_APPROVED_LOCAL_CPU_ONLY' : v.kind!=='PROTOCOL_CONFORMANCE' || v.authorization!=='LOCAL_PROTOCOL_ONLY') || !phases.includes(v.recorded_phase) || !count(v.recorded_at_state_version) || v.recorded_at_state_version>version || v.current_execution_status!=='UNKNOWN' || v.source_coverage!=='ORIGINAL_EVENT_VERIFIED' || v.actual_cost_status!=='UNKNOWN' || v.resource_release_status!=='NOT_OBSERVED' || !['controls_available','model_enabled','native_execution_enabled','candidate_write_enabled','delegation_enabled','synthetic_tokens_settled','arbitrary_tree_stop'].every(k=>v[k]===false) || (v.recorded_phase==='FIXTURE_SCOPE_STOPPED' ? !count(v.recorded_wall_seconds) : v.recorded_wall_seconds!==null))fail();
+  if(local)checkLocalTaskExtras(v);
 }
 export function checkFixtureProfile(v,s){scope(v,s);if(!closed(v,[...meta,'control_api_installed','original_owner_available','profile','native_execution_enabled','arbitrary_tree_stop']) || v.control_api_installed!==true || typeof v.original_owner_available!=='boolean' || v.profile!=='FIXED_CPU_SINGLE_PARTICIPANT' || v.native_execution_enabled!==false || v.arbitrary_tree_stop!==false)fail();return v;}
 export function checkFixturePage(v,s,after=''){
@@ -17,9 +20,9 @@ export function checkFixturePage(v,s,after=''){
   // Cursor tracks SCANNED reservations, so an empty sparse page may advance.
   if(v.next_after!==null && (!id(v.next_after) || v.next_after<=after || v.next_after<previous))fail();return v;
 }
-export function checkFixtureDetail(v,s,selected){scope(v,s);if(!closed(v,[...meta,'task']))fail();task(v.task,v.as_of_state_version);if(v.task.id!==selected.id || v.task.reservation_id!==selected.reservation_id || v.task.attempt_id!==selected.attempt_id)fail();return v;}
+export function checkFixtureDetail(v,s,selected){scope(v,s);const local=v.task?.kind==='LOCAL_CONFIGURED_CPU';if(!closed(v,[...meta,'task',...(local?['configured_result','recorded_settled_usage']:[])]))fail();task(v.task,v.as_of_state_version);if(v.task.id!==selected.id || v.task.reservation_id!==selected.reservation_id || v.task.attempt_id!==selected.attempt_id)fail();if(local)checkLocalDetail(v);return v;}
 export function checkFixtureTimeline(v,s,selected){
-  if(!closed(v,[...meta,'task','events']))fail();
+  if(!closed(v,[...meta,'task','events',...(v.task?.kind==='LOCAL_CONFIGURED_CPU'?['configured_result','recorded_settled_usage']:[])]))fail();
   const {events,...detail}=v;checkFixtureDetail(detail,s,selected);
   if(!Array.isArray(events) || events.length<1 || events.length>7)fail();
   let phase=-1,version=-1;const seen=new Set();

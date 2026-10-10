@@ -1,0 +1,15 @@
+Final checks on the Checkpoint 87 candidate (not full-suite qualification)
+Python compileall: changed read modules, new/changed tests and browser fixture,
+exit 0. JavaScript node --check: local-cpu-view, fixture-view, fixture-panel,
+local-cpu-browser.test and local-cpu-view.test, exit 0.
+.venv/bin/python -m pip check: No broken requirements found. Exit 0.
+git diff --check: exit 0.
+User unrelated package-lock.json unchanged SHA256:
+becc7e2a36dfcad4ffe934b5ff2f0f68187611d6c0641bd63d81367651cfbf09
+All original test sessions terminal; no tests restarted while running.
+Read-only systemctl --user list-units --all rlflow*: only three previously
+recorded failed/failed timeout fixture units; no active local execution unit.
+No reset-failed, unit adoption, GPU query/run, model generation or production
+state changes. No new installation/full-suite/24h8h qualification claimed.
+The archived public-task.json is a newline-normalized JSON copy, not a byte
+seal. It contains actual approved output/criteria and original historic usage.

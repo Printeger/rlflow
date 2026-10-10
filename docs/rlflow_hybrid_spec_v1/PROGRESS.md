@@ -1,5 +1,9 @@
 # Hybrid v1 开发进度
 
+Checkpoint87 收尾：86提交9f1fd989。认证Dashboard现可消费原批准可配置CPU实验的实际输出/验收阈值/机器结论/原历史计额，私有managed证明不公开，exact启动reader门、末Auth/源版本/闭query不放宽；固定按钮按kind隔离，本地无控制。实际API初1pass16.26s/真实Chrome1pass24.13s（原median4→starts1→STOP/FREE→SSE与Reader一致→logout，无固定POST）、旧Node16pass、新实际DTO负例1pass。High新容量MUST已修独立ControlPool(2)，取消waiter不释放真实worker槽位、读取+版本核验同job、lifespan真实drain，不占STOP。必要旧读取回归首8pass/1fail/1setup error81.92s：漏fixture导入与重复使用已关闭app，终态后修接线；仅受影响最终3pass38.73s，真实held读满额/取消保槽/第三429/独立STOP-FREE/关闭等待及实际研究API均过，8项不重复。证据checkpoint-87-public-dashboard/，接口见HYBRID_LOCAL_CPU_DASHBOARD.md。Chrome为容量修复前同未改UI版本，非最终全库或安装资格；82全量4fail/2532pass/32skip不重标。87进入提交，原USERlock不改不stage。
+
+下一按用户优先推进真实Engineer/Reviewer链可用资格，先核现有原生模型/usage/Review能力与未批准集中合同之间的实际门；并补可配置实验的完整预算期限与长期恢复，不增加固定演示。真实模型/GPU合同仍未答，不调用；strict quota/完整异常STOP/24h8h/instinctRL实机准入仍缺。instinctRL只读HOLD，原Goal ACTIVE，无新增本地需用户决定阻塞。
+
 Checkpoint86 收尾：85实际提交e81c2c4。已交付 JSON_METRICS_RANGE 批准数值验收（≤16有限区间，精确平坦 metric 键集、重复键/非有限/bool/extra/缺值/嵌套/坏JSON均FAIL，stderr按批准规则），旧EXACT/NOT_CONFIGURED保留；结果闭schema及归档raw重算同原函数，完整spec/hash/原审批源仍绑定阈值。cold同snapshot原终态Budget项目consumed差量给recorded_settled_usage，非终态None，不升级current status。原37907终fec1c4 exit0 21pass47.85s（全changed profile+真实噪声OLS研究PASS/FAIL，G计1/STOP/FREE/cached不多计/audit/replay/recover/退出后cold）；必要旧文本PASS/FAIL44715终1d8dbd 2pass43.33s。High增量无MUST，无重复无变化生命周期/全库。
 
 86新wheel651d0fa371daa4f6ddf2675004cc4c4b2b924e196ef7aa7aaf3172d62e37c19e，无deps/build-isolation网络安装；checkout外公开CLI实际另一配置统计任务：原15424终e92542 exit0、task1612955、机器PASS、原settled experiment_starts1/wall4/模型GPU0、Pooloccupied0/fullmanagedSTOP/FREE，公开history原74085终602a2e exit0与原history完全相同、controlsfalse/currentUNKNOWN。全部顶层rlflow Python同installedpayload，compile/pipcheck/diff通过、无live，证据checkpoint-86-metrics/。不是科学结论/独立产品Review/ConditionEvidence/自主科研Goal或长跑准入；JSON副本有末尾newline不称byte seal。86进入归档提交，USERlock不变不stage。

@@ -144,21 +144,34 @@ class FixtureTaskReader(HybridReader):
 
 def install(app, readers, projects, auth):
     """Trusted startup injection only; no caller-supplied roots or epochs."""
-    import asyncio
+    from contextlib import asynccontextmanager
     from pathlib import Path
     from fastapi import Request
     from fastapi.responses import JSONResponse
-    from .hybrid_control import ControlError, error_response
+    from .hybrid_control import ControlError, ControlPool, error_response
     from .hybrid_protocol import ProtocolError
+    from .hybrid_local_cpu_reads import LocalCpuPublicTaskReader
 
     readers = dict(readers)
     if len(readers)>128: raise ValueError('too many fixture Task sources')
     for key, reader in readers.items():
         project = projects.get(key)
-        if (type(reader) is not FixtureTaskReader or project is None or project.data_mode != 'fixture' or
+        if (type(reader) not in (FixtureTaskReader,LocalCpuPublicTaskReader) or project is None or project.data_mode != 'fixture' or
                 reader.project_id != key or reader.store.root != Path(project.root).resolve(strict=True)):
             raise ValueError('fixture Task reader startup scope mismatch')
         with reader.snapshot(): pass
+
+    # Independent of control/STOP capacity. Slots belong to the real worker,
+    # including after its HTTP waiter disconnects, until source validation ends.
+    pool = ControlPool(2)
+    app.state.hybrid_fixture_read_pool = pool
+    original_lifespan = app.router.lifespan_context
+    @asynccontextmanager
+    async def lifespan(current):
+        async with original_lifespan(current):
+            try: yield
+            finally: await pool.close()
+    app.router.lifespan_context = lifespan
 
     def authorize(request, project_id):
         authorization = request.headers.get('authorization')
@@ -174,11 +187,14 @@ def install(app, readers, projects, auth):
     async def response(request, project_id, call):
         try:
             reader = authorize(request, project_id)
-            result = await asyncio.to_thread(call, reader)
+            def read():
+                result = call(reader)
+                if result is not None:
+                    reader.check_current(result['as_of_state_version'])
+                return result
+            result = await pool.run(read)
             authorize(request, project_id)
             if result is None: raise ControlError(404, 'NOT_FOUND', 'fixture Task not found')
-            await asyncio.to_thread(reader.check_current, result['as_of_state_version'])
-            authorize(request, project_id)
             return JSONResponse(result)
         except ControlError as error: return error_response(error)
         except Conflict:

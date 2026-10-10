@@ -36,6 +36,7 @@ class LocalCpuTaskReader(FixtureTaskReader):
             validate_links(value,dependency_lookup(self.store,db,read,state))
         return value
 
+
     @staticmethod
     def _dto(key,head):
         value=FixtureTaskReader._dto(key,head)
@@ -87,3 +88,16 @@ class LocalCpuTaskReader(FixtureTaskReader):
                 project=next(iter(derived_heads(entry)[SECTIONS[3]].values()))
                 value['recorded_settled_usage']=subtract(project['consumed'],entry['prior_project']['consumed'])
             return self.output(value,256*1024)
+
+
+class LocalCpuPublicTaskReader(LocalCpuTaskReader):
+    """Authenticated display projection; no private scope/FD/process handles."""
+
+    def task(self,reservation_id,*,timeline=False):
+        value=super().task(reservation_id,timeline=timeline)
+        if value is None:return None
+        proof=value.pop('managed_terminal_proof')
+        result=None if proof is None else proof['configured_local_result']
+        value['configured_result']=None if result is None else {
+            name:result[name] for name in ('outputs','approved_acceptance','machine_acceptance')}
+        return self.output(value,256*1024)

@@ -56,7 +56,7 @@ export class FixturePanel {
   buttons(syncFloor=true){
     const c=this.context(),operator=c?.session.kind==='human' && c.session.roles.includes('operator');
     if(syncFloor){this.bindVersionScope();if(c?.mode==='fixture' && Number.isSafeInteger(c.version) && c.version>=0)this.wantedVersion=Math.max(this.wantedVersion,c.version);}
-    const enabled=operator && this.profile?.original_owner_available && this.detail && !this.pending && !this.reading && this.detail.as_of_state_version>=this.wantedVersion;
+    const enabled=operator && this.profile?.original_owner_available && this.detail?.task.kind==='PROTOCOL_CONFORMANCE' && !this.pending && !this.reading && this.detail.as_of_state_version>=this.wantedVersion;
     const phase=this.detail?.task.recorded_phase;
     this.$('fixture-start').disabled=!(enabled && phase==='REGISTER_NO_HANDOFF');
     this.$('fixture-stop').disabled=!(enabled && !['STOP_REQUESTED','FIXTURE_SCOPE_STOPPED'].includes(phase));

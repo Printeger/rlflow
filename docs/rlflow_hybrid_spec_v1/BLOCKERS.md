@@ -1,5 +1,7 @@
 # 阻塞与证据缺口
 
+87 已闭合可配置实验原结果/计额到认证Dashboard的只读消费及独立有限读取容量。最终定向3pass38.73s、原未受影响8pass保留，真实Chrome与API、前端负例通过；独立增量容量MUST关闭。新应用完整安装/全库/长跑资格未由本片证明。模型Engineer/独立产品Reviewer条件接续仍待集中资源合同明确答复；strict diskquota、预算长时效、完整异常STOP/恢复及24h8h未完成，instinctRL只读HOLD。没有需要重复索权才能推进普通本地实现的新阻塞。固定统计任务机器PASS不算自主闭环。
+
 86 关闭数值实验验收与原计额cold消费缺口：JSON_METRICS_RANGE完整批准阈值→实际研究指标→原机器PASS/FAIL→G保守计experiment1/STOP/FREE→历史原Budget消费差量与cold重算。37907/fec1c4 21pass47.85s，必要原EXACT回归44715/1d8dbd 2pass43.33s。安装CLI统计任务15424/e92542 exit0/机器PASS/start1/wall4/Pool0，公开cold74085/602a2e exit0同原history；High无MUST，源码同wheel/compile/pipcheck/diff通过，无live。不是独立科研Review/科学结论/自主闭环，证据checkpoint-86-metrics/。
 
 仍缺：可配置local任务原结果/计额的认证Dashboard接线（现fixture Task startup reader要求exact旧类）、真实模型Engineer/Reviewer条件接续（集中资源合同未批准）、strict diskquota/全部崩溃恢复/24h8h实机资格。先做已授权原数据Dashboard消费，不把历史升当前或授cold执行权；instinctRL保持只读HOLD，无新增用户决定才能继续本地的阻塞。
