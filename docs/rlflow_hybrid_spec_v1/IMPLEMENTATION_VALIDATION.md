@@ -1,5 +1,9 @@
 # 系统实施验收记录
 
+Checkpoint81 AUDIT：真实原生 start 拒绝及版本/公开目录检查通过；尚无产品 Reviewer 交付或新测试资格。依赖审计和 High 五项执行前 MUST 见 evidence/checkpoint-81-reviewer-readiness.txt，订阅费用、软限额、原生 owner/BOUND 来源、独立结果与 STOP 门均不得跳过。原80代码/用例未变，不重测。
+
+下一82验收行为：安装态显式诊断 consumer→新合法 protected diagnostic owner/原共享 Pool+task/reservation/HANDOFF_UNKNOWN→credential-free loopback 挂起/拒绝的真实 CLI→显式 STOP→原 producer/FD/reap 收尾或 UNKNOWN 保额→认证 Dashboard/console 原源读回。正常模型 RUN 仍拒；实际调用需新 owner 合法接 BOUND 后才允许，不借 legacy/fixture capability 绕过。既有 rejecting census不能重复冒充新增交付；必须证明在途取消、写失败/丢Popen返回保额和消费者闭环。该验收不是 native付费用量/独立Review/T13完成。产品 Reviewer 的新会话权限另待具体账户和软额度决定，原 M0–M5保持 active。
+
 Checkpoint80 FINAL：原 Goal 预算与共享池可信只读消费已接入 Dashboard。原事件/索引/派生 head/REGISTER 来源核验，七维 int64 十进制余额由 BigInt 精确校验；两个来源独立 as-of，不冒称当前进程、跨库原子快照或实际费用。所有历史池成员权限完整覆盖才显示全池占用与版本，否则两者均 null；坏源/迟到响应清空当前数值并显示 UNKNOWN，不退款。实际 CPU/工程执行消费、正常释放及 UNKNOWN STOP 保留占槽/曝露已由原浏览器链验证。后台三项 distinctcase 分轮通过、Node 六项通过、新 Chrome 两项及必要旧 Dashboard 一项通过；失败均先定位测试生命周期/来源假设，未重复已过执行链。High 差量隐私 MUST 已关闭。证据见 evidence/checkpoint-80-tests.txt；发行差量与最终输入核对随归档记录，不声明新全库或安装态执行。
 
 下一81按 T13 依赖核验真实独立产品 Reviewer 的只读隔离、可中断执行与可信用量来源，并提出具体有界验收合同；现有 fixture 模型/GPU 额度为零，不调用模型、不改既有批准。产品 Review/ConditionEvidence、native、strictOS、provider invoice、B1、长期及完整 M0–M5 仍未验收，Goal ACTIVE；代码 High 审查不替代产品 Review。无当前80代码阻塞；需要新的实际模型验收时必须先获具体权限/额度批准。USER package-lock.json 保持不改不暂存。下方保留历史。

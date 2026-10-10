@@ -1,5 +1,7 @@
 # 需求包离线校验报告
 
+Checkpoint81 AUDIT：9a7ad0本地 CLI实际版本0.161.0；8dd0a1有限公开目录元数据确认 gpt-6.1-sol/medium声明，不等于访问资格；fea5b4实际调用两个无条件拒绝 start 方法均 PermissionError，exit0、构造owner0/worker0/model0/Coremutationfalse。只读源审计及九来源SHA见 evidence/checkpoint-81-reviewer-readiness.txt。无新 pytest/Node/浏览器/worker 运行；80证据复用，不重新打包未变代码。T13/A05/A06/A23/native usage/interrupt仍NOT_PROVEN，代码独立审查不算产品Review。
+
 Checkpoint80 FINAL：原 Goal 预算与共享池可信只读消费已接入 Dashboard。原事件/索引/派生 head/REGISTER 来源核验，七维 int64 十进制余额由 BigInt 精确校验；两个来源独立 as-of，不冒称当前进程、跨库原子快照或实际费用。所有历史池成员权限完整覆盖才显示全池占用与版本，否则两者均 null；坏源/迟到响应清空当前数值并显示 UNKNOWN，不退款。实际 CPU/工程执行消费、正常释放及 UNKNOWN STOP 保留占槽/曝露已由原浏览器链验证。后台三项 distinctcase 分轮通过、Node 六项通过、新 Chrome 两项及必要旧 Dashboard 一项通过；失败均先定位测试生命周期/来源假设，未重复已过执行链。High 差量隐私 MUST 已关闭。证据见 evidence/checkpoint-80-tests.txt；发行差量与最终输入核对随归档记录，不声明新全库或安装态执行。
 
 下一81按 T13 依赖核验真实独立产品 Reviewer 的只读隔离、可中断执行与可信用量来源，并提出具体有界验收合同；现有 fixture 模型/GPU 额度为零，不调用模型、不改既有批准。产品 Review/ConditionEvidence、native、strictOS、provider invoice、B1、长期及完整 M0–M5 仍未验收，Goal ACTIVE；代码 High 审查不替代产品 Review。无当前80代码阻塞；需要新的实际模型验收时必须先获具体权限/额度批准。USER package-lock.json 保持不改不暂存。下方保留历史。

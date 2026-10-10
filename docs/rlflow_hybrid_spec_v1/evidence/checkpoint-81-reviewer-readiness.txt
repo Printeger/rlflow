@@ -1,0 +1,166 @@
+Checkpoint81 native independent Reviewer readiness audit (NOT runtime delivery)
+2026-10-10; base 7e7dc7461fa4f8ab1c600f2c432f132e3cd20fcf.
+Previous goal turn80 = PROGRESS: actual code/evidence/package checks/commit.
+This audit preserves original full M0-M5/T00-T25/A01-A36 and authority.
+No live original81 test handle, no prior execution test restarted.
+No feature completed, T13/A05/A06/A23 remain incomplete.
+
+ACTUAL NEW READ-ONLY OBSERVATIONS
+af7c4a git current HEAD80; only USER untracked package-lock.json.
+9a7ad0 actual /usr/local/bin/codex --version: codex-cli0.161.0 matches
+rlflow.isolation.PINNED_VERSION; exit0 final version command.
+8dd0a1 exit0 bounded public models_cache.json metadata only:
+gpt-6.1-sol present, efforts low/medium/high/xhigh/max/ultra declared.
+Catalog is not account/model access or billing proof. No auth file read/output.
+fea5b4 exit0 actual two start method calls with no constructed owner:
+CodexExecAdapter.start -> PermissionError "Hybrid source, controller/writer
+lease, budget and STOP release gates unavailable";
+WorkingPlanService.start -> PermissionError "Working plan/runtime execution
+gates not implemented". Both currently unconditional deny before any IO.
+constructed owners0/launchedworkers0/modelcalls0/Coremutationfalse.
+No new pytest/Node/Chrome/worker test executed; unchanged80 evidence reused.
+
+DEPENDENCY AUDIT / EVIDENCE CHANGES NEXT ACTION
+T13 depends T10/T11, readonly execution independence uses T12; credible native
+usage/UNKNOWN requires T14; in-flight physical STOP relies on T17/T21 capability.
+WorkingPlan READY/material renderer is nonexecuting, NOT a native permit.
+BOUND raw legacy children denied by check_cold_entry; cannot call legacy
+codex_command/cpu_exec or reuse LEGACY_UNBOUND as a Hybrid execution bypass.
+FixtureRuntimeOwner.register accepts only closed fixed protocol/CPU/engineering
+scenarios and original fixture grants; no arbitrary native command branch.
+FixtureUsageSourceOwner launches synthetic fixed protocol producer only;
+Accumulator parses counters/positions but itself does not prove native origin.
+Existing isolated_finite_example explicitly model sessions/input/output=0;
+must never edit/renew that original approval to run real Reviewer.
+HostPool register/claim plus fixture CPU/Engineering STOP prove finite cooperating
+scopes, not native harness/MCP descendants or strict cgroup empty.
+DeliveryEvidenceReader binds actual original source/current contract but every
+condition UNASSESSED and Review NOT_PERFORMED; cannot accept caller PASS or
+independent-looking session IDs as actual independent Review.
+Therefore new budget approval ALONE does not make current product runnable.
+The next real implementation must issue native producer/source authority and
+preserve existing deny gates until original proof and physical STOP qualify.
+
+OFFICIAL SOURCE (OpenAI Docs skill; fetched, not search snippet)
+https://learn.chatgpt.com/docs/non-interactive-mode
+Official page confirms JSONL events and structured last-message output, optional
+ephemeral sessions and required MCP initialization failure behavior. Its example
+turn.completed has usage but no stable event_id. Actual native owner must derive
+lineage from its original thread/turn/source position, never invent backend IDs;
+verify actual per-turn/cumulative semantics for pinned CLI before settlement.
+Documentation is not actual account/readonly/interrupt/hard-cost qualification.
+Broad official CLI defaults do not override this product's BOUND safety gates.
+No new API credentials, paid request, GPU, production state or global install.
+
+PROPOSED NEXT ACCEPTANCE, NOT APPROVAL / NO RUN UNTIL GATES
+One newly isolated engineering output candidate and original raw test facts first;
+do NOT claim CPU independent Review or original entire Goal complete from it.
+Use exact original source/candidate/contract/rule hashes, fixed snapshot with
+no implementer chat inherited as sole evidence; read raw evidence before summaries.
+Historical80 output may be reference input only after original source proof,
+never current execution approval or budget. New human scope approval and native
+reservation separated from original zero-model fixture; original budget continuous.
+At most2 NEW independent gpt-6.1-sol medium sessions, SERIAL:
+1 normal real readonly Reviewer -> structured independent conclusion with exact
+condition/source/candidate binding, original producer usage and collect;
+2 actual in-flight native STOP -> block new release/tools, bounded interrupt,
+then original physical terminal/complete scope evidence or honest UNKNOWN.
+Do not add Critic/Architect or auto retry/resume/model substitution/delegation.
+Within-session provider retries/multiple turns are NOT the same as session count;
+must explicitly constrain retry configuration and truthfully expose unknown
+provider request count rather than promise2 total network/model requests.
+Initial proposed Reviewer has one input turn per session and no model-driven
+tool calls: complete tiny engineering candidate/raw evidence must fit fixed
+packet, otherwise reject this acceptance input, not silently expand context.
+Transport request/stream retries proposed0. Exact request-count enforcement
+must qualify independently; the2-session gate alone does not prove it. Local
+process STOP does not prove remote provider compute/billing has ceased.
+Proposed session deadline180s each, total360s model-active envelope, fixed tool
+command deadline5s; startup/cleanup separate bounded deadlines reported.
+Proposed text packet <=16KiB, stdout/stderr separately <=1MiB where enforcement
+exists, model sessions hard count2 only after native start accounting qualifies.
+Proposed total input64,000/output16,000 tokens are SOFT observable thresholds,
+not provider-enforced hard caps. Exceeding/absent usage blocks subsequent starts;
+missing usage retains original reservation/unknown exposure, never zero.
+Actual subscription billing UNKNOWN. Subscription auth alone does not prove
+free use or disabled paid credits/overage. No API key/provider/model/account
+fallback, top-up or paid credits without explicit separate authorization.
+If operator requires a hard token or hard-zero-charge guarantee, this adapter
+is not qualified; refuse strict configuration, do not silently call anyway.
+Agent tools must not write candidate/evidence/control or read protected control;
+private scratch is explicitly writable, and trusted harness output writes are
+separate. Existing native policy uses workspace-write for scratch, NOT a globally
+readonly harness. No tool network/GPU/nested agent or uncontrolled native tools.
+Command execution deadline5s differs from existing MCP transport timeout15s
+(command_seconds+10); both must be bounded and reported separately, not called5s
+total transport. Existing RLIMIT is partial, not strict cgroup,
+host-wide process count or arbitrary-tree STOP; proposed bounded memory profile
+must describe actual enforceable scope, not call it a whole-harness2GiB cap.
+
+NECESSARY BEFORE THE FIRST MODEL REQUEST
+New protected human principal/source-confirmed contract and exact account/billing
+decision; original controller + Pool membership/claim + Task/Attempt/Lease and
+reservation proof; original candidate FD/hash/readonly tools/command scope,
+physical identity registration before release and durable HANDOFF_UNKNOWN before
+Popen/stdin/provider side effect; end-of-proof Auth/UTC/monotonic checks.
+Actual native source owner only accepts original producer stdout descriptor,
+profile/model/epoch/generation/semantics/thread/turn/source identity, finite reads,
+stable position/digest, missing/truncated/forged replay remains UNKNOWN.
+Collect result and condition fact only from original issued independent receipt,
+not model output alone. Revoke/STOP/late result cannot complete newer attempt.
+Physical STOP scope must include CLI/MCP/tool participants or explicitly remain
+UNKNOWN; no FREE/refund based solely on leader exit, stderr, EOF, PID disappearance.
+Transport/backend errors consume original request/session exposure; no remint.
+These gates require implementation plus affected deterministic qualification;
+this audit/approval is not evidence that they currently exist or have passed.
+
+INPUTS INSPECTED (sha256)
+3eda34570cf92ab1f74df7d2fac2f6628db92ba759da6e5efaf0bbed7d02bd9b  rlflow/isolation.py
+5706b9ab3c968fae36ccb0b4e1cee379861d765c877f7738af2d4b95e388d81f  rlflow/hybrid_runtime_boundary.py
+7b2fdaf8a731365f7155330320f6de1bba0a451be8200453692c2fa29fa175a1  rlflow/execution_adapter.py
+c3fecea2bb6ffc48a3a08ea8a8c20001f28c570016595433026d3009af1453a0  rlflow/hybrid_working_plan_service.py
+896cb41b87e51c45990c287928418e6cc22582d21b3480266cb08f54f8ea5b80  rlflow/hybrid_usage_source.py
+a88710dc289ca9c0eb4b6626d578d72f1f9555251659da87d448ff5d4f69b962  rlflow/hybrid_usage_stream.py
+c60e5e1521474aca9633bdb56d49835e56fa40d0bfe2a5681a00a258a3e8d0b3  rlflow/hybrid_delivery_evidence.py
+f58c3ce56c2e7e667c10c1baf054853d0d8b7d9e54fdb24fc8797d222d68bbbc  rlflow/hybrid_host_pool.py
+9d99fc80080537dd195122e4d3d1db02c7fb58ffabf4eb8c6feb910616a46a61  rlflow/isolated_finite_example.py
+USER package-lock SHA becc7e2a36dfcad4ffe934b5ff2f0f68187611d6c0641bd63d81367651cfbf09 unchanged/untracked/unstaged.
+
+INDEPENDENT HIGH READ-ONLY AUDIT
+Existing authorized finite_app_review_63, no tests/code edits/product model calls.
+Five execution-before MUSTs: selected account/billing, new legitimate BOUND native
+owner, exact soft/count/retry/deadline/remote billing semantics, scratch vs immutable
+inputs/control plus command vs MCP timeout, native source before settlement/review.
+Audit text revised to preserve all five; this is no execution approval or claim
+that implementation MUSTs are already met. Official pricing/auth fetched by main:
+https://learn.chatgpt.com/docs/pricing
+https://learn.chatgpt.com/docs/auth
+Independent review confirms subscription included quota/credits vs API billing
+must not be inferred from local model catalog, authentication or subscription label.
+
+SAFE NEXT82 BEHAVIOR AND ACCEPTANCE (PLANNED, NOT IMPLEMENTED)
+Explicit installed SDK/CLI diagnostic -> newly issued protected diagnostic owner
+and original shared Pool/task/reservation/HANDOFF_UNKNOWN -> actual CLI with
+credential-free loopback rejecting/held receiver -> original stdout inode and
+PID/pidfd -> explicit STOP -> reap/FD close/complete known terminal or UNKNOWN
+retention -> authenticated Dashboard or installed console original source readback.
+Normal model/Reviewer RUN remains denied. Existing local tool_census is already
+subprocess.run+rejecting stub; repeating it or merely adding async helper is NOT
+this delivery. New value must be real in-flight cancellation, write/lost-Popen
+failure retained exposure, original complete producer source and consumer result.
+No fake business success/tokens/independent Review. Missing legitimate new BOUND
+diagnostic owner means no actual CLI launch in that namespace until implemented.
+Local diagnostic model/catalog/receiver are test-only and not external model
+availability, actual token settlement, billing or T13 evidence. No second Goal
+supervisor, production mutation or previous handle/test restart.
+
+FINAL / PENDING AUTHORITY
+Main asked a concrete nonblocking authority question: at most2 serial original
+gpt-6.1-sol medium new sessions,180s each,soft64k input/16k output,one input turn,
+model tool calls0/transport retry0, included-only selected account/workspace;
+no API/credits/overage/fallback and failclosed if billing boundary unverified.
+No reply is consent; approval cannot substitute implementation qualification.
+No secrets requested. Zero-model local diagnostic implementation can proceed.
+c444a4 final quiet388 runtime input check from80 unchanged; doc diff check exit0;
+USER lock hash unchanged. No new wheel needed for docs-only audit, no repeated
+passed test or paid model execution. Goal ACTIVE;81 audit NOT T13/runtime delivery.

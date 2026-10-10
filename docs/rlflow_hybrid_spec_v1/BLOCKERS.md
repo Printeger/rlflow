@@ -1,5 +1,7 @@
 # 阻塞与证据缺口
 
+Checkpoint81：真实 Reviewer 存在权限与实现两类独立缺口。权限：未批准任何新模型会话/账户/软 token/费用路径，现有 fixture额度零；订阅也不自动证明无付费 credits。实现：原 native start 拒绝、fixture UsageOwner 非 native来源、固定 STOP 非完整 CLI/MCP/tool 范围。增加预算不关闭后者；实现可在项目内推进，不能用准备组件或本审计宣称验收。具体待决定为最多2个 gpt-6.1-sol medium会话、每180秒、总input64k/output16k软阈值，且选定 included-only账户（不能确认则不启动）或另行明确允许付费及软上限。当前未调用，完整 Goal active，strictOS/invoice/B1/长期等原缺口未缩减。
+
 Checkpoint80 FINAL：原 Goal 预算与共享池可信只读消费已接入 Dashboard。原事件/索引/派生 head/REGISTER 来源核验，七维 int64 十进制余额由 BigInt 精确校验；两个来源独立 as-of，不冒称当前进程、跨库原子快照或实际费用。所有历史池成员权限完整覆盖才显示全池占用与版本，否则两者均 null；坏源/迟到响应清空当前数值并显示 UNKNOWN，不退款。实际 CPU/工程执行消费、正常释放及 UNKNOWN STOP 保留占槽/曝露已由原浏览器链验证。后台三项 distinctcase 分轮通过、Node 六项通过、新 Chrome 两项及必要旧 Dashboard 一项通过；失败均先定位测试生命周期/来源假设，未重复已过执行链。High 差量隐私 MUST 已关闭。证据见 evidence/checkpoint-80-tests.txt；发行差量与最终输入核对随归档记录，不声明新全库或安装态执行。
 
 下一81按 T13 依赖核验真实独立产品 Reviewer 的只读隔离、可中断执行与可信用量来源，并提出具体有界验收合同；现有 fixture 模型/GPU 额度为零，不调用模型、不改既有批准。产品 Review/ConditionEvidence、native、strictOS、provider invoice、B1、长期及完整 M0–M5 仍未验收，Goal ACTIVE；代码 High 审查不替代产品 Review。无当前80代码阻塞；需要新的实际模型验收时必须先获具体权限/额度批准。USER package-lock.json 保持不改不暂存。下方保留历史。
