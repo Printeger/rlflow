@@ -114,6 +114,103 @@ class LocalCpuRunnerOwner(FixtureRuntimeOwner):
             raise Conflict('original Reviewer input changed')
         return json.loads(row[2])
 
+    def handoff_workflow_reviewer(self,lease,cap,*,token):
+        """Close original CPU responsibility, install ONE same-Budget model owner.
+
+        Not a Reviewer grant/role-plan/session: original admission still applies.
+        All close requests/normal retirement receipts remain strongly retained.
+        """
+        from .hybrid_native_model_runtime import NativeModelOwner
+        from .hybrid_fixture_runtime import _registry,_owners
+        from .hybrid_workspace import fact_key,head as workspace_head
+        from .hybrid_goals import digest
+        from .jobs import identity
+        from .store import sha
+        if type(self) is not LocalCpuRunnerOwner or os.getpid()!=self.process['pid'] or identity(os.getpid())!=self.process:
+            raise PermissionError('original creator CPU owner required')
+        self.pool._actual();self.controller._issued(token)
+        root=self._review_handoff_roots.get(id(cap))
+        if (root is not None and root[6] is not self or root is None and _owners.get(id(self)) is not self):
+            raise PermissionError('original registered CPU handoff owner required')
+        with self._workflow_cpu_admission_lock,self.pool._lock,_registry:
+            row=self._review_handoffs.get(id(cap))
+            if row is not None:
+                root=self._review_handoff_roots.get(id(cap))
+                if (root is None or root[0] is not row or root[1] is not lease or root[2] is not cap or
+                        root[3:6]!=(row['raw'],row['material'],row['parent']) or cap.raw!=row['raw']):
+                    raise PermissionError('original frozen CPU Reviewer handoff required')
+                if row['child'] is not None:
+                    child=row['child']
+                    if (type(child) is not NativeModelOwner or child.pool is not self.pool or
+                            child.plans is not self.plans or child.membership is not self.membership or
+                            child.budget is not self.budget or child._review_parent_handoff is not row or
+                            child._review_parent_owner!=(self,cap) or
+                            child._review_parent_raw!=(root[4],root[5]) or self._live or self.sources._live):
+                        raise PermissionError('original same-Budget Reviewer child required')
+                    child._actual();return child
+                if row['retired']:
+                    return NativeModelOwner(self.pool,self.membership,self.plans,_review_handoff=(self,cap))
+            material=self._issued_workflow_reviewer_input(lease,cap)
+            self.controller.check_token(token)
+            for attempt in self._attempts.values():
+                parent=attempt['entries'].get('FIXTURE_SCOPE_STOPPED')
+                if parent is None or parent['decision']!='SETTLED':
+                    raise Conflict('all original CPU attempts must settle before Reviewer handoff')
+                self._check_terminal(attempt);self._verify_pool_link(attempt,'FIXTURE_FREE',parent)
+                with self.pool._transaction() as db:
+                    free=self.pool._point(db,'fixture_free_'+sha([attempt['claim_value']['key'],attempt['lease'].id]))
+                    if free is None or free['payload']['project_fact_hash']!=digest(parent):
+                        raise Conflict('all original CPU attempts require committed FREE')
+            self._safety_freeze=True
+            if row is None:
+                row={'raw':cap.raw,'material':canonical(material),
+                    'parent':canonical(self._issued(lease)['entries']['FIXTURE_SCOPE_STOPPED']),
+                    'retired':False,'child':None,'closes':{}}
+                self._review_handoffs[id(cap)]=row
+                root=(row,lease,cap,row['raw'],row['material'],row['parent'],self)
+                self._review_handoff_roots[id(cap)]=root
+            elif row['material']!=canonical(material):raise Conflict('original Reviewer material changed')
+            observations={id(a['observation']):a['observation'] for a in self._attempts.values()}
+            for observation in observations.values():
+                value=json.loads(observation.raw)
+                attempt=next(a for a in self._attempts.values() if a['observation'] is observation)
+                origin=attempt['ready']['source_context']['workspace_head']
+                progress=row['closes'].get(id(observation))
+                if progress is None:
+                    self.workspace._issued(observation)
+                    request={k:origin[k] for k in ('project_id','data_mode','goal_ref','workspace_id','reservation_id')}
+                    request['store_epoch']=self.workspace.store_epoch
+                    with self.store.read_connection() as db:
+                        db.execute('BEGIN');read=ReadBudget(db,PREPARATION_READ_BYTES)
+                        head=self.workspace._current(db,request,read,self.workspace._metadata(db))
+                    if head['state']!='HELD_PRE_RUNTIME':raise Conflict('original unclosed CPU Workspace required')
+                    request.update(operation='request_close',idempotency_key='review_close_'+value['workspace_id'],
+                        expected_state_version=self.store.version(),expected_workspace_revision=head['revision'])
+                    progress={'observation':observation,'request':request,'request_predecessor':canonical(head),
+                        'complete':None,'receipt':None}
+                    row['closes'][id(observation)]=progress
+                if progress['observation'] is not observation:raise PermissionError('original CPU close observation required')
+                receipt=NativeModelOwner._handoff_close_record(self,progress,'request',token)
+                if progress['complete'] is None:
+                    self.workspace.close_physical_pre_runtime(fact_key(receipt['request']),observation)
+                    progress['complete']={**progress['request'],'operation':'complete_close',
+                        'idempotency_key':'review_closed_'+value['workspace_id'],
+                        'expected_state_version':self.store.version(),
+                        'expected_workspace_revision':progress['request']['expected_workspace_revision']+1}
+                    progress['complete_predecessor']=canonical(workspace_head(receipt))
+                progress['receipt']=canonical(NativeModelOwner._handoff_close_record(self,progress,'complete',token))
+            try:self.shutdown()
+            finally:
+                if (not self._live and not self.sources._live and id(self) not in _owners and
+                        row['closes'] and all(p['receipt'] is not None for p in row['closes'].values())):
+                    closed=canonical({json.loads(p['observation'].raw)['workspace_id']:digest(json.loads(p['receipt']))
+                        for p in row['closes'].values()})
+                    self._review_retirements[id(cap)]=(root,self.sources,closed)
+                    row['retired']=True
+            if self._live or self.sources._live or id(self) in _owners:
+                raise Conflict('original CPU owner retirement incomplete')
+            return NativeModelOwner(self.pool,self.membership,self.plans,_review_handoff=(self,cap))
+
     def execute_workflow_cpu(self,token):
         """Derive and execute the single original A candidate CPU stage.
 

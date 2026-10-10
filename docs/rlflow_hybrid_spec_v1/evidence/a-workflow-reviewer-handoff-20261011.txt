@@ -1,0 +1,55 @@
+A CPU -> Reviewer same-Budget owner handoff, 2026-10-11
+Base 539f837; candidate is containing commit.
+Actual same-Budget transfer, not just parser/metadata. All original CPU
+SETTLED/FREE/FD and current token -> original Workspace closes -> normal
+CPU/source retirement -> atomic ONE NativeModelOwner child installation.
+No clear Budget pointer, new Budget, old plan/claim reuse or generating grant.
+Locks admission -> Pool -> registry; original immutable root/retirement/source/
+complete-close digests required. Safety bool alone cannot install.
+Uses unchanged original NativeModelOwner._handoff_close_record helper for
+exact original receipt and proven no-COMMIT same-predecessor CAS semantics.
+Explicit synthetic Engineer Source hooks; native G intercepted, actual CPU
+only. No credentials/account/model/API billing/GPU/B/C/instinctRL operation.
+
+All pytest use PYTHONPATH=. PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q
+25346 / 7b242b: tests/test_hybrid_a_workflow_review.py
+exit0: 1 passed / 1 existing warning / 111.45s.
+Original actual CPU PASS/STOP/SETTLED/Pool0 -> Reviewer cap -> copied cap direct
+constructor denied -> new NativeOwner installed then simulated lost return ->
+same original child recovered, original CPU/source retired, same Budget pointer.
+Copy CPU denied, same child repeated no version change, old FIRST_ENGINEER
+cannot reset, no native attempts/grants/execution, recover==audit==replay.
+
+74415 / e9b1fa:
+tests/test_hybrid_native_model_runtime.py::test_original_generating_grant_registers_frozen_source_but_cannot_launch
+exit0: 1 passed / 12.28s. Necessary old Native constructor/grant deny regression.
+Previous CPU installation success not repeated after terminal; new direct
+receipt/safety responsibility cases only:
+3727: tests/test_hybrid_a_workflow_review.py -k responsibility
+51f0c0 exit0: 3 passed / 1 deselected / 1 existing warning / 255.65s.
+workspace_close: original complete_close COMMIT succeeds, simulated lost
+return resumes exact original receipt and retires CPU to same-Budget child.
+normal_shutdown: original CPU/source shutdown completes then return lost;
+finally retains original normal-retirement tuple, next call installs one child.
+safety_only: complete_close fails BEFORE COMMIT, original shutdown_safety
+physically retires CPU/source; mutable retired=True still cannot install native
+child, original Budget pointer unchanged, original retirement tuple absent.
+No new native attempt/G/grant, duplicate child return no Store/Pool changes,
+all original Store snapshot/recover==audit==replay. Tests naturally terminal,
+no restart/repeat of already-passed install success; only new direct risks.
+
+Final compileall/diff checks exit0. USER package-lock preserved/unstaged SHA
+becc7e2a36dfcad4ffe934b5ff2f0f68187611d6c0641bd63d81367651cfbf09.
+
+Independent finite_app_review_63 read-only narrow source review: no confirmed
+MUST; copy/fork/root pre-lock identity, admission->Pool->registry, all CPU
+terminal/FREE/FD+current token, original normal-retirement tuple vs Safety bool,
+atomic child installation and original FIRST_ENGINEER uniqueness retained.
+Development review is not product autonomous Reviewer acceptance.
+
+Still missing: original Evaluator role-plan and executed candidate material
+binding, same-A high registration/replay/quota and original fresh session,
+authentic Review/usage, machine+Review condition CAS, unmet-demand continuation.
+Real nonpreset task NOT_EXECUTED, full Goal ACTIVE. Small A actual model calls
+await existing approval only; local implementation not permission-blocked.
+GPU/B/C/instinctRL HOLD unchanged. No full-suite/installation/longrun claim.

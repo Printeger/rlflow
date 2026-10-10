@@ -1,5 +1,7 @@
 # 开发决策记录
 
+2026-10-11 CPU→Reviewer不临时清Budget指针/另建零账本，也不复用settled Engineer/CPU计划、claim或lease。新增受保护反向交接：exact CPU/原review cap、全部CPU原SETTLED/FREE/FD、current token，原Workspace全部关闭后正常shutdown与source实际退休；强留root+原正常退休tuple/source/complete-close digest，constructor独立重核再原子写Budget pointer/_owners/child。Safety或可变retired bool不能晋升，lost安装返回只取原child。admission→Pool→registry保持CPU准备和STOP同锁序；共享既有exact关闭/CAS helper不复制改其语义。此Owner尚无新Reviewer grant/角色plan/high预算，不把构造器能力误作模型来源、条件或自主任务验收。
+
 2026-10-11 Reviewer未知candidate输入必须来自原执行CPU的完整STOP/SETTLED/FREE终态及原Engineer持久结果，不能用caller JSON/开发期High/同hash发grant。纯from_cpu只重放DATA，原Owner核wholeevent/全部history/currentApproval/pins/FD/Pool后封存lease/cap/raw；重复消费全重证。跨新reservation的policy_source snapshot source_version必然推进，沿现有Budget guard只排除source_version/evaluated_at，其他所有字段（含批准/作用域/epoch/expiry）一致，不能把快照序号误作合同批准身份。当前材料不是新Owner/high grant或条件，后续仍须不同角色plan/原新会话和同账本配额，不借FIRST_ENGINEER旧计划升级。
 
 2026-10-11 自动CPU桥复用原受保护服务，不重新生成批准、不收caller候选/checks；唯一CPU stage、原window/累计余量前移reserve前，最终REGISTER原CAS仍在。异常latch而非泛化恢复；已完成重复读用强tuple(sequence/lease/canonical结果)，不走可变缓存快路。独立审查确认STOP必须封闭准备，不仅禁止spawn：每一原准备步骤使用短admission→原组件/Pool锁序，段内exact-live/永久freeze及句柄强留；shutdown/safety先freeze再等当前准备段，不能等整个sequence/RUN。此锁仅覆盖新增桥，不替代原Controller/source最终效果门；暂不增加长期恢复。
