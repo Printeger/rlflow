@@ -1,5 +1,8 @@
 # 实施计划与依赖
 
+Checkpoint73 FINAL：原完整 project.example.yaml 静态配置→目标cwd可信原注册 schema/catalog discovery→显式Goal1.1建议→人类原DRAFT→ADOPTED已交付，目录只读无Core/预算/执行权限。最终受影响四module67pass/1新增fixture认证method误用，修测试后该单项1pass；这是合成68case证据，不称一次全绿或新全库。实际独立读池取消waiter保留容量/第三429/两原scopeSTOP及Pool0通过；High raw绑定和schema缓存两MUST已关闭。最终wheel e16140b6…01ff28实际安装console/source外导入/完整配置describe→submit→humanDRAFT→report/packagedskill通过；Core1，worker/model/approval0。333最终输入hash归档，compile/pip/diff/skill检查通过，无live测试，USERlock未改未stage。详HYBRID_CONTRACT_DISCOVERY.md/evidence/checkpoint-73-tests.txt；完整Goal仍active，A01/全GoalSTOP/native产品Reviewer/strictOS/invoice/B1/T22/T23/长期M5未关闭。下一74补目标cwd原有限执行能力/拒绝原因报告的可信来源闭环，不新增运行权限。无新增用户决定阻塞；原Reviewer预算和OS委派缺口保留。下方记录为历史。
+
+
 Checkpoint39 最终验证全部实际终态：root/High同十二modules各408pass（230.29s/228.66s），中央full原98257 exit0 **1671pass/32既有外部H1skip/1既有warning633.86s**；24SHA一致、范围MUST关闭、compileall/pipcheck/diff0，无live测试。见HYBRID_WORKSPACE_RENEWAL.md/evidence/checkpoint-39-final-tests.txt；下方candidate/LIVE是历史阶段。实际事务性renew、原pending未知COMMIT ACK/显式abort已实现，全部runtime授权仍关闭。无新browser/NFR06/B1/24h/8h/离线18checks证明，不关闭完整runtime/legacy/STOP/T12/M1/M0–M5。下一40先做可信安装边界的legacy hard-deny与真实working-copy非执行计划，Goal active，USERpackage-lock保留。
 
 Checkpoint38 最终终态：root/High同九modules各358pass（195.50s/195.74s），中央full原95667实际exit0，1621pass/32既有外部H1skip/1既有warning589.10s；21SHA一致、范围MUST关闭、compileall/pipcheck/diff0，无live测试。见HYBRID_WORKSPACE_HOLD.md/evidence/checkpoint-38-final-tests.txt；下方candidate/LIVE是历史阶段。服务renew仍拒绝，下一39仅设计见HYBRID_WORKSPACE_RENEWAL.md。无新browser/NFR06/B1/24h/8h/离线18checks证明，不关闭完整runtime/legacy/STOP/T12/M1/M0–M5，Goal active。

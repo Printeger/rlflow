@@ -38,8 +38,8 @@ def read_regular(path, limit):
         raise ClientError('regular input unavailable') from exc
 
 
-def closed_json(raw):
-    if len(raw) > MAX_BYTES:
+def closed_json(raw,limit=MAX_BYTES):
+    if len(raw) > limit:
         raise ClientError('bounded JSON required')
     def pairs(items):
         value = {}
@@ -69,27 +69,13 @@ class AgentClient:
         if path.is_symlink() or path.parent.is_symlink():
             raise ClientError('project configuration cannot be a symlink')
         try:
-            raw = read_regular(path, 8192)
-            # Use YAML for the established filename, but reject aliases and
-            # duplicate top-level keys before interpreting any endpoint.
-            nodes = list(yaml.parse(raw))
-            if any(isinstance(node, yaml.events.AliasEvent) or getattr(node, 'anchor', None) is not None for node in nodes):
-                raise ClientError('configuration aliases refused')
-            data = yaml.safe_load(raw)
-            root = yaml.compose(raw)
-            if (not isinstance(root, yaml.nodes.MappingNode)
-                    or len(root.value) != len(data)
-                    or any(not isinstance(k, yaml.nodes.ScalarNode) for k, _ in root.value)):
-                raise ClientError('closed project configuration required')
-        except (OSError, yaml.YAMLError, TypeError, RecursionError) as exc:
+            from .client_project_config import parse
+            project_id,config_origin,config_mode=parse(read_regular(path,MAX_BYTES),cwd)
+        except (OSError, ValueError, yaml.YAMLError, TypeError, RecursionError) as exc:
             raise ClientError('project configuration unavailable or invalid') from exc
-        if (type(data) is not dict or set(data) != {'schema_version', 'project_id', 'control_origin'}
-                or data['schema_version'] != '1.0' or not isinstance(data['project_id'], str)
-                or ID.fullmatch(data['project_id']) is None):
-            raise ClientError('explicit client project registration required')
         origin = environ.get('RLFLOW_CONTROL_ORIGIN')
         token = environ.get('RLFLOW_REQUEST_TOKEN')
-        if (not isinstance(origin, str) or origin != data['control_origin']
+        if (not isinstance(origin, str) or origin != config_origin
                 or not isinstance(token, str) or not token.isascii() or not 20 <= len(token) <= 128
                 or not re.fullmatch(r'[A-Za-z0-9_-]+', token)):
             raise ClientError('trusted matching origin and request-only token required')
@@ -103,10 +89,11 @@ class AgentClient:
                 or port is None or not 1 <= port <= 65535 or parsed.netloc != f'{host}:{port}'
                 or parsed.path or parsed.query or parsed.fragment or parsed.username):
             raise ClientError('canonical loopback origin required; remote transport not enabled')
-        self.project_id, self.origin, self._token = data['project_id'], origin, token
+        self.project_id, self.origin, self._token = project_id, origin, token
+        self.data_mode = config_mode
         self._opener = build_opener(ProxyHandler({}), _NoRedirect())
 
-    def _call(self, suffix, *, payload=None, key=None):
+    def _call(self, suffix, *, payload=None, key=None, contract=False):
         headers = {'Authorization': 'Bearer ' + self._token, 'Origin': self.origin, 'Accept': 'application/json'}
         raw = None
         if payload is not None:
@@ -117,17 +104,25 @@ class AgentClient:
             if len(raw) > MAX_BYTES:
                 raise ClientError('proposal request exceeds bounds')
             headers.update({'Content-Type': 'application/json', 'Idempotency-Key': key})
-        url = f'{self.origin}/api/v1/projects/{self.project_id}/agent-requests{suffix}'
+        endpoint='proposal-contract' if contract else 'agent-requests'+suffix
+        url = f'{self.origin}/api/v1/projects/{self.project_id}/{endpoint}'
+        limit=512*1024 if contract else MAX_BYTES
         try:
             with self._opener.open(Request(url, data=raw, headers=headers), timeout=5) as response:
                 if response.headers.get_content_type() != 'application/json':
                     raise ClientError('JSON receipt required')
-                value = closed_json(response.read(MAX_BYTES + 1))
+                value = closed_json(response.read(limit + 1),limit)
         except HTTPError as exc:
             # Do not print URLs, response bodies or supplied credentials.
             raise ClientError(f'inbox HTTP {exc.code}; reconcile the same request/key, no automatic retry') from None
         except (URLError, TimeoutError, OSError) as exc:
             raise ClientError('inbox response unknown; reconcile the same request/key, no automatic retry') from None
+        if self.data_mode is not None and (type(value) is not dict or value.get('data_mode')!=self.data_mode):
+            raise ClientError('registered local project mode differs from original service')
+        if contract:
+            from .hybrid_contract_discovery import validate_public
+            try:return validate_public(value,self.project_id,self.data_mode)
+            except ValueError:raise ClientError('closed original proposal contract required') from None
         if type(value) is dict and value.get('action') == 'request_finite_stop':
             from .hybrid_agent_stop_requests import validate_public
             try:return validate_public(value, self.project_id)
@@ -170,6 +165,7 @@ class AgentClient:
         if not isinstance(key, str) or ID.fullmatch(key) is None:
             raise ClientError('explicit original idempotency key required')
         if (type(proposal) is not dict or proposal.get('project_id') != self.project_id
+                or self.data_mode is not None and proposal.get('data_mode') != self.data_mode
                 or type(proposal.get('contract_version')) is not int or proposal['contract_version'] < 1):
             raise ClientError('explicit project-scoped proposal required')
         result = self._call('', payload={'action': 'submit_goal', 'proposal': proposal,
@@ -198,8 +194,13 @@ class AgentClient:
 
     get_report = get_status
 
+    def describe(self):
+        return self._call('',contract=True)
+
     def request_finite_stop(self, stop_scope, *, key):
         from .hybrid_agent_stop_requests import validate_scope
+        if self.data_mode not in (None,'fixture'):
+            raise ClientError('original finite STOP requires fixture project mode')
         if not isinstance(key,str) or ID.fullmatch(key) is None:
             raise ClientError('explicit original finite request key required')
         try:validate_scope(stop_scope)
@@ -219,6 +220,7 @@ class AgentClient:
 def arguments(parser):
     actions = parser.add_subparsers(dest='client_action', required=True)
     actions.add_parser('skill-path', help='print the packaged single rlflow skill location')
+    actions.add_parser('describe',help='read original registered proposal schema/catalog; never authority')
     submit = actions.add_parser('submit-goal')
     submit.add_argument('--proposal', type=Path, required=True)
     submit.add_argument('--key', required=True)
@@ -236,7 +238,9 @@ def main(args):
             print(Path(__file__).parent / 'skills' / 'rlflow' / 'SKILL.md')
             return 0
         client = AgentClient()
-        if args.client_action == 'submit-goal':
+        if args.client_action == 'describe':
+            result=client.describe()
+        elif args.client_action == 'submit-goal':
             value = closed_json(read_regular(args.proposal, MAX_BYTES))
             result = client.submit_goal(value, key=args.key)
         elif args.client_action == 'request-finite-stop':

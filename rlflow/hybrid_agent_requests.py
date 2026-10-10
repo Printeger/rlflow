@@ -381,6 +381,9 @@ def install(app, services, controls, projects, auth, *, origin, max_jobs):
             raise ValueError('request service original control binding mismatch')
         service._pure()
     pool = ControlPool(max_jobs)
+    from .hybrid_contract_discovery import ContractDiscovery
+    discoveries={key:ContractDiscovery(service,controls[key]) for key,service in services.items()}
+    discovery_pool=ControlPool(2)
     stop_prepare_pool = ControlPool(2)
     stop_read_pool = ControlPool(2)
     stop_tasks = set()
@@ -401,6 +404,7 @@ def install(app, services, controls, projects, auth, *, origin, max_jobs):
                 await pool.close()
                 await stop_prepare_pool.close()
                 await stop_read_pool.close()
+                await discovery_pool.close()
     app.router.lifespan_context = lifespan
 
     def scoped(request, project, *, human=False):
@@ -473,6 +477,14 @@ def install(app, services, controls, projects, auth, *, origin, max_jobs):
                 return service.stop_requests.submit(payload['stop_scope'], token=token, key=request.headers['idempotency-key'])
             return service.submit(payload['proposal'], token=token, idempotency_key=request.headers['idempotency-key'], expected_revision=payload['expected_revision'])
         return await response(call)
+
+    @app.get('/api/v1/projects/{project_id}/proposal-contract')
+    async def discovery(request:Request,project_id:str):
+        def call():
+            closed(request)
+            _,token,method=scoped(request,project_id)
+            return discoveries[project_id].read(token=token,method=method)
+        return await response(call,jobs=discovery_pool)
 
     @app.post('/api/v1/projects/{project_id}/agent-requests/{request_id}/forward-stop')
     async def forward_stop(request: Request, project_id: str, request_id: str):

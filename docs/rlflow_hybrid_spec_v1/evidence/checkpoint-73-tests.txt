@@ -1,0 +1,48 @@
+Checkpoint73 evidence; original M0–M5 Goal ACTIVE.
+Baseline: 8493d22845bee6e3da3611c19d3f63c8f4f66a23. No paid model/GPU/global install/production migration.
+This record is a tool-output reconstruction and diagnostic summary, not a byte-exact combined raw pytest log.
+Commands use PYTHONPATH=/home/mint/rl_dev/rlflow_standalone PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest.
+1. -q tests/test_agent_client.py tests/test_hybrid_agent_requests.py
+ original84151 terminal0c0075 exit0: 48 passed, 1 existing warning, 11.70s.
+2. -q -s tests/test_contract_discovery.py
+ original65472 terminal7742cc exit0: 17 passed, 1 existing warning, 2.29s.
+ actual_full_config_discovery_DRAFT {'source': 'original registered contract', 'Core_version': 1, 'discovery_Core_writes': 0, 'workers': 0, 'approvals': 0}
+3. -q -s tests/test_contract_discovery_finite.py
+ R1 original70051 terminal08cfe3 exit1: 1 failed, 1 existing warning, 18.72s.
+ Root cause: disposable test cleanup treated successful dict as HTTP Response (.status_code AttributeError).
+ All preceding retained-slot / third429 / two actual original STOP assertions had passed; not claimed as complete pass.
+ Corrected cleanup to handle original successful dict; no production/timeout/budget change.
+ R2 original27495 terminalb90d71 exit0: 1 passed, 1 existing warning, 18.94s.
+ actual_discovery_STOP_isolation {'cancelled_waiter_capacity_retained': True, 'original_STOP_scopes': 2, 'pool_occupied': 0}
+ Scope: route coroutine waiter cancellation; not browser TCP disconnect, not running arbitrary tree cleanup.
+4. High read-only: actual raw not included in closure comparison; returned schema referenced mutable global cache.
+ Fixes: compare self.raw == captured binding[5] == Registry._raw; deepcopy original schema.
+ Additional local client full mode mismatch rejected before proposal POST/fixture STOP POST.
+5. Final affected regression:
+ -q -s tests/test_contract_discovery.py tests/test_contract_discovery_finite.py tests/test_agent_client.py tests/test_hybrid_agent_requests.py
+ original6965 terminal6a39e7 exit1: 67 passed, 1 failed, 1 existing warning, 33.26s.
+ Same actual discovery STOP isolation output and original DRAFT output observed.
+ Only failure: new SDK test incorrectly supplied method='GET'; original auth expects 'request' or 'session'.
+ Failed before raw/schema assertions; production unchanged. Synthetic fixture token from traceback omitted, no secret evidence copied.
+ Fix only new test's three calls to original method='request'.
+ -q tests/test_contract_discovery.py::test_discovery_raw_rebinding_refused_and_returned_schema_detached
+ terminal26d0be exit0: 1 passed, 1 existing warning, 0.41s.
+ Final evidence is 67-pass + corrected single-pass composition, NOT one 68-pass run nor a new full-repository run.
+ No duplicate successful cases rerun after test-only correction.
+ High final read-only delta: both MUST closed, no remaining MUST; no additional tests or edits.
+6. Skill creator quick_validate.py rlflow/skills/rlflow: Skill is valid!
+ Offline pip wheel --no-index --no-deps --no-build-isolation -w /tmp/rlflow-cp73-final-wheel-80WomS .
+ exit0; wheel SHA256 e16140b61761777d13d3ee5fcd0d2c1c7657356c5aecf45b45467a446b01ff28.
+ pip install --no-index --no-deps --target /tmp/rlflow-cp73-final-wheel-80WomS/site exact wheel: exit0.
+ .venv/bin/python /tmp/rlflow-cp73-final-wheel-80WomS/probe.py
+ original34507 terminal4ddec3 exit0:
+ {"installed_console": true, "outside_checkout_import": true, "complete_original_config": true, "describe_source": "original registered contract", "discovery_Core_writes": 0, "report": "ADOPTED", "Core_version": 1, "worker_model_approvals": 0, "packaged_skill": true, "Goal_completed": false}
+ Probe uses disposable original trusted source fixture; CLI child exclusively installed package import outside checkout.
+ Read-only describe -> user-authored original fixture Goal1.1 plus discovered IDs/hashes -> request-only suggestion -> original human Draft -> console report.
+ Build outputs created by this build moved recoverably to /tmp/rlflow-cp73-final-wheel-80WomS/checkout-build; no deletion.
+7. compileall -q rlflow, pip check, git diff --check: exit0 (No broken requirements found).
+ USER untracked package-lock.json remains SHA becc7e2a36dfcad4ffe934b5ff2f0f68187611d6c0641bd63d81367651cfbf09; never staged.
+ Final 333 runtime/test/web input hashes in checkpoint-73-inputs.sha256; this is final identity, not a pre-run all-input freeze.
+ Final changes after regression only test-method correction and packaged skill documentation (actual wheel tested).
+ Outstanding: full A01/T15, whole Goal/arbitrary tree STOP, runtime config loader, native model/product Reviewer contract+budget, strict OS delegation/quota/invoice, B1/T22/T23,24h/8h/M5.
+ Next slice: bind trusted discovery to original finite execution capability/refusal explanation so target-cwd report distinguishes DRAFT/nonexecutable/missing trusted gates; no fabricated capability or new execution permission.

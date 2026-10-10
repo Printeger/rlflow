@@ -1,5 +1,8 @@
 # 系统实施验收记录
 
+Checkpoint73 FINAL：原完整 project.example.yaml 静态配置→目标cwd可信原注册 schema/catalog discovery→显式Goal1.1建议→人类原DRAFT→ADOPTED已交付，目录只读无Core/预算/执行权限。最终受影响四module67pass/1新增fixture认证method误用，修测试后该单项1pass；这是合成68case证据，不称一次全绿或新全库。实际独立读池取消waiter保留容量/第三429/两原scopeSTOP及Pool0通过；High raw绑定和schema缓存两MUST已关闭。最终wheel e16140b6…01ff28实际安装console/source外导入/完整配置describe→submit→humanDRAFT→report/packagedskill通过；Core1，worker/model/approval0。333最终输入hash归档，compile/pip/diff/skill检查通过，无live测试，USERlock未改未stage。详HYBRID_CONTRACT_DISCOVERY.md/evidence/checkpoint-73-tests.txt；完整Goal仍active，A01/全GoalSTOP/native产品Reviewer/strictOS/invoice/B1/T22/T23/长期M5未关闭。下一74补目标cwd原有限执行能力/拒绝原因报告的可信来源闭环，不新增运行权限。无新增用户决定阻塞；原Reviewer预算和OS委派缺口保留。下方记录为历史。
+
+
 Checkpoint36完整终态：中央full原11991 exit0 1393passed/32既有skip/1warning408.56s；root/独立High同六modules各263passed/81.63s及82.57s，15 SHA不变、范围无MUST、compileall/pipcheck/diff0、无live。实际owned writer BLOCKED事实与原source/snapshot/recover闭合见HYBRID_BLOCKED_ADMISSION.md/evidence/checkpoint-36-final-tests.txt。不是executionlease、writer排斥或STOP；无新增browser/NFR/B1/24h/8h/离线validator证明，完整M0–M5仍未完成。
 
 Checkpoint35完整终态：中央full原12471 exit0 1296/32既有skip/1warning359.97s；独立High原68295 exact四modules ONCE exit0 166/1warning38.34s，11SHA一致、范围MUST关闭、compileall/pipcheck/diff0，无live测试。下段pending为旧过程，见HYBRID_CONTROLLER_FENCING.md/evidence/checkpoint-35-final-tests.txt。CORE_FACTS_ONLY不等于workspace writer、执行或STOP；无新UI/性能/长期/离线validator证明，完整M0–M5仍未完成。
