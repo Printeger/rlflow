@@ -122,6 +122,8 @@ def derived_heads(value):
         phase=runtime['phase'];changed=old_balance
         if phase=='REGISTER_NO_HANDOFF':decision,reason='HELD','FIXTURE_REGISTERED_NO_HANDOFF'
         elif phase=='FIXTURE_SCOPE_STOPPED':
+            from .hybrid_native_model_profile import KIND as MODEL_KIND
+            generating=runtime['origin']['kind']==MODEL_KIND
             usage={**zero(),'wall_seconds':runtime['wall_seconds']}
             if runtime['origin']['kind']=='LOCAL_CPU_NUMERICAL_TRIAL':
                 # Conservative G-attempt accounting, not a fabricated ACK:
@@ -130,8 +132,15 @@ def derived_heads(value):
             if runtime['origin']['kind']=='LOCAL_CONFIGURED_CPU':
                 usage['experiment_starts']=int(runtime['origin']['local_cpu']['purpose']=='research' and
                                                runtime['local_cpu_release_attempted'])
-            changed=settle_known(old_balance,reservation['amount'],usage,prior_status=reservation['status'])
-            decision,reason='SETTLED','FIXTURE_SCOPE_TERMINATED'
+            if generating and runtime['native_model_handoff_attempted']:
+                # Native original usage/source settlement is not implemented
+                # yet. Physical STOP is NEVER proof of zero model use.
+                if reservation['status']=='HELD':changed=mark_unknown(old_balance,reservation['amount'])
+                elif reservation['status']!='UNKNOWN':raise Conflict('generating model retained exposure required')
+                decision,reason='UNKNOWN','FIXTURE_EXPOSURE_RETAINED'
+            else:
+                changed=settle_known(old_balance,reservation['amount'],usage,prior_status=reservation['status'])
+                decision,reason='SETTLED','FIXTURE_SCOPE_TERMINATED'
         else:
             if reservation['status']=='HELD':changed=mark_unknown(old_balance,reservation['amount'])
             elif reservation['status']!='UNKNOWN':raise Conflict('fixture runtime retained exposure required')

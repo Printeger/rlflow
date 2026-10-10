@@ -265,7 +265,9 @@ class FixtureUsageSourceOwner:
         from .hybrid_fixture_runtime import FixtureRuntimeOwner
         from .hybrid_native_diagnostic import NativeDiagnosticOwner
         from .hybrid_native_diagnostic_source import NativeDiagnosticSourceOwner
-        if (type(owner),type(self)) not in ((FixtureRuntimeOwner,FixtureUsageSourceOwner),(NativeDiagnosticOwner,NativeDiagnosticSourceOwner)) or owner.sources is not self:
+        from .hybrid_native_model_runtime import NativeModelOwner
+        from .hybrid_native_model_source import NativeModelSourceOwner
+        if (type(owner),type(self)) not in ((FixtureRuntimeOwner,FixtureUsageSourceOwner),(NativeDiagnosticOwner,NativeDiagnosticSourceOwner),(NativeModelOwner,NativeModelSourceOwner)) or owner.sources is not self:
             raise PermissionError('fixed original fixture Runtime source binding required')
         runtime = owner._issued(lease); claim = runtime['claim']
         with self._lock:

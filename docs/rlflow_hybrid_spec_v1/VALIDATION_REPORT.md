@@ -1,5 +1,11 @@
 # 需求包离线校验报告
 
+末窄审新增1项MUST（来源physical/reader核验在try外可恢复后继续）已锁存original source：新原登记test_packet_source_failure_latches_after_bytes_restored_and_reader_replaced独立原session3325自然terminal，1pass9.00s；High源码关闭，无剩余确证MUST。编译changed modules/diff通过，USER package-lock仍原SHA，不暂存。此本地实现快照非A/98验收，真实task仍NOT_EXECUTED。
+
+2026-10-10 A生成原接线验证：初原登记2pass32.79s；handoff/packet组首1fail6pass+1teardownerror10.52s为错误假设HANDOFF无producer可伪终态，保持原guard不变，改为保UNKNOWN/Pool1的负例仅1pass10.70s。独立三MUST修后原源/部分分配受影响7pass7deselected66.91s；必要共享旧fixture stop-before-spawn与diagnostic copygrant2pass19.60s。本轮新增held-FD数据读取8pass.07s；增强并发growth隐藏旧prefix篡改的真实全audit负例+原source接线2pass10.95s。不同版本结果不合并为单次全module绿，不重复旧已过项；无真实模型/账户/产品Review/结算资格，首个工程task NOT_EXECUTED，A/98未关闭。完整命令/原session/tool/失败诊断见evidence/a-native-model-wip-20261010.txt；Goal当前ACTIVE，82历史全量失败保留。
+
+2026-10-10 A WIP验证：原预算+ledger正在运行的37项自然通过17.56s；封闭packet decoder首23pass/1fail为测试异常类型误捕，schema拒绝正确，修测试后仅该项1pass.06s。独立源码MUST（final message后仍允许忽略更新）已修为MESSAGE-only completion，受影响正常流+三负例8pass/19deselected.06s，独立静态关闭；未改通过项不重复。必要原预算/无spawn diagnostic授权回归4pass11.27s；新增原BudgetService caller JSON七动作全拒1pass.72s。编译、diff、USERlock SHA检查通过；不是一次全module全绿/真实模型task/Review/条件接续验收。详细命令、初失败及分版本结果见evidence/a-native-model-wip-20261010.txt。模型/GPU0；82历史全量失败保留，新checkpoint/A仍未关闭。
+
 97：tool1025a8实际复现数学complete误报；首全affectedsource模块36pass33.05s，High发现inclusive部分缺账同类MUST。原回归结束后修allparticipants，最终只选16affected/new纯协议+1actualparentinclusive源=17pass/31deselected1.95s；原35无影响case不重复，不伪一次48全绿。独立源码MUST关闭，compile/diff/USERlock通过，详evidence/checkpoint-97-usage-completeness.txt。模型/GPU0、source仍fixture-only/settlementfalse，不关闭真实模型Engineer/Reviewer/条件接续；82历史全量失败保留，Goal ACTIVE。
 
 96实际验收：任意替换/新增/删除协议与原输入/允许路径/容量门11pure通过；新包装层SystemExit0真实失败保留并修复后，仅受影响正例1pass15.47s，原结果SUCCEEDED/PASS；最终spec含候选metadata的新负例1pass15.84s，打印匹配文本仍NONZERO/FAIL。两原受管scope完整STOP/SETTLED/Pool0/allFDclosed，原结果仍ReviewNOT_PROVEN/conditionfalse。High无确证源码MUST，原结果离线补核成功退出/机器PASS，不伪新pytest；compile/diff/USERlock/无新active检查通过。详HYBRID_ARBITRARY_ENGINEERING_CANDIDATE.md/evidence/checkpoint-96-arbitrary-candidate/。真实模型任务未执行，未称安装/全库/自主闭环/长跑通过；82历史4fail/2532pass/32skip保留，Goal ACTIVE。

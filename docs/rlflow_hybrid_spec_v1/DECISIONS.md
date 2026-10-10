@@ -1,5 +1,9 @@
 # 开发决策记录
 
+2026-10-10 A生成接线：原授权绑定packet里的角色、候选manifest、真实任务objective/conditions，不用含自身合同hash的WorkingPlan packet造成递归hash；原source发布后独立强留source/grant raw与original identity，不以mutable model_allocated标记决定完整性。部分分配未返回source也必须清理原claim强留的FD，闭包失败保UNKNOWN/占槽。HANDOFF无producer的初测试假设违反原终态来源，改诊断/负例，不放松原NO_HANDOFF门。新增held-FD reader全prefix分步审计，检测并发增长隐藏的旧prefix改写；helper与poll_packet_data始终data-only，fixture poll/seal在生成source明确拒绝。OpenAI Docs只读核对CLI/auth/config：ignore-user-config仍用CODEX_HOME认证、forced登录/workspace不匹配会logout/exit；未来必须隔离原凭据持有与可写会话目录，不能直接运行或改当前auth home。官方选项不证明账户/重试/transport资格，未编造硬次数/费用封顶。
+
+2026-10-10 A WIP：生成profile与零模型diagnostic授权分离；缺原计数的生成handoff不能借物理STOP结零token。CLI声明的chatgpt.com allowlist和workspace UUID仍未证明实际账户/目的地/网络资格，registration.execution_qualified=false；不开放旧start deny或原owner allowlist。PacketTranscript仅有限数据解码，原stdout/producer/account/packet/EOF/STOP和独立Review仍需exact owner证明。最终message进入MESSAGE锁定状态，不接受后续item更新洗掉原输出。按用户拆阶段，先A小额CPU合同，B/C/GPU/HOLD不变；本地代码开发不等运行批准。其余恢复后置，先接真实生成纵向链。
+
 97：已知prefix求和与全scope完整性分离，不能借groups过滤把未计账参与者当零。包括parent-inclusive在内，complete须每个已观察参与者实际有完整计数；inclusive只去双计。cumulative与per-turn修复规则不同，原source/math不能自授settlement。High同类MUST在首回归terminal后仅修受影响分支，原35无影响case不重复。此修直接阻断未来模型安全结算，符合95后仅直接链路/确证安全边界优先，不前移其他恢复增强。
 
 96：不将 fixed AFTER/父Core exec扩展成任意代码执行。封闭替换/新增/删除先校验允许路径和原hash，内存canonical冻结；可配置验收经已有fresh configured CPU完整批准执行，原项目不改。任意candidate/checks/rule/hash均进spec，变更需新原授权；pure Candidate不是ModelReceipt。共享验收子进程仍有恶意绕过语义风险，机器PASS只作执行观察，必须另真实独立Review/受保护条件接纳。新wrapper的成功sys.exit0误触旧异常门已修正常返回，不改旧keeper标准；正负原证据不同输入版本保留。其他恢复增强后置，真实生成profile/财务settlement为下一直接缺口。

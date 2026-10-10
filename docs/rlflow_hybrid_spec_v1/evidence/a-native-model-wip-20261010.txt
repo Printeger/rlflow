@@ -1,0 +1,162 @@
+A native model local implementation WIP; NOT completed checkpoint or real run.
+HEAD at evidence creation: 247ce0e (checkpoint 97).
+Real Engineer/model task: NOT_EXECUTED. Product independent Reviewer: NOT_EXECUTED.
+Condition acceptance/autonomous continuation: NOT_EXECUTED. GPU/model calls: 0.
+
+Original in-flight session 2206 naturally completed; no restart/replacement.
+Command: PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest tests/test_hybrid_native_model_budget.py tests/test_hybrid_budget_ledger.py -q
+Result: exit0, 37 passed,1 warning,17.56s (tools 56e42d/92d1d3).
+Independent original agent finite_app_review_63: no confirmed MUST for generating
+binding, one-way handoff/UNKNOWN-retained math, original links, caller JSON guard.
+No live new native owner/source exists; declarations execution_qualified=false.
+
+Command: PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest tests/test_hybrid_native_model_stream.py -q
+Result: exit1,23passed/1failed,.09s (tool1cff4c).
+Failure: schema correctly rejected extra source_authenticated in Review, but
+test incorrectly expected Conflict instead of ProtocolError(ValueError).
+Change: test expects ValueError; no schema relaxation.
+Only failed case rerun: test_reviewer_data_is_candidate_bound_not_an_independence_receipt
+Result: exit0,1passed,.06s (tool a24944).
+
+Independent decoder review confirmed MUST: final completed agent message could
+be followed by ignored started/updated events before turn.completed, returning
+stale message. Fix: MESSAGE state admits only turn.completed, everything else
+latches failed. New started/updated/completed negative cases.
+Affected-only command: same pytest module -k 'packet_decodes or missing_actual or reviewer_data or final_message' -q
+Result: exit0,8passed/19deselected,.06s (tool37a483).
+Final original agent static review: MUST closed, no new confirmed MUST.
+Unchanged passing cases not repeated; no one-run all27green claim.
+
+Necessary shared original approval/budget closure regression:
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest tests/test_hybrid_budget_service.py::test_actual_reserve_audit_snapshot_recover tests/test_hybrid_budget_service.py::test_cleanup_is_atomic_terminal_and_never_executes tests/test_hybrid_native_diagnostic.py::test_original_diagnostic_grant_copy_cannot_register_another_attempt -q
+Original session51569 naturally finished; exit0,4passed/1warning,11.27s
+(tools66eeb7/1f6408). Diagnostic test never enters producer spawn/model generation.
+New actual original BudgetService JSON rejection test:
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest tests/test_hybrid_native_model_budget.py::test_generating_caller_json_never_reaches_original_runtime_writer -q
+Result: exit0,1passed/1warning,.72s (tool eb3163).
+All seven runtime action JSON inputs refused; Store audit unchanged.
+
+Official CLI event format actually fetched via tools106search0/107view0:
+https://learn.chatgpt.com/docs/non-interactive-mode?translationFallback=fr-FR
+Only thread/turn/item top-level event counts consumed; never usage JSON embedded
+in model text. No claim documentation alone qualifies local binary semantics.
+Per-turn decoder output remains source_authenticated=false, settlement=false,
+condition=false; original FD/account/process provenance is still required.
+
+User package-lock.json untouched/unstaged SHA256:
+becc7e2a36dfcad4ffe934b5ff2f0f68187611d6c0641bd63d81367651cfbf09
+Original82 whole-suite4failed/2532passed/32skipped not relabelled green.
+No push, production mutation, auth read, paid model or GPU use.
+
+Original independent agent's next-owner/source integration inspection:
+Do not simply extend exact type lists. FixtureRuntimeOwner._append_phase still
+hardcodes terminal SETTLED; new model owner must write its original one-way
+handoff latch and matching UNKNOWN decision from durable lineage, not callers.
+Original Pool terminal/closed-slot-FD proof does not require Budget SETTLED;
+same original complete physical STOP can free hardware while budget stays
+UNKNOWN/full reserved. Do not invent a zero-token refund or relax Pool proof.
+Future NativeModelOwner/SourceOwner/Grant must be separate from diagnostic;
+reuse original writer/controller/WorkingPlan/Pool and lifecycle gates, sealed
+packet/schema/account source, same-PID original ELF/ready, stdout lineage,
+TGID/FD/fork cleanup. Actual start stays denied without account qualification
+and new original approval. Actual usage needs separate original-source owner
+and protected immutable publication/one-shot settlement, not decoder dict.
+This is implementation guidance, NOT current execution qualification.
+
+Final local checks: compileall changed four modules exit0 (tool eb6f08),
+git diff --check exit0 and same USER lock hash (tools 9e77b4/2166b1).
+No live test session remains. Changes retained as WIP, no new checkpoint commit.
+
+=== Continued original generating owner/source implementation ===
+Original Goal observed ACTIVE (current turn tool 53f018/get_goal output;
+prior continuation e26055 ACTIVE). No new Goal or reduced acceptance.
+Exact NativeModelOwner and NativeModelSourceOwner integrated with original
+Controller/WorkingPlan/Budget/Pool registration. Frozen packet/schema readonly
+FDs, actual role/objective/conditions/candidate manifest/hash binding, original
+same-object grants and independently retained source/grant bytes. No launch:
+actual start/_runtime_spawn/_runtime_release denied, no credentials read.
+
+Original runs, all naturally terminal (do not restart):
+60240: PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest
+ tests/test_hybrid_native_model_runtime.py -q
+ 2 passed 32.79s (bed195/f7214b).
+60841: same module -k 'handoff_intent or packet_binding' -q
+ 1 failed, 6 passed, 2 deselected, 1 teardown error 10.52s (e26055/b2c5c3).
+ Root cause: test incorrectly expected HANDOFF with no original producer to
+ prove complete STOP/FREE. Immutable original links correctly require original
+ REGISTER_NO_HANDOFF lineage for no-producer terminal. Do not weaken it.
+89085: corrected affected-only test
+ test_original_handoff_without_producer_proof_retains_budget_and_pool
+ 1 passed 10.70s (b0eab2/5313a6). Budget UNKNOWN/full reservation and Pool1;
+ original shutdown_safety closes physical descriptors without fake FREE.
+9302: same module -k 'not packet_binding and not handoff_without' -q
+ 7 passed, 7 deselected 66.91s (796286/afead6). Three High MUST fixes:
+ independent published source binding (marker=False cannot bypass checks),
+ original source/grant bytes prevent paired mutation, strong partial-allocation
+ cleanup before terminal (including FIFO/nonblocking and injected close failure).
+ High finite_app_review_63 independently closed all three, no remaining confirmed
+ MUST, no execution/source/account/settlement qualification claimed.
+20168: PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest
+ tests/test_hybrid_fixture_runtime.py::test_durable_stop_before_spawn_is_zero_wall_and_never_releases
+ tests/test_hybrid_native_diagnostic.py::test_original_diagnostic_grant_copy_cannot_register_another_attempt -q
+ 2 passed 19.60s (1dbb34/0c8b9e). Necessary shared guard regression; no model spawn.
+
+=== Held packet stdout data decoding, current turn ===
+Private _HeldPacketReader: read-only original regular FD/inode, <=1MiB file,
+ <=64KiB/128 lines per poll, tail/tip validation, failed latch, independent full
+ prefix hash audit <=64KiB/step; final metadata checked and post-finish append
+ refused. This owns no FD, authenticates no producer, grants no settlement.
+NativeModelSourceOwner retains reader on the original source/held read FD;
+poll_packet_data gives only data, no usage/review capability. Native poll/seal
+ explicitly deny inherited fixture source publication.
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest
+ tests/test_hybrid_native_packet_reader.py -q
+ terminal exit0, 8 passed 0.07s (2ed815).
+Changed the middle-rewrite test to exercise concurrent file growth hiding old
+ rewritten prefix outside the retained anchor, rather than metadata-only refusal.
+82604: PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest
+ tests/test_hybrid_native_packet_reader.py::test_full_audit_catches_old_middle_rewrite_beyond_anchor
+ tests/test_hybrid_native_model_runtime.py::test_original_generating_grant_registers_frozen_source_but_cannot_launch -q
+ terminal exit0, 2 passed 10.95s (8be026/9f7dd2). Original actual registration
+ reads empty data; model source poll/seal deny; no launch/versions unchanged;
+ complete original no-handoff cleanup/SETTLED/Pool0/allFDclosed/audit=replay.
+
+OpenAI Docs skill completely read (1b9557); official scoped search then actual
+ fetched CLI/auth/config pages (turn108search*, turn109view0/1/2):
+ https://learn.chatgpt.com/docs/cli/reference
+ https://learn.chatgpt.com/docs/auth
+ https://learn.chatgpt.com/docs/config-file/config-reference
+ --ignore-user-config does not suppress CODEX_HOME auth. Forced ChatGPT/workspace
+ mismatch logs out/exits: never point an unqualified generating attempt at the
+ existing writable auth home. Docs do not prove request count/retry/transport
+ or actual model/source/usage qualification. No login/manual/provider run.
+
+Actual real engineering task, modifications from model, independent product
+ Reviewer, condition acceptance and continuation: NOT_EXECUTED. Existing
+ synthetic normalizer inputs are local integration fixtures, not A acceptance.
+No GPU/B/C/instinctRL execution; HOLD unchanged. A contract still unanswered,
+not a prerequisite for continuing local implementation. Final checks/review
+and any local snapshot commit are recorded below, not an A/checkpoint98 PASS.
+
+Final independent reader review: one confirmed MUST in poll_packet_data:
+ physical/source-reader binding was outside its failure latch. Fixed with
+ independent original-source _packet_failures; all physical/binding/decoder
+ checks in one catch, retained reader.failed and source QUARANTINED. Entry
+ refuses the original source even after bytes restored or reader replaced;
+ independent original STOP cleanup is still available.
+3325: PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest
+ tests/test_hybrid_native_model_runtime.py::test_packet_source_failure_latches_after_bytes_restored_and_reader_replaced -q
+ terminal exit0, 1 passed 9.00s (ca3a64/910b17). Actual original synthetic-DEV
+ grant/register, same-inode material damage/restore, replaced reader denied,
+ then original fullSTOP/Pool0/allFDclosed; not model/account qualification.
+High finite_app_review_63 independently closed this new MUST, no remaining
+ confirmed MUST. Did not rerun tests or old reviews.
+Final compileall ten changed modules + git diff --check exit0 (e08be1).
+USER package-lock.json unchanged SHA256
+ becc7e2a36dfcad4ffe934b5ff2f0f68187611d6c0641bd63d81367651cfbf09 (a849dd).
+All original test sessions terminal. Local implementation snapshot may be
+committed with this evidence, not a completed checkpoint98/A qualification.
+Next: fixed native generating gate/credential-owner and original producer
+qualification, original usage publication and settlement; then independent
+Evaluator, protected condition CAS and bounded autonomous continuation.
+Original Goal remains ACTIVE; unapproved actual model/GPU calls remain zero.

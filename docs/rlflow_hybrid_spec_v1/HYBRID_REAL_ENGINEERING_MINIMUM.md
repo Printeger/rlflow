@@ -1,5 +1,21 @@
 # 首个真实工程自主闭环：最小交付清单
 
+2026-10-10最新：原Goal当前工具核对ACTIVE；历史blocked不再是现状态。本地exact生成owner/source已实现原登记、冻结packet/schema与独立物理绑定、部分分配FD闭包；held原stdout有限数据读取/全prefix审计已接线，但source/account/usage qualification仍false，实际start/spawn/release和source poll/seal拒绝。下面第1项仅完成登记/材料与读取部分，不能标完成；第2–5项仍缺真实publisher/独立Evaluator/条件CAS接续/非预设实任务。其他恢复后置，未以运行许可暂停这些本地实现。
+
+2026-10-10 A阶段续作（WIP，尚未完成新checkpoint）：用户明确本地生成来源、结算、Reviewer、条件证据和接续实现不等待运行批准。当前新增生成型独立合同/预算分支及有限CLI packet解码：旧零模型授权不升级；handoff后缺原用量，物理STOP仍UNKNOWN/全预留；原BudgetService拒所有caller JSON runtime动作。单thread/单turn/无tools的结构化Engineer输出可进入96任意候选变换；Evaluator输出校验同candidate hash与无未解MUST。decoder为数据，source_authenticated/settlement/condition均false，不是原来源或独立Review。
+
+当前最小剩余实现按交付行为排序：
+
+1. 新exact生成owner/source接原controller、WorkingPlan、Pool、Budget和原账户/冻结packet/schema，不借diagnostic零模型grant；同PID原ELF/ready/原stdout/参与者STOP需本地接通并验证。验收：未授权不产生模型调用；原批准生成attempt只运行所绑定packet，变更或STOP后不放行。
+2. 原CLI成功或失败结果与可信usage持久化、原guard结算。验收：完整原计数按语义记账，缺失/失败未知保留预留，不把stdout JSON或物理STOP当退款依据；完整scope停止后的硬件与财务责任分别处理。
+3. 全新独立Evaluator会话只读冻结candidate/原测试/契约；必要有界修复。验收：不同原生产者/会话、同候选版本和原审批来源可核，不接受caller PASS或开发期High结论替代产品Review。
+4. 受保护条件证据+Core版本CAS接纳+一次预算内自主接续。验收：原机器结果及原Review同时满足所绑定条件；拒迟到/STOP/候选改版，接续按未完成真实需求而非固定成功分支。
+5. 首个非预设真实工程任务。验收报告必须列实际需求/修改/测试/独立Review/条件接纳/接续和用量；当前仍NOT_EXECUTED，合成normalizer输入不算任务完成。
+
+首次A小额运行合同已单独提出，待用户回答：仅当前ChatGPT工作区既有额度/积分，不切换账户/不开API计费/不充值；gpt-6.1-sol最多8个产品CLI会话（6 Medium、2 High），单会话300秒，累计输入40万/输出3.2万token为软停止阈值，墙钟90分钟/受管模型与CPU累计60分钟。缺用量或未解STOP停止新会话。CLI会话数不等于后端请求数，内部重试/费用没有硬封顶承诺。限定一个CPU真实工程任务、独立评审、有界修复及一次接续。GPU=0；B/C与instinctRL HOLD不变。此合同只阻止未批准的实际运行，不阻止上述本地代码开发；不再要求旧整包模型/GPU合同先获答。
+
+工具状态注意：本轮get_goal仍返回此前blocked；接口不提供resume状态写入，本轮未新建/替换原Goal，也不据此中断本地实现。此追踪器标记不代表本地开发存在新权限阻塞。
+
 96进展：任意补丁已能按原hash/批准路径冻结，交现原受管CPU验证（不再固定AFTER或父Core exec），实测成功PASS/匹配文本后失败FAIL及完整STOP/SETTLED/FREE。接口和严格限制见HYBRID_ARBITRARY_ENGINEERING_CANDIDATE.md；本项仅为真实模型候选可承接的执行行为，不是首个实际任务。真实source/最终Working晋升与CAS、Reviewer及条件接续仍未实现，不以数据类替ModelReceipt。
 
 独立架构复核进一步确认最小前置：生成型exact owner/source/kind须独立批准，旧diagnostic零额度不可升级；真实provider凭据持有者/目的地/transport retry与次数边界不可由本地credential-empty receiver证明；旧Budget STOP math全部model维度为0，生成分支必须另按原CLI完整计数结算，缺计数保UNKNOWN与全预留。首次可采用完整小packet/no-model-tools入口，但仍必须真实Engineer→受管任意验收→全新只读Evaluator→原条件证据→至少一次批准范围内自主接续，不冒称通用工具或全Goal完成。

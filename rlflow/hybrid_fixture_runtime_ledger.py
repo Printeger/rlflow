@@ -9,6 +9,7 @@ from .store import Conflict,canonical
 from .hybrid_cpu_trial import BINDING as CPU_BINDING, KIND as CPU_KIND, AUTHORIZATION as CPU_AUTHORIZATION
 from .hybrid_engineering_patch import BINDING as ENGINEERING_BINDING,KIND as ENGINEERING_KIND,AUTHORIZATION as ENGINEERING_AUTHORIZATION
 from .hybrid_local_cpu_profile import BINDING as LOCAL_BINDING,KIND as LOCAL_KIND,AUTHORIZATION as LOCAL_AUTHORIZATION
+from .hybrid_native_model_profile import BINDING as MODEL_BINDING,KIND as MODEL_KIND,AUTHORIZATION as MODEL_AUTHORIZATION
 
 PHASES = ('REGISTER_NO_HANDOFF', 'HANDOFF_UNKNOWN', 'PROCESS_REGISTERED',
           'RELEASE_INTENT', 'STARTED_AS_OBSERVED', 'STOP_REQUESTED',
@@ -48,6 +49,11 @@ ORIGIN={'type':'object','if':{'properties':{'kind':{'const':'PROTOCOL_CONFORMANC
     'then':CPU_ORIGIN,'else':{'if':{'properties':{'kind':{'const':DIAGNOSTIC_KIND}},'required':['kind']},
     'then':DIAGNOSTIC_ORIGIN,'else':{'if':{'properties':{'kind':{'const':LOCAL_KIND}},'required':['kind']},
     'then':LOCAL_ORIGIN,'else':ENGINEERING_ORIGIN}}}}
+MODEL_ORIGIN=obj({**PROTOCOL_ORIGIN['properties'], 'kind':{'const':MODEL_KIND},
+    'authorization':{'const':MODEL_AUTHORIZATION}, 'scenario':{'const':'native_model'},
+    'model_enabled':{'const':True}, 'native_model':MODEL_BINDING})
+ORIGIN={'type':'object','if':{'properties':{'kind':{'const':MODEL_KIND}},'required':['kind']},
+        'then':MODEL_ORIGIN,'else':ORIGIN}
 nullable = lambda schema: {'oneOf': [schema, {'type': 'null'}]}
 CONTROL_BODY = obj({'action': enum('START_FIXED_CPU', 'STOP_FIXED_SCOPE'),
     'task_id': ID, 'expected_state_version': COUNT})
@@ -79,6 +85,7 @@ from .hybrid_local_cpu_recovery import SCOPE_RUNTIME
 RUNTIME['properties']['local_cpu_recovery_source']=RECOVERY_SOURCE
 RUNTIME['properties']['local_cpu_recovery_public_key']={'type':'string','pattern':'^[0-9a-f]{64}$'}
 RUNTIME['properties']['local_cpu_scope_binding']=SCOPE_RUNTIME
+RUNTIME['properties']['native_model_handoff_attempted']={'type':'boolean'}
 
 
 def control_command_id(request, actor_id, client_key):
@@ -121,6 +128,17 @@ def validate_runtime(request, prior):
     value = request['fixture_runtime']; validate_schema(RUNTIME, value)
     current = phase(request)
     old = prior.get('fixture_runtime') if prior is not None else None
+    generating=value['origin']['kind']==MODEL_KIND
+    if generating:
+        entered=value.get('native_model_handoff_attempted')
+        if (type(entered) is not bool or
+                current=='REGISTER_NO_HANDOFF' and entered or
+                current in ('HANDOFF_UNKNOWN','PROCESS_REGISTERED','RELEASE_INTENT','STARTED_AS_OBSERVED') and not entered or
+                old is not None and old.get('native_model_handoff_attempted') and not entered or
+                entered and old is not None and not old.get('native_model_handoff_attempted') and current!='HANDOFF_UNKNOWN'):
+            raise Conflict('generating model original handoff latch differs')
+    elif 'native_model_handoff_attempted' in value:
+        raise Conflict('zero-model profile cannot acquire generating handoff fields')
     local=value['origin']['kind']==LOCAL_KIND
     if local:
         publication=value.get('local_cpu_recovery_source')
@@ -203,6 +221,10 @@ def validate_runtime(request, prior):
             raise Conflict('fixture registration requires exact unregistered HELD origin')
         # This fixed CPU diagnostic does not spend/settle synthetic model tokens.
         amount = prior['amount']
+        if generating:
+            from .hybrid_native_model_profile import validate_reservation
+            validate_reservation(amount,value['origin']['native_model'])
+            return value
         needed_seconds=value['origin']['local_cpu']['task_seconds']+10 if local else 4
         starts=int(value['origin']['local_cpu']['purpose']=='research') if local else int(trial)
         if (amount['wall_seconds'] < needed_seconds or
@@ -251,6 +273,16 @@ def validate_original_links(value, lookup):
     from .hybrid_working_plan import SECTIONS, validate_record, validate_links
     from .hybrid_budget_ledger import SECTIONS as BUDGET
     request = value['request']; runtime = request['fixture_runtime']; origin = runtime['origin']
+    if origin['kind']==MODEL_KIND:
+        from .hybrid_native_model_profile import approved_binding
+        from .hybrid_goals import SECTIONS as GOALS
+        from .hybrid_authority import SECTIONS as AUTHORITY
+        sources=value['policy_source'];record=lookup(GOALS[0],sources['contract_key']);approval=lookup(AUTHORITY[0],sources['approval_key'])
+        if record is None or approval is None:raise Conflict('generating model original approval missing')
+        binding=approved_binding(record['contract']['proposal'],approval['registry_witness'],origin['program_sha256'])
+        binding.update(grant_id=origin['native_model']['grant_id'],
+            **{k:sources[k] for k in ('proposal_hash','approval_hash','config_hash','scope_hash')})
+        if canonical(binding)!=canonical(origin['native_model']):raise Conflict('generating model original approved binding differs')
     if origin['kind']==LOCAL_KIND:
         from .hybrid_local_cpu_profile import approved_binding
         from .hybrid_goals import SECTIONS as GOALS

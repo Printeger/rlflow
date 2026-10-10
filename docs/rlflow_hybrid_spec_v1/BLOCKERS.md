@@ -1,5 +1,9 @@
 # 阻塞与证据缺口
 
+2026-10-10最新核对：原Goal ACTIVE，本地代码实现无新增用户决定阻塞；下方blocked为历史记录。新exact生成owner/source登记、冻结原packet/schema与部分分配清理已实现；原held stdout FD有界读取和全prefix审计为数据能力，不能证明模型/账户/EOF。剩余直接链路缺口：固定同PID ELF gate/原credential持有者与ready/producer证明；完整原计数的可信publisher及一次结算；独立产品Evaluator；条件publisher+Core CAS接纳/自主接续；首个非预设真实任务。start/spawn/release及模型source poll/seal仍拒绝，不能以REGISTER或调用decoder代替。已提出A合同未答仅阻止真实运行，不阻止上述本地实现；GPU/B/C/instinctRL HOLD未改变，不读取auth、不调用模型。
+
+2026-10-10当前：运行授权不阻塞生成来源/结算/Reviewer/条件接续的必要本地实现。新生成预算分支与封闭packet解码已验证，但新exact模型owner/账户及原FD输出来源、可信结算、独立产品Evaluator、条件CAS/接续仍缺；模型task NOT_EXECUTED。首次真实A只待已提出的当前ChatGPT账户8CLI会话、输入40万/输出3.2万soft token、每会话300s、墙钟90min/累计受管60min合同答复，不再以旧整包B/C或GPU合同为前置。不读取auth或调用模型/GPU；B/C与instinctRL HOLD不变。原Goal追踪器get仍blocked且工具无resume状态，本地继续，不重建Goal、不冒报ACTIVE。
+
 97关闭数学complete误报的直接安全缺口；模型原来源/profile、真实CLI语义资格与生成型预算settlement仍缺，不能拿原fixture math或旧STOP零模型结算代替。96任意候选验收已交付，最终Working晋升/CAS、真实独立Evaluator、条件publisher/接续和首个非预设实任务仍未实现。集中资源合同仍未批准，不启模型/GPU、不读取认证资料、不解除instinctRL HOLD；本地必要实现继续，完整Goal ACTIVE。
 
 96关闭固定候选验收入口缺口：任意文本候选已实际在受管CPU物化/执行，不在Core执行。仍缺真实模型 exact source/kind/授权及原CLI用量结算（旧STOP零模型math不可借用）、最终Working writer晋升、独立只读产品Evaluator、条件publisher/CAS/自主接续与首个非预设实任务。共享检查进程的机器PASS非抗恶意证明，不升条件；未重开冷恢复或扩展功能。集中模型账户/额度合同未答仍阻塞真实调用，但不阻塞本地实现；不重复索权、不启GPU、不解instinctRL HOLD，原Goal ACTIVE。
