@@ -279,7 +279,7 @@ class NativeModelSourceOwner(FixtureUsageSourceOwner):
                 raise Conflict('original generating gate materials changed')
         return result
 
-    def _packet_step(self, source, *, finish=False, candidate=False, result=False):
+    def _packet_step(self, source, *, finish=False, candidate=False, result=False, review=False):
         """One original FD step, never an EOF/account/settlement assertion."""
         attempt = self._issued(source)
         with self._lock:
@@ -298,23 +298,29 @@ class NativeModelSourceOwner(FixtureUsageSourceOwner):
                     prior=self._packet_completed.setdefault(id(source),completed)
                     if completed!=prior or reader.transcript.message!=prior[0]:
                         raise Conflict('original audited packet output changed')
-                if not candidate and not result:return state
+                if not candidate and not result and not review:return state
                 if not state['data_complete']:
                     raise Conflict('original full packet audit required before candidate data')
                 audited=json.loads(self._packet_completed[id(source)][1])
                 if result:return audited  # fresh data copy; never a usage receipt
                 if 'failure_event' in audited:
-                    raise Conflict('failed model observation cannot produce candidate data')
+                    raise Conflict('failed model observation cannot produce candidate or review data')
+                message=json.loads(self._packet_completed[id(source)][0])
+                from .hybrid_protocol import validate_schema
+                validate_schema(json.loads(original[4]),message)
+                role=json.loads(original[3])['role']
+                if review:
+                    if role!='Evaluator':raise Conflict('original Evaluator packet required')
+                    from .hybrid_native_model_stream import review_data
+                    binding=json.loads(self._model_bindings[id(source)][5])
+                    return review_data(message,binding['candidate_sha256'])
+                if role!='Engineer':raise Conflict('original Engineer candidate required')
                 if original[5] is None:
                     raise PermissionError('original workflow candidate paths required')
                 # Neither the model nor this API chooses input bytes, edit
                 # scope or tests. The packet/schema and approved Registry
                 # scope are independently frozen by this original source.
-                from .hybrid_protocol import validate_schema
                 from .hybrid_engineering_candidate import transform
-                if reader.transcript.role!='Engineer':raise Conflict('original Engineer candidate required')
-                message=json.loads(self._packet_completed[id(source)][0])
-                validate_schema(json.loads(original[4]),message)
                 return transform(json.loads(original[3])['files'],message,allowed_paths=original[5])
             except Exception:
                 self._packet_failures.add(id(source))
@@ -347,6 +353,15 @@ class NativeModelSourceOwner(FixtureUsageSourceOwner):
         a candidate, known-cost settlement, refund or another model session.
         """
         return self._packet_step(source,result=True)
+
+    def review_data(self, source):
+        """Audited original Evaluator FD -> version-bound closed review DATA.
+
+        Uses the independently frozen packet role/schema/grant, never caller
+        role/candidate fields or mutable transcript declarations. No model
+        provenance, independence receipt, condition CAS or new-session grant.
+        """
+        return self._packet_step(source,review=True)
 
     def _runtime_usage_publication(self, owner, lease):
         """Original writer hook, NOT an audited-data or caller receipt API.

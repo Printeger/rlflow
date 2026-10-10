@@ -67,7 +67,7 @@ def plans(tmp_path, native_setup, request, monkeypatch):
         store_epoch=builder.store_epoch,clock=lambda:utc[0],monotonic_ns=lambda:mono[0])
     goal=head_key(builder.project_id,'fixture',proposal['goal_id'])
     preparation={'project_id':builder.project_id,'data_mode':'fixture','goal_ref':goal,
-        'idempotency_key':'prepare','role':'Engineer','context':{'text':proposal['objective']}}
+        'idempotency_key':'prepare','role':options.get('role','Engineer'),'context':{'text':proposal['objective']}}
     if getattr(request,'param',False) and not options:
         schema={'type':'object','description':'Working plan literal capacity fixture',
                 'examples':[{'$rlflow_blob':0} for _ in range(180000)]}

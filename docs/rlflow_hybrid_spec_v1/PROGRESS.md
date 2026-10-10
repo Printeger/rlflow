@@ -1,5 +1,9 @@
 # Hybrid v1 开发进度
 
+本Reviewer数据切片FINAL：旧Engineer原25591自然terminal1pass/19deselected11.13s；独立窄复核无新增确证MUST，compile/diff/USERlock通过，所有本轮handles已终态。仅原数据消费接线提交，不是产品独立Review/首个实任务/A完成。下一原生成资格与可信用量发行继续本地实现，Goal ACTIVE。
+
+2026-10-11 原Reviewer FD消费接线：独立冻结的packet角色/schema/grant候选hash→审计review数据，ACCEPT/REVISE不变；错候选、未解MUST却ACCEPT、失败强拒且锁存，返回freshcopy不改Store/Pool/条件/usage。candidate也从原packet核角色，不信mutable transcript。首34pure pass，原Reviewer成功消费后末负例因无workflow paths先触PermissionError而1fail9.45s；诊断后角色检查前移，不放宽门。原5Reviewer cases+Engineer正例6pass/8deselected65.02s，55900自然terminal；旧默认Engineer夹具回归收尾，独立窄审收尾。证据 evidence/a-native-review-data-20261011.txt。当前只是原输出接线，非真实产品Review或任务；账户/生成/EOF/usage cap与同workflow CPU/不同Evaluator派生、条件CAS/接续仍缺。A小额调用待批不阻代码，GPU/B/C/HOLD不变，Goal ACTIVE。
+
 2026-10-11 原 no-G producer 已本地接通：原 HANDOFF/Pool/Controller 最终门下启动固定 Python sandbox gate，核真实 PID/nonce/冻结输入/内核 ready；不发 G、不 exec Codex、不读账户。原 STOP 实测 reap/关闭全部 FD/Pool0，财务 UNKNOWN/full reservation 不退款。独立 High 发现通用 release 入口绕过 Source deny，已加 Owner 最终无条件拒绝并实测原 RELEASE_INTENT 下写 G 前拒绝；定向复核确认 MUST 关闭。首 fixture Popen 禁令失败已定位，不放宽产品门；固定 Python 专用测试 1pass17.80s，最终受影响 1pass20.16s；旧 native/register 回归 2pass/20deselected26.24s，不重复。证据 evidence/a-native-no-release-producer-20261011.txt。首次真实任务仍 NOT_EXECUTED，无产品 Reviewer/条件接纳/接续证据；下一原账户+same ELF/G/EOF/usage cap发行，继而 workflow CPU/独立 Evaluator/条件 CAS/接续。A调用待小额合同批准，GPU/B/C/instinctRL HOLD不变，Goal ACTIVE；非A/98关闭或全库通过。
 
 本原Budget切片FINAL：copy-lease末assert原80817自然terminal1pass12.75s；High独立窄范围无新增确证MUST，所有本轮原测试终态、compile/diff/USERlock通过。本次提交只交付格式/原Budget处理/live拒伪，真实Source资格发行明确NOT_IMPLEMENTED，不能算实际结算/任务/A完成。下一仍优先发行者本地实现，不停止原Goal，ACTIVE。

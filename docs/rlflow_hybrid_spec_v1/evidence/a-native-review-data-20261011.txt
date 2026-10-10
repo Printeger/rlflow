@@ -1,0 +1,42 @@
+Scope: original held Evaluator stdout data consumption, not model provenance,
+independent product review, condition acceptance, continuation or A completion.
+Base: f75ce95.
+
+Original packet role/schema/grant candidate hash are independently frozen.
+Full held-FD prefix audit precedes review_data; no caller message/role/hash.
+Closed ACCEPT/REVISE returns a fresh copy. Wrong candidate, ACCEPT with MUST,
+or turn.failed rejects and independently latches source failure.
+No Store/Pool mutation from consumption; no source/usage/condition cap minted.
+Original STOP Pool0/allFDclosed and Store audit==replay remain verified.
+
+Command first:
+env -u PYTHONPATH PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q tests/test_hybrid_native_review_source.py tests/test_hybrid_native_model_stream.py tests/test_hybrid_native_model_failure_data.py
+Handle10808/output4b4be4: 1 failed,34 passed in9.45s.
+Cause: review consumption passed; final wrong-role candidate negative expected
+Conflict but V1 no-workflow paths first raised PermissionError. Move original
+frozen-role check ahead of paths; retain all permission checks.
+
+Command affected:
+env -u PYTHONPATH PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q tests/test_hybrid_native_review_source.py tests/test_hybrid_a_workflow_candidate_source.py -k 'evaluator_review_data or audited_bytes_derive_candidate'
+Original55900/output148b25 naturally terminal exit0:
+6 passed,8 deselected in65.02s.
+Five original Evaluator cases + affected Engineer candidate positive.
+No duplicate pure suite; all stdout synthetic and explicitly not model output.
+
+Necessary default Engineer fixture regression and independent narrow review
+are recorded below when terminal. No auth secret read, CLI/model/G/GPU call.
+Compile/diff check passed; unrelated user package-lock preserved.
+
+Final regression command:
+env -u PYTHONPATH PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q tests/test_hybrid_native_model_runtime.py -k original_generating_grant_registers_frozen_source_but_cannot_launch
+Original25591/outputc74a4f natural exit0:
+1 passed,19 deselected in11.13s.
+Independent read-only /root/finite_app_review_63: no new confirmed MUST;
+original frozen role/schema/grant hash, audit/freshcopy/failure latch and STOP
+checks accepted in this narrow data-consumption scope. No tests rerun by agent.
+All current handles terminal. No full-suite or real-task acceptance claim.
+
+Highest remaining: account+actual model generation/same-ELF/G/EOF qualification,
+original usage cap issuance; same-workflow CPU/Evaluator grants/condition CAS
+and bounded autonomous continuation; first real task remains NOT_EXECUTED.
+Existing small A runtime contract awaiting approval; GPU/B/C/HOLD unchanged.

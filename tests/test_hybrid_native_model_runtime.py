@@ -61,10 +61,28 @@ def generating_bound(config):
 
 
 @pytest.fixture
-def model_runtime(tmp_path,native_setup,monkeypatch):
+def model_runtime(tmp_path,native_setup,monkeypatch,request):
     tmp_path.chmod(0o700); pool=HostPoolOwner.create_fixture(tmp_path)
     options=dict(bound=generating_bound,source=FILES['module/source.py'],
         amount={**zero(),'model_sessions':1,'model_input_tokens':1000,'model_output_tokens':100,'wall_seconds':20})
+    if getattr(request,'param',None)=='Evaluator':
+        from rlflow.hybrid_native_model_stream import REVIEW
+        def evaluator_bound(config):
+            registry,proposal=generating_bound(config)
+            global PACKET
+            PACKET={**PACKET,'role':'Evaluator'}
+            spec=config['tools']['native_model']['definition']['spec']
+            spec.update(role='Evaluator',effort='high',packet_sha256=digest(PACKET),
+                output_schema_sha256=digest(REVIEW))
+            rows=registration(spec)
+            config.update(tools={'native_model':rows['tool']},commands={'native_model':rows['command']},
+                evaluation_rules={'native_model_rule':rows['rule']},resource_profile=rows['resources'])
+            registry=Registry(config)
+            proposal.update(registry_bindings=registry.bindings,
+                evaluation_data=dict(mode='EXPLICIT_NONE',datasets=[],
+                    evaluation_rule=dict(id='native_model_rule',version_hash=digest(rows['rule']))))
+            return registry,proposal
+        options.update(bound=evaluator_bound,role='Evaluator')
     fixture=plan_fixture.__wrapped__(pool.projects_root,native_setup,SimpleNamespace(param=options),monkeypatch)
     plans,token,observation,*_=next(fixture)
     owner=None

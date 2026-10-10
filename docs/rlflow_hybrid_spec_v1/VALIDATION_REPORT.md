@@ -1,5 +1,9 @@
 # 需求包离线校验报告
 
+Reviewer数据末验：原25591自然exit0，旧默认Engineer登记1pass/19deselected11.13s；独立原finite_app_review_63只读窄审无新增确证MUST，未重跑测试。全本轮handlesterminal/compile/diff/USERlock通过；归档 evidence/a-native-review-data-20261011.txt，不支持真实模型/独立产品Review或条件接续验收。
+
+2026-10-11 Reviewer原FD消费：原10808终态1fail/34pass9.45s；失败在末候选拒绝类型预期，原review正消费已过，诊断为V1无workflow paths先PermissionError。改原冻结role检查前移后，仅受影响原5Reviewer cases/Engineer正例55900自然terminal6pass/8deselected65.02s，34pure已通过不重复。验证ACCEPT/REVISE/freshcopy、不改Store/Pool、错版本/ACCEPT+MUST/turn.failed锁存、篡改transcript role不能晋升Candidate，STOP Pool0/allFDclosed/audit=replay。旧Engineer夹具回归与独立窄审收尾，证据 evidence/a-native-review-data-20261011.txt。无真实model/Review/条件/A或全库通过声明，Goal ACTIVE。
+
 2026-10-11 no-G 原 producer：首测试 1FAIL/1teardown ERROR12.26s，原因 fixture全局禁止Popen，未实际创建进程；原UNKNOWN保守保留未被放宽。仅允许固定 Python gate argv 后 1pass17.80s；旧 native/register 2pass/20deselected26.24s。High发现通用 Source release入口缺 Owner最终拒绝，修后原74295自然terminal：1pass20.16s，证明原 RELEASE_INTENT下写G前拒、producer仍Python、原STOP reap/allFDclosed/Pool0及UNKNOWN/fullreserve/audit=replay。定向独立复核确认唯一 MUST关闭，未重跑已过审查/测试；compile/diff/USERlock检查通过。证据 evidence/a-native-no-release-producer-20261011.txt。没有实际Codex/model/auth/GPU调用，不宣称真实任务、产品独立Review、条件接纳/接续、A/98或全库通过。
 
 native Budget末affected原80817自然结束1pass12.75s，复制lease拒/伪资格不发行/原STOP与audit=replay通过。原85354/85847/15768均已terminal，不重启；独立High无本片MUST、compile/diff/USERlock通过。仅格式与原消费接线/拒伪资格，不支持真实source或实际结算声明。

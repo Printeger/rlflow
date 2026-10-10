@@ -1,5 +1,7 @@
 # 首个真实工程自主闭环：最小交付清单
 
+2026-10-11 Reviewer输出消费接线已补：原held FD全prefix审计后，只按冻结Evaluator packet角色/schema/原grant候选版本返回闭review数据；ACCEPT与REVISE保留，错版本、ACCEPT+MUST、失败和追加/替换拒绝锁存，不信mutable transcript角色。数据copy不能发行独立性凭证/条件/新session。第3项仍需同workflow自动派生不同原Evaluator会话及真实source资格；第1–2项原账户/生成/EOF/usage发行与第4项条件CAS接续仍未完成，首实任务NOT_EXECUTED。
+
 2026-10-11 原 fixed Python producer 已经原 HANDOFF→PROCESS→STOP接通，ready绑定原 PID/nonce/内核/冻结材料，STOP Pool0但账务UNKNOWN全额；Source/Owner独立deny保证不发G/exec模型/读账户。第1项剩余收敛为原账户+same ELF/G/完整stdout/EOF资格，第2项原opaque usage cap发行，第3–5项仍须同workflow CPU/不同Evaluator/条件CAS/接续及首个非预设实任务。当前实际任务 NOT_EXECUTED，不以本地生产者或开发期High复核计闭环。A合同待批仅阻调用，GPU/B/C/HOLD不变。
 
 2026-10-11 财务处理部分缩减：原Budget/phase builder/Native Guard已有完整usage publication消费与缺账保全分支，计CLI session1+全input/output/wall/overrun，不借零模型/旧历史；Source真实issuer仍缺且hook恒None，因此不是原用量发行或实际结算完成。下一须实装原账户/producer/G/EOF/audit→opaque cap，并接未知candidate同workflowCPU、不同Evaluator、条件CAS及接续；现首次真实task NOT_EXECUTED。小额A调用待批仅限runtime，GPU/B/C/HOLD不变。

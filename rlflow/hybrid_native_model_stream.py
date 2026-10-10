@@ -21,6 +21,17 @@ REVIEW = obj({'candidate_sha256': HASH, 'verdict': enum('ACCEPT', 'REVISE'),
         'text': {'type': 'string', 'minLength': 1, 'maxLength': 4000}})}})
 
 
+def review_data(value, candidate_sha256):
+    """Candidate-bound review DATA, never an independence/acceptance cap."""
+    validate_schema(REVIEW,value)
+    if value['candidate_sha256'] != candidate_sha256:
+        raise Conflict('Evaluator packet candidate version differs')
+    if value['verdict']=='ACCEPT' and any(row['severity']=='MUST' for row in value['findings']):
+        raise Conflict('Evaluator acceptance contradicts unresolved MUST')
+    # A fresh closed-data copy, not the decoder's mutable message or caller map.
+    return json.loads(canonical(value))
+
+
 class PacketTranscript:
     def __init__(self, *, role, candidate_sha256):
         if role not in ('Engineer', 'Evaluator'):
@@ -110,9 +121,4 @@ class PacketTranscript:
         if (self.role != 'Evaluator' or not self.sealed or self.failed or
                 self.state!='DONE' or self.failure_event is not None):
             raise Conflict('sealed Evaluator packet required')
-        value = json.loads(self.message); validate_schema(REVIEW, value)
-        if value['candidate_sha256'] != self.candidate_sha256:
-            raise Conflict('Evaluator packet candidate version differs')
-        if value['verdict'] == 'ACCEPT' and any(row['severity'] == 'MUST' for row in value['findings']):
-            raise Conflict('Evaluator acceptance contradicts unresolved MUST')
-        return value  # data only; source independence must be proven by owner
+        return review_data(json.loads(self.message),self.candidate_sha256)
