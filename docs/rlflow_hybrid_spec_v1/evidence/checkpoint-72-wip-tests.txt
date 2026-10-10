@@ -1,0 +1,45 @@
+Checkpoint72 WIP, 2026-10-10. Base3836e7bd46303e2edc643113bdca5a562439478f (71).
+Full Goal ACTIVE, no paid model/GPU/sysfs/production/global skill install/push.
+72 is NOT complete or committed: client STOP, typed inbox/human forwarding/UI and end-to-end physical control pending.
+Previous goal turn was progress (71 committed); this turn implemented original STOP GET source proof and repaired an actual sealed installation regression.
+
+Test cwd=/home/mint/rl_dev/rlflow_standalone
+Environment PYTHONPATH=/home/mint/rl_dev/rlflow_standalone PYTEST_DISABLE_PLUGIN_AUTOLOAD=1
+All test handles below terminal; no duplicate/restarted live tests.
+Read test command (.venv/bin/python -m):
+pytest -q -s tests/test_hybrid_finite_host_stop.py::test_actual_finite_receipt_read_proves_Core_source_without_second_cleanup
+
+R1 /tmp/rlflow-cp72-source-read-eWV1FQ, original4657 terminal3cebf3 exit1.
+Setup error1.08s, before actual STOP: private closed_inventory rejects intermediate staged skill directory created0755 by pathlib mkdir(parents=True), mode applies only to leaf. Actual product installation defect surfaced by new nested resource, not weakened validator/fixture failure workaround.
+Raw failure SHA5fa8cfd2e487cbac8f474bbaba1efb625f6c5725bde9589acd14bbbb80359f21.
+Fix: stage own nested directories each mkdir(mode0700), existing whole inventory/identity/seal checks unchanged.
+
+R2 /tmp/rlflow-cp72-source-read-r2-EeTKdK, original31183 terminalf9dd20 exit1.
+Read test plus tests/test_hybrid_fixture_materials.py::test_actual_fresh_material_closes_catalog_policy_and_release_seal.
+1 passed (actual skill SHA+private parents/sealed source), 1 failed, 1 existing warn19.66s.
+Read returned400 on damaged source: Conflict subclasses ValueError and old generic helper classifies caller validation first. High independently identified same root cause while frozen test ran; no mid-test edit. New receipt route catches Conflict503 before generic helper; other old command branches unchanged.
+Raw failure SHA adbb2e1e50e407e8edb22b25555108e4213b6f7819faf2267e6083435994db91 retained at temp path.
+Archived r2-redacted log omits ONLY disposable fixture repr containing inactive synthetic auth token; diagnostic stack/assertions retained, archive hash differs from original raw. Do not treat sanitized log as byte-identical raw.
+
+R3 /tmp/rlflow-cp72-source-read-r3-AkYb6g, original18170 terminal6316b6 exit0.
+1 passed/1 oldwarn18.85s, four input hashes OK. Did not repeat already-passed material test.
+High found original issued/raw/batch command scope gate missing. After terminal added pure exact body/hash/key/service/actor validation and negative mutable task_id branch.
+R4 /tmp/rlflow-cp72-source-read-r4-QF6vvO, original4895 terminalcbfd1d exit0.
+1 passed/1 oldwarn19.36s, four input hashes OK.
+Added UNKNOWN every-scope fresh receipt proof without enriching uncertain physical state. Evidence is injected UNKNOWN cache + actual legal accepted Core receipt, not natural lost return/new commit timing.
+High then found lock-exit used original mutable body reference. After terminal freeze, captured canonical detached command bodies and scalar batch identity; original raw is checked against that snapshot, all later source checks use it.
+R5 /tmp/rlflow-cp72-source-read-r5-JyCHqH, original88449 terminald26a9c exit0.
+1 passed/1 oldwarn19.41s, final four input hashes OK.
+Added source-read hook actually mutating original SDK body during proof; captured original scope remains intact. Normal read, prior mutation rejection, unknown nonpromotion, missing Core projection on accepted/UNKNOWN503, zero second cancel/version changes, original Pool0 all pass.
+
+Required material regression /tmp/rlflow-cp72-material-regression-FprMhl:
+Original91620 terminal3dee58 exit0.
+.venv/bin/python -m pytest -q tests/test_hybrid_fixture_materials.py --deselect tests/test_hybrid_fixture_materials.py::test_actual_fresh_material_closes_catalog_policy_and_release_seal
+25 passed, 1 explicitly deselected17.79s. Deselected case passed R2 after same material fix and unchanged since, no silent skip or changed standard.
+Frozen manifest archived, terminal readback all OK before docs updates. R5 differs only source-read implementation/test; material source/test unchanged. Final targeted four-path compile and git diff check passed after snapshot change; final four runtime/test input hashes still all OK after delivery docs update.
+
+Independent High reused /root/finite_app_review_63, read-only, no tests/edits.
+Architecture: explicit original finite scope request, all-target permission on every read/write, retain old inbox formats, durable frozen claim then original early latch, original future/cache/resume, no project->whole implicit scope, no Goal STOP.
+Source-read classification/issued snapshot/UNKNOWN proof fixes implemented; final snapshot delta statically closed with no remaining MUST in this read-only increment. Deterministic SDK mutation inserted by receipt hook, not claimed independent-thread race. Material directory fix statically approved, necessary regression passed.
+Remaining before72 checkpoint: actual request/client/UI closure, original STOP affected lifecycle regressions, final High/test/archive/commit. Original71 unchanged client/browser not rerun.
+USER package-lock SHA becc7e2a36dfcad4ffe934b5ff2f0f68187611d6c0641bd63d81367651cfbf09 unchanged/unstaged.

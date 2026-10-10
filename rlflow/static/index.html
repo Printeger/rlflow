@@ -81,13 +81,14 @@
         </section>
       </div>
       <section class="panel goals-panel" aria-labelledby="agent-request-title">
-        <div class="panel-heading"><h2 id="agent-request-title">Agent 目标建议</h2><button id="agent-request-refresh" type="button">读取请求</button></div>
+        <div class="panel-heading"><h2 id="agent-request-title">Agent 建议与明确转交</h2><button id="agent-request-refresh" type="button">读取请求</button></div>
         <p id="agent-request-note" class="muted" role="status"></p>
         <div id="agent-request-list" class="object-list"></div>
         <div id="agent-request-private" hidden>
           <pre id="agent-request-view"></pre>
-          <label class="check"><input id="agent-request-consent" type="checkbox">我已核对完整 proposal 与请求 hash，只将建议转交为不可执行 DRAFT；这不是批准。</label>
+          <label class="check"><input id="agent-request-consent" type="checkbox"><span id="agent-request-consent-text">我已核对完整 proposal 与请求 hash，只将建议转交为不可执行 DRAFT；这不是批准。</span></label>
           <button id="agent-request-forward" type="button" disabled>明确转交原草案服务</button>
+          <button id="agent-request-resume" type="button" disabled hidden>显式继续原未知 scope 收尾</button>
           <button id="agent-request-close" type="button">关闭并清除</button>
         </div>
       </section>

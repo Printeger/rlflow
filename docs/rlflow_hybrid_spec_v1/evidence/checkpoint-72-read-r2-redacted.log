@@ -1,0 +1,48 @@
+F.
+=================================== FAILURES ===================================
+__ test_actual_finite_receipt_read_proves_Core_source_without_second_cleanup ___
+
+application = <disposable fixture representation omitted: synthetic authentication token>
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7d6f6d9c0ce0>
+
+    def test_actual_finite_receipt_read_proves_Core_source_without_second_cleanup(application,monkeypatch):
+        host,units,services,observers,app,token,headers=application
+        coordinator=app.state.finite_host_stop
+        batch=coordinator.prepare({'action':ACTION},token=token,csrf=headers['X-CSRF-Token'],
+            origin=ORIGIN,idempotency_key='source_bound_read')
+        result=coordinator.execute_prepared(batch)
+        assert result['status']=='ORIGINAL_SCOPES_STOPPED_AS_OF_RETURN'
+        versions=[s.store.version() for s in services]
+        def no_cleanup(*a,**k):pytest.fail('receipt read repeated original cleanup')
+        for unit in units:monkeypatch.setattr(unit,'cancel',no_cleanup)
+        with TestClient(app,base_url=ORIGIN) as client:
+            client.cookies.set('rlflow_session',token)
+            url='/api/v1/finite-host/commands/'+batch.id
+            response=client.get(url)
+            assert response.status_code==200,response.text
+            assert response.json()=={**result,'duplicate':True}
+            assert coordinator.read_result(batch.id,actor_id='other_actor') is None
+            assert [s.store.version() for s in services]==versions
+            # Projection damage is confined to this disposable fixture. Original
+            # accepting event remains, so cache must not hide missing Core source.
+            service=services[0];key=batch.commands[0][2]
+            with service.store.connect() as db:
+                db.execute('DELETE FROM projection WHERE section=? AND object_key=?',
+                           (service._stop_domain.SECTION,key))
+                db.commit()
+            rejected=client.get(url)
+>           assert rejected.status_code==503,rejected.text
+E           AssertionError: {"code":"VALIDATION_ERROR","message":"closed finite STOP request required","retryable":false,"correlation_id":"control_error_09ad1085266ef60e55ad7367","details":{}}
+E           assert 400 == 503
+E            +  where 400 = <Response [400 Bad Request]>.status_code
+
+tests/test_hybrid_finite_host_stop.py:39: AssertionError
+=============================== warnings summary ===============================
+.venv/lib/python3.12/site-packages/starlette/testclient.py:37
+  /home/mint/rl_dev/rlflow_standalone/.venv/lib/python3.12/site-packages/starlette/testclient.py:37: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = typing.Callable[[], typing.ContextManager[anyio.abc.BlockingPortal]]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_hybrid_finite_host_stop.py::test_actual_finite_receipt_read_proves_Core_source_without_second_cleanup
+1 failed, 1 passed, 1 warning in 19.66s

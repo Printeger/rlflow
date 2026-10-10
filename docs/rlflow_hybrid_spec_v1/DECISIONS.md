@@ -1,5 +1,9 @@
 # 开发决策记录
 
+Checkpoint72 FINAL决策：显式原有限全集scope，不从project默认扩大范围；原inbox只建议/耐久human claim，不是新Core权威。全目标权限及原helper登记身份在每条读写路径保留；copy/rebound拒绝。最多2个保留编排task承担claim/latch后原STOP handoff，HTTP取消不消耗真实未来容量；原STOP关闭前drain，再关池。独立有界末读池不占STOP槽或阻loop。UI显示/确认/resume前验证scope SHA、派生全集/子ID和bodySHA，crypto后核票据；普通重试只读已有结果，显式resume仅原未知scope。cold claim为UNKNOWN，建议inbox I/O失败尚未转交，直接紧急STOP独立可用。329冻结全match，15必要回归及两Chrome、隔离wheel console通过；不重复未变成功审查/测试，不扩paid/GPU/生产权限。skill-creator仅修随包skill合同；write-page仅按仓库格式归档真实证据，不创建外部Page。下方WIP是过程历史。
+
+Checkpoint72 WIP架构：采用显式原有限全集STOP建议，inbox项目仅存储锚点，不从project默认推导跨项目范围。完整scopeitems/hash绑定原唯一FiniteHostStop；Agent提交/status/report和human列表/详情/转交都核全目标权限，旧Goal与DDL不变。先冻结耐久claim，再原prepare/latch，后原独立STOP队列；不能承诺任何inbox I/O前latch，失败保留原直接紧急STOP。拒绝直接per-unit execute_details重试方案，因为它会重复cancel并需要额外恢复队列；复用原coordinator future/cache/显式unknown resume。原GET盲缓存已改原source证明；捕获issued/raw及独立body快照，UNKNOWN新合法receipt不提升physical，损坏503不按ValueError400。新增skill导致stage父目录默认权限的真实安装回归已逐层700修复，不放宽私有校验。High源读差量关闭，72尚缺client/inbox/UI，不称Goal STOP/fullT15完成。
+
 Checkpoint71：按70后独立架构结论交付T15结构化请求首切片，不向Agent发human operator/approver凭据，也不以另一数据库接受Core权威。request-only token目的与原bearer/session分离；独立inbox仅保存提议/冻结转交，人类原DraftService写未批准DRAFT，ADOPTED必须完整原Core来源证明。旧库精确DDL/index/meta/page校验且拒绝隐式修复，fork身份门先于继承锁，最后Auth复核先于COMMIT。客户端绑定可信loopback origin、原hash/rid与closed DTO，禁代理/重定向/特殊文件。产品skill仅wheel资源，无用户全局安装或付费自然语言测试。最后四路径窄修通过48pass，未变608输入及浏览器结果复用，不重复已过审查。详HYBRID_AGENT_REQUESTS.md。下一72沿原人类有限STOP coordinator实现实际清理回执，不把请求当取消锁存/已停止；原预算/权限边界与完整Goal不变。
 
 Checkpoint70 FINAL：原 Popen 实例 wait4 观察保留固定程序启动守卫与原 waitpid 锁，不全局替换 waitpid。用量仅原固定无后代参与者的内核生命周期，显式 sample 后经现认证 GET/SSE/UI 读取；读侧不执行、不升级旧槽、无预算结算。真实样本步长8，实时退休1/2加独立终态退休4；原creator/PID是收割门，installed hooks身份仅是观测门，失效不能阻断STOP；旧槽不可复活，并发退休读只用锁内捕获的局部状态。仅 Linux CPython3.12 支持，冷重启/缺观察为UNKNOWN。必要81项回归后只补8项受影响验收，不重复未变化审查与测试。write-page用于仓库交接与证据强度，没有创建外部Page；原strict/Reviewer/可信invoice与完整Goal验收不缩减。

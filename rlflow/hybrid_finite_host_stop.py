@@ -260,6 +260,56 @@ class FiniteHostStop:
             'cleanup_status':'UNKNOWN','post_cleanup_status':'UNKNOWN','error_type':'ScopeFailure',
             'goal_completed':False,'independent_review_status':'NOT_PERFORMED'}
 
+    def read_result(self,command_id,*,actor_id):
+        """Original as-of-return cleanup, with fresh immutable intent proofs.
+
+        No new STOP, cleanup, resampling or cold owner reconstruction. Each
+        project source is checked separately: never a distributed snapshot.
+        """
+        self._pure()  # Parent/original identity before any inherited lock.
+        validate_schema(ID,command_id);validate_schema(ID,actor_id)
+        with self._lock:
+            row=next((r for (actor,_),r in self._rows.items()
+                      if actor==actor_id and r['operation'].id==command_id),None)
+            if row is None or row['result'] is None:return None
+            raw=row['result'];batch=row['operation']
+            batch_id,batch_actor,batch_key=batch.id,batch.actor,batch.key
+            credential_hash=digest([batch.token,batch.csrf])
+            commands=tuple((s,json.loads(canonical(body)),key,h) for s,body,key,h in batch.commands)
+            if (type(batch) is not _Batch or self._issued.get(id(batch)) is not batch or
+                    batch_actor!=actor_id or len(commands)!=len(self.controls) or
+                    any(command[0] is not service for command,service in zip(commands,self.controls)) or
+                    self._raw.get(id(batch))!=canonical([batch_id,batch_actor,batch_key,credential_hash,
+                        [[s.project_id,child,key,h] for s,child,key,h in commands]])):
+                raise PermissionError('actual original immutable finite STOP required')
+            for service,body,key,request_hash in commands:
+                if (body!={'action':service._stop_action,'task_id':service.task_id} or
+                        request_hash!=digest(body) or key!=control_command_id(
+                            {'project_id':service.project_id,'data_mode':'fixture','store_epoch':service.store_epoch},
+                            batch_actor,batch_key)):
+                    raise PermissionError('original finite STOP command scope required')
+        result=json.loads(raw)
+        if (result['command_id']!=batch_id or len(result['items'])!=len(commands)):
+            raise Conflict('original finite STOP cached scope differs')
+        for item,(service,body,key,request_hash) in zip(result['items'],commands):
+            if (item['project_id'],item['store_epoch'],item['task_id'])!=(service.project_id,service.store_epoch,service.task_id):
+                raise Conflict('original finite STOP cached item scope differs')
+            receipt=service.receipt(key)
+            if receipt is not None and (receipt['action'],receipt['request_hash'],receipt['actor_id'],receipt['task_id'])!=\
+                    (body['action'],request_hash,batch_actor,service.task_id):
+                raise Conflict('original finite STOP command source differs')
+            if item['intent'] is None:
+                if item['intent_status']!='UNKNOWN':
+                    raise Conflict('original finite STOP intent status differs')
+                continue  # No promotion of unknown acceptance from history.
+            if (receipt is None or receipt!=item['intent'] or
+                    (receipt['action'],receipt['request_hash'],receipt['actor_id'],receipt['task_id'])!=
+                    (body['action'],request_hash,batch_actor,service.task_id) or
+                    item['intent_status']!='ACCEPTED'):
+                raise Conflict('original finite STOP accepted source differs')
+        self._pure()
+        return {**result,'duplicate':True}
+
     def close(self):
         self._parent_identity()
         with self._lock:self._closed=True
@@ -277,17 +327,22 @@ def install(app,coordinator):
     coordinator._pure()
     jobs=ControlPool(2)
     disk_jobs=ControlPool(1)
+    read_jobs=ControlPool(2)
     app.state.finite_host_stop=coordinator
     app.state.finite_host_stop_pool=jobs
     app.state.finite_host_disk_pool=disk_jobs
+    app.state.finite_host_receipt_pool=read_jobs
     original=app.router.lifespan_context
     @asynccontextmanager
     async def lifespan(current):
         async with original(current):
             try:yield
             finally:
+                drain=getattr(current.state,'agent_request_stop_drain',None)
+                if drain is not None:await drain()
                 await jobs.close()
                 await disk_jobs.close()
+                await read_jobs.close()
                 await asyncio.to_thread(coordinator.close)
     app.router.lifespan_context=lifespan
 
@@ -351,11 +406,14 @@ def install(app,coordinator):
         try:
             if request.query_params:raise ValueError('closed finite receipt query required')
             _,access=authorize(request);validate_schema(ID,command_id)
-            with coordinator._lock:
-                row=next((r for (actor,_),r in coordinator._rows.items() if actor==access.principal.id and r['operation'].id==command_id),None)
-                raw=None if row is None else row['result']
-            if raw is None:raise ControlError(404,'NOT_FOUND','original finite result unavailable')
-            return JSONResponse({**json.loads(raw),'duplicate':True})
+            result=await read_jobs.run(lambda:coordinator.read_result(command_id,actor_id=access.principal.id))
+            if result is None:raise ControlError(404,'NOT_FOUND','original finite result unavailable')
+            authorize(request)
+            return JSONResponse(result)
+        except Conflict:
+            # Conflict is a ValueError subclass; source damage is UNKNOWN,
+            # not a malformed caller request through failure(...).
+            return error_response(ControlError(503,'UNKNOWN_EXECUTION','original finite STOP source unavailable',True))
         except Exception as exc:return failure(exc)
 
     @app.post('/api/v1/finite-host/commands')

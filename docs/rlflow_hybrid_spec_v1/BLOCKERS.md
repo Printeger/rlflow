@@ -1,5 +1,9 @@
 # 阻塞与证据缺口
 
+Checkpoint72 FINAL：本切片无新增未解决故障或用户决定阻塞，无live测试，真实客户端→human→原有限STOP→物理清理/来源回执及必要15项回归通过。剩余原整个Goal/任意树STOP、自然语言全局skill、完整配置/catalog发现、native/独立产品Reviewer/严格cgroup-quota/invoice/B1/T21/T22/T23/24h-8h/M5缺口保留，不把有限原固定执行成功当完整验收。cgroup及模型/Reviewer权限问题仍按原问题等待用户决定，不能自行调用paid/GPU或迁移生产。下一73先对齐原注册项目配置及schema/catalog发现行为；72进入归档提交，USERlock未改未stage。下方72 WIP为历史。
+
+72实施中：无新增需用户决定的权限阻塞。已修71嵌套skill实际封存目录权限缺陷，封存断言与必要回归通过；原有限STOP source read及immutable snapshot已通过、High差量关闭。尚未接通显式whole scope的client/inbox/human/UI；不能用这些读回测试证明完整STOP请求链。先耐久claim与零inbox I/O前latch不可同时承诺：请求inbox坏则尚未转交，原直接紧急STOP仍可用，不静默扩大权限/弃持久绑定。cold无原cache/owner不能从Core intent证明physical STOP，closedowner只历史AS_OF_RETURN。下一继续实际请求闭环，不把scope组件数量当完成。原paid/native/产品Reviewer/cgroup/OS/invoice/B1/长期/M5缺口全部保持；USERlock未改未stage，完整Goal active。
+
 Checkpoint71边界更新：结构化请求、人类转交、原DRAFT来源与实际安装client/skill已通过，无本切片新增需用户决定的阻塞。T15仍部分：A01自然语言自动触发/全局安装、完整项目配置/schema discovery及client STOP未验收，不能从skill文案/测试数量推算完成。72待实现请求STOP经人类原有限执行体收尾并报告真实取消/reap/FD关闭/Pool释放。原native执行/产品独立Reviewer授权与预算、严格cgroup delegation/OS任意树与配额、全局条件/invoice/B1/T21/T22/T23/长期及M5缺口继续保留；当前无需重复未答预算问题，也不擅自调用付费模型/GPU或迁移生产。证据见HYBRID_AGENT_REQUESTS.md与checkpoint-71-tests.txt。原Goal active，USERlock未改未stage。
 
 Checkpoint70 FINAL：没有剩余源码MUST、live测试或新增用户决定阻止本片提交。实际观测hook失效后的原HTTP STOP、不可复活撤回、并发退休读取与真实SSE展示均已验收，失败证据保留。严格cgroup/quota委派和产品Reviewer合同/额度仍沿用未答问题，无系统/生产/模型授权；终态内核用量不是可信invoice、预算结算、任意树或严格OS资源控制。原native/安装/B1/长期/T23/M5与完整Goal缺口保持，Goal active，USERlock未改未stage。

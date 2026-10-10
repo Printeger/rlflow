@@ -1,0 +1,21 @@
+TAP version 13
+# Subtest: actual client suggestion → explicit Chrome human forwarding → original DRAFT report; private clearing and lost response
+ok 1 - actual client suggestion → explicit Chrome human forwarding → original DRAFT report; private clearing and lost response
+  ---
+  duration_ms: 17612.521827
+  ...
+# physical_STOP {"versions":[16,15],"occupied":0,"pre_G_entered":true,"release_entered":false,"all_cancelled":true,"producer_reaped":true,"all_FDs_closed":true}
+# Subtest: actual client whole-scope suggestion → Chrome consent STOP → lost-response source report and physical cleanup
+ok 2 - actual client whole-scope suggestion → Chrome consent STOP → lost-response source report and physical cleanup
+  ---
+  duration_ms: 37891.858901
+  ...
+1..2
+# tests 2
+# suites 0
+# pass 2
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 55893.677911

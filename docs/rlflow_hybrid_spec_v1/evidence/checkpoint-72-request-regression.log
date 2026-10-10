@@ -1,0 +1,22 @@
+shared_auth_HTTP_STOP_isolation {'cpu_G': False, 'other_store_unchanged': True, 'other_AST_cases': 21, 'occupied': 0}
+.shared_auth_HTTP_actual_results {'launches': 2, 'pwrites': 1, 'cpu_status': 'EXPERIMENT_MACHINE_VERIFIED_PENDING_REVIEW', 'engineering_AST': 21, 'worker_cpu_ns': 0, 'billing': 'UNKNOWN'}
+.actual_finite_receipt_read {'original_Core_proved': True, 'second_cleanup': False, 'damaged_projection_rejected': True, 'occupied': 0}
+.actual_two_original_Runs_STOP {'live_before_STOP': 1, 'other_Pool_wait': True, 'both_G': False, 'all_reaped': True, 'all_FDs_closed': True, 'occupied': 0}
+.actual_whole_bounds {'bad_auth_and_key_conflict_no_latch': True, 'capacity_rows': 32, 'overflow_all_latched': True, 'occupied': 0, 'human_STOP_facts': 0}
+.actual_pending_interrupt {'active_until_future_terminal': True, 'known_scope_not_recleaned': True, 'occupied': 0}
+.actual_partial_submit {'submitted': 1, 'bounded_inline_fallback': 1, 'occupied': 0}
+.actual_HTTP_zero_submission_safe_cleanup {'response': 429, 'all_latched': True, 'cleanup_scopes': 2, 'occupied': 0, 'human_STOP_facts': 0}
+.actual_HTTP_finite_STOP {'scopes': 2, 'cpu_G': False, 'occupied': 0, 'independent_from_original_Run': True, 'receipt_retry_no_writes': True}
+.actual_finite_STOP {'original_scopes': 2, 'all_latched_before_cleanup': True, 'cpu_G': False, 'other_spawn': False, 'occupied': 0, 'duplicate_cleanup': False}
+.actual_reverse_unknown_interrupted_resume {'known_scope_preserved': True, 'known_scope_not_recleaned': True, 'occupied': 0}
+.actual_finite_partial_resume {'initial_occupied': 1, 'remaining_unknown': True, 'mutated_JSON_not_authority': True, 'only_unknown_cleanup_resumed': True, 'occupied': 0}
+.actual_partial_suggestion_STOP {'ordinary_retry_read_only': True, 'explicit_resume_unknown_only': True, 'known_scope_Core_unchanged': True, 'pool_occupied': 0}
+.actual_detached_STOP_handoff {'waiter_cancelled_after_all_latches': True, 'original_cleanup_returned': True, 'ordinary_inbox_workers_blocked': True, 'same_loop_profile_available': True, 'pool_occupied': 0}
+..
+=============================== warnings summary ===============================
+.venv/lib/python3.12/site-packages/starlette/testclient.py:37
+  /home/mint/rl_dev/rlflow_standalone/.venv/lib/python3.12/site-packages/starlette/testclient.py:37: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = typing.Callable[[], typing.ContextManager[anyio.abc.BlockingPortal]]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+15 passed, 1 warning in 327.32s (0:05:27)

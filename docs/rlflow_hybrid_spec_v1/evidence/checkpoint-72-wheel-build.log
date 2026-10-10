@@ -1,0 +1,9 @@
+Processing /home/mint/rl_dev/rlflow_standalone
+  Preparing metadata (pyproject.toml): started
+  Preparing metadata (pyproject.toml): finished with status 'done'
+Building wheels for collected packages: rlflow-standalone
+  Building wheel for rlflow-standalone (pyproject.toml): started
+  Building wheel for rlflow-standalone (pyproject.toml): finished with status 'done'
+  Created wheel for rlflow-standalone: filename=rlflow_standalone-0.2.0-py3-none-any.whl size=600806 sha256=b5ec07bfa0f03e29b2e21548e2df2d4079bd828ab020eef117f10246257ca860
+  Stored in directory: /tmp/pip-ephem-wheel-cache-wrqdqpd4/wheels/a7/dd/de/4ff772373f23860751f9c8a7f957d60d480d12a01600394091
+Successfully built rlflow-standalone

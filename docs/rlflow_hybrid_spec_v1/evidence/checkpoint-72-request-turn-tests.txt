@@ -1,0 +1,105 @@
+Checkpoint72 request implementation WIP, 2026-10-10, base3836e7b.
+This is a tool-transcript summary, not a byte-identical raw pytest log.
+Original goal ACTIVE. No paid model/GPU/global installation/production migration/push.
+All previous source-read/material evidence remains in checkpoint-72-wip-tests.txt.
+
+Test environment PYTHONPATH=/home/mint/rl_dev/rlflow_standalone PYTEST_DISABLE_PLUGIN_AUTOLOAD=1.
+Initial command without this environment failed before collection: ROS launch_testing imports lark, absent. No product test executed; no dependency install. Fixed environment, not test standard.
+
+Original19442 terminalf104af exit0: pytest -q -s tests/test_hybrid_agent_stop_requests.py.
+2 passed/1 existing Starlette warning41.13s. Actual suggestion no Core writes/latch,
+whole target Agent permission, original pre-G CPU STOP/reap/all FDs/Pool0,
+synthetic lost return AFTER actual original cleanup, original read source recovery,
+ordinary retry no prepare/cancel, explicit partial resume only unknown scope.
+
+High read-only three MUST: cancellation gap between prepare future and original STOP
+submission; final synchronous receipt read on ASGI loop; copied/rebound STOP helper.
+Fix bounded2 retained/shield orchestration, drain before original STOP jobs shutdown,
+independent ControlPool2 final read, original inbox/self binding checks before locks.
+
+Original28493 terminal049e18 exit0: same module before helper binding final delta.
+3 passed/1 existing warning62.91s. New deterministic real route coroutine waiter
+cancel AFTER all latches, orchestration continues original cleanup; blocked final
+read still same event loop original profile works. This is route-level cancellation,
+not a claimed browser TCP-disconnect observation.
+
+Original24899 terminale2313f exit1: latest first new request test +
+tests/test_hybrid_agent_requests.py tests/test_agent_client.py.
+1 failed/48 passed/1 old warning28.75s. New negative test mistakenly constructed a
+second AgentRequestService on an already-bound Store; ORIGINAL one-service gate
+correctly rejects. Test now reads actual original registered service; no gate change.
+Do not archive fixture tuple repr containing inactive synthetic credentials.
+Only failed/changed test rerun; unchanged48 Goal/client results reused.
+Original8703 terminalad1f3c exit0: first actual request test1 pass/1 old warning22.36s.
+Added direct copy/rebound helper negative, original no Inbox/Core/latch effect.
+
+Old Goal browser original54640 terminalae5360 exit0: 1pass19.094s after initial UI
+integration. Later crypto changed same panel; necessary final old+new browser rerun.
+First new Chrome original78770 terminala69d24 exit1 before server ready: owned
+fixture requested ttl900 > original short-lived max300. Fixed fixture ttl60, no
+Auth policy change, no worker STOP assertion reached in failed run.
+Original30762 terminal8ef7a7 exit0: real original two-scope client/Chrome STOP1pass
+38.399s. Actual CPU pre-G, allCancelled/reaped/allFDclosed/Pool0, one POST despite
+dropped successful return, source read recovers STOPPED_AS_OF_RETURN.
+
+High UI hash closure MUST: supplied scope/aggregate/child/body hashes not derived.
+Added async verification BEFORE display/confirm/resume, current ticket checked AFTER
+crypto awaits. PureNode1pass71.727ms, all four tamper classes public/private denied.
+Final old+new Chrome command node --test --test-concurrency=1
+web_checks/agent-stop-request-browser.test.mjs web_checks/agent-request-browser.test.mjs.
+Original52783 terminal6fb00c exit0:2pass55.894s. Full stdout archived separately.
+Loopback STOP fixture owns port8765 to match original preprovisioned approvals;
+collision refuses, does not kill another listener or rebind approved origin.
+
+Original4149 terminal0f9d52 exit0: new scope drift/inbox failure/cold claim test
+1pass/1 oldwarning17.75s. Valid rehashed foreign epoch/task/action rejected409 with
+zero latch/Core writes. Inbox I/O failure means not forwarded. Persisted claim plus
+original handoff failure yields UNKNOWN, cold separately provisioned reader has no
+owner/cache or cleanup authority and cannot promote durable intent to physical STOP.
+
+Skill-creator used for packaged product instructions (not global install); validator
+passed. JS syntax/diff/pip check passed before regression. USER package-lock sha
+becc7e2a36dfcad4ffe934b5ff2f0f68187611d6c0641bd63d81367651cfbf09 unchanged/unstaged.
+
+Added final disconnect test saturation of original ordinary inbox/list workers;
+only test source changed, not runtime since last browser/bounds successes.
+329 runtime/test/web inputs frozen in checkpoint-72-runtime-inputs.sha256.
+Unique necessary affected regression original61915 terminaldcf4bd exit0:
+pytest -q -s tests/test_hybrid_finite_host_app.py tests/test_hybrid_finite_host_stop.py
+tests/test_hybrid_agent_stop_requests.py::test_partial_original_cleanup_requires_explicit_resume_known_scope_not_repeated
+tests/test_hybrid_agent_stop_requests.py::test_disconnected_prepare_waiter_still_hands_off_STOP_and_final_read_does_not_block_loop
+tests/test_hybrid_fixture_materials.py::test_actual_fresh_material_closes_catalog_policy_and_release_seal
+15 passed/1 existing warning327.32s; no duplicate/restart. Final ordinary inbox/list
+workers saturation still original STOP latch/handoff returned, independently held
+final read did not block same-loop original profile. Original12 finiteApp/STOP cases,
+new partial/last disconnect combination and actual fresh sealed skill passed.
+All329 runtime/test/web inputs verified at terminal and after build/packaging, exit0.
+Manifest SHA323eb13711555085f267ec3d55e6e83d57458b61aa2fc1f21865565d65c4ca2f.
+High final UI hash/ticket delta has no remaining MUST; agent only read, did not test.
+
+Final isolated wheel /tmp/rlflow-cp72-final-wheel-4ddJBQ:
+.venv/bin/python -m pip wheel --no-index --no-deps --no-build-isolation --wheel-dir /tmp/rlflow-cp72-final-wheel-4ddJBQ .
+terminald19cae exit0. Wheel rlflow_standalone-0.2.0-py3-none-any.whl
+SHAb5ec07bfa0f03e29b2e21548e2df2d4079bd828ab020eef117f10246257ca860.
+.venv/bin/python -m pip install --no-index --no-deps --target /tmp/rlflow-cp72-final-wheel-4ddJBQ/site /tmp/rlflow-cp72-final-wheel-4ddJBQ/rlflow_standalone-0.2.0-py3-none-any.whl
+terminale368ab exit0. No global install/network/dependencies.
+.venv/bin/python /tmp/rlflow-cp72-final-wheel-4ddJBQ/probe.py
+R1 original85282 terminal5f0301 exit1: native fixture replaces subprocess.run with
+version-only stub. First CLI import probe never executed; product unaffected.
+Fixed disposable probe only: capture actual run/Popen before fixture, temporarily
+restore for installed CLI child (no runtime worker concurrent); fresh owned fixture-r2
+and target-r2, no delete/reset of first artifacts. R2 original81389 terminald1b521 exit0.
+Actual installed console/import outside checkout, target cwd, request-finite-stop
+AWAITING_HUMAN/Core no writes, status, original human SDK STOP/nonspawned two units,
+report original STOPPED_AS_OF_RETURN/Pool0, packaged skill path/content all pass.
+Installed probe does not claim worker execution; actual running CPU physical cleanup
+comes from the independent Chrome and backend tests above. Probe script archived.
+
+Final compile/JSsyntax/pipcheck/source-document diff passed. Final snapshot/user lock still match.
+Staged full diff check reports four trailing-whitespace lines in original pytest
+read-r1 raw log (stack separators/source excerpts); preserve byte-exact failure
+evidence, do not normalize it. Staged check excluding archived .log files passes.
+Archive and checkpoint72 commit follow; full Goal remains ACTIVE. Original72 source
+and earlier successful material evidence is reused only for unchanged behavior;
+fresh material case rerun because packaged skill changed. No new full repository
+regression or fullT15/T21/native/Reviewer/Goal completion assertion.

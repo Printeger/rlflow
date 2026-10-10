@@ -128,6 +128,10 @@ class AgentClient:
             raise ClientError(f'inbox HTTP {exc.code}; reconcile the same request/key, no automatic retry') from None
         except (URLError, TimeoutError, OSError) as exc:
             raise ClientError('inbox response unknown; reconcile the same request/key, no automatic retry') from None
+        if type(value) is dict and value.get('action') == 'request_finite_stop':
+            from .hybrid_agent_stop_requests import validate_public
+            try:return validate_public(value, self.project_id)
+            except ValueError:raise ClientError('closed original finite STOP receipt required') from None
         if (type(value) is not dict or value.get('schema_version') != '1.0'
                 or set(value) != {'schema_version','request_id','project_id','data_mode','store_epoch','action','request_hash','submitted_by','status','execution_enabled','result'}
                 or not isinstance(value.get('request_id'), str) or re.fullmatch(r'request_[0-9a-f]{64}', value['request_id']) is None
@@ -194,6 +198,23 @@ class AgentClient:
 
     get_report = get_status
 
+    def request_finite_stop(self, stop_scope, *, key):
+        from .hybrid_agent_stop_requests import validate_scope
+        if not isinstance(key,str) or ID.fullmatch(key) is None:
+            raise ClientError('explicit original finite request key required')
+        try:validate_scope(stop_scope)
+        except ValueError:raise ClientError('explicit complete original finite scope required') from None
+        result=self._call('',payload={'action':'request_finite_stop','stop_scope':stop_scope},key=key)
+        if result['action']!='request_finite_stop' or result['stop_scope']!=stop_scope:
+            raise ClientError('finite receipt differs from explicit original scope')
+        original={'schema_version':'1.0','action':'request_finite_stop','project_id':self.project_id,
+            'data_mode':'fixture','store_epoch':result['store_epoch'],'actor':result['submitted_by'],
+            'idempotency_key':key,'stop_scope':stop_scope}
+        rid='request_'+digest([self.project_id,'fixture',result['store_epoch'],result['submitted_by'],key]).removeprefix('sha256:')
+        if result['request_id']!=rid or result['request_hash']!=digest(original):
+            raise ClientError('finite receipt differs from exact scoped original key/body')
+        return result
+
 
 def arguments(parser):
     actions = parser.add_subparsers(dest='client_action', required=True)
@@ -201,6 +222,9 @@ def arguments(parser):
     submit = actions.add_parser('submit-goal')
     submit.add_argument('--proposal', type=Path, required=True)
     submit.add_argument('--key', required=True)
+    stop=actions.add_parser('request-finite-stop',help='suggest explicitly enumerated original finite scope STOP; no direct cancellation')
+    stop.add_argument('--scope',type=Path,required=True)
+    stop.add_argument('--key',required=True)
     for name in ('status', 'report'):
         read = actions.add_parser(name)
         read.add_argument('--request', required=True)
@@ -215,6 +239,9 @@ def main(args):
         if args.client_action == 'submit-goal':
             value = closed_json(read_regular(args.proposal, MAX_BYTES))
             result = client.submit_goal(value, key=args.key)
+        elif args.client_action == 'request-finite-stop':
+            value=closed_json(read_regular(args.scope, MAX_BYTES))
+            result=client.request_finite_stop(value,key=args.key)
         else:
             result = client.get_status(args.request)
         print(json.dumps(result, ensure_ascii=False, sort_keys=True, indent=2))

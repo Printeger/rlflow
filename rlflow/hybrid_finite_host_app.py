@@ -12,10 +12,12 @@ from .web_auth import AuthStore
 from .web_api import Project,create_app
 
 
-def create_finite_host_app(host,controls,auth,*,origin,observers=(),max_streams=8,max_control_jobs=4):
+def create_finite_host_app(host,controls,auth,*,origin,observers=(),max_streams=8,max_control_jobs=4,agent_requests=False):
     if type(host) is not HostExecutionService or type(auth) is not AuthStore:
         raise TypeError('actual original finite Host and same AuthStore required')
     host._pure_identity()  # Reject fork/copy before inherited locks or IO.
+    if type(agent_requests) is not bool:
+        raise ValueError('explicit trusted request hosting flag required')
     if type(max_streams) is not int or not 1<=max_streams<=16:
         raise ValueError('invalid stream limit')
     if type(max_control_jobs) is not int or not 1<=max_control_jobs<=8:
@@ -77,10 +79,20 @@ def create_finite_host_app(host,controls,auth,*,origin,observers=(),max_streams=
     from .hybrid_finite_host_stop import FiniteHostStop,install
     coordinator=FiniteHostStop(host,controls,auth,origin=origin)
     try:
+        pairs=None;requests=None
+        if agent_requests:
+            from .hybrid_control import ControlServices
+            from .hybrid_agent_requests import AgentRequestService
+            pairs={s.project_id:ControlServices(s.store._hybrid_draft_service,s.store._hybrid_authority_service) for s in controls}
+            if any(p.drafts is None or p.approvals is None or p.drafts.auth is not auth or p.approvals.auth is not auth or
+                   p.drafts.origin!=origin or p.approvals.origin!=origin for p in pairs.values()):
+                raise ValueError('original project Core services required for request hosting')
+            requests={key:AgentRequestService(pair.drafts,finite_stop=coordinator) for key,pair in pairs.items()}
         app=create_app(projects,auth,origin=origin,max_streams=max_streams,max_control_jobs=max_control_jobs,
             cpu_unit_services=cpu,engineering_unit_services=engineering,
             cpu_assessment_readers=cpu_readers,candidate_output_readers=engineering_readers,
-            fixed_unit_telemetry=telemetry,delivery_evidence_readers=delivery)
+            fixed_unit_telemetry=telemetry,delivery_evidence_readers=delivery,
+            control_services=pairs,agent_request_services=requests)
         install(app,coordinator)
         return app
     except BaseException:

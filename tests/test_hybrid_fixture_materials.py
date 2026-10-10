@@ -33,6 +33,10 @@ def test_actual_fresh_material_closes_catalog_policy_and_release_seal(prepared):
     raw = (material.stage_path / 'rlflow/runtime_boundary_policy.py').read_bytes()
     assert raw == policy_source(descriptor)
     assert hashlib.sha256(raw).hexdigest() == seal['release_manifest']['rlflow/runtime_boundary_policy.py']
+    skill = material.stage_path / 'rlflow/skills/rlflow/SKILL.md'
+    assert hashlib.sha256(skill.read_bytes()).hexdigest() == seal['release_manifest']['rlflow/skills/rlflow/SKILL.md']
+    for directory in (skill.parent, skill.parent.parent, skill.parent.parent.parent):
+        assert directory.stat().st_mode & 0o077 == 0
     assert not material.release_path.exists()
     assert builder.prepare() is material  # No remint, no new namespace/epoch.
     with pytest.raises(PermissionError, match='core installation INTENT'):

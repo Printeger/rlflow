@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "/tmp/rlflow-cp72-final-wheel-4ddJBQ/probe.py", line 48, in <module>
+    loaded=subprocess.run([sys.executable,'-c','import rlflow.agent_client;print(rlflow.agent_client.__file__)'],
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/mint/rl_dev/rlflow_standalone/tests/test_execution_adapter.py", line 48, in version
+    assert argv == [isolation.CODEX, '--version']
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError

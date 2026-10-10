@@ -6,9 +6,73 @@ import pytest
 from fastapi.testclient import TestClient
 
 from rlflow.hybrid_finite_host_stop import FiniteHostStop,ACTION
-from rlflow.store import Conflict
+from rlflow.store import Conflict,canonical
 from tests.test_hybrid_finite_host_app import application,ORIGIN,path,start
 from tests.test_execution_adapter import setup as native_setup
+
+def test_actual_finite_receipt_read_proves_Core_source_without_second_cleanup(application,monkeypatch):
+    host,units,services,observers,app,token,headers=application
+    coordinator=app.state.finite_host_stop
+    batch=coordinator.prepare({'action':ACTION},token=token,csrf=headers['X-CSRF-Token'],
+        origin=ORIGIN,idempotency_key='source_bound_read')
+    result=coordinator.execute_prepared(batch)
+    assert result['status']=='ORIGINAL_SCOPES_STOPPED_AS_OF_RETURN'
+    versions=[s.store.version() for s in services]
+    def no_cleanup(*a,**k):pytest.fail('receipt read repeated original cleanup')
+    for unit in units:monkeypatch.setattr(unit,'cancel',no_cleanup)
+    with TestClient(app,base_url=ORIGIN) as client:
+        client.cookies.set('rlflow_session',token)
+        url='/api/v1/finite-host/commands/'+batch.id
+        response=client.get(url)
+        assert response.status_code==200,response.text
+        assert response.json()=={**result,'duplicate':True}
+        assert coordinator.read_result(batch.id,actor_id='other_actor') is None
+        assert [s.store.version() for s in services]==versions
+        original_task=batch.commands[0][1]['task_id']
+        try:
+            batch.commands[0][1]['task_id']='foreign_task'
+            with pytest.raises(PermissionError,match='immutable'):
+                coordinator.read_result(batch.id,actor_id=batch.actor)
+        finally:batch.commands[0][1]['task_id']=original_task
+        assert coordinator.read_result(batch.id,actor_id=batch.actor)==response.json()
+        receipt=services[0].receipt
+        def concurrent_mutation(key):
+            batch.commands[0][1]['task_id']='changed_during_source_read'
+            return receipt(key)
+        try:
+            with monkeypatch.context() as patch:
+                patch.setattr(services[0],'receipt',concurrent_mutation)
+                assert coordinator.read_result(batch.id,actor_id=batch.actor)==response.json()
+        finally:batch.commands[0][1]['task_id']=original_task
+        # A genuine late intent receipt cannot promote unobserved cleanup.
+        row=coordinator._rows[(batch.actor,batch.key)];saved=row['result']
+        unknown=response.json();unknown['status']='PARTIAL_OR_UNKNOWN'
+        unknown['items'][0].update(intent=None,intent_status='UNKNOWN',cleanup_status='UNKNOWN',post_cleanup_status='UNKNOWN')
+        unknown_raw=canonical(unknown)
+        try:
+            row['result']=unknown_raw
+            kept=client.get(url)
+            assert kept.status_code==200 and kept.json()['status']=='PARTIAL_OR_UNKNOWN'
+            assert kept.json()['items'][0]['intent'] is None
+        finally:row['result']=saved
+        # Projection damage is confined to this disposable fixture. Original
+        # accepting event remains, so cache must not hide missing Core source.
+        service=services[0];key=batch.commands[0][2]
+        with service.store.connect() as db:
+            db.execute('DELETE FROM projection WHERE section=? AND object_key=?',
+                       (service._stop_domain.SECTION,key))
+            db.commit()
+        rejected=client.get(url)
+        assert rejected.status_code==503,rejected.text
+        assert rejected.json()['code']=='UNKNOWN_EXECUTION'
+        try:
+            row['result']=unknown_raw
+            assert client.get(url).status_code==503
+        finally:row['result']=saved
+        assert [s.store.version() for s in services]==versions
+        assert host.pool.snapshot()['occupied']==0
+    print('actual_finite_receipt_read',dict(original_Core_proved=True,second_cleanup=False,
+        damaged_projection_rejected=True,occupied=0),flush=True)
 
 def test_actual_two_original_Runs_one_live_one_Pool_wait_STOP_before_both_G(application,monkeypatch):
     host,units,services,observers,app,token,headers=application

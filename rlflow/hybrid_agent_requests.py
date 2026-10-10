@@ -32,13 +32,18 @@ class RequestConflict(Conflict):
 class AgentRequestService:
     """Trusted startup injection; IDs cannot reconstruct an original service."""
 
-    def __init__(self, drafts):
+    def __init__(self, drafts, *, finite_stop=None):
         if type(drafts) is not DraftService or drafts.store._hybrid_draft_service is not drafts:
             raise TypeError('original protected DraftService required')
         self.drafts = drafts
         self.store, self.auth = drafts.store, drafts.auth
         self.project_id, self.data_mode, self.store_epoch = drafts.project_id, drafts.data_mode, drafts.store_epoch
         self.origin = drafts.origin
+        self.stop_requests = None
+        if finite_stop is not None:
+            from .hybrid_agent_stop_requests import FiniteStopRequests
+            self.stop_requests = FiniteStopRequests(self, finite_stop)
+        self._stop_requests = self.stop_requests
         self._binding = (drafts, self.store, self.auth, self.project_id, self.data_mode, self.store_epoch, self.origin)
         self._pid = os.getpid()
         self._lock = threading.Lock()
@@ -101,6 +106,7 @@ class AgentRequestService:
     def _identity(self):
         # Check parent identity before inherited locks or sqlite after fork.
         if (os.getpid() != self._pid or getattr(self.store, '_hybrid_agent_request_service', None) is not self
+                or self.stop_requests is not self._stop_requests
                 or self._binding != (self.drafts, self.store, self.auth, self.project_id, self.data_mode, self.store_epoch, self.origin)
                 or self.path != self._path
                 or (self.drafts.store, self.drafts.auth, self.drafts.project_id, self.drafts.data_mode,
@@ -108,6 +114,8 @@ class AgentRequestService:
                 or self.store._hybrid_draft_service is not self.drafts
                 or self.store._hybrid_draft_auth_owner is not self.auth):
             raise PermissionError('original request service binding required')
+        if self.stop_requests is not None:
+            self.stop_requests.identity()
 
     def _pure(self):
         self._identity()
@@ -173,6 +181,11 @@ class AgentRequestService:
         budget = budget or ReadBudget(None, 4 * MAX_BYTES)
         value = budget.parse(row['body'].encode())
         budget.charge_literal(value)  # Inbox marker-like dicts are data, NOT blobs.
+        if type(value) is dict and value.get('action') == 'request_finite_stop':
+            from .hybrid_agent_stop_requests import decode
+            claim = budget.parse(row['claim'].encode()) if row['claim'] is not None else None
+            if claim is not None: budget.charge_literal(claim)
+            return decode(self, value, claim, row['id'])
         validate_request(value)
         if value != self._request(value['proposal'], actor=value['actor'], key=value['idempotency_key'], expected_revision=value['expected_revision']):
             raise Conflict('invalid inbox request')
@@ -253,6 +266,9 @@ class AgentRequestService:
             return command_dto(command_id, receipt), 'ADOPTED'
 
     def _dto(self, rid, value, claim, *, private=False):
+        if value['action'] == 'request_finite_stop':
+            from .hybrid_agent_stop_requests import dto
+            return dto(self, rid, value, claim, private=private)
         result, status = self._source(claim) if claim is not None else (None, 'AWAITING_HUMAN')
         dto = {'schema_version': '1.0', 'request_id': rid, 'project_id': self.project_id,
             'data_mode': self.data_mode, 'store_epoch': self.store_epoch,
@@ -275,9 +291,17 @@ class AgentRequestService:
             value, claim = self._decode(self._rows(db, rid=rid))
         if method == 'request' and value['actor']['id'] != access.principal.id:
             raise ControlError(404, 'NOT_FOUND', 'request not found')
+        self._scope_access(value, access, method)
         dto = self._dto(rid, value, claim, private=method == 'session')
-        self._authorize(token, method)
+        self._scope_access(value, self._authorize(token, method), method)
         return dto
+
+    @staticmethod
+    def _scope_access(value, access, method):
+        if value['action'] == 'request_finite_stop':
+            from .hybrid_agent_stop_requests import allowed
+            if not allowed(access.principal, value, human=method == 'session'):
+                raise ControlError(404, 'NOT_FOUND', 'request not found')
 
     def list(self, *, token):
         self._identity()
@@ -288,8 +312,13 @@ class AgentRequestService:
                 raise Conflict('inbox exceeds request limit')
             budget = ReadBudget(None, 16 * 1024 * 1024)
             values = [(row['id'], *self._decode(row, budget)) for row in rows]
-        items = [self._dto(rid, value, claim) for rid, value, claim in values]
-        self._authorize(token, 'session')
+        access = self._authorize(token, 'session')
+        from .hybrid_agent_stop_requests import allowed
+        visible = [(rid, value, claim) for rid, value, claim in values
+                   if value['action'] != 'request_finite_stop' or allowed(access.principal, value, human=True)]
+        items = [self._dto(rid, value, claim) for rid, value, claim in visible]
+        access = self._authorize(token, 'session')
+        for _, value, _ in visible: self._scope_access(value, access, 'session')
         return {'project_id': self.project_id, 'data_mode': self.data_mode, 'store_epoch': self.store_epoch, 'items': items}
 
     def forward(self, rid, *, request_hash, expected_version, token, csrf, origin):
@@ -304,6 +333,8 @@ class AgentRequestService:
             with self.auth.operator_guard(token, project_id=self.project_id, csrf=csrf) as guard:
                 principal = guard.check().principal
                 value, claim = self._decode(self._rows(db, rid=rid))
+                if value['action'] != 'propose_goal_draft':
+                    raise RequestConflict('finite STOP requires explicit original-scope forwarding')
                 if digest(value) != request_hash:
                     raise RequestConflict('human confirmation differs from saved request')
                 actor = {'id': principal.id, 'kind': 'human'}
@@ -337,6 +368,7 @@ def install(app, services, controls, projects, auth, *, origin, max_jobs):
     from fastapi import Request
     from .hybrid_control import ControlPool, body, error_response
     from contextlib import asynccontextmanager
+    import asyncio
     services = dict(services)
     if not 1 <= len(services) <= 128:
         raise ValueError('bounded original request services required')
@@ -349,6 +381,15 @@ def install(app, services, controls, projects, auth, *, origin, max_jobs):
             raise ValueError('request service original control binding mismatch')
         service._pure()
     pool = ControlPool(max_jobs)
+    stop_prepare_pool = ControlPool(2)
+    stop_read_pool = ControlPool(2)
+    stop_tasks = set()
+    stop_closing = [False]
+    async def drain_stop_tasks():
+        stop_closing[0] = True
+        if stop_tasks:
+            await asyncio.gather(*tuple(stop_tasks), return_exceptions=True)
+    app.state.agent_request_stop_drain = drain_stop_tasks
     original_lifespan = app.router.lifespan_context
     @asynccontextmanager
     async def lifespan(current):
@@ -356,7 +397,10 @@ def install(app, services, controls, projects, auth, *, origin, max_jobs):
             try:
                 yield
             finally:
+                await drain_stop_tasks()
                 await pool.close()
+                await stop_prepare_pool.close()
+                await stop_read_pool.close()
     app.router.lifespan_context = lifespan
 
     def scoped(request, project, *, human=False):
@@ -386,15 +430,15 @@ def install(app, services, controls, projects, auth, *, origin, max_jobs):
         if request.query_params:
             raise ControlError(400, 'VALIDATION_ERROR', 'closed inbox query required')
         headers = request.scope['headers']
-        for name in (b'x-csrf-token', b'content-type', b'idempotency-key'):
+        for name in (b'x-csrf-token', b'content-type', b'idempotency-key', b'origin', b'cookie', b'authorization'):
             if sum(k == name for k, _ in headers) > 1:
                 raise ControlError(403, 'PERMISSION_DENIED', 'ambiguous inbox headers')
         if write and request.headers.get('origin') != origin:
             raise ControlError(403, 'PERMISSION_DENIED', 'same-origin inbox write required')
 
-    async def response(call):
+    async def response(call, *, jobs=pool):
         try:
-            return await pool.run(call)
+            return await jobs.run(call)
         except ControlError as error:
             return error_response(error)
         except PermissionError:
@@ -413,7 +457,9 @@ def install(app, services, controls, projects, auth, *, origin, max_jobs):
         try:
             closed(request, write=True)
             payload = await body(request)
-            validate_schema(obj({'action': {'const': 'submit_goal'}, 'proposal': {'type': 'object'}, 'expected_revision': COUNT}), payload)
+            from .hybrid_agent_stop_requests import ACTION, SCOPE
+            validate_schema({'oneOf': [obj({'action': {'const': 'submit_goal'}, 'proposal': {'type': 'object'}, 'expected_revision': COUNT}),
+                obj({'action': {'const': ACTION}, 'stop_scope': SCOPE})]}, payload)
             validate_schema(ID, request.headers.get('idempotency-key'))
         except (ControlError, ProtocolError) as error:
             return error_response(error if isinstance(error, ControlError) else ControlError(400, 'VALIDATION_ERROR', 'closed goal request required'))
@@ -421,8 +467,58 @@ def install(app, services, controls, projects, auth, *, origin, max_jobs):
             service, token, method = scoped(request, project_id)
             if method != 'request':
                 raise ControlError(403, 'PERMISSION_DENIED', 'request-only agent token required')
+            if payload['action'] == 'request_finite_stop':
+                if service.stop_requests is None:
+                    raise ControlError(409, 'UNSUPPORTED_CAPABILITY', 'original finite STOP requests not enabled')
+                return service.stop_requests.submit(payload['stop_scope'], token=token, key=request.headers['idempotency-key'])
             return service.submit(payload['proposal'], token=token, idempotency_key=request.headers['idempotency-key'], expected_revision=payload['expected_revision'])
         return await response(call)
+
+    @app.post('/api/v1/projects/{project_id}/agent-requests/{request_id}/forward-stop')
+    async def forward_stop(request: Request, project_id: str, request_id: str):
+        try:
+            closed(request, write=True)
+            payload = await body(request)
+            validate_schema(obj({'request_hash': HASH, 'resume_cleanup': {'type': 'boolean'}}), payload)
+        except (ControlError, ProtocolError) as error:
+            return error_response(error if isinstance(error, ControlError) else ControlError(400, 'VALIDATION_ERROR', 'explicit whole finite confirmation required'))
+        def prepare():
+            service, token, _ = scoped(request, project_id, human=True)
+            helper = service.stop_requests
+            if helper is None or getattr(app.state, 'finite_host_stop', None) is not helper.coordinator:
+                raise ControlError(409, 'UNSUPPORTED_CAPABILITY', 'original finite STOP not hosted')
+            batch = helper.prepare(request_id, **payload, token=token,
+                csrf=request.headers.get('x-csrf-token'), origin=origin)
+            return service, token, helper, batch
+        async def execute():
+            service, token, helper, batch = await stop_prepare_pool.run(prepare)
+            if batch is not None:
+                try:
+                    await app.state.finite_host_stop_pool.run(lambda:helper.execute(batch, resume_cleanup=payload['resume_cleanup']))
+                except ControlError:
+                    helper.coordinator._safety_cancel()
+                    raise
+            return await stop_read_pool.run(lambda:service.get(request_id, token=token, method='session'))
+        # Keep error mapping shared, but do NOT queue behind Goal forwards.
+        try:
+            # The bounded orchestration, not the HTTP waiter, owns the handoff
+            # from a durable claim/all latches to the original STOP future.
+            if stop_closing[0] or len(stop_tasks) >= 2:
+                raise ControlError(429, 'BUDGET_EXHAUSTED', 'finite forwarding capacity reached')
+            task = asyncio.create_task(execute())
+            stop_tasks.add(task)
+            def terminal(done):
+                stop_tasks.discard(done)
+                if not done.cancelled():
+                    done.exception()  # Consume detached errors; never invent a receipt.
+            task.add_done_callback(terminal)
+            return await asyncio.shield(task)
+        except ControlError as error:return error_response(error)
+        except PermissionError:return error_response(ControlError(403, 'PERMISSION_DENIED', 'whole human finite scope required'))
+        except RequestConflict:return error_response(ControlError(409, 'VERSION_CONFLICT', 'frozen finite request differs'))
+        except Conflict:return error_response(ControlError(503, 'UNKNOWN_EXECUTION', 'original finite result unavailable'))
+        except ProtocolError:return error_response(ControlError(400, 'VALIDATION_ERROR', 'closed finite request required'))
+        except Exception:return error_response(ControlError(503, 'UNKNOWN_EXECUTION', 'finite result unknown; reconcile original request'))
 
     @app.get('/api/v1/projects/{project_id}/agent-requests')
     async def listing(request: Request, project_id: str):

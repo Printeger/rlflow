@@ -369,7 +369,13 @@ class FixtureMaterialBuilder:
                     if total > 16 * 1024**2:
                         raise Conflict('fixture release material exceeds finite bound')
                     target = stage / name
-                    target.parent.mkdir(mode=0o700, parents=True, exist_ok=True)
+                    # pathlib parents=True applies mode only to the leaf.
+                    # Nested packaged resources (e.g. skills/rlflow/SKILL.md)
+                    # must not introduce default-umask intermediate dirs.
+                    directory = stage
+                    for part in Path(name).parts[:-1]:
+                        directory /= part
+                        directory.mkdir(mode=0o700, exist_ok=True)
                     _write_new(target, data); manifest[name] = hashlib.sha256(data).hexdigest()
                 _verify_inventory(self._source, sources, directories, chain, deadline)
             seal = {'descriptor': descriptor, 'catalog': catalog, 'release_manifest': manifest, 'release_id': sha(manifest)}

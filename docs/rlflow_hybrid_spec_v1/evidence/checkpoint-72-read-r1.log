@@ -1,0 +1,82 @@
+E
+==================================== ERRORS ====================================
+_ ERROR at setup of test_actual_finite_receipt_read_proves_Core_source_without_second_cleanup _
+
+tmp_path = PosixPath('/tmp/pytest-of-mint/pytest-612/test_actual_finite_receipt_rea0')
+native_setup = (<rlflow.execution_adapter.CodexExecAdapter object at 0x7dd2cbab6f60>, PreparationPlan(id='preparation_beeb6f9626cc629...receipt_rea0/candidate/module'), PosixPath('/tmp/pytest-of-mint/pytest-612/test_actual_finite_receipt_rea0/cache'), [])
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7dd2cbab6f30>
+
+    @pytest.fixture
+    def application(tmp_path,native_setup,monkeypatch):
+        # Trusted fixture setup BEFORE either independent approval. Never rebind
+        # an existing Runtime/Store/Approval witness to a replacement Auth.
+        auth=AuthStore([Credential.create(Principal('fixture_human','human',
+            {'operator','approver'},{'shared_project_0','shared_project_1'}),PHRASE)],ttl=900)
+        from tests import test_hybrid_working_plan_service as working
+        monkeypatch.setattr(working,'AuthStore',lambda *args,**kwargs:auth)
+        fixture=shared.__wrapped__(tmp_path,native_setup,monkeypatch)
+        try:
+>           host,units=next(fixture)
+
+tests/test_hybrid_finite_host_app.py:33: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_hybrid_host_execution.py:78: in shared
+    owner, token, observation, _, reserve, utc, mono = next(fixture)
+tests/test_hybrid_working_plan_service.py:46: in plans
+    installation=FixtureInstallationService(builder);material=builder.prepare()
+rlflow/hybrid_fixture_materials.py:377: in prepare
+    with _inventory(stage, closed=True, deadline=deadline) as (sources, directories, chain):
+/usr/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+root = PosixPath('/tmp/pytest-of-mint/pytest-612/test_actual_finite_receipt_rea0/rlflow-host-fixture-jkba1gtc/projects/project_0/installation-parent/rlflow-guarded-fixture-_i6nb2j3/bootstrap/stage-fixture_install_e6bc7572ccbb42e78e678882540c8461')
+
+    @contextmanager
+    def _inventory(root, *, closed=False, deadline=None):
+        """Retain the original descriptor graph; closed releases admit no hidden bytes.
+    
+        The trusted source checkout intentionally selects the existing code-only
+        release domain. A staged release instead inventories EVERY entry, including
+        root extras and caches, before it can be considered sealed.
+        """
+        root = Path(root); opened = []; sources = {}; directories = []
+        with _held_chain(root) as (chain_fds, chain):
+            root_fd = chain_fds[-1]
+            root_info = os.fstat(root_fd)
+            directories.append({'path': root, 'fd': root_fd, 'stamp': stamp(root_info), 'parent_fd': None})
+            stack = [(root, root_fd, 0)]; entries_seen = 0; seen_top = set()
+            try:
+                while stack:
+                    _deadline(deadline)
+                    path, parent_fd, depth = stack.pop()
+                    if depth > 64: raise Conflict('fixture release directory enumeration exceeds bound')
+                    with os.scandir(parent_fd) as entries:
+                        for item in entries:
+                            _deadline(deadline); entries_seen += 1
+                            if entries_seen > 4096:
+                                raise Conflict('fixture release entry count exceeds bound')
+                            name = item.name
+                            if depth == 0:
+                                if name not in _FOLDERS | _TOP_FILES | ({'release.json'} if closed else set()):
+                                    if closed: raise Conflict('fixture release contains extra root entry')
+                                    continue
+                                seen_top.add(name)
+                            if name == '__pycache__':
+                                if closed: raise Conflict('fixture release contains unsealed cache')
+                                continue
+                            info = os.stat(name, dir_fd=parent_fd, follow_symlinks=False)
+                            if closed and (info.st_uid != os.getuid() or info.st_mode & 0o077):
+>                               raise Conflict('fixture release requires private owner entries')
+E                               rlflow.store.Conflict: fixture release requires private owner entries
+
+rlflow/hybrid_fixture_materials.py:152: Conflict
+=============================== warnings summary ===============================
+.venv/lib/python3.12/site-packages/starlette/testclient.py:37
+  /home/mint/rl_dev/rlflow_standalone/.venv/lib/python3.12/site-packages/starlette/testclient.py:37: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = typing.Callable[[], typing.ContextManager[anyio.abc.BlockingPortal]]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+ERROR tests/test_hybrid_finite_host_stop.py::test_actual_finite_receipt_read_proves_Core_source_without_second_cleanup
+1 warning, 1 error in 1.08s
