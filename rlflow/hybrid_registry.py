@@ -154,6 +154,9 @@ class Registry:
                 raise ProtocolError('unregistered or changed dataset version')
             if declaration['purpose'] not in dataset['purposes'] or declaration['access'] != dataset['access']:
                 raise ProtocolError('dataset declaration exceeds registered boundary', 'PERMISSION_DENIED')
+        if any(tool['adapter']=='original_a_workflow_v2' for tool in config['tools'].values()):
+            from .hybrid_a_workflow_profile import validate_approval
+            validate_approval(proposal,config)
         proposal_hash, config_hash = digest(proposal), digest(config)
         return {'state': 'NOT_EXECUTABLE', 'project_id': config['project_id'],
                 'data_mode': config['data_mode'], 'proposal_hash': proposal_hash,

@@ -1,5 +1,7 @@
 # 首个真实工程自主闭环：最小交付清单
 
+2026-10-11审批表达已本地接通：新A_ENGINEERING_WORKFLOW_V2原Registry/ApprovalService可冻结一次model+CPU契约，历史回放验证同envelope，明确Engineer PATCH与独立Evaluator REVIEW输出、可信验收、双向protected边界、配额/修复/接续限制；仍execution_qualified=false。下一直接实现原受保护事实派生逐次packet/grant（含parent key/hash/version和原新reservation/Controller/CAS/STOP），而非继续仅增加准备组件。原账户/生成来源、结算、产品独立Review、条件CAS/接续和首个真实任务仍全部必需，当前NOT_EXECUTED；小额A运行合同未经批准不调用，GPU/B/C/instinctRL HOLD不变。
+
 2026-10-11首要纠正：须先建立versioned workflow批准envelope与原持久事实派生每次packet/grant的接线。当前V1单一role/候选hash审批无法对未知产出发Evaluator或续作grant，现CPU验收合同又要求模型预算全零；已原调用链实证拒绝并独立确认。不能用多个人类批准的单packet试跑充自主闭环，也不能删原hash/审批门。新workflow需同一原批准/Registry不变下完成Engineer未知candidate→受管CPU检查→不同原session Evaluator→受保护条件接纳→有界下一packet，并保留父facts key/hash/version、新reservation/Controller/CAS/STOP。已有V1维持旧语义不升级；账户/source/结算仍缺，本地继续、实际A合同未批不运行。完整目标与其他验收不变。
 
 最新实现边界：新fixed native gate已真实在Linux内核限制下no-G退出，不执行Codex；原source/controller事务可冻结ELF/config/helper/ready和empty私有会话目录并独立清理正常/partial分配。实际输入会经sealed memfd防等待G期间篡改，G不作模型上下文。第1项剩原账户/credential-owner、原生产者与ready/G接通和完整stdout/EOF；第2–5项仍缺原用量publisher结算、独立Evaluator、条件CAS接纳/接续及真实任务结果。start/spawn/release仍deny，不能用no-G证据计真实任务或A闭环完成。

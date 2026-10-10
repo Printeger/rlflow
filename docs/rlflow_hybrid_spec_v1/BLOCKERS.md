@@ -1,5 +1,7 @@
 # 阻塞与证据缺口
 
+2026-10-11更新：V2一次workflow envelope已可经原Registry/ApprovalService持久化并冷回放，旧V1不升级；这仅消除审批合同表达缺口，尚未连接保护来源派生新packet/grant和历史runtime核验。原账户/生产者、可信结算、不同原会话Review、条件CAS及首次真实任务仍缺；控制总时长/角色配额尚需原账本实际消费门。不把execution_qualified=false登记当执行资格，不增加每步人工审批。无新增用户决定阻塞本地开发；实际模型运行仍只待已提出小额A合同批准，GPU/B/C/instinctRL HOLD不变。
+
 当前最高本地缺口是workflow批准与逐次派生出处边界，不是账户读取前置：V1 profile/grant/历史闭包锁死单一角色及候选，CPU旧合同要求全零模型维度，现不能实现同审批下未知candidate→验收→独立Review→下一packet。需新版本workflow envelope+protected派生facts，同时保留V1不升级和原新grant/预算/Controller/CAS/STOP。原A合同资源/账户不变，仅实际运行待已提出合同批准；本地改造继续，不增加每步人工审批；实际模型/任务仍NOT_EXECUTED，GPU/B/C/instinctRL HOLD不变。
 
 最新直接缺口缩减：固定native gate与原no-auth启动材料已本地实装，实际无G在内核限制后退出126、原材料正常/partial清理验证通过。仍缺原credential持有者/账户验证、实际producer-ready-G与原stdout/EOF用量publisher/结算；新gate的account=false ready或未发送G试验不能替代。独立Evaluator、条件CAS/接续与首个非预设真实工程task仍未完成。无新增用户决定阻塞本地开发；已提出A运行合同未答不调用模型，GPU/B/C/instinctRL HOLD不变，Goal ACTIVE。

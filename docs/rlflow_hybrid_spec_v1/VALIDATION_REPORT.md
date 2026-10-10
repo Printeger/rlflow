@@ -1,5 +1,7 @@
 # 需求包离线校验报告
 
+2026-10-11 V2原审批切片：新profile首失败已定位为测试owner误重绑和definition alias，保留原门/逐项detached修后12affectedpass2.85s；6原spec负例已首pass未重复。共享Registry/Authority77pass5.28s；required conditions新affected3pass.88s；V1变候选/Evaluator原拒绝1pass5.06s证明兼容而非A完成。High保护路径后代重叠MUST双向修复，affected正/负3pass.89s；compile/diff/USERlock检查通过，完整命令/失败记录见evidence/a-workflow-envelope-20261011.txt。实际模型任务、产品Review/结算/条件接续NOT_EXECUTED；不虚称全量或关闭98/A。Goal ACTIVE。
+
 2026-10-11原V1自治缺口复现：单独原78829自然terminal1pass5.11s，实际原审批/plan/owner拒Evaluator packet与新candidate，未发grant/Store和Pool版本不变。测试通过仅证明V1正确拒越界，并证明不能完成要求的自主链，不是Review/A验收。独立High确证原审批Registry闭包及CPU全零模型合同冲突；根因与下一最小重构见evidence/a-workflow-contract-gap-20261011.txt。未重复gate/旧passed，不读auth/调模型/GPU，Goal ACTIVE。
 
 末窄审临时FD MUST修后，仅受影响原prepare/partial/真实helper closefault原29929三项通过31.50s；实际ELF pin失败尚未返回FD+原closefault新5309一项通过10.03s。未清FD时UNKNOWN/Pool1，只有原FD实际成功关闭才完整STOP/FREE；新owner terminal和fork均覆盖extras。High关闭/no remaining MUST，compile/diff/USERlock/旧helperhash通过；全部原session terminal，未重复无变更7项gate。证据a-native-gate-wip-20261010.txt，snapshot不是A/98或真实任务完成。

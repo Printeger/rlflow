@@ -1,5 +1,7 @@
 # Hybrid v1 开发进度
 
+2026-10-11 A workflow V2审批切片：已接原Registry/ApprovalService，冻结同一模型+CPU范围、角色输出schema、可信检查、预算及有限修复/接续，不冻结未知候选bytes；实际原会话fixture确认后immutable registry witness及snapshot/recover/audit/replay通过。新case首12fail/6pass定位测试误重绑owner及输出alias，保留原权限门修后仅12affectedpass2.85s；共享Registry/Authority77pass5.28s、required条件3pass.88s、旧V1原拒绝兼容1pass5.06s。High保护路径后代重叠MUST修为双向检查，affected3pass.89s；证据a-workflow-envelope-20261011.txt。不把本审批组件计自主闭环/A/98完成，真实task仍NOT_EXECUTED。下一原持久来源派生packet/grant及历史validator接线，继而可信结算/独立Review/条件CAS/接续；受控总时长和角色配额仍需原ledger消耗门。A实际额度待批，本地继续，GPU/B/C/HOLD不变，Goal ACTIVE。
+
 2026-10-11 A直接依赖纠正：已实证V1模型合同只授权同一预冻结role/packet/candidate/schema，新候选或Evaluator原grant拒绝、Store/Pool不变（78829单项1pass5.11s）。独立High核原审批/Registry/历史validator/WorkingPlan确认：8会话不等于能从未知产出自主评审/接续；现CPU验收又只能zero-model/none-network，不能借给同模型Goal。这是直接阻链契约设计缺口，不应继续仅添credential/preflight组件。下一首要新增版本化workflow批准范围/角色schema/固定验收规则/同A费用ceilings，再由原持久Source/Candidate/test/Review证据派生各attempt与packet，新reservation/Controller/CAS/STOP不减；V1不自动升级，不要求每步人类再批。不增A合同资源、不启模型/GPU、B/C/HOLD不变。详细证据evidence/a-workflow-contract-gap-20261011.txt；真实task/Review/条件/接续仍NOT_EXECUTED，Goal ACTIVE。
 
 本轮收尾：独立source窄审临时FD未完整强保留MUST已修为所有ELF祖先/ELF/helper打开即登记，独立fork/cleanup/terminal全纳闭包，未返回的pin/read失败也不可漏FREE。受影响原prepare两项+真实helper close失败3pass31.50s；另真实ELF pin未返回+close失败1pass10.03s；均UNKNOWN/Pool1直到原FD成功close，最后fullSTOP/Pool0，High源码关闭，无剩余确证MUST。原7项no-G无需重跑；compile/diff/USERlock/helperhash通过。归档提交为A本地实现快照，不编号关闭98或A；下一原credential-owner/生产者-ready-G/可信用量结算→Evaluator/条件CAS/接续；未批准不运行模型/GPU，Goal ACTIVE。

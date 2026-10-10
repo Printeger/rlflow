@@ -1,5 +1,7 @@
 # 开发决策记录
 
+2026-10-11 A workflow V2 原审批边界：新增明确adapter而非升级V1；审批固定账户、模型、总额度、原程序hash声明、可信CPU验收、候选路径及角色schema，未知生成candidate留给原受保护事实逐次派生。原Registry.resolve确认和历史回放同时校验此闭合范围；原ApprovalService继续只产生LEASE_VALIDATION_PENDING。登记及声明hash不证明账户、实际程序或运行资格，不会把caller JSON变成来源。必需deterministic和independent_review条件不可降optional；可写候选与保护路径双向重叠均拒。两个High为共享总配额，REVISE耗尽时必须停止，不能额外调用；一次接续仅证明下一任务派发，不保证其完整闭环。下一必须实现原facts→新grant/reservation→Controller/CAS/STOP和历史验证，不以contract登记代替纵向交付。证据evidence/a-workflow-envelope-20261011.txt。
+
 2026-10-11：V1只对单一预冻结packet安全，不是自主workflow授权。未知Engineer产出不能预签hash，但也不能删除原hash核验或让caller JSON充出处。新增版本由一次审批冻结范围/资源/角色schema/可信检查与条件，由Core原持久source/candidate/test/review事实派生逐次冻结输入，fresh与历史同时核envelope+出处。CPU验收也须workflow派生原grant，不借旧全零模型合同。此直接依赖前移，credential/producer接线仍需要但不以更多预备组件代替纵向链；同A小额合同不扩资源，V1不迁移/自动升级。
 
 末审直接STOP缺陷处理：不借内部finally-close失败无法交回原FD的pin/read helper。新Source为每次本片open立即强登记，身份未知不采纳/不假关闭，成功身份核后独立close；所有输入含祖先FD纳fork与终态门。只修当前直接接线所引入的闭包问题，不扩旧恢复工作；原共享diagnostic helper未改。

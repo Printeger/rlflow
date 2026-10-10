@@ -1,0 +1,71 @@
+A workflow envelope V2 — local approval slice, NOT autonomous completion
+Base: 50f284e; date: 2026-10-11; real model/API/GPU calls: ZERO.
+
+Delivered behavior:
+- Original Registry.resolve interprets the explicitly registered V2 adapter.
+- One combined native_model + local_cpu engineering approval pins current
+  workspace/account mode, medium/high quotas, soft tokens, wall/controlled
+  time, immutable model/CPU program declarations, exact candidate paths,
+  trusted acceptance code/rule, role-specific Engineer PATCH/Evaluator REVIEW
+  schemas, finite repairs and one condition-dependent continuation.
+- Required deterministic and independent_review conditions cannot be optional.
+- Future packet/candidate bytes are deliberately not the approval envelope.
+- Original authenticated ApprovalService persists the full registry witness;
+  snapshot/recover/audit/replay validate it through the same Registry.resolve.
+- Registration is execution_qualified=false. No dispatch, provenance receipt,
+  usage settlement, Review/ConditionEvidence or continuation authority added.
+- Old V1 packet approvals keep their original exact packet/candidate semantics.
+
+Commands/results (actual product development tests; synthetic account/consent):
+0c139b: .venv/bin/pytest -q tests/test_hybrid_a_workflow_profile.py
+  exit1 before collection: inherited ROS plugin requires missing lark.
+  Changed invocation to isolated PYTHONPATH + disabled third-party autoload;
+  no system dependency/configuration mutation and no blind same-command rerun.
+653b64 / 23981 / dd7158:
+  env -u PYTHONPATH PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m
+  pytest -q tests/test_hybrid_a_workflow_profile.py
+  12 failed, 6 passed in 2.09s.
+  Diagnosis: test reused already-bound original Authority owner (11 failures),
+  plus returned registration shared definition references (1 failure).
+  Fixed test with fresh Store, preserved original non-rebinding gate;
+  individually copied returned definitions, did not relax validation.
+5d5b72 / 93037 / 3abc71:
+  same isolated command, -k 'not spec_is_closed'
+  12 passed, 6 deselected in 2.85s. Only affected failures rerun.
+938ca7 / 37930 / 04641e:
+  isolated pytest tests/test_hybrid_registry.py tests/test_hybrid_authority.py
+  77 passed in 5.28s. Required shared Registry hook regression, not full suite.
+17a3d7:
+  isolated pytest tests/test_hybrid_a_workflow_profile.py
+  -k 'actual_original or optional_review or optional_checks'
+  3 passed, 17 deselected in 0.88s. Added required condition validation.
+3f945c / 12649 / b9f7cc:
+  isolated pytest tests/test_hybrid_native_model_runtime.py
+  -k v1_approval_does_not_authorize
+  1 passed, 19 deselected in 5.06s. Changed Registry compatibility check;
+  old approval still denies changed candidate or Evaluator packet.
+8373af: changed Python compileall + git diff --check exit0.
+High narrow review: protected-path descendant overlap missing; fixed exact
+  two-way overlap (candidate below protected OR protected below candidate).
+801d26: isolated pytest new profile -k 'actual_original or protected_'
+  3 passed, 18 deselected in 0.89s (normal sibling positive, parent and
+  descendant protected negatives); no unchanged tests rerun.
+High final read-only review: sole protected-descendant MUST closed; no
+  remaining confirmed MUST within approval-envelope/Registry replay scope.
+  Review did not run tests or change files and is not a product Review receipt.
+92edaa: unrelated USER package-lock.json SHA unchanged:
+becc7e2a36dfcad4ffe934b5ff2f0f68187611d6c0641bd63d81367651cfbf09
+
+Not proven / next vertical slice:
+Protected original persisted provenance must derive every packet/grant under
+this envelope, including exact parent key/hash/version, candidate manifest,
+role schema, fresh reservation and Controller/WorkingPlan CAS/STOP. Historical
+runtime validators must validate those original derivations, not merely delete
+V1 packet hashes. No workflow grant can execute yet. Controlled-time and role
+quota consumption still require original ledger enforcement. Two High sessions
+are a shared finite quota; exhausted repair/review branches must stop, not
+silently create more calls. Continuation dispatch is not completion of a second
+task. Actual account/producer/source, trusted settlement, independent product
+review, condition acceptance and first non-preset task remain NOT_EXECUTED.
+Existing small A runtime contract pending approval; GPU/B/C/instinctRL HOLD
+unchanged. Local development unblocked; Goal ACTIVE; no checkpoint98/A closure.
