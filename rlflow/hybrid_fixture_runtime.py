@@ -158,6 +158,10 @@ class FixtureRuntimeOwner:
             self._workflow_handoff=handoff
             self._workflow_handoff_parent=None if handoff is None else (prior,cap)
             self._workflow_handoff_raw=None if handoff is None else (root[4],root[5])
+            self._workflow_cpu_sequence_lock=threading.Lock()
+            self._workflow_cpu_admission_lock=threading.RLock()
+            self._workflow_cpu_sequence=None
+            self._workflow_cpu_completed=None
             self._engineering_units = self._execution_units  # Original SDK compatibility, same registry.
             diagnostic = type(self) is NativeDiagnosticOwner
             local_cpu = type(self) is LocalCpuRunnerOwner

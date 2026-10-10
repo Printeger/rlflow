@@ -30,6 +30,101 @@ ACTUAL_POPEN=subprocess.Popen
 
 
 @pytest.mark.parametrize('original',[{'data_mode':'live','project_id':'project_live','bound':lambda config:cpu_bound(config)}],indirect=True)
+@pytest.mark.parametrize('fault',[None,'reserve_committed','safety_after_reserve'])
+def test_automatic_cpu_stage_from_original_parent_without_model(original,native_setup,monkeypatch,fault):
+    owner,bundle,token,obs,claim=original
+    lease=synthetic_engineer_parent(owner,bundle,token,obs,claim,native_setup[4],monkeypatch)
+    cap=owner.prepare_workflow_cpu_input(lease)
+    token=owner.controller.renew(token,'automatic_cpu',expected_version=owner.store.version(),ttl_seconds=60)['token']
+    cpu=owner.handoff_workflow_cpu(lease,cap,token=token)
+    def actual_cpu_only(argv,*args,**kwargs):
+        assert argv[0]=='/usr/bin/systemd-run' and 'hybrid_local_runner_service' in argv[-1]
+        return ACTUAL_POPEN(argv,*args,**kwargs)
+    monkeypatch.setattr(subprocess,'Popen',actual_cpu_only)
+    try:
+        if fault:
+            real_record=cpu.budget.record
+            def lost_reserve(request,*args,**kwargs):
+                value=real_record(request,*args,**kwargs)
+                assert request['action']=='RESERVE'
+                if fault=='safety_after_reserve':
+                    def partial_close():raise OSError('TEST source safety close failed')
+                    with monkeypatch.context() as partial:
+                        partial.setattr(cpu.sources,'shutdown_safety',partial_close)
+                        with pytest.raises(OSError,match='TEST source safety close'):
+                            cpu.shutdown_safety()
+                    assert cpu._live and cpu._safety_freeze
+                    return value
+                raise OSError('TEST lost CPU reserve COMMIT return')
+            with monkeypatch.context() as broken:
+                broken.setattr(cpu.budget,'record',lost_reserve)
+                expected=Conflict if fault=='safety_after_reserve' else OSError
+                message='frozen for cleanup' if fault=='safety_after_reserve' else 'TEST lost CPU reserve'
+                with pytest.raises(expected,match=message):
+                    cpu.execute_workflow_cpu(token)
+            version=cpu.store.version();pool=cpu.pool.snapshot()
+            with pytest.raises(Conflict,match='unresolved; no redispatch'):
+                cpu.execute_workflow_cpu(token)
+            assert cpu.store.version()==version and cpu.pool.snapshot()==pool
+            assert cpu._workflow_cpu_sequence['phase']=='RESERVE'
+            assert not cpu._attempts and cpu._workflow_cpu_sequence['observation'] is None
+            if fault=='safety_after_reserve':
+                cpu._workflow_cpu_sequence=None
+                with pytest.raises(Conflict,match='frozen for cleanup'):
+                    cpu.execute_workflow_cpu(token)
+                assert cpu.store.version()==version and cpu.pool.snapshot()==pool
+        else:
+            with pytest.raises(PermissionError):copy.copy(cpu).execute_workflow_cpu(token)
+            output=cpu.execute_workflow_cpu(token)
+            assert output['machine_acceptance']['status']=='PASS' and not output['condition_evidence']
+            sequence=cpu._workflow_cpu_sequence
+            assert sequence['phase']=='COMPLETE' and sequence['complete']
+            assert cpu._current(cpu._issued(sequence['lease']))['status']=='SETTLED'
+            assert cpu.pool.snapshot()['occupied']==0
+            version=cpu.store.version();pool=cpu.pool.snapshot()
+            assert cpu.execute_workflow_cpu(token)==output
+            assert cpu.store.version()==version and cpu.pool.snapshot()==pool
+            assert len(cpu._attempts)==1
+            attempt=cpu._issued(sequence['lease']);original_raw=attempt['local_result_raw']
+            attempt['local_result_raw']=canonical({'forged_result':True})
+            try:assert cpu.execute_workflow_cpu(token)==output
+            finally:attempt['local_result_raw']=original_raw
+            original_lease=sequence['lease'];sequence['lease']=replace(original_lease)
+            try:
+                with pytest.raises(PermissionError,match='original completed CPU sequence'):
+                    cpu.execute_workflow_cpu(token)
+            finally:sequence['lease']=original_lease
+            sequence['complete']=False
+            try:
+                with pytest.raises(Conflict,match='unresolved; no redispatch'):
+                    cpu.execute_workflow_cpu(token)
+            finally:sequence['complete']=True
+            assert cpu._workflow_cpu_sequence_lock.acquire(blocking=False)
+            try:
+                with pytest.raises(Conflict,match='sequence already active'):
+                    cpu.execute_workflow_cpu(token)
+            finally:cpu._workflow_cpu_sequence_lock.release()
+            assert cpu.store.version()==version and cpu.pool.snapshot()==pool
+            # Simulate an earlier CPU stage driven via the original low-level
+            # SDK: uniqueness is in the original Budget, not this helper cache.
+            cpu._workflow_cpu_sequence=None
+            with pytest.raises(Conflict,match='unique CPU stage required before reservation'):
+                cpu.execute_workflow_cpu(token)
+            assert cpu.store.version()==version and cpu.pool.snapshot()==pool
+        cpu.store.snapshot();assert cpu.store.recover()==cpu.store.audit()==cpu.store.replay()
+    finally:
+        original_error=sys.exc_info()[1]
+        if cpu._live:
+            try:cpu.shutdown()
+            except BaseException as cleanup_error:
+                cpu.shutdown_safety()
+                if original_error is not None:
+                    original_error.add_note('CPU cleanup: '+repr(cleanup_error))
+                    raise original_error
+                raise
+
+
+@pytest.mark.parametrize('original',[{'data_mode':'live','project_id':'project_live','bound':lambda config:cpu_bound(config)}],indirect=True)
 def test_safety_retirement_flag_cannot_forge_original_cpu_handoff(original,native_setup,monkeypatch):
     owner,bundle,token,obs,claim=original
     lease=synthetic_engineer_parent(owner,bundle,token,obs,claim,native_setup[4],monkeypatch)

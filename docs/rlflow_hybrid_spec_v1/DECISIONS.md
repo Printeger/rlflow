@@ -1,5 +1,7 @@
 # 开发决策记录
 
+2026-10-11 自动CPU桥复用原受保护服务，不重新生成批准、不收caller候选/checks；唯一CPU stage、原window/累计余量前移reserve前，最终REGISTER原CAS仍在。异常latch而非泛化恢复；已完成重复读用强tuple(sequence/lease/canonical结果)，不走可变缓存快路。独立审查确认STOP必须封闭准备，不仅禁止spawn：每一原准备步骤使用短admission→原组件/Pool锁序，段内exact-live/永久freeze及句柄强留；shutdown/safety先freeze再等当前准备段，不能等整个sequence/RUN。此锁仅覆盖新增桥，不替代原Controller/source最终效果门；暂不增加长期恢复。
+
 2026-10-11 CPU 同 Budget handoff 只承认原 normal shutdown 后的强留退休 tuple（原 root/source/Workspace 完整回执 digest），不相信可变 retired 布尔值或 Safety/UNKNOWN 退休。child 在原预算绑定安装点强留，lost constructor return 重取同 child；没有清指针窗口。close CAS 重链须先核 current token，再于同读快照证明 fact/event 双不存在及原 Workspace 前驱完全未变；已有 COMMIT 保留 exact 请求，部分来源不一致强拒。累计 CPU reservation 收取完整 task_seconds+10，STOP 不退款、不重置 A 窗口。测试合成 model publisher 与真实 CPU 执行证据严格分开，不能把 parser 演示算成首真实任务。
 
 2026-10-11 CPU派生分离 DATA 与权限：纯 from_engineer 只重算格式/候选/规则，不能认证 parent；原 Owner 必须独立验证 Source 原结果与持久 Budget/event/history、当前批准、实际 Pool FREE/完整STOP后才冻结 NativeCpuInput，消费须同 owner/lease/cap 强身份并重核。No-handoff SETTLED 不能满足 known usage/result；材料不携带执行权，原 CPU 单工具批准与 live constructor 不放宽。后续受保护 handoff 必须在同一 Budget 原绑定中核全部前Owner责任已闭，不能清指针重绑或凭JSON进入CPU。窗口与当前批准在最后材料序列化后重采样，后续 dispatch 仍须独立 Controller 最后效果门。

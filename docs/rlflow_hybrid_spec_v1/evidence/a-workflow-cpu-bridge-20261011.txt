@@ -1,0 +1,64 @@
+A automatic original-parent CPU execution bridge, 2026-10-11
+Base: 3cb8e2b; candidate is containing commit.
+New execute_workflow_cpu(token): original protected handoff/material, original
+Budget reserve, new Workspace/WorkingPlan/Pool claim/grant/lease, actual managed
+CPU result and full STOP. No caller candidate/checks/limits accepted.
+One nonblocking sequence lock; completed repeat reads original result only.
+Uncertain failure latches unresolved; no replacement allocation or redispatch.
+Remaining local gaps: different Reviewer parent/session and A role accounting,
+machine+Review condition CAS acceptance and unmet-requirement continuation.
+Real nonpreset task / actual usage settlement / product Reviewer NOT_EXECUTED.
+Explicit synthetic Engineer Source hooks, original native G intercepted;
+actual CPU only, no auth secrets/model/GPU/production/instinctRL operation.
+
+Commands: PYTHONPATH=. PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q
+89505: tests/test_hybrid_a_workflow_cpu_runtime.py -k automatic_cpu
+Purpose: actual CPU PASS, SETTLED/Pool0, copy owner denied, completed repeat no
+Store/Pool version change or second attempt; reserve COMMIT lost return
+latched with no second reservation/Workspace/claim/dispatch, audit==replay.
+1d9168 exit0: 2 passed / 5 deselected / 1 existing warning / 110.02s.
+Before subsequent pre-reserve head/window/quota gate and review repairs.
+
+48100 / f829ec: same test -k 'automatic_cpu and None'
+exit0: 1 passed / 6 deselected / 1 existing warning / 79.81s.
+New original unique-stage-before-reserve rejection, no Store/Pool change.
+Run finished before review repair/pinned-module edits, never restarted.
+
+Independent finite_app_review_63 found 2 confirmed MUST:
+partial safety close could leave live frozen Owner preparing new resources;
+completed-repeat mutable local_result_raw could replace returned result.
+Fix: exact-live/freeze checks in bounded admission step, shutdown freezes
+before waiting only current preparation (not sequence/RUN), all returned
+handles retained inside step. Separate immutable completion tuple binds
+original sequence/lease/result bytes; repeat returns fresh decoded bytes.
+34081: final affected automatic None + safety_after_reserve cases.
+5d486e exit0: 2 passed / 6 deselected / 1 existing warning / 110.89s.
+Actual candidate CPU PASS/full STOP/SETTLED/Pool0/audit=replay; completed
+repeat uses original frozen result despite forged local_result_raw, copied
+lease denied, complete false denied, concurrent sequence lock denied,
+cleared helper cache still rejected by original unique-stage Budget head.
+Reserve completed then original Safety shutdown source close failed:
+owner remained live but permanently frozen, no Workspace/claim/task created;
+cleared sequence could not perform first reserve either. All repeat probes
+kept original Store/Pool versions and exposure unchanged.
+Independent differential review confirmed both source MUST closed, no new
+confirmed issues; actual tests finished after source review. No test/review
+substituted for real model provenance or product independent Reviewer.
+No need to repeat unchanged committed-reserve-loss or old handoff cases.
+
+49435 / 897897:
+tests/test_hybrid_local_cpu_runtime.py::test_actual_configured_core_task_result_managed_stop_budget_and_free
+exit0: 1 passed / 15.78s. Required old actual CPU/fullSTOP compatibility after
+CPU normal/safety shutdown admission lock change.
+
+6760 / 85d7c7:
+tests/test_hybrid_local_cpu_runtime.py::test_original_configured_cpu_grant_budget_pool_source_and_no_handoff_stop
+exit0: 1 passed / 9.85s. Necessary old constructor/standalone CPU path regression.
+Previous 4 handoff cases and 42 Budget regression not repeated; no changed
+handoff/accounting behavior this slice. No new full-suite/installation/longrun claim.
+
+compileall of both changed modules and new test exit0 (65e9a9), diff check exit0.
+Final post-repair compile/diff exit0. All sessions terminal, no restart of any
+live run; the pre-reserve and review fixes had affected-only new validation.
+USER package-lock preserved, sha256:
+becc7e2a36dfcad4ffe934b5ff2f0f68187611d6c0641bd63d81367651cfbf09

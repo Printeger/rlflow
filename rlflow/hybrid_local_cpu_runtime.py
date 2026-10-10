@@ -20,8 +20,15 @@ class LocalCpuGrant:
 
 
 class LocalCpuRunnerOwner(FixtureRuntimeOwner):
+    def shutdown(self):
+        self._actual();self._safety_freeze=True
+        # STOP never waits for the whole run/sequence. Finish only an already
+        # admitted bounded preparation step before closing original handles.
+        with self._workflow_cpu_admission_lock:return super().shutdown()
+
     def shutdown_safety(self):
-        value=super().shutdown_safety()
+        self._actual();self._safety_freeze=True
+        with self._workflow_cpu_admission_lock:value=super().shutdown_safety()
         # Compatibility state names are not a whole managed-scope proof.
         # Lost report/job receipts never become terminal/FREE by retirement.
         return {**value,'retirement_scope':'ORIGINAL_PARENT_HANDLES_ONLY',
@@ -41,6 +48,91 @@ class LocalCpuRunnerOwner(FixtureRuntimeOwner):
 
     def issue_cpu_trial_grant(self,*args,**kwargs):raise PermissionError('no fixed CPU grant upgrade')
     def issue_engineering_patch_grant(self,*args,**kwargs):raise PermissionError('no fixed engineering grant upgrade')
+
+    def execute_workflow_cpu(self,token):
+        """Derive and execute the single original A candidate CPU stage.
+
+        No caller candidate, checks, limits, plan or reservation is accepted.
+        Concurrent/reentrant calls fail rather than waiting across a writer.
+        An uncertain preparation failure latches this sequence: never allocate
+        a replacement reservation/Workspace/claim or silently retry dispatch.
+        Existing original handles remain available for explicit safe cleanup.
+        """
+        from .hybrid_budget import zero
+        from .hybrid_budget_ledger import reservation_key
+        from .store import sha
+        self._actual();self.controller._refuse_nested_writer()
+        self.controller._issued(token)
+        if self._workflow_handoff is None:
+            raise PermissionError('original A workflow CPU handoff required')
+        if not self._workflow_cpu_sequence_lock.acquire(blocking=False):
+            raise Conflict('original CPU sequence already active')
+        try:
+            sequence=self._workflow_cpu_sequence
+            if sequence is not None:
+                if sequence['token'] is not token:
+                    raise PermissionError('original CPU sequence token required')
+                if sequence['complete']:
+                    receipt=self._workflow_cpu_completed
+                    if receipt is None or receipt[0] is not sequence or receipt[1] is not sequence['lease']:
+                        raise PermissionError('original completed CPU sequence and lease required')
+                    self._issued(receipt[1])
+                    return json.loads(receipt[2])
+                raise Conflict('original CPU sequence outcome unresolved; no redispatch')
+            self.controller.check_token(token)
+            parent=json.loads(self._workflow_handoff_raw[1])
+            with self.store.read_connection() as db:
+                db.execute('BEGIN');read=ReadBudget(db,PREPARATION_READ_BYTES)
+                loaded=self.budget._load(db,parent['request']['goal_ref'],read)
+                binding,_,_=self._workflow_cpu_material(loaded)
+                from .hybrid_a_workflow_accounting import check_window
+                probe={k:parent['request'][k] for k in ('project_id','data_mode','goal_ref','store_epoch','reservation_id')}
+                probe['action']='MARK_UNKNOWN'
+                head,_,_=self.budget._heads(db,probe,read,self.budget._metadata(db))
+                if head is None or 'workflow' not in head or 'candidate_cpu_entry' in head['workflow']:
+                    raise Conflict('original unique CPU stage required before reservation')
+                now,_=self.controller._sample();check_window(head['workflow'],binding['workflow'],now)
+                if head['workflow']['controlled_seconds_charged']+binding['task_seconds']+10>binding['workflow']['limits']['controlled_seconds']:
+                    raise Conflict('workflow CPU controlled time quota exceeded before reservation')
+            key='a_cpu_'+sha([binding['workflow']['parent'],binding['workflow']['envelope_sha256']])
+            sequence={'token':token,'complete':False,'lease':None,'phase':'RESERVE',
+                'observation':None,'bundle':None,'claim':None,'grant':None}
+            self._workflow_cpu_sequence=sequence
+            def step(phase,operation,field=None):
+                with self._workflow_cpu_admission_lock:
+                    self._actual()
+                    if self._safety_freeze:raise Conflict('original CPU sequence frozen for cleanup')
+                    sequence['phase']=phase
+                    value=operation()
+                    if field is not None:sequence[field]=value
+                    return value
+            request={k:parent['request'][k] for k in ('project_id','data_mode','goal_ref','store_epoch')}
+            intent=parent['preparation']['intent_key']
+            reserve={**request,'idempotency_key':key+'_reserve','expected_state_version':self.store.version(),
+                'action':'RESERVE','preparation_intent_key':intent,
+                'amount':{**zero(),'wall_seconds':binding['task_seconds']+10},'purpose':'EXECUTION'}
+            sequence['reserve']=reserve
+            step('RESERVE',lambda:self.budget.record(reserve,token))
+            observation=step('WORKSPACE_STAGE',lambda:self.workspace.stage(intent,ttl_seconds=60),'observation')
+            value=json.loads(observation.raw)
+            acquire={**request,'idempotency_key':key+'_workspace','expected_state_version':self.store.version(),
+                'expected_workspace_revision':0,'workspace_id':value['workspace_id'],
+                'reservation_id':reservation_key(reserve),'operation':'acquire','ttl_seconds':60}
+            sequence['acquire']=acquire
+            step('WORKSPACE_ACQUIRE',lambda:self.workspace.record(acquire,token,observation))
+            bundle=step('PLAN',lambda:self.plans.prepare_plan(token,observation,key+'_plan'),'bundle')
+            step('PLAN_INTENT',lambda:self.plans.persist_intent(bundle,token,observation,expected_version=self.store.version()))
+            step('PLAN_PUBLISH',lambda:self.plans.publish(bundle,token,observation,expected_version=self.store.version()))
+            claim=step('CLAIM',lambda:self.pool.claim(self.membership,expected_version=self.pool.snapshot()['version'],request_key=key+'_claim',seconds=60),'claim')
+            grant=step('GRANT',lambda:self.issue_local_cpu_grant(bundle,token,observation),'grant')
+            lease=step('REGISTER',lambda:self.register(bundle,token,observation,claim,request_key=key+'_task',scenario='local_cpu',local_cpu_grant=grant),'lease')
+            sequence['phase']='RUN'
+            result=self.run_local_cpu(lease)
+            with self._workflow_cpu_admission_lock:
+                self._workflow_cpu_completed=(sequence,lease,canonical(result))
+                sequence['complete']=True;sequence['phase']='COMPLETE'
+            return result
+        finally:self._workflow_cpu_sequence_lock.release()
 
     def _binding(self,loaded):
         config=json.loads(self.plans.registry._raw)
