@@ -1,5 +1,7 @@
 # 需求包离线校验报告
 
+2026-10-11 CPU parent material：PYTHONPATH=. PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q tests/test_hybrid_a_workflow_cpu.py，原session97549/outputa68c4d终态exit0，19pass/1既有warning12.96s。18个pure DATA cases核同envelope candidate/checks/完整acceptance/pins与未知/缺账/越界/改版本拒；1个actual fresh LIVE登记/无handoff STOP/SETTLED/Pool0，原父不具known model result所以无CPU cap、无Store/Pool版本变化，audit=replay。没有模型、G、账户输入或GPU调用，不能计首真实任务。独立只读窄审未发现确证MUST；compileall/diff/USERlock检查通过。证据 evidence/a-workflow-cpu-parent-20261011.txt。旧已通过执行/恢复测试无相关变更，未重复；没有新全量回归或A/98完成声明。
+
 2026-10-11 generic CPU acceptance：91093/output7de18f终态1pass/2fail/13deselected30.84s，实际task/STOP已跑但新测试忘collect，结果None；核原接口须在FD关闭前collect并断言 machine_acceptance，修夹具不改产品门。仅失败两cases+必要旧stdout路径64904/outputac26fa自然exit0，3pass/13deselected51.25s：相同实际checks输出cases2，范围2 PASS、范围3 FAIL，原结果冻结/归档、STOP/SETTLED/Pool0/audit=replay；旧EXACT候选执行通过。先前已过规则deepcopy/覆盖拒绝pure case不重复。独立只读窄审无MUST，compile/diff/USERlock通过，证据 evidence/a-workflow-cpu-acceptance-20261011.txt。合成候选/单独CPU批准，不证明同A审批、真实模型或首非预设task/Reviewer/条件/接续。
 
 持久结果末窄审 FINAL：原 finite_app_review_63 只读确认两个 MUST 全部关闭、最后 exact-frame 降 UNKNOWN 无新增确证 MUST；未跑重复测试或实际模型。所有原 handles 已终态，证据 evidence/a-native-result-durable-20261011.txt 随本提交归档；非 task/独立产品 Reviewer/A/98/全库通过。

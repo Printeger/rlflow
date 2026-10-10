@@ -1,0 +1,35 @@
+A workflow original Engineer parent -> CPU material, 2026-10-11
+Base commit: 703e52b. This is a local implementation slice, not A/98 completion.
+
+Behavior:
+- NativeModelOwner independently obtains exact stopped Source result publication.
+- Durable terminal result must equal that publication; original Budget event,
+  full history links, current reservation and actual committed Pool FREE verified.
+- Same current approval/policy and original workflow window must hold.
+- Pure from_engineer derives approved candidate/checks/acceptance/limits/modules;
+  candidate/spec/parent/command/resources frozen with original envelope hashes.
+- NativeCpuInput has exact owner/lease/cap identity, immutable raw registry and
+  revalidation. Its JSON and pure derivation DO NOT grant CPU execution.
+- 256KiB material admission and last approval TTL/window sample after reads.
+
+Test command:
+PYTHONPATH=. PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q tests/test_hybrid_a_workflow_cpu.py
+Original handle 97549, initial output4d0779, terminal outputa68c4d:
+19 passed, 1 existing Starlette/anyio warning in 12.96s, exit0.
+18 pure synthetic DATA cases; 1 actual fresh LIVE original registration/STOP:
+SETTLED/Pool0 without handoff is NOT known Engineer generation and cannot issue
+CPU input; copied unissued cap refused; no Store/Pool changes; audit=replay.
+Popen forbidden in these tests. Zero model/GPU or account credential reads.
+
+Independent review: /root/finite_app_review_63 read-only current changed code,
+no confirmed MUST_FIX. Future handoff/dispatch must independently fresh-check;
+no duplicate prior test/review run. compileall and git diff --check passed.
+User package-lock.json untouched/unstaged:
+becc7e2a36dfcad4ffe934b5ff2f0f68187611d6c0641bd63d81367651cfbf09
+
+Remaining: same-Budget protected sequential owner handoff; new reservation,
+Workspace/WorkingPlan/claim/CPU grant; unique CPU-stage/time accounting;
+live managed CPU result; distinct model Evaluator; condition CAS; continuation.
+Positive known real model parent NOT_VERIFIED. First real task NOT_EXECUTED.
+Small A runtime contract unapproved; local code not blocked. GPU/B/C and
+instinctRL HOLD unchanged. Original Goal ACTIVE; no new scope/resource request.

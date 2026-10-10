@@ -45,10 +45,17 @@ class NativeModelLaunch:
     raw: bytes
 
 
+@dataclass(frozen=True,eq=False)
+class NativeCpuInput:
+    """Original Engineer parent/spec material, not CPU runtime permission."""
+    raw: bytes
+
+
 class NativeModelOwner(FixtureRuntimeOwner):
     def __init__(self,*args,**kwargs):
         self._native_launches={}
         self._native_releases={}
+        self._native_cpu_inputs={}
         self._launch_active=None
         super().__init__(*args,**kwargs)
 
@@ -246,6 +253,82 @@ class NativeModelOwner(FixtureRuntimeOwner):
     def _native_result_publication(self,attempt):
         self._issued(attempt['lease'])
         return self.sources._runtime_result_publication(self,attempt['lease'])
+
+    def prepare_workflow_cpu_input(self,lease):
+        """Original settled Engineer -> same-envelope frozen CPU material.
+
+        No execution, owner transfer, new reservation or condition authority.
+        A future protected handoff must consume this exact original material.
+        """
+        attempt=self._issued(lease)
+        with self.pool._lock,self._lock:
+            publication=self._native_result_publication(attempt)
+            parent=attempt['entries'].get('FIXTURE_SCOPE_STOPPED')
+            if publication is None or parent is None or self.workspace.data_mode!='live':
+                raise Conflict('original live known Engineer result required for CPU stage')
+            if parent['request']['fixture_runtime'].get('native_model_result')!=publication:
+                raise Conflict('original durable Engineer result differs from exact source')
+            self._verify_pool_link(attempt,'FIXTURE_FREE',parent)
+            from .store import sha
+            key='fixture_free_'+sha([attempt['claim_value']['key'],lease.id])
+            with self.pool._transaction() as pool_db:
+                free=self.pool._point(pool_db,key)
+                if (free is None or free['action']!='FIXTURE_FREE' or
+                        free['payload']['project_fact_hash']!=digest(parent)):
+                    raise Conflict('original committed Engineer Pool FREE required')
+            from .hybrid_a_workflow_cpu import from_engineer
+            from .hybrid_local_cpu_profile import module_pins
+            from .hybrid_a_workflow_accounting import check_window
+            from .hybrid_budget_ledger import entry_key
+            pins=module_pins();request=parent['request']
+            with self.store.read_connection() as db:
+                db.execute('BEGIN');read=ReadBudget(db,PREPARATION_READ_BYTES)
+                version=self.budget._metadata(db)
+                original=self.budget._point(db,entry_key(request),read)
+                if original!=parent:raise Conflict('original CPU parent event differs')
+                self.budget._dependencies(db,parent,read)
+                loaded=self.budget._load(db,request['goal_ref'],read)
+                if any(parent['policy_source'][k]!=loaded[k] for k in
+                        ('proposal_hash','approval_hash','config_hash','scope_hash')):
+                    raise Conflict('CPU parent original current approval differs')
+                heads=self.budget._heads(db,request,read,version)
+                now,_=self.controller._sample()
+                check_window(heads[0]['workflow'],attempt['origin']['native_model']['workflow'],now)
+                config=json.loads(self.plans.registry._raw)
+                binding,spec=from_engineer(loaded['record']['contract']['proposal'],config,
+                    pins['hybrid_local_runner_service.py'],parent,pins)
+                material={'binding':binding,'spec':spec,'pins':pins,
+                    'policy_source':parent['policy_source'],'execution_enabled':False}
+                check_bytes(material,256*1024)
+                raw=canonical(material)
+                # Last reads/serialization must not publish an already expired
+                # material. This is still DATA, not a Controller effects gate.
+                from .hybrid_authority import timestamp
+                final_now,_=self.controller._sample()
+                check_window(heads[0]['workflow'],attempt['origin']['native_model']['workflow'],final_now)
+                if not now<=final_now<timestamp(loaded['expires_at']):
+                    raise Conflict('CPU material current approval expired or clock regressed')
+            old=self._native_cpu_inputs.get(id(lease))
+            if old is not None:
+                if old[0] is not lease or old[2]!=raw or old[1].raw!=old[2]:
+                    raise Conflict('original workflow CPU material changed')
+                return old[1]
+            if len(self._native_cpu_inputs)>=8:raise Conflict('bounded CPU parent material capacity reached')
+            cap=NativeCpuInput(raw)
+            self._native_cpu_inputs[id(lease)]=(lease,cap,raw,attempt)
+            return cap
+
+    def _issued_workflow_cpu_input(self,lease,cap):
+        """Exact owner/lease capability plus fresh protected parent recheck."""
+        self._issued(lease)
+        with self.pool._lock,self._lock:
+            row=self._native_cpu_inputs.get(id(lease))
+            if (type(cap) is not NativeCpuInput or row is None or row[0] is not lease or
+                    row[1] is not cap or cap.raw!=row[2] or row[3] is not self._issued(lease)):
+                raise PermissionError('original same-lease workflow CPU input required')
+            if self.prepare_workflow_cpu_input(lease) is not cap:
+                raise Conflict('original workflow CPU input changed')
+            return json.loads(row[2])
 
     def _preflight_native_result_archive(self,lease,data):
         """Read-only size admission against original current Budget frame."""

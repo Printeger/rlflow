@@ -1,5 +1,7 @@
 # 开发决策记录
 
+2026-10-11 CPU派生分离 DATA 与权限：纯 from_engineer 只重算格式/候选/规则，不能认证 parent；原 Owner 必须独立验证 Source 原结果与持久 Budget/event/history、当前批准、实际 Pool FREE/完整STOP后才冻结 NativeCpuInput，消费须同 owner/lease/cap 强身份并重核。No-handoff SETTLED 不能满足 known usage/result；材料不携带执行权，原 CPU 单工具批准与 live constructor 不放宽。后续受保护 handoff 必须在同一 Budget 原绑定中核全部前Owner责任已闭，不能清指针重绑或凭JSON进入CPU。窗口与当前批准在最后材料序列化后重采样，后续 dispatch 仍须独立 Controller 最后效果门。
+
 2026-10-11 A envelope 已允许 JSON 指标验收，而候选 verification_spec 原先强制固定 stdout。复用现有闭合 validate_acceptance，把同一外部批准规则冻结进 spec，不新增方法、不改阈值、不相信模型自选测试。acceptance/stdout 二选一，原 stdout 默认路径保持；真实执行由原受管 CPU runner 完成，机器FAIL不因任务exit0而变PASS。其余同workflow接线采用顺序受保护Owner handoff，不临时清 Budget._fixture_runtime，不重绑Store服务，不用旧已结算reservation/WorkingPlan。父原event/完整history links、same live Goal/epoch/approval/envelope/known usage/result必须先成立，普通CPU/V1不升级。
 
 2026-10-11 原结果与财务终态同原事件持久化，避免仅保内存 candidate cap。新 optional native_model_result 不重写旧事实、不授历史来源/独立性/条件资格；只能 exact Source 已登记自然exit0/full-audit result、完整STOP原usage及 Guard发行重核进入writer。保存 Source 原 canonical消息（不是任意JSON重算hash）、完整候选及批准paths，原approval回放重算变换。归档 admission 提前于cap发行，用原同snapshot Budget entry/heads做尺寸预检；8KiB用于STOP command/固定hash/version/时间扩展，最终 exact frame仍核原256KiB门。超界保守永久撤 Source结算发行，移result/usage→UNKNOWN，不放宽格式上限且物理STOP/FREE仍按原完整证明进行。正向真实归档仍待授权实证，纯消息/候选不冒充 actual task。
