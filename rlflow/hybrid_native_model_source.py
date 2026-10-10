@@ -14,6 +14,8 @@ class NativeModelSourceOwner(FixtureUsageSourceOwner):
     def __init__(self, pool):
         self._model_bindings = {}
         self._packet_readers = {}
+        self._packet_origins = {}
+        self._packet_completed = {}
         self._packet_failures = set()
         self._gate_bindings = {}
         self._gate_inputs = {}
@@ -178,6 +180,20 @@ class NativeModelSourceOwner(FixtureUsageSourceOwner):
                 self._packet_readers[id(original)] = _HeldPacketReader(attempt['fds']['read'],
                     role=binding['native_model']['role'],
                     candidate_sha256=binding['native_model']['candidate_sha256'])
+                reader = self._packet_readers[id(original)]
+                # Allocation can follow a durable REGISTER retry. Rebind a
+                # single captured Registry to the original grant config hash;
+                # neither the current registry nor a mutable grant row alone
+                # is an approval source.
+                from .hybrid_goals import digest
+                config=json.loads(owner.plans.registry._raw)
+                if digest(config)!=binding['native_model']['config_hash']:
+                    raise Conflict('original generating Registry config changed before allocation')
+                paths = (tuple(config['tools']['native_model']
+                    ['definition']['spec']['candidate_paths'])
+                    if 'workflow' in binding['native_model'] else None)
+                self._packet_origins[id(original)] = (original, reader, reader.transcript,
+                    row['packet_raw'], row['schema_raw'], paths)
                 return original
             except BaseException:
                 attempt['status'] = 'UNKNOWN'; raise
@@ -225,8 +241,8 @@ class NativeModelSourceOwner(FixtureUsageSourceOwner):
                 raise Conflict('original generating gate materials changed')
         return result
 
-    def poll_packet_data(self, source):
-        """Original held FD decoding only; no model/usage/review publication."""
+    def _packet_step(self, source, *, finish=False, candidate=False):
+        """One original FD step, never an EOF/account/settlement assertion."""
         attempt = self._issued(source)
         with self._lock:
             if id(source) in self._packet_failures:
@@ -234,15 +250,53 @@ class NativeModelSourceOwner(FixtureUsageSourceOwner):
             try:
                 self._physical(attempt)
                 reader = self._packet_readers.get(id(source))
-                if reader is None or reader.fd != attempt['fds']['read']:
+                original = self._packet_origins.get(id(source))
+                if (original is None or original[0] is not source or reader is not original[1] or
+                        reader.transcript is not original[2] or reader.fd != attempt['fds']['read']):
                     raise Conflict('original same-source packet reader required')
-                return reader.poll()
+                state = reader.finish_data() if finish else reader.poll()
+                if state['data_complete']:
+                    completed=(reader.audited_message,canonical(reader.result))
+                    prior=self._packet_completed.setdefault(id(source),completed)
+                    if completed!=prior or reader.transcript.message!=prior[0]:
+                        raise Conflict('original audited packet output changed')
+                if not candidate:return state
+                if not state['data_complete']:
+                    raise Conflict('original full packet audit required before candidate data')
+                if original[5] is None:
+                    raise PermissionError('original workflow candidate paths required')
+                # Neither the model nor this API chooses input bytes, edit
+                # scope or tests. The packet/schema and approved Registry
+                # scope are independently frozen by this original source.
+                from .hybrid_protocol import validate_schema
+                from .hybrid_engineering_candidate import transform
+                if reader.transcript.role!='Engineer':raise Conflict('original Engineer candidate required')
+                message=json.loads(self._packet_completed[id(source)][0])
+                validate_schema(json.loads(original[4]),message)
+                return transform(json.loads(original[3])['files'],message,allowed_paths=original[5])
             except Exception:
                 self._packet_failures.add(id(source))
                 retained = self._packet_readers.get(id(source))
                 if retained is not None:retained.failed = True
                 attempt['status'] = 'QUARANTINED'
                 raise
+
+    def poll_packet_data(self, source):
+        """Original held FD decoding only; no model/usage/review publication."""
+        return self._packet_step(source)
+
+    def finish_packet_data(self, source):
+        """Finite full-prefix audit only. Completion is NOT authentic EOF."""
+        return self._packet_step(source,finish=True)
+
+    def candidate_data(self, source):
+        """Original audited Engineer bytes → bounded Candidate DATA only.
+
+        Does not publish provenance or usage, execute checks, modify a project,
+        authorize another model, or provide Reviewer/ConditionEvidence.
+        Original producer/account/EOF and settlement gates remain mandatory.
+        """
+        return self._packet_step(source,candidate=True)
 
     def poll(self, source):
         self._issued(source)

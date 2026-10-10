@@ -1,5 +1,9 @@
 # 需求包离线校验报告
 
+原candidate source末审已关闭全部确证MUST；原29615终态exit0/2pass25.30s。所有本轮原handles自然结束，无模型/GPU调用。属于本地数据接线提交，不是首个真实任务/产品独立Review/A/98或全库验收；证据a-workflow-candidate-source-20261011.txt。
+
+2026-10-11 原candidate source：首3 setup errors .08s漏fixture已诊断修；首原接线3pass37.71s。High同message与可变路径MUST修后实际FD独立解码重放/冻结及config hash来源门：前后message/row污染+正例4pass56.00s；最后耐久REGISTER丢allocation+Registry漂移retry拒/STOP与正例2pass25.30s。合成审计→原范围candidate，无来源/结算资格；各原STOP Pool0/allFDclosed/audit=replay。最后shared35pass.09s、旧V1 affected2pass20.54s，compile/diff/USERlock通过；末窄复审收尾中，见evidence/a-workflow-candidate-source-20261011.txt。不报告真实任务完成，不关闭A/98或全Goal，Goal ACTIVE。
+
 2026-10-11原workflow登记预算：先原accounted1pass14.98s、8pure+actual9pass14.93s、窗口原1pass12.82s；共享预算三文件原88913自然terminal86pass73.41s/1旧warning。High rawprojection窗口MUST修后新增SQL列名测试fail10.71s定位为object_key，保留门定向actual1pass13.22s（删/降/改投影拒+20s expiry拒+originalSTOP Pool0/allFDclosed）；version affectedpure8pass.06s；新增原issuer STOP后重复首grant拒/版本与grant数不变、coldreplay定向1pass15.66s。High源码关闭/no新增MUST；compile/diff/USERlock通过，证据a-workflow-registration-budget-20261011.txt。无真实模型/task/产品Review/条件接续/A或全库验收声明，Goal ACTIVE。
 
 2026-10-11首Engineer来源接线：原setup error预算head2.27s定位fulltoken reservation触finalization reserve，保留产品门改每session预留；corrected单项actual原fixture grant/register/fullSTOP/no-handoffSETTLED/Pool0/allFDclosed/coldreplay1pass14.64s。原files与历史parent hash篡改拒、V1不借V2、无subprocess。共享MODEL_BINDING/Budget/Runtime变化必要回归原28282自然terminal21pass/3deselected/1旧warning105.87s，未重启。compile/diff/USERlock检查通过；命令/失败证据a-workflow-first-source-20261011.txt。不是实际模型、task、Review或A完成；阶段quota/time及后续parents仍缺，Goal ACTIVE。

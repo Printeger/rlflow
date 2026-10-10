@@ -1,0 +1,88 @@
+A original audited output-to-candidate slice (base 865d5bb)
+Not a real model run, task result, independent product Review or A closure.
+Model/API/GPU calls zero; original launch and source publication still DENY.
+
+Behavior:
+Original NativeModelSourceOwner now exposes finite finish_packet_data audit
+and candidate_data. Candidate input snapshot, output schema and allowed paths
+come from the original issued packet/schema and original approved Registry
+workflow spec, not mutable grant-row cache, API arguments or model text.
+The source retains exact original reader AND transcript identity separately.
+Candidate extraction rechecks physical source, original reader and completed
+full-prefix audit, validates original output schema, then derives immutable
+Candidate data. No original project writes or acceptance code execution.
+Malformed/out-of-scope output, replacement reader and post-audit append latch
+failure; restoring reader does not revive source. Original STOP stays available.
+V1 gains no workflow candidate-path authority. No producer/account/EOF proof,
+trusted usage settlement, Reviewer evidence or ConditionEvidence is minted.
+
+Actual commands/results (unset PYTHONPATH, PYTEST_DISABLE_PLUGIN_AUTOLOAD=1):
+786f16 initial pytest tests/test_hybrid_a_workflow_candidate_source.py:
+  3 setup errors, .08s; missing native_setup fixture import, no task executed.
+  Read fixture dependencies, imported existing native_setup; no product gate
+  weakened and no blind repetition of the unmodified invocation.
+92457b / session20037 / c1140a corrected same affected file:
+  3 passed37.71s, original handle naturally terminal, no restart.
+  Synthetic stdout positive: original audit -> bounded candidate, returned-file
+  mutation does not alter candidate; no Store/Pool changes, producer=None,
+  source seal/model start denied. Post-audit append refuses candidate; original
+  STOP -> Pool0/all source FDs closed/audit==replay.
+  Unapproved edit and replacement reader both refuse/latch; original STOP
+  -> Pool0/all FDs closed/audit==replay. Not real generation or task execution.
+c44833 shared decoder/FD-reader regression:
+  pytest tests/test_hybrid_native_packet_reader.py
+    tests/test_hybrid_native_model_stream.py:35 passed.08s.
+  Rationale: changed original consumer now invokes full audit/candidate path.
+Compile/diff and unchanged unstaged USER package-lock hash passed:
+  becc7e2a36dfcad4ffe934b5ff2f0f68187611d6c0641bd63d81367651cfbf09.
+c2505a / session36064 / 0d8dd2 affected V1 source regression:
+  pytest tests/test_hybrid_native_model_runtime.py -k
+    'original_generating_grant_registers or packet_source_failure_latches'
+  2 passed/18 deselected20.54s; original handle naturally terminal.
+
+Independent High found two MUST, not suppressed by passed tests:
+1 Same original transcript.message remained mutable after audit, allowing
+  a valid patch absent from stdout. Fixed full-prefix audit to independently
+  decode actual held FD bytes, compare original incremental result against
+  replay, freeze audited message/result, recheck on every completed read.
+  Source additionally freezes its completed record; transform consumes this
+  frozen audited message, not mutable decoder output.
+2 Candidate paths were in mutable grant row, not original approval. Removed
+  this cache field; allocation captures one Registry config and verifies its
+  digest against original grant.config_hash before freezing its spec paths.
+  A new test poisons row paths after issue; source ignores it and refuses new
+  path. Narrow review caught REGISTER retry bypasses live fresh; config hash
+  is therefore checked at allocation itself, not presumed from prior fresh.
+baf1e5 affected independent audit/decoder regression:35 passed.09s.
+  Changes now include held-reader semantics, so rerun justified.
+ef111f / session10515 / 669464 affected original positive + three MUST cases:
+  pytest tests/test_hybrid_a_workflow_candidate_source.py -k
+    'review_source or original_audited'
+  4 passed/2 deselected56.00s; original handle naturally terminal, no restart.
+  Message mutation before full audit and after completion both refused/latch;
+  restoring original message did not revive source. Issued grant-row poisoned
+  paths ignored; original approved paths still refused unrelated edit. Each
+  original STOP completed Pool0/allFDclosed/audit==replay. Positive original
+  candidate and post-audit append case rerun because audit implementation
+  changed; already-passed unchanged replacement-reader cases not repeated.
+d5250e / session29615 / a866ea last Registry-binding fix affected cases:
+  pytest tests/test_hybrid_a_workflow_candidate_source.py -k
+    'durable_register or original_audited'
+  2 passed/5 deselected25.30s, natural terminal. Durable REGISTER/allocation
+  interruption then Registry path drift refused retry; restore original
+  Registry -> original STOP Pool0/all retainedFDs closed/audit==replay.
+  Positive source rerun only because allocation config-hash check changed.
+Independent High narrow review: both MUST closed in final source; no new
+  confirmed MUST in direct impact scope. Reviewer did not run tests. Its final
+  note awaited session terminal; original session29615 is now exit0 as above.
+  Development safety review is not an independent product Evaluator receipt.
+
+Next minimal vertical chain:
+Original account/producer-ready-G and authenticated full stdout/EOF/usage
+publication -> protected trusted settlement -> workflow CPU grant from same
+candidate/trusted checks -> distinct original Evaluator -> condition CAS ->
+one original next packet. All later stages extend the existing parent facts,
+budget counters and managed STOP, not caller evidence or development reviews.
+First non-preset task NOT_EXECUTED. Existing small A run contract awaits
+approval; local implementation continues. GPU/B/C/instinctRL HOLD unchanged.
+Goal ACTIVE; no checkpoint98/A/full-suite/installation/long-run claim.

@@ -10,7 +10,7 @@ import stat
 
 from .hybrid_native_model_stream import PacketTranscript
 from .hybrid_usage_stream import MAX_LINE
-from .store import Conflict
+from .store import Conflict, canonical
 
 READ_BYTES = 65536
 READ_LINES = 128
@@ -22,11 +22,14 @@ class _HeldPacketReader:
         self.fd = fd
         self.identity = None
         self.transcript = PacketTranscript(role=role, candidate_sha256=candidate_sha256)
+        self._origin = (role,candidate_sha256)
         self.seen = None
         self.anchor = b''
         self.tail = b''
         self.audit = None
         self.result = None
+        self.audited_message = None
+        self._completed = None
         self.failed = False
         self.identity = self._stamp()[:2]
 
@@ -92,7 +95,9 @@ class _HeldPacketReader:
             if self.audit is None:
                 if self.transcript.state != 'DONE' or self.tail or self.transcript.offset != stamp[2]:
                     raise Conflict('complete consumed packet data required')
-                self.audit = {'stamp': stamp, 'offset': 0, 'hash': hashlib.sha256()}
+                self.audit = {'stamp': stamp, 'offset': 0, 'hash': hashlib.sha256(),
+                    'decoder':PacketTranscript(role=self._origin[0],candidate_sha256=self._origin[1]),
+                    'tail':b''}
             return self._audit_step(stamp)
         except Exception:
             self.failed = True
@@ -102,18 +107,37 @@ class _HeldPacketReader:
         audit = self.audit
         if stamp != audit['stamp']:
             raise Conflict('held final packet data changed')
-        if self.result is None:
+        if self._completed is None:
+            if self.result is not None or self.audited_message is not None:
+                raise Conflict('held packet audit completion not original')
             block = os.pread(self.fd, min(READ_BYTES, stamp[2]-audit['offset']), audit['offset'])
             if not block and audit['offset'] < stamp[2]:
                 raise Conflict('held packet audit short read')
             audit['hash'].update(block)
+            raw=audit['tail']+block; cursor=0
+            while True:
+                end=raw.find(b'\n',cursor)
+                if end<0:break
+                decoder=audit['decoder']
+                decoder.accept(decoder.offset,raw[cursor:end+1]);cursor=end+1
+            audit['tail']=raw[cursor:]
+            if len(audit['tail'])>MAX_LINE:raise Conflict('bounded packet audit tail required')
             audit['offset'] += len(block)
             if self._stamp() != stamp:
                 raise Conflict('held packet changed during audit')
             if audit['offset'] == stamp[2]:
                 if audit['hash'].digest() != self.transcript.hash.digest():
                     raise Conflict('held earlier packet prefix rewritten')
-                self.result = self.transcript.finish()
+                if audit['tail']:raise Conflict('complete packet audit lines required')
+                result=audit['decoder'].finish()
+                if result!=self.transcript.finish():
+                    raise Conflict('held packet decoded output differs from original audit')
+                self.result=result;self.audited_message=audit['decoder'].message
+                self._completed=(canonical(result),self.audited_message)
+        if self._completed is not None and (canonical(self.result)!=self._completed[0] or self.audited_message!=self._completed[1] or
+                self.transcript.message!=self._completed[1] or
+                canonical(self.transcript.finish())!=self._completed[0]):
+            raise Conflict('held packet decoded output changed after audit')
         return self._snapshot()
 
     def _snapshot(self):
