@@ -54,11 +54,18 @@ class NativeModelOwner(FixtureRuntimeOwner):
     def issue_cpu_trial_grant(self, *args, **kwargs):raise PermissionError('closed generating owner')
     def issue_engineering_patch_grant(self, *args, **kwargs):raise PermissionError('closed generating owner')
 
-    def _binding(self, loaded):
+    def _binding(self, loaded, *, workflow=None, intent=None, ready=None):
+        if workflow is not None:
+            from .hybrid_a_workflow_derivation import first_engineer
+            binding,_,_=first_engineer(loaded['record']['contract']['proposal'],
+                json.loads(self.plans.registry._raw),self.program_hash,intent,ready,workflow['files'])
+            if binding['workflow']!=workflow:raise Conflict('original workflow derivation changed')
+            return binding
         return approved_binding(loaded['record']['contract']['proposal'],
             json.loads(self.plans.registry._raw), self.program_hash)
 
-    def issue_native_model_grant(self, bundle, token, observation, *, packet, output_schema):
+    def issue_native_model_grant(self, bundle, token, observation, *, packet, output_schema,
+                                 _workflow=False):
         self._actual(); self.controller._issued(token)
         intent, ready = self._plan_original(bundle, token, observation)
         check_bytes(packet, 60000); check_bytes(output_schema, 8192)
@@ -68,7 +75,13 @@ class NativeModelOwner(FixtureRuntimeOwner):
         with self.pool._lock, self.store.read_connection() as db:
             db.execute('BEGIN'); read = ReadBudget(db, PREPARATION_READ_BYTES)
             loaded = self.budget._load(db, self._ready_for_bundle(bundle)['request']['goal_ref'], read)
-            binding = self._binding(loaded)
+            if _workflow:
+                from .hybrid_a_workflow_derivation import first_engineer
+                binding,derived,schema=first_engineer(loaded['record']['contract']['proposal'],
+                    json.loads(self.plans.registry._raw),self.program_hash,intent,ready,packet['files'])
+                if packet!=derived or output_schema!=schema:
+                    raise Conflict('original first Engineer workflow packet/schema required')
+            else:binding = self._binding(loaded)
             if digest(packet) != binding['packet_sha256'] or digest(output_schema) != binding['output_schema_sha256']:
                 raise Conflict('actual packet/schema differs from original generating approval')
             packet_raw = bind_packet(packet, binding, intent, loaded['record']['contract']['proposal'])
@@ -82,6 +95,19 @@ class NativeModelOwner(FixtureRuntimeOwner):
                     observation=observation, attempt=None, packet_raw=packet_raw, schema_raw=schema_raw)
                 return grant
 
+    def issue_workflow_engineer_grant(self,bundle,token,observation,*,files):
+        """Only first original Engineer, not an unproven Reviewer/continuation."""
+        self._actual();self.controller._issued(token)
+        intent,ready=self._plan_original(bundle,token,observation)
+        with self.store.read_connection() as db:
+            db.execute('BEGIN');read=ReadBudget(db,PREPARATION_READ_BYTES)
+            loaded=self.budget._load(db,self._ready_for_bundle(bundle)['request']['goal_ref'],read)
+            from .hybrid_a_workflow_derivation import first_engineer
+            _,packet,schema=first_engineer(loaded['record']['contract']['proposal'],
+                json.loads(self.plans.registry._raw),self.program_hash,intent,ready,files)
+        return self.issue_native_model_grant(bundle,token,observation,packet=packet,
+            output_schema=schema,_workflow=True)
+
     def _issued_native_model_grant(self, grant, bundle, token, observation):
         self._actual(); row = self._native_model_grants.get(id(grant))
         if (type(grant) is not NativeModelGrant or row is None or row['grant'] is not grant or
@@ -92,7 +118,9 @@ class NativeModelOwner(FixtureRuntimeOwner):
     def _fresh_native_model(self, loaded, attempt):
         grant = attempt['native_model_grant']
         row = self._issued_native_model_grant(grant, attempt['bundle'], attempt['token'], attempt['observation'])
-        expected = self._binding(loaded)
+        frozen=json.loads(grant.raw)
+        intent,ready=self._plan_original(attempt['bundle'],attempt['token'],attempt['observation'])
+        expected = self._binding(loaded,workflow=frozen.get('workflow'),intent=intent,ready=ready)
         expected.update(grant_id=grant.id, **{k:loaded[k] for k in ('proposal_hash','approval_hash','config_hash','scope_hash')})
         if row['attempt'] is not attempt or canonical(expected) != grant.raw:
             raise Conflict('current original generating approval differs')

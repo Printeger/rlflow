@@ -1,5 +1,7 @@
 # 需求包离线校验报告
 
+2026-10-11首Engineer来源接线：原setup error预算head2.27s定位fulltoken reservation触finalization reserve，保留产品门改每session预留；corrected单项actual原fixture grant/register/fullSTOP/no-handoffSETTLED/Pool0/allFDclosed/coldreplay1pass14.64s。原files与历史parent hash篡改拒、V1不借V2、无subprocess。共享MODEL_BINDING/Budget/Runtime变化必要回归原28282自然terminal21pass/3deselected/1旧warning105.87s，未重启。compile/diff/USERlock检查通过；命令/失败证据a-workflow-first-source-20261011.txt。不是实际模型、task、Review或A完成；阶段quota/time及后续parents仍缺，Goal ACTIVE。
+
 2026-10-11 V2原审批切片：新profile首失败已定位为测试owner误重绑和definition alias，保留原门/逐项detached修后12affectedpass2.85s；6原spec负例已首pass未重复。共享Registry/Authority77pass5.28s；required conditions新affected3pass.88s；V1变候选/Evaluator原拒绝1pass5.06s证明兼容而非A完成。High保护路径后代重叠MUST双向修复，affected正/负3pass.89s；compile/diff/USERlock检查通过，完整命令/失败记录见evidence/a-workflow-envelope-20261011.txt。实际模型任务、产品Review/结算/条件接续NOT_EXECUTED；不虚称全量或关闭98/A。Goal ACTIVE。
 
 2026-10-11原V1自治缺口复现：单独原78829自然terminal1pass5.11s，实际原审批/plan/owner拒Evaluator packet与新candidate，未发grant/Store和Pool版本不变。测试通过仅证明V1正确拒越界，并证明不能完成要求的自主链，不是Review/A验收。独立High确证原审批Registry闭包及CPU全零模型合同冲突；根因与下一最小重构见evidence/a-workflow-contract-gap-20261011.txt。未重复gate/旧passed，不读auth/调模型/GPU，Goal ACTIVE。

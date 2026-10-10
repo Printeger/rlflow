@@ -1,5 +1,7 @@
 # 开发决策记录
 
+2026-10-11首workflow派生沿用原生成runtime登记，不另建仅helper证据账本：显式V2 workflow出处扩展存INTENT/READY引用与匹配原清单的有限files，fresh及历史validator都从原审批/原plan重算packet/schema/binding。旧V1 approved_binding仍原exact合同，不能借V2 issuer改role/schema。按floor总soft/CLI slots分配初始reservation以保留原finalization reserve；这是soft预留切片，不限制供应商请求数或硬封费用。后续原usage超额/缺计数不得剪裁/补零。FIRST_ENGINEER为出处阶段非唯一阶段消耗证明，实际release继续deny直到原quota/time/阶段账本和生成资格接通。证据a-workflow-first-source-20261011.txt。
+
 2026-10-11 A workflow V2 原审批边界：新增明确adapter而非升级V1；审批固定账户、模型、总额度、原程序hash声明、可信CPU验收、候选路径及角色schema，未知生成candidate留给原受保护事实逐次派生。原Registry.resolve确认和历史回放同时校验此闭合范围；原ApprovalService继续只产生LEASE_VALIDATION_PENDING。登记及声明hash不证明账户、实际程序或运行资格，不会把caller JSON变成来源。必需deterministic和independent_review条件不可降optional；可写候选与保护路径双向重叠均拒。两个High为共享总配额，REVISE耗尽时必须停止，不能额外调用；一次接续仅证明下一任务派发，不保证其完整闭环。下一必须实现原facts→新grant/reservation→Controller/CAS/STOP和历史验证，不以contract登记代替纵向交付。证据evidence/a-workflow-envelope-20261011.txt。
 
 2026-10-11：V1只对单一预冻结packet安全，不是自主workflow授权。未知Engineer产出不能预签hash，但也不能删除原hash核验或让caller JSON充出处。新增版本由一次审批冻结范围/资源/角色schema/可信检查与条件，由Core原持久source/candidate/test/review事实派生逐次冻结输入，fresh与历史同时核envelope+出处。CPU验收也须workflow派生原grant，不借旧全零模型合同。此直接依赖前移，credential/producer接线仍需要但不以更多预备组件代替纵向链；同A小额合同不扩资源，V1不迁移/自动升级。

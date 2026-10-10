@@ -31,6 +31,12 @@ SPEC = obj({'profile': {'const': PROFILE}, 'role': enum('Engineer', 'Evaluator')
 BINDING = obj({**SPEC['properties'], 'grant_id': ID, 'proposal_hash': HASH,
     'approval_hash': HASH, 'config_hash': HASH, 'scope_hash': HASH,
     'command_sha256': HASH, 'resource_sha256': HASH})
+# Explicit new derivation, not an automatic widening of packet V1 approval.
+BINDING['properties']['workflow'] = obj({'profile':{'const':'A_ENGINEERING_WORKFLOW_V2'},
+    'stage':{'const':'FIRST_ENGINEER'},'envelope_sha256':HASH,
+    'intent':obj({'key':ID,'hash':HASH}),'ready':obj({'key':ID,'hash':HASH}),
+    'files':{'type':'object','minProperties':1,'maxProperties':32,
+             'additionalProperties':{'type':'string','maxLength':49152}}})
 
 
 def validate_spec(spec):

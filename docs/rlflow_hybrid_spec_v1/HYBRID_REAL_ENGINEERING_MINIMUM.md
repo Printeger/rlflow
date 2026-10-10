@@ -1,5 +1,7 @@
 # 首个真实工程自主闭环：最小交付清单
 
+2026-10-11推进：首workflow Engineer原manifest→冻结packet/schema→原grant/登记与fresh/historical重算已可实际STOP并coldreplay，不再仅审批数据。下一先补原stage/角色quota/controlled累计时长与唯一首stage消耗，再完成真实原账户/生成source/settlement及后续candidateCPU/Evaluator/条件CAS/接续。所有release仍拒，FIRST_ENGINEER不代表once-only证明；首次真实任务NOT_EXECUTED。现有小额A合同待批只限制实际调用，不阻本地实现，GPU/B/C/HOLD不变。
+
 2026-10-11审批表达已本地接通：新A_ENGINEERING_WORKFLOW_V2原Registry/ApprovalService可冻结一次model+CPU契约，历史回放验证同envelope，明确Engineer PATCH与独立Evaluator REVIEW输出、可信验收、双向protected边界、配额/修复/接续限制；仍execution_qualified=false。下一直接实现原受保护事实派生逐次packet/grant（含parent key/hash/version和原新reservation/Controller/CAS/STOP），而非继续仅增加准备组件。原账户/生成来源、结算、产品独立Review、条件CAS/接续和首个真实任务仍全部必需，当前NOT_EXECUTED；小额A运行合同未经批准不调用，GPU/B/C/instinctRL HOLD不变。
 
 2026-10-11首要纠正：须先建立versioned workflow批准envelope与原持久事实派生每次packet/grant的接线。当前V1单一role/候选hash审批无法对未知产出发Evaluator或续作grant，现CPU验收合同又要求模型预算全零；已原调用链实证拒绝并独立确认。不能用多个人类批准的单packet试跑充自主闭环，也不能删原hash/审批门。新workflow需同一原批准/Registry不变下完成Engineer未知candidate→受管CPU检查→不同原session Evaluator→受保护条件接纳→有界下一packet，并保留父facts key/hash/version、新reservation/Controller/CAS/STOP。已有V1维持旧语义不升级；账户/source/结算仍缺，本地继续、实际A合同未批不运行。完整目标与其他验收不变。

@@ -1,0 +1,59 @@
+A workflow first source derivation — WIP, not a real task result
+Base: 420613b. Model/API/GPU calls: zero; existing runtime launch gates DENY.
+
+Behavior delivered:
+Explicit new workflow Engineer issuer derives a packet from original approved
+objective/conditions and exact original WorkingPlan file manifest. Whole V2
+envelope and original INTENT/READY key/hash + frozen UTF-8 files are persisted
+in generating registration's binding. Fresh original owner and historical
+Budget runtime validator both recompute this binding. Old V1 approval/issuer
+does not inherit workflow scope. Reviewer, repair and continuation need their
+authenticated parent facts and remain unavailable; matching caller bytes are
+not a model receipt. Account/producer qualification remains false.
+
+579ab9 / 79414 / eb6524:
+isolated pytest tests/test_hybrid_a_workflow_derivation.py
+1 setup error in 2.27s: original PRE_RUNTIME budget head differs.
+Root cause: reserving all approved 400k/32k tokens conflicts with original
+finalization reserve; not missing user runtime permission. Changed reservation
+derivation to floor(soft total / CLI slots), min1, preserving original Budget
+admission. This is a reservation slice/soft threshold, not hard provider caps;
+overflow/missing usage must remain conservative, never clip into settlement.
+6d651d / 90937 / 9378fb:
+same single original test, corrected amounts 50k input/4k output/310s/1session
+1 passed in 14.64s. Actual original fixture approval→plan→opaque workflow grant
+→registration/source frozen packet→full STOP→SETTLED no-handoff→Pool0/allFDs
+closed→snapshot/recover/audit/replay. Fake original files denied without Store
+or Pool changes; start denied/no subprocess; V1 issuer refuses V2 envelope;
+historical altered parent hash refused. Synthetic authenticated fixture is not
+approval to access the real account. No actual code task/model was completed.
+915bea: changed Python compileall + git diff --check exit0.
+05a7df / 28282 / ac3c3c:
+isolated pytest tests/test_hybrid_native_model_budget.py
+tests/test_hybrid_native_model_runtime.py -k
+'not native_gate and not partial_gate and not elf and not prefix and not packet_source_failure and not helper'
+21 passed, 3 deselected, 1 existing Starlette deprecation warning, 105.87s.
+Original handle naturally terminal, not restarted; required shared binding,
+runtime/fresh/original ledger regression after these modules changed.
+Independent High read-only difference review: no new confirmed MUST in
+  original FIRST_ENGINEER derivation/registration/no-handoff STOP/history
+  scope. Common historical original WorkingPlan record/link/scope/reservation
+  checks retained; V1 isolation and physical cleanup gates not weakened.
+  Did not run tests; not a product Reviewer receipt. Shared regression later
+  independently observed terminal by root as recorded above.
+3180ea: final changed compileall + git diff --check exit0; USER lock SHA
+becc7e2a36dfcad4ffe934b5ff2f0f68187611d6c0641bd63d81367651cfbf09
+unchanged and not staged.
+
+Remaining required before any workflow release:
+- original stage/role quota + controlled-total-time ledger, unique first stage;
+  current FIRST_ENGINEER identifies derivation type, not a proven once-only
+  workflow disposition across multiple independently prepared attempts;
+- actual credential/account + native producer-ready-G + complete original
+  stdout/EOF/protected source publisher, trusted usage settlement;
+- candidate/CPU verification provenance under same workflow approval;
+- different original Evaluator session + protected condition CAS acceptance
+  + bounded next packet and actual non-preset task result.
+No checkpoint98/A closure. No additional user decision blocks local coding;
+actual model calls pending existing small A contract approval, GPU/B/C and
+instinctRL HOLD unchanged. Original Goal ACTIVE.
