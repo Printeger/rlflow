@@ -88,6 +88,8 @@ RUNTIME['properties']['local_cpu_scope_binding']=SCOPE_RUNTIME
 RUNTIME['properties']['native_model_handoff_attempted']={'type':'boolean'}
 from .hybrid_native_model_usage import PUBLICATION as MODEL_USAGE
 RUNTIME['properties']['native_model_usage']=nullable(MODEL_USAGE)
+from .hybrid_native_model_result import PUBLICATION as MODEL_RESULT
+RUNTIME['properties']['native_model_result']=MODEL_RESULT
 
 
 def control_command_id(request, actor_id, client_key):
@@ -145,10 +147,18 @@ def validate_runtime(request, prior):
             validate_publication(usage,value)
         if old is not None and old.get('native_model_usage') is not None and usage!=old['native_model_usage']:
             raise Conflict('original native usage publication changed')
+        result=value.get('native_model_result')
+        if result is not None:
+            from .hybrid_native_model_result import validate_publication as validate_result
+            validate_result(result,value)
+        if old is not None and old.get('native_model_result') is not None and result!=old['native_model_result']:
+            raise Conflict('original durable native result changed')
     elif 'native_model_handoff_attempted' in value:
         raise Conflict('zero-model profile cannot acquire generating handoff fields')
     if not generating and 'native_model_usage' in value:
         raise Conflict('zero-model profile cannot acquire native usage publication')
+    if not generating and 'native_model_result' in value:
+        raise Conflict('zero-model profile cannot acquire native result publication')
     local=value['origin']['kind']==LOCAL_KIND
     if local:
         publication=value.get('local_cpu_recovery_source')
@@ -306,6 +316,11 @@ def validate_original_links(value, lookup):
         binding.update(grant_id=origin['native_model']['grant_id'],
             **{k:sources[k] for k in ('proposal_hash','approval_hash','config_hash','scope_hash')})
         if canonical(binding)!=canonical(origin['native_model']):raise Conflict('generating model original approved binding differs')
+        if runtime.get('native_model_result') is not None:
+            from .hybrid_native_model_result import validate_publication as validate_result
+            paths=(approval['registry_witness']['tools']['native_model']['definition']['spec']['candidate_paths']
+                if 'workflow' in frozen else None)
+            validate_result(runtime['native_model_result'],runtime,approved_paths=paths)
     if origin['kind']==LOCAL_KIND:
         from .hybrid_local_cpu_profile import approved_binding
         from .hybrid_goals import SECTIONS as GOALS

@@ -651,6 +651,8 @@ class FixtureRuntimeOwner:
                 if phase=='FIXTURE_SCOPE_STOPPED':
                     publication=self._native_usage_publication(attempt)
                     if publication is not None:runtime['native_model_usage']=publication
+                    result=self._native_result_publication(attempt)
+                    if result is not None:runtime['native_model_result']=result
             for name in ('start_command', 'stop_command'):
                 if prior is not None and name in prior: runtime[name] = prior[name]
             if command is not None:
@@ -673,6 +675,8 @@ class FixtureRuntimeOwner:
                 'prior_goal': goal, 'prior_reservation': reservation, 'prior_project': project,
                 'decision': decision, 'reason': reason, 'accepted_state_version': version + 1,
                 'execution_enabled': False}
+            if phase=='FIXTURE_SCOPE_STOPPED' and attempt.get('native_model_grant') is not None:
+                self._native_terminal_archive_gate(attempt,original)
             validate_record(BUDGET[0], entry_key(request), original)
             attempt['entries'][phase] = original  # Retain exact original CAS before COMMIT.
         if original['request']['expected_state_version'] != version:

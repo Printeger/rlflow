@@ -243,6 +243,48 @@ class NativeModelOwner(FixtureRuntimeOwner):
         self._issued(attempt['lease'])
         return self.sources._runtime_usage_publication(self,attempt['lease'])
 
+    def _native_result_publication(self,attempt):
+        self._issued(attempt['lease'])
+        return self.sources._runtime_result_publication(self,attempt['lease'])
+
+    def _preflight_native_result_archive(self,lease,data):
+        """Read-only size admission against original current Budget frame."""
+        from .hybrid_budget_ledger import SECTIONS as BUDGET
+        from .hybrid_native_model_result import from_result,archive_preflight
+        attempt=self._issued(lease);origin=attempt['origin'];binding=origin['native_model']
+        # A terminal hash has fixed length; actual STOP proof does not exist yet.
+        usage={'profile':'ORIGINAL_NATIVE_CLI_USAGE_V1','source_id':attempt['source'].id,
+            **{k:origin[k] for k in ('lease_id','task_id','attempt_id','nonce')},
+            'grant_id':binding['grant_id'],'grant_sha256':digest(binding),'producer':attempt['producer_identity'],
+            **{k:binding[k] for k in ('workspace_id','packet_sha256','output_schema_sha256','candidate_sha256')},
+            **{k:data[k] for k in ('stream_sha256','output_sha256','usage','ready_sha256')},
+            'stream_bytes':data['bytes'],'started_ack_sha256':digest(json.loads(attempt['started_ack'].raw)),
+            'terminal_proof_sha256':'sha256:'+'f'*64,'producer_exit_code':0}
+        value=from_result(data,binding['role'],usage)
+        request={k:attempt['intent']['request'][k] for k in ('project_id','data_mode','store_epoch','goal_ref')}
+        request['action']='FIXTURE_RUNTIME_STARTED_AS_OBSERVED'
+        request['reservation_id']=attempt['ready']['source_context']['budget_reservation']['reservation_id']
+        with self.store.read_connection() as db:
+            db.execute('BEGIN');read=ReadBudget(db,PREPARATION_READ_BYTES)
+            heads=self.budget._heads(db,request,read,self.budget._metadata(db))
+            reservation=heads[1]
+            if reservation is None or reservation.get('fixture_runtime',{}).get('origin')!=origin:
+                raise Conflict('original native archive preflight reservation differs')
+            entry=read.object(BUDGET[0],reservation['last_entry_key'])
+            if entry is None or digest(entry)!=reservation['last_entry_hash']:
+                raise Conflict('original native archive preflight fact differs')
+            archive_preflight(entry,value,usage,heads)
+
+    def _native_terminal_archive_gate(self,attempt,value):
+        """Exact final frame size may only demote to UNKNOWN, never deny STOP."""
+        if value['request']['fixture_runtime'].get('native_model_result') is None:return
+        try:check_bytes(value,256*1024)
+        except Exception:
+            self.sources._packet_failures.add(id(attempt['source']))
+            runtime=value['request']['fixture_runtime']
+            runtime.pop('native_model_result',None);runtime.pop('native_model_usage',None)
+            value.update(request_hash=digest(value['request']),decision='UNKNOWN',reason='FIXTURE_EXPOSURE_RETAINED')
+
     def check_guard(self,db,guard):
         self._issued(guard.attempt['lease'])
         value=super().check_guard(db,guard)
@@ -251,6 +293,10 @@ class NativeModelOwner(FixtureRuntimeOwner):
             if recorded['phase']=='FIXTURE_SCOPE_STOPPED' else None)
         if recorded.get('native_model_usage')!=expected:
             raise PermissionError('original issued native usage publication required')
+        result=(self._native_result_publication(guard.attempt)
+            if recorded['phase']=='FIXTURE_SCOPE_STOPPED' else None)
+        if recorded.get('native_model_result')!=result:
+            raise PermissionError('original issued native result publication required')
         return value
 
     def _final_deadlines(self,guard,now,mono):

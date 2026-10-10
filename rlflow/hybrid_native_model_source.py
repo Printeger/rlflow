@@ -527,6 +527,16 @@ class NativeModelSourceOwner(FixtureUsageSourceOwner):
         validate_schema(PUBLICATION,value)
         return value
 
+    def _runtime_result_publication(self,owner,lease):
+        """Exact source result, after original full STOP; not a caller API."""
+        usage=self._runtime_usage_publication(owner,lease)
+        if usage is None:return None
+        runtime=owner._issued(lease);source=runtime['source']
+        original=self._model_results[id(source)]
+        cap=self._issued_native_result(owner,lease,original[2]);data=json.loads(cap.raw)
+        from .hybrid_native_model_result import from_result
+        return from_result(data,runtime['origin']['native_model']['role'],usage)
+
     def _released_original(self,owner,lease):
         from .hybrid_native_model_runtime import NativeModelOwner
         self._actual()
@@ -644,13 +654,21 @@ class NativeModelSourceOwner(FixtureUsageSourceOwner):
             binding=json.loads(runtime['native_model_grant'].raw)
             if binding['role']=='Engineer':
                 candidate=self.candidate_data(source)
-                output={'candidate_sha256':candidate.output_sha256,'files':candidate.files()}
+                output={'candidate_sha256':candidate.output_sha256,'files':candidate.files(),
+                    'allowed_paths':list(self._packet_origins[id(source)][5])}
             else:output={'review':self.review_data(source)}
             cap=NativeModelResult(source,canonical({**data,**output,
+                'message_utf8':self._packet_completed[id(source)][0].decode('utf-8'),
                 'ready_sha256':digest(json.loads(witness[5])),
                 'source_authenticated':True,'account_qualified':True,
                 'account_binding':'TRUSTED_CLI_FORCED_CHATGPT_WORKSPACE',
                 'condition_evidence_enabled':False}))
+            # Size admission BEFORE registering any settleable result. Failure
+            # latches financial UNKNOWN, never obstructs physical STOP cleanup.
+            try:owner._preflight_native_result_archive(lease,json.loads(cap.raw))
+            except Exception:
+                self._packet_failures.add(id(source))
+                raise
             if runtime.get('source_stop_latched'):
                 raise Conflict('STOP raced original native result; no issue')
             self._model_results[id(source)]=(owner,lease,cap,cap.raw,
