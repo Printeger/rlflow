@@ -47,8 +47,9 @@ def test_original_configured_cpu_grant_budget_pool_source_and_no_handoff_stop(tm
 
 def test_actual_configured_core_task_result_managed_stop_budget_and_free(tmp_path):
     import time
-    from rlflow.hybrid_local_cpu_manager import _originals
+    from rlflow.hybrid_local_cpu_manager import _originals,_stop_replies
     original_managers=set(_originals)
+    original_replies=set(_stop_replies)
     tmp_path.chmod(0o700)
     spec=_spec();spec['code']="""import json,collections,os,time
 data=json.loads(open(WORK+'/payload.txt').read())
@@ -82,12 +83,14 @@ if not child:
         assert all(fd is None for fd in row['fds'].values())
         manager=row['manager']
         assert manager.closed and _originals[id(manager)] is manager
+        original_reply=_stop_replies[id(manager)]
         # Alias corruption must fail BEFORE deleting any original manager;
         # closed cached proofs still support the same owner's cleanup retry.
         alias=object();runtime.sources._attempts[id(alias)]=row
         try:
             with pytest.raises(Conflict,match='retirement row alias'):runtime.sources.shutdown()
             assert runtime.sources._live and _originals[id(manager)] is manager
+            assert _stop_replies[id(manager)] is original_reply
             assert manager.stop()==json.loads(manager.stopped_raw)
         finally:del runtime.sources._attempts[id(alias)]
         (tmp_path/'actual-command.json').write_text(json.dumps(row['command']))
@@ -95,6 +98,7 @@ if not child:
         (tmp_path/'actual-terminal.json').write_text(json.dumps(attempt['terminal']))
         (tmp_path/'actual-result.json').write_text(json.dumps(result))
     assert set(_originals)==original_managers
+    assert set(_stop_replies)==original_replies
     with pytest.raises(PermissionError):manager.close()
 
 
@@ -450,15 +454,25 @@ def test_actual_lost_stop_return_retires_only_parent_preserves_cold_exposure(tmp
         row=runtime.sources._issued(attempt['source']);runtime.start(lease)
         manager=row['manager'];original_call=manager._call;calls=[];actual_jobs=[]
         def lose_return(method,*args,**kwargs):
-            value=original_call(method,*args,**kwargs)
-            if method=='StopUnit':
-                calls.append(method);actual_jobs.append(value)
-                raise OSError(5,'injected original StopUnit return lost AFTER actual manager effect')
-            return value
+            if method!='StopUnit':return original_call(method,*args,**kwargs)
+            calls.append(method)
+            read=manager.lib.sd_bus_message_read
+            def lose_decode(message,types,*values):
+                status=read(message,types,*values)
+                if types==b'o':
+                    import ctypes
+                    actual_jobs.append(ctypes.cast(values[0],ctypes.POINTER(ctypes.c_char_p)).contents.value.decode())
+                    raise OSError(5,'injected original STOP wire decode lost before strong receipt')
+                return status
+            with monkeypatch.context() as wire_fault:
+                wire_fault.setattr(manager.lib,'sd_bus_message_read',lose_decode)
+                return original_call(method,*args,**kwargs)
         monkeypatch.setattr(manager,'_call',lose_return)
         with pytest.raises(Conflict,match='partial cleanup retained'):runtime.stop_to_terminal(lease)
         assert calls==['StopUnit'] and actual_jobs[0].startswith('/org/freedesktop/systemd1/job/')
         assert manager.stop_entered and manager.stop_job is None and manager.stopped_raw is None
+        from rlflow.hybrid_local_cpu_manager import _stop_replies
+        assert id(manager) not in _stop_replies
         assert manager.closed and row['producer'].poll() is not None
         assert identity(row['ready']['keeper']['pid']) is None
         assert runtime.sources._kernel_terminals[id(row)] is row
@@ -511,6 +525,47 @@ print(json.dumps(view))
     assert view['managed_terminal_proof'] is None
     assert len([event for event in view['events'] if event['recorded_phase']=='RELEASE_INTENT'])==1
     (tmp_path/'lost-stop-return-cold.json').write_text(result.stdout)
+
+
+def test_actual_retained_stop_wire_reply_recovers_caller_return_and_free(tmp_path,monkeypatch):
+    from rlflow.hybrid_local_cpu_manager import _stop_replies
+    from rlflow.hybrid_local_cpu_reads import LocalCpuTaskReader
+    from rlflow.hybrid_budget_ledger import reservation_key
+    original_replies=set(_stop_replies);tmp_path.chmod(0o700)
+    spec=_spec();spec['code']='import os,time; child=os.fork(); print(os.getpid(),flush=True); time.sleep(9)'
+    with isolated_session(tmp_path,spec,approved=True,confirmation_reader=_confirm) as session:
+        runtime=session['runtime'];lease=session['lease'];attempt=runtime._issued(lease)
+        row=runtime.sources._issued(attempt['source']);runtime.start(lease)
+        manager=row['manager'];call=manager._call;calls=[]
+        def lost_caller(method,*args,**kwargs):
+            value=call(method,*args,**kwargs)
+            if method=='StopUnit':
+                calls.append(method)
+                assert _stop_replies[id(manager)].job==value
+                raise OSError(5,'caller return lost AFTER original wire receipt retained')
+            return value
+        monkeypatch.setattr(manager,'_call',lost_caller)
+        runtime.stop_to_terminal(lease)
+        assert calls==['StopUnit'] and manager.closed and manager.stop_job==_stop_replies[id(manager)].job
+        assert runtime._current(attempt)['status']=='SETTLED' and runtime.pool.snapshot()['occupied']==0
+        proof=attempt['terminal']['managed_service_proof']
+        assert proof['job']['path']==manager.stop_job and proof['job']['result']=='done'
+        assert proof['manager']['MainPID']==0 and proof['original_manager_scope_processes']==[]
+        assert proof['keeper_kernel_terminal'] and proof['transport_reaped']
+        assert proof['original_manager_connection_closed'] and proof['original_protocol_closed']
+        assert all(fd is None for fd in row['fds'].values())
+        version=runtime.store.version();pool_version=runtime.pool.snapshot()['version']
+        runtime.stop_to_terminal(lease)
+        assert calls==['StopUnit'] and runtime.store.version()==version and runtime.pool.snapshot()['version']==pool_version
+        root=runtime.store.root;epoch=runtime.plans.workspace.store_epoch;key=reservation_key(session['reserve'])
+        (tmp_path/'retained-stop-terminal.json').write_text(json.dumps(attempt['terminal']))
+    assert set(_stop_replies)==original_replies
+    reader=LocalCpuTaskReader(runtime.store,project_id='isolated_local_cpu',store_epoch=epoch)
+    history=reader.task(key,timeline=True)
+    assert history['task']['recorded_budget_status']=='SETTLED'
+    assert history['managed_terminal_proof']['managed_service_proof']==proof
+    assert history['recorded_settled_usage']['experiment_starts']==1
+    (tmp_path/'retained-stop-cold.json').write_text(json.dumps(history))
 
 
 @pytest.mark.parametrize('expected_status',['PASS','FAIL'])

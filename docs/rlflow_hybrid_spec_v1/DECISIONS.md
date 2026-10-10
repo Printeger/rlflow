@@ -1,5 +1,7 @@
 # 开发决策记录
 
+92 仅完整原wire decode回执可恢复caller Exception，immutable context须含decoded job本身，不只依赖frozen dataclass；保留先于return/unref，同原manager/socket/source/Invocation/intent每次核验，永不重发。fatal BaseException透传，真正decode丢失不借JobRemoved补cap。receipt在Source整体退休preflight后撤，alias失败全保留。冷父死不复原旧job能力，完整scope缺口另列，不以GC/任务签名FREE。详HYBRID_LOCAL_CPU_STOP_REPLY_RECOVERY.md。
+
 91 原inode不代表内容认证：独立MUST证明成对改报告/hash/输出可伪机器PASS，改为task fork/sandbox之后才生成内存私钥、原ready公钥G前持久、domain Ed25519签完整报告，冷仅原事件公钥验真。源路径/inodeHANDOFF前绑定，partial不发布；NONBLOCK拒FIFO，来源旧inode与本次opened FD清理身份分离。失去原managerjob的报告只证明任务证据，不退款、不FREE、无cold控制。分轮证据区分未签/最终签名版本，不改原验收合同。详HYBRID_LOCAL_CPU_EVIDENCE_RECOVERY.md。
 
 90 实测否定父死必留active服务假设，不改RemainAfterExit。采用新启动CollectMode=inactive-or-failed并snapshot精确核验：原RefUnit保住正常STOP证据，父死后允许失败单元物理GC。名字not-found仅诊断；原pidfd死前捕获证实进程退役，仍不能补已失manager业务证明。冷Budget UNKNOWN/Pool占槽和原历史不写保持；不清理历史failed单元，不退款、不冷接管。详HYBRID_LOCAL_CPU_PARENT_CRASH.md。

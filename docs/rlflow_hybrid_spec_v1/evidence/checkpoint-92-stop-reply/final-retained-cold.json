@@ -1,0 +1,209 @@
+{
+  "schema_version": "1.1",
+  "project_id": "isolated_local_cpu",
+  "data_mode": "fixture",
+  "store_epoch": "store_07998fb9fa454079a9c389db79899dcc",
+  "as_of_state_version": 17,
+  "execution_enabled": false,
+  "task": {
+    "id": "fixture_task_0a48fd8968e843c4a148b6a188ff4dbc",
+    "attempt_id": "fixture_attempt_3e239fe439fa442aa916bcb0fcb10ee0",
+    "reservation_id": "budget_reservation_c5a1d821c6e6c8a14b6515348e3a06ffda1ea4e19f90de129cd49ad8819bb288",
+    "kind": "LOCAL_CONFIGURED_CPU",
+    "authorization": "ORIGINAL_APPROVED_LOCAL_CPU_ONLY",
+    "recorded_phase": "FIXTURE_SCOPE_STOPPED",
+    "recorded_at_state_version": 17,
+    "current_execution_status": "UNKNOWN",
+    "controls_available": false,
+    "source_coverage": "ORIGINAL_EVENT_VERIFIED",
+    "model_enabled": false,
+    "native_execution_enabled": false,
+    "candidate_write_enabled": false,
+    "delegation_enabled": false,
+    "actual_cost_status": "UNKNOWN",
+    "synthetic_tokens_settled": false,
+    "arbitrary_tree_stop": false,
+    "resource_release_status": "NOT_OBSERVED",
+    "recorded_wall_seconds": 4,
+    "configured_local_cpu_only": true,
+    "fixed_cpu_scope_only": false,
+    "profile": "CONFIGURED_LOCAL_CPU_V1",
+    "approved_spec_sha256": "sha256:132a657cf0b879a9cd99cf7fb1ac4236eec94d2b186b1b1ac7e1b5673e271b1d",
+    "approved_code_sha256": "sha256:4b6c5ab3094dc465b41f77535e4bd89bb8aac5da99773a946f93acbea34aaee1",
+    "approved_inputs_sha256": "sha256:9380161cb527a07560e395b80f9d2cf67c4ea3e604b7230bd21e959f7f713733",
+    "recorded_release_attempted": true,
+    "recorded_terminal_proof_sha256": "sha256:3fcbe94de1aa7f537c4ccdf80e37f0acb36d146bf9de411163be3875a575f412",
+    "local_result_status": "RESULT_UNAVAILABLE",
+    "machine_acceptance_status": "UNKNOWN",
+    "independent_review_status": "NOT_PROVEN",
+    "condition_evidence": false,
+    "recorded_budget_status": "SETTLED",
+    "recorded_reserved_amount": {
+      "model_sessions": 0,
+      "model_input_tokens": 0,
+      "model_output_tokens": 0,
+      "gpu_device_seconds": 0,
+      "experiment_starts": 0,
+      "experiment_retries": 0,
+      "wall_seconds": 0
+    },
+    "recorded_unknown_exposure": {
+      "model_sessions": 0,
+      "model_input_tokens": 0,
+      "model_output_tokens": 0,
+      "gpu_device_seconds": 0,
+      "experiment_starts": 0,
+      "experiment_retries": 0,
+      "wall_seconds": 0
+    },
+    "cold_recovery_action": "READ_ONLY_HISTORY_NO_EXECUTION_REPLAY"
+  },
+  "events": [
+    {
+      "event_id": "budget_entry_06533ce94dc4f10f14bb95ff5fd08ebe49585724571f98ff623d56135194447f",
+      "state_version": 12,
+      "recorded_at": "2026-10-10T12:21:07.776318Z",
+      "recorded_phase": "REGISTER_NO_HANDOFF"
+    },
+    {
+      "event_id": "budget_entry_ca9b0e5c9a097f703fbf665279aa015b356e2cecae90eda986110d1999612bd3",
+      "state_version": 13,
+      "recorded_at": "2026-10-10T12:21:09.077507Z",
+      "recorded_phase": "HANDOFF_UNKNOWN"
+    },
+    {
+      "event_id": "budget_entry_77f2bc4fce041b79ca16f657276fa89073fd9cf7b3dac8b5b2c1de31f3e4d1cc",
+      "state_version": 14,
+      "recorded_at": "2026-10-10T12:21:11.127964Z",
+      "recorded_phase": "PROCESS_REGISTERED"
+    },
+    {
+      "event_id": "budget_entry_aaf6e14d855b97b1ca7f93af3deaf24e68f7d4a4372578ac4274f34a7a2db7fe",
+      "state_version": 15,
+      "recorded_at": "2026-10-10T12:21:11.964111Z",
+      "recorded_phase": "RELEASE_INTENT"
+    },
+    {
+      "event_id": "budget_entry_d03dd934608210ff1eabfdd5a52c4dd7f24b4354a873ce1e4afbf5799f17f6cc",
+      "state_version": 16,
+      "recorded_at": "2026-10-10T12:21:13.603873Z",
+      "recorded_phase": "STOP_REQUESTED"
+    },
+    {
+      "event_id": "budget_entry_bf43b954c3ddfb1c4b55bf758f237d55b83b26334d5dd56b5b02c052f589977f",
+      "state_version": 17,
+      "recorded_at": "2026-10-10T12:21:14.557936Z",
+      "recorded_phase": "FIXTURE_SCOPE_STOPPED"
+    }
+  ],
+  "managed_terminal_proof": {
+    "all_original_source_fds_closed": true,
+    "arbitrary_tree_stop": false,
+    "configured_local_result": null,
+    "disk_enforcement": "PARTIAL_NO_HARD_QUOTA",
+    "lease_id": "fixture_lease_0098cf64dfa54586afce4bdb857d49e1",
+    "local_cpu_release_attempted": true,
+    "managed_service_proof": {
+      "job": {
+        "id": 7635,
+        "path": "/org/freedesktop/systemd1/job/7635",
+        "result": "done",
+        "unit": "rlflow-local-f8c9c36e6c7243d28f8037709482e2a6.service"
+      },
+      "keeper": {
+        "boot_id": "fa257cc3-1204-4e6f-88a5-a8a2ea7743aa",
+        "invocation_id": "7b44be419e3c42e4864747dc18d8bd2c",
+        "pid": 1617969,
+        "starttime": "158260926"
+      },
+      "keeper_kernel_terminal": true,
+      "manager": {
+        "ActiveState": "inactive",
+        "ExecMainCode": 2,
+        "ExecMainPID": 1617969,
+        "ExecMainStatus": 15,
+        "InvocationID": "7b44be419e3c42e4864747dc18d8bd2c",
+        "KillMode": "control-group",
+        "MainPID": 0,
+        "Result": "success",
+        "SendSIGKILL": 1,
+        "SubState": "dead",
+        "TimeoutStopUSec": 2000000
+      },
+      "original_manager_connection_closed": true,
+      "original_manager_scope_processes": [],
+      "original_protocol_closed": true,
+      "task_closed": {
+        "closed": {
+          "keeper_protocol_handles_closed": true,
+          "stop_latched": true,
+          "task_handles_closed": true,
+          "whole_scope_stopped": false
+        },
+        "config_sha256": "4fafe4787acf1575e1b5114efd400a04a6b78e71a55e2694eb61d8409a83b5a0",
+        "keeper": {
+          "boot_id": "fa257cc3-1204-4e6f-88a5-a8a2ea7743aa",
+          "invocation_id": "7b44be419e3c42e4864747dc18d8bd2c",
+          "pid": 1617969,
+          "starttime": "158260926"
+        },
+        "original_control_fd_closed": true,
+        "original_output_fds_closed": true,
+        "stopped": {
+          "control_terminal_reason": "CONTROL_EOF",
+          "cpu_stat": "usage_usec 2540\nuser_usec 0\nsystem_usec 2540\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 4\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0",
+          "handoff_unknown": false,
+          "keeper_still_live": true,
+          "memory_peak": 2015232,
+          "protocol_cleanup_unknown": false,
+          "reaped": [
+            {
+              "pid": 1617970,
+              "status": 9
+            },
+            {
+              "pid": 1617991,
+              "status": 9
+            }
+          ],
+          "release_attempted": true,
+          "stop_latched": true,
+          "task_empty": true,
+          "whole_scope_stopped": false
+        },
+        "task": {
+          "pid": 1617970,
+          "sandbox": "CPU_LOCAL_LANDLOCK_SECCOMP",
+          "source_sha256": "4b6c5ab3094dc465b41f77535e4bd89bb8aac5da99773a946f93acbea34aaee1",
+          "starttime": "158260929"
+        },
+        "type": "local_cpu.task_closed",
+        "whole_scope_stopped": false
+      },
+      "transport_reaped": true,
+      "transport_status": 0,
+      "unit": "rlflow-local-f8c9c36e6c7243d28f8037709482e2a6.service",
+      "unit_reference_held": true
+    },
+    "original_participant_reaped": true,
+    "producer": {
+      "boot_id": "fa257cc3-1204-4e6f-88a5-a8a2ea7743aa",
+      "pgid": 1617969,
+      "pid": 1617969,
+      "starttime": "158260926"
+    },
+    "program_sha256": "sha256:b264428b20d1b1976e1c0ef9caf8e4b529d15f44ddb8cf95cbb3be44a6a2b281",
+    "scope": "ORIGINAL_CONFIGURED_CPU_SERVICE",
+    "synthetic_tokens_settled": false,
+    "wall_seconds": 4
+  },
+  "recorded_settled_usage": {
+    "model_sessions": 0,
+    "model_input_tokens": 0,
+    "model_output_tokens": 0,
+    "gpu_device_seconds": 0,
+    "experiment_starts": 1,
+    "experiment_retries": 0,
+    "wall_seconds": 4
+  }
+}

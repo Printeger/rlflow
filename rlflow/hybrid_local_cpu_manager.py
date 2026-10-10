@@ -5,12 +5,15 @@ source capability, not a caller name. StopUnit return is intent, JobRemoved(done
 is completion. Connection/job outcome loss remains UNKNOWN and never resends.
 """
 import ctypes as C
+from dataclasses import dataclass
 import errno
+import hashlib
 import json
 import os
 import re
 import stat
 import time
+import uuid
 
 from .jobs import identity
 from .store import Conflict
@@ -21,8 +24,16 @@ MANAGER=b'org.freedesktop.systemd1.Manager'
 UNIT=b'org.freedesktop.systemd1.Unit'
 SERVICE=b'org.freedesktop.systemd1.Service'
 _originals={}
+_stop_replies={}
 P=C.c_void_p
 CALLBACK=C.CFUNCTYPE(C.c_int,P,P,P)
+
+
+@dataclass(frozen=True,eq=False)
+class _OriginalStopReply:
+    owner: object
+    context: bytes
+    job: str
 
 
 def _library():
@@ -72,6 +83,8 @@ class OriginalServiceManager:
         self.destination=None;self.unit_path=None;self.bound=None
         self.unit_referenced=False
         self.stop_entered=False;self.stop_job=None;self.stop_receipt=None
+        self._stop_wire_entered=False
+        self._stop_nonce=uuid.uuid4().hex
         self.stopped_raw=None
         self.events=[];self.callback_error=None;self.closed=False
         self.observed_snapshots=[]
@@ -116,6 +129,13 @@ class OriginalServiceManager:
     def _call(self,name,types,*args,return_type=None,destination=None,path=PATH,interface=MANAGER):
         reply=P()
         try:
+            if name=='StopUnit':
+                self._check_socket()
+                if (not self.stop_entered or self._stop_wire_entered or self.bound is None or id(self) in _stop_replies or
+                        types!=b'ss' or args!=(self.unit.encode(),b'fail') or return_type!=b'o' or
+                        destination is not None or path!=PATH or interface!=MANAGER):
+                    raise Conflict('same original entered STOP call required; no reissue')
+                self._stop_wire_entered=True
             _ok(self.lib.sd_bus_call_method(self.bus,destination or self.destination.encode(),path,interface,
                 name.encode(),None,C.byref(reply),types,*args))
             if return_type is None:return None
@@ -131,9 +151,35 @@ class OriginalServiceManager:
                 return pids
             value=C.c_char_p();_ok(self.lib.sd_bus_message_read(reply,return_type,C.byref(value)))
             if value.value is None:raise Conflict('original manager reply missing')
-            return value.value.decode()
+            value=value.value.decode()
+            if name=='StopUnit':
+                # Actual authenticated wire reply, retained BEFORE caller
+                # return or unref can fail. Not JobRemoved completion.
+                if re.fullmatch(r'/org/freedesktop/systemd1/job/[1-9][0-9]{0,9}',value) is None:
+                    raise Conflict('original STOP job path invalid')
+                from .store import canonical
+                _stop_replies[id(self)]=_OriginalStopReply(self,canonical(self._stop_reply_context(value)),value)
+            return value
         finally:
             if reply.value:self.lib.sd_bus_message_unref(reply)
+
+    def _stop_reply_context(self,job):
+        self._check_socket()
+        if self.row.get('manager') is not self or self.bound is None or not self.stop_entered or not self._stop_wire_entered:
+            raise Conflict('original STOP reply owner binding differs')
+        return {'job':job,'creator':self.creator,'destination':self.destination,'unit':self.unit,
+                'keeper':self.bound,'socket_identity':list(self.fd_identity),
+                'source_sha256':hashlib.sha256(self.row['source'].raw).hexdigest(),'stop_intent':self._stop_nonce}
+
+    def _original_stop_job(self):
+        self._check_socket()
+        receipt=_stop_replies.get(id(self))
+        if receipt is None:raise Conflict('original StopUnit wire reply UNKNOWN; no reissue')
+        from .store import canonical
+        if (type(receipt) is not _OriginalStopReply or receipt.owner is not self or
+                receipt.context!=canonical(self._stop_reply_context(receipt.job))):
+            raise Conflict('original StopUnit wire reply context differs')
+        return receipt.job
 
     def _property(self,name,kind,interface=UNIT):
         reply=P()
@@ -202,8 +248,19 @@ class OriginalServiceManager:
         self.snapshot()  # Current same Invocation BEFORE any STOP effect.
         if not self.stop_entered:
             self.stop_entered=True  # Lost method return never reissues StopUnit.
-            self.stop_job=self._call('StopUnit',b'ss',self.unit.encode(),b'fail',return_type=b'o')
-        if self.stop_job is None:raise Conflict('original StopUnit return UNKNOWN; no reissue')
+            try:
+                returned=self._call('StopUnit',b'ss',self.unit.encode(),b'fail',return_type=b'o')
+            except Exception:
+                # Fully decoded original receipt only. Missing wire reply
+                # stays UNKNOWN; no resend and no fatal BaseException swallowing.
+                self.stop_job=self._original_stop_job()
+            else:
+                original=self._original_stop_job()
+                if returned!=original:raise Conflict('original STOP return differs from wire reply')
+                self.stop_job=original
+        original=self._original_stop_job()
+        if self.stop_job is None:self.stop_job=original
+        elif self.stop_job!=original:raise Conflict('original STOP job differs from wire reply')
         end=time.monotonic()+3
         while self.stop_receipt is None:
             if self.callback_error is not None:raise Conflict('original manager job stream UNKNOWN') from self.callback_error

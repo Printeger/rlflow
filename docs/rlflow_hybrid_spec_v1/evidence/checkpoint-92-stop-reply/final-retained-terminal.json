@@ -1,0 +1,101 @@
+{
+  "scope": "ORIGINAL_CONFIGURED_CPU_SERVICE",
+  "lease_id": "fixture_lease_0098cf64dfa54586afce4bdb857d49e1",
+  "program_sha256": "sha256:b264428b20d1b1976e1c0ef9caf8e4b529d15f44ddb8cf95cbb3be44a6a2b281",
+  "producer": {
+    "pid": 1617969,
+    "pgid": 1617969,
+    "starttime": "158260926",
+    "boot_id": "fa257cc3-1204-4e6f-88a5-a8a2ea7743aa"
+  },
+  "all_original_source_fds_closed": true,
+  "original_participant_reaped": true,
+  "managed_service_proof": {
+    "job": {
+      "id": 7635,
+      "path": "/org/freedesktop/systemd1/job/7635",
+      "result": "done",
+      "unit": "rlflow-local-f8c9c36e6c7243d28f8037709482e2a6.service"
+    },
+    "keeper": {
+      "boot_id": "fa257cc3-1204-4e6f-88a5-a8a2ea7743aa",
+      "invocation_id": "7b44be419e3c42e4864747dc18d8bd2c",
+      "pid": 1617969,
+      "starttime": "158260926"
+    },
+    "manager": {
+      "ActiveState": "inactive",
+      "ExecMainCode": 2,
+      "ExecMainPID": 1617969,
+      "ExecMainStatus": 15,
+      "InvocationID": "7b44be419e3c42e4864747dc18d8bd2c",
+      "KillMode": "control-group",
+      "MainPID": 0,
+      "Result": "success",
+      "SendSIGKILL": 1,
+      "SubState": "dead",
+      "TimeoutStopUSec": 2000000
+    },
+    "original_manager_scope_processes": [],
+    "unit": "rlflow-local-f8c9c36e6c7243d28f8037709482e2a6.service",
+    "unit_reference_held": true,
+    "keeper_kernel_terminal": true,
+    "transport_reaped": true,
+    "transport_status": 0,
+    "original_protocol_closed": true,
+    "original_manager_connection_closed": true,
+    "task_closed": {
+      "closed": {
+        "keeper_protocol_handles_closed": true,
+        "stop_latched": true,
+        "task_handles_closed": true,
+        "whole_scope_stopped": false
+      },
+      "config_sha256": "4fafe4787acf1575e1b5114efd400a04a6b78e71a55e2694eb61d8409a83b5a0",
+      "keeper": {
+        "boot_id": "fa257cc3-1204-4e6f-88a5-a8a2ea7743aa",
+        "invocation_id": "7b44be419e3c42e4864747dc18d8bd2c",
+        "pid": 1617969,
+        "starttime": "158260926"
+      },
+      "original_control_fd_closed": true,
+      "original_output_fds_closed": true,
+      "stopped": {
+        "control_terminal_reason": "CONTROL_EOF",
+        "cpu_stat": "usage_usec 2540\nuser_usec 0\nsystem_usec 2540\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 4\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0",
+        "handoff_unknown": false,
+        "keeper_still_live": true,
+        "memory_peak": 2015232,
+        "protocol_cleanup_unknown": false,
+        "reaped": [
+          {
+            "pid": 1617970,
+            "status": 9
+          },
+          {
+            "pid": 1617991,
+            "status": 9
+          }
+        ],
+        "release_attempted": true,
+        "stop_latched": true,
+        "task_empty": true,
+        "whole_scope_stopped": false
+      },
+      "task": {
+        "pid": 1617970,
+        "sandbox": "CPU_LOCAL_LANDLOCK_SECCOMP",
+        "source_sha256": "4b6c5ab3094dc465b41f77535e4bd89bb8aac5da99773a946f93acbea34aaee1",
+        "starttime": "158260929"
+      },
+      "type": "local_cpu.task_closed",
+      "whole_scope_stopped": false
+    }
+  },
+  "configured_local_result": null,
+  "local_cpu_release_attempted": true,
+  "disk_enforcement": "PARTIAL_NO_HARD_QUOTA",
+  "arbitrary_tree_stop": false,
+  "wall_seconds": 4,
+  "synthetic_tokens_settled": false
+}

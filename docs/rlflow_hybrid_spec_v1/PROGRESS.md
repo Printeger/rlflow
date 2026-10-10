@@ -1,5 +1,7 @@
 # Hybrid v1 开发进度
 
+92 完成原已收到 STOP wire 回执的同 owner 返回丢失恢复：StopUnit一次→原完整终态→SETTLED/PoolFREE/cold；真正decode丢失仍UNKNOWN/占槽。High job binding MUST已修复复审关闭。首实机2pass35.10s；最终14pass/1test-fixture fail31.12s，夹具修后仅单项1pass0.03s，不重跑已过实机。证据checkpoint-92-stop-reply/及HYBRID_LOCAL_CPU_STOP_REPLY_RECOVERY.md。不是父死coldFREE/自治/全库/新安装或长跑资格。91提交8d41790；原Goal ACTIVE。下一完整冷scope可信来源及预算/Pool跨账本收敛；集中资源合同未答不调用模型/GPU，无新增用户决定阻塞本地实现。
+
 Checkpoint91 收尾：90提交fe93ab7。父SIGKILL后可显式恢复原任务输出/退出原因并按原spec重算，新增公开history --recover-task-evidence；原路径/inode/config在HANDOFF前持久，task真实fork+confine后 keeper才生成内存Ed25519私钥，原ready公钥PROCESS在G前持久/后续不可变，close+fsync原报告签完整domain payload。冷原event/approval+公钥/libcrypto pin/chain/inode/stable read验真；不升级managerSTOP/FREE/结算，UNKNOWN/占槽不变。首未签1fail/2pass45.62s为测试缺事务，接线修后1pass13.54s；独立source-integrity/partial/FIFO/FD MUST修，签版实机4pass65.30s；最终异常read-close修后49pass9.09s及当前CLI原signed冷读同值exit0，不重复未受影响实机。High所有MUST关闭，compile/diff/USERlock检查通过，证据checkpoint-91-crash-recovery/及HYBRID_LOCAL_CPU_EVIDENCE_RECOVERY.md，进入提交。不是安装/全库/长跑/自主闭环完成。
 
 下一安全收敛原scope残留与UNKNOWN占槽，必须真实恢复协议与预算/Pool一致，不重建失去的旧STOP能力。模型集中合同未答不调用，strictquota/24h8h/科研自治/instinctRL准入未完成，原Goal ACTIVE。

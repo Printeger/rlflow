@@ -1,5 +1,7 @@
 # 系统实施验收记录
 
+92 定向实机首2pass35.10s；High job binding MUST修后原caller-loss完整STOP/FREE/cold及alias退休回归通过，合并14pass/1fail31.12s（纯fixture缺snapshot）；修test仅单项1pass0.03s。真decode-lossUNKNOWN原实机证据保留，无受影响不重复。High末窄无MUST，详HYBRID_LOCAL_CPU_STOP_REPLY_RECOVERY.md/evidence/checkpoint-92-stop-reply/。非coldFREE/自治/全库/安装或长跑资格。
+
 91 原任务证据恢复：实际签名父SIGKILL/原正常STOP-FREE/no-handoff/deadline84597/e999f5 4pass65.30s；最终异常read-cleanup修后4747/5e24da 49pass9.09s（48pure与真实partial allocation无派发清理），current公开CLI61c1cf exit0同原signed冷恢复，无执行。首未签28866/c4f4fd 1fail2pass45.62s测试缺事务，修1137/60c453 1pass13.54s只为未签版；不冒签名最终资格。High认证/partial/FIFO/FD MUST全闭，compile/diff/USERlock检查通过，无live。证据checkpoint-91-crash-recovery/及HYBRID_LOCAL_CPU_EVIDENCE_RECOVERY.md。UNKNOWN/占槽/无controls不变，任务报告不是managed scope STOP/结算/科研独立Review/自治/安装或长跑资格。
 
 Checkpoint90：baseline99838/84c7e5 1pass11.62s；新策略26445/b3dc90实际崩溃、正常原fullSTOP/FREE、deadline3pass52.31s；最终受影响故障追加Pool冷读55148/aed070 1pass11.67s。死前原keeper/leader/setsid后代pidfd均终态、unit GC；原Store UNKNOWN/no terminal/no settled/no controls，原Pool occupied1/no claims且读取不写。High无新确认MUST；compile/diff与USERlock检查通过，无重复已过正常/期限/UI/65s/全库。证据checkpoint-90-owner-crash/，验收边界与命令见HYBRID_LOCAL_CPU_PARENT_CRASH.md；物理GC不是原同Invocation业务STOP或长期恢复/自治资格。

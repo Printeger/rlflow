@@ -410,7 +410,7 @@ class LocalCpuSourceOwner(FixtureUsageSourceOwner):
         Validate every row before deleting any registration; no RPC or new
         source capability, and no budget/Pool facts are changed here.
         """
-        from .hybrid_local_cpu_manager import OriginalServiceManager,_originals
+        from .hybrid_local_cpu_manager import OriginalServiceManager,_originals,_stop_replies
         self._actual();managers=[];seen_rows=set();seen_managers=set()
         for key,row in self._attempts.items():
             if key!=id(row['claim']) or id(row) in seen_rows:
@@ -427,7 +427,9 @@ class LocalCpuSourceOwner(FixtureUsageSourceOwner):
                 raise Conflict('original manager retirement duplicate; registrations retained')
             seen_managers.add(id(manager))
             managers.append(manager)
-        for manager in managers:del _originals[id(manager)]
+        for manager in managers:
+            _stop_replies.pop(id(manager),None)
+            del _originals[id(manager)]
 
     def shutdown(self):
         from .hybrid_usage_source import _registry,_owners

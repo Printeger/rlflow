@@ -1,5 +1,7 @@
 # 需求包离线校验报告
 
+92 实施验证：同原已decoded STOP receipt caller-loss实际一次STOP/完整terminal/SETTLED/PoolFREE/no doublecharge/cold通过；真实decode-loss仍UNKNOWN/占槽。首2pass35.10s，job绑定MUST修后14pass/1testfixture fail31.12s，修夹具只单项1pass0.03s；High关闭MUST。完整命令与分版本证据见HYBRID_LOCAL_CPU_STOP_REPLY_RECOVERY.md及checkpoint-92-stop-reply/，不重标82全量，不称父死完整冷恢复或自主闭环。
+
 91 定向实施验证：原任务签名证据恢复已实机父SIGKILL验证，含真实setsid后代终态、cold fresh CLI和报告/输出成对篡改拒绝；正常完整STOP/FREE/nohandoff/deadline共4pass65.30s。最终read FD差量49pass9.09s、原signed当前CLI同值exit0，High全部确证MUST关闭。分版本首失败及完整边界见HYBRID_LOCAL_CPU_EVIDENCE_RECOVERY.md和evidence/checkpoint-91-crash-recovery/；UNKNOWN/占槽不自动释放，不称长期恢复、真实模型自主闭环、安装或全库/长跑资格。82历史全量4fail/2532pass/32skip未重标。
 
 86 验证：原37907/fec1c4 exit0 21pass47.85s（完整changed profile含finite/JSON/type/范围负门、真实噪声OLS不同阈值PASS/FAIL、research计1/STOP/FREE、cache/replay/recover无重复计、退出后cold同原history）；必要旧文本原44715/1d8dbd exit0 2pass43.33s。High新接受/来源门无MUST。新wheel SHA651d0fa371daa4f6ddf2675004cc4c4b2b924e196ef7aa7aaf3172d62e37c19e，checkout外public CLI另一配置统计任务15424/e92542 exit0、task1612955/机器PASS/settled start1/wall4/Pool0/模型GPU0；原74085/602a2e public history exit0完全同原runhistory/currentUNKNOWN/controlsfalse。当前全部顶层Python同installedpayload、compile/pipcheck/diff通过、无live，raw outputs与PASS/FAIL result/cold见checkpoint-86-metrics/。这是新数值验收及用量消费安装资格，不是新whole-repo pytest全绿、24h8h、科研Review或完整自治；82原4fail/2532pass/32skip保留，USERlock不变/不stage。
