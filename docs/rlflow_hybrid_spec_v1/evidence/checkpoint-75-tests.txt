@@ -1,0 +1,63 @@
+Checkpoint75 STANDARD evidence; original full M0–M5 Goal ACTIVE.
+Baseline eba6c3802cbe0e8cceb508664e1beec3a20733ef.
+Reconstructed retained tool terminal output and diagnoses; not a byte-exact combined raw test log.
+Pytest prefix: env PYTHONPATH=/home/mint/rl_dev/rlflow_standalone PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q.
+R1 tests/test_hybrid_core_host.py terminal da028e exit1: 1 failed, 5 passed, 1 old warning, 0.78s.
+ Original attach_existing rejected newly prepared writer.lock permissions. Private fixture original writer.lock/research.db only; did not loosen production attach checks.
+R2 positive original case terminal ef3a2a exit0: 1 passed, 1 old warning, 0.40s.
+R3 initial source preflight/PID/all-project coverage original32802 terminal ea536f exit0: 11 passed, 1 old warning, 1.54s.
+R4a real fork and alias checks original87153 terminal753b7e exit0: 13 passed, 2 warnings, 1.73s.
+ Python multithreaded-fork warning is diagnostic fixture evidence, not a safe production fork endorsement.
+High initial actual-source review four MUST: closing before drain; database alias identity; reused/partial FD closing; actual drain versus cancelled exit waiter.
+ Source fixes applied, original max300s request-only token contract unchanged.
+R4b original47204 terminal a2c44e exit0: 16 passed, 2 warnings, 1.90s.
+Then single original lifespan started/ready and pure foreign-child gate fixed parent reentry prematurely releasing pending pins.
+R5 terminal d5e1cf exit0: 3 passed, 2 warnings, 0.67s:
+ tests/test_hybrid_core_host.py::test_cancelled_shutdown_waiter_keeps_pin_until_real_drain
+ tests/test_hybrid_core_host.py::test_existing_Core_restart_does_not_migrate_or_reexecute
+ tests/test_hybrid_core_host.py::test_real_fork_lifespan_does_not_unlock_parent_pin
+R6 extra pending-drain reentry assertion added only to existing test:
+ tests/test_hybrid_core_host.py::test_cancelled_shutdown_waiter_keeps_pin_until_real_drain
+ terminal1078a8 exit0: 1 passed, 1 old warning, 0.34s.
+This is composite final affected evidence for16 distinct module cases, NOT a newly rerun whole16case final module/fullrepository.
+Necessary original regression original8487 terminal f14790 exit0: 107 passed, 1 old warning, 23.83s:
+ tests/test_agent_client.py tests/test_hybrid_agent_requests.py tests/test_hybrid_control_api.py tests/test_web_auth.py tests/test_contract_discovery.py.
+ No running test restarted, no parallel duplicate of these modules. Last source-only changes new host plus packaging only.
+Build:
+ .venv/bin/python -m pip wheel --no-deps --no-index --no-build-isolation --wheel-dir /tmp/rlflow-cp75-install-VrsBck/wheels .
+ terminal6526ff exit0; initialwheel27573fba97126206dd22d146434499e8e92d2a4de47258bac7920fec8a52ed2c.
+ install --no-deps --no-index --target /tmp/rlflow-cp75-install-VrsBck/site exactwheel exit0.
+ First installed-only probe terminal348461 exit1 before server start:
+ FileNotFoundError /tmp/rlflow-cp75-install-VrsBck/site/schemas/RuntimeState.json.
+ Root cause: original contracts.ROOT requires top-level schemas, original wheel shipped only rlflow package data.
+ Fixed only pyproject.toml package discovery include schemas and schemas/*.json. All original validators/schema bytes unchanged; no fallback checkout/sys.path/testimports.
+Finalwheel:
+ .venv/bin/python -m pip wheel --no-deps --no-index --no-build-isolation --wheel-dir /tmp/rlflow-cp75-install-VrsBck/final-wheels .
+ terminalab9852 exit0; finalwheelSHA9eaaeaf2731a0715c88c6088c482ef5d08cb79ac9509686fd636fe0ff6b03674, 632722bytes.
+ install --no-deps --no-index --target /tmp/rlflow-cp75-final-fQZoGc/site finalexactwheel terminal0d276e exit0.
+ Initial postpackaging installed consumer original77264 terminal8b9c35 exit1:
+ human DRAFT/restart completed, probe wrongly expected CLI genericstderr to contain401.
+ Root cause original agent_client.main intentionally emits generic safe error; console expectedexit2 already succeeded.
+ Changed only probe: console2 then direct originalHTTP401; no production/client/Auth changes.
+Final installed-only consumer argv:
+ env PYTHONPATH=/tmp/rlflow-cp75-final-fQZoGc/site /home/mint/rl_dev/rlflow_standalone/.venv/bin/python
+ /tmp/rlflow-cp75-install-VrsBck/probe.py /tmp/rlflow-cp75-consumer-4crA7G /tmp/rlflow-cp75-final-fQZoGc/site
+ cwd /tmp/rlflow-cp75-consumer-4crA7G.
+ original11969 output733f57 and terminal525502 exit0:
+ {"installed_only_server":true,"installed_console":true,"tests_imported":false,"real_TCP":true,"human_HTTP_forward":"ADOPTED","restart_report":"same_original_ADOPTED","old_token_HTTP":401,"Core_version":1,"workers":0,"model_calls":0,"GPU_starts":0,"runtime_adoption":false,"Goal_completed":false}
+ Full server drain/join happens before exit0, not merely printed summary. Both boots original lifespan=on, same original source epoch/root/registry. Credential requesttokens provisioned via original SDK, never arguments or output.
+ Original preparation explicit Store+enable ONLY newlycreated private disposablefixture; serve itself attach_existing without init/recover/migration.
+ Minimal client configuration used; original full YAML73 unchanged evidence reused.
+ Installed schemas check terminal6e53b1 exit0:
+ 18 installed original schemas: exact bytes and closed inventory PASS.
+ This check read original schema files as identity evidence; actual consumer imports neither checkout code nor tests.
+ Independent High final lifecycle review four MUST closed. Packaging delta review separately rechecked ZIP18 exact originalbytes/finalSHA; no remainingMUST.
+ Reviewer did NOT rerun pytest/probe or claim independent verification of terminal output. Root execution terminal retained above.
+Compileall rlflow, pip check, git diff --check terminal1da5cc exit0. No broken requirements found.
+Build artifact moved recoverably from /home/mint/rl_dev/rlflow_standalone/build to /tmp/rlflow-cp75-install-VrsBck/checkout-build, not deleted.
+Final358 runtime/tests/web/originalschema plus pyproject input hashes checkpoint-75-inputs.sha256, final identity/installed proof manifest, NOT pre-R1 frozen full-run manifest.
+No paid model, GPU, sysfs, global install, production state migration, push, new runtime authority or changed original acceptance.
+USER package-lock SHA becc7e2a36dfcad4ffe934b5ff2f0f68187611d6c0641bd63d81367651cfbf09 unchanged/notstaged.
+Limit: Core-only SDK factory, no new serveCLI/configloader, no finite/execution/report assembly, no unknown or FREE historicalexecution adoption.
+Next76: real installed finite execution/report/STOP consumer with trusted original host registration and existing bounded runtime; no test-import assembly and no paid/native authorization expansion.
+Original native/productReviewer/strictOS/quota/invoice/B1/T22/T23/24h8h/fullGoal gaps retain.
