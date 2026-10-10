@@ -180,6 +180,8 @@ def validate_runtime_state(state: dict) -> None:
         validate_engineering_unit_stop(state)
         from .hybrid_candidate_output import validate_persisted as validate_candidate_output
         validate_candidate_output(state)
+        from .hybrid_a_condition_acceptance import validate_persisted as validate_a_conditions
+        validate_a_conditions(state)
         from .hybrid_budget_ledger import validate_persisted as validate_budget
         validate_budget(state)
         from .hybrid_workspace import validate_persisted as validate_workspace

@@ -36,6 +36,8 @@ SPEC = obj({'profile':{'const':PROFILE},
     'network_enforcement':{'const':'PARTIAL_NOT_QUALIFIED'},
     'model_tools':{'const':False},'api_billing':{'const':False},
     'account_switch':{'const':False},'gpu_enabled':{'const':False}})
+from .hybrid_a_condition_rules import BINDINGS as CONDITION_BINDINGS
+SPEC['properties']['condition_bindings']=CONDITION_BINDINGS
 
 
 def validate_spec(spec):
@@ -108,6 +110,8 @@ def validate_approval(proposal,config):
                     beneath(root) or root.rstrip('/').startswith(name+'/')
                     for root in scope['protected_paths']):
                 raise Conflict('workflow candidate path exceeds approved writable boundary')
+        from .hybrid_a_condition_rules import validate_bindings
+        validate_bindings(proposal,spec)
         return {'profile':PROFILE,'envelope_sha256':digest(spec),
                 'execution_qualified':False,'derivation_enabled':False}
     except (KeyError,TypeError,ValueError) as error:

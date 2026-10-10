@@ -24,11 +24,16 @@ PUBLICATION=obj({'profile':{'const':'ORIGINAL_NATIVE_CLI_USAGE_V1'},
     'producer_exit_code':{'const':0},
     'usage':obj({'input_tokens':COUNT,'output_tokens':COUNT,'cached_tokens':COUNT,
         'complete':{'const':True}})})
+# Append-only: historical facts without an actual session identity stay valid,
+# but cannot qualify a new independent condition acceptance.
+PUBLICATION['properties']['model_session_id']={'type':'string','minLength':1,'maxLength':160}
 
 
 def validate_publication(value,runtime):
     """Historical bindings only; live Source provenance is checked separately."""
     validate_schema(PUBLICATION,value)
+    if 'model_session_id' in value and len(value['model_session_id'].encode('utf-8'))>160:
+        raise Conflict('bounded original model session identity required')
     origin=runtime['origin'];binding=origin['native_model']
     if (runtime['phase']!='FIXTURE_SCOPE_STOPPED' or
             not runtime['native_model_handoff_attempted'] or

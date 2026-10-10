@@ -524,6 +524,7 @@ class NativeModelSourceOwner(FixtureUsageSourceOwner):
             **{k:data[k] for k in ('stream_sha256','output_sha256','usage','ready_sha256')},
             'stream_bytes':data['bytes'],'started_ack_sha256':digest(json.loads(ack.raw)),
             'terminal_proof_sha256':digest(terminal),'producer_exit_code':0}
+        value['model_session_id']=json.loads(ack.raw)['event']['thread_id']
         validate_schema(PUBLICATION,value)
         return value
 

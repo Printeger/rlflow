@@ -1,5 +1,7 @@
 # 需求包离线校验报告
 
+2026-10-11 原 A 条件接纳行为验收：original43051/outputf43606自然 exit0，actual CPU PASS→只读 synthetic Evaluator/不同会话 ACCEPT→完整 STOP/SETTLED/FREE→条件 CAS→丢 COMMIT 返回同请求 duplicate（只一次版本递增）→snapshot recover=audit=replay，1pass/15deselected/1warning219.76s。原98345/59517两个不同故障分别定位重复父历史开销的30s与64MiB上限，改原事务 immutable proof复用，当前权限头继续新读，未延期限或提高额度。独立窄审关闭实时/历史 A window 和 marker 门，无新增确认 MUST。新 pure/Store 拒写/SQL界10pass.26s、marker1pass、finalsample/STOP4pass.19s、historical window1pass.19s、Source ACK session harness1pass.19s；affected regression原94377 142pass/1warning19.24s；必要Store历史/快照原1792/outputacbc6b自然112pass286.85s；旧schema/usage原15077 41pass/1warning3.74s保留不重跑。新测试错误模块import/UTC Z及不存在旧测试文件的命令错误均保留于证据，无原测试重启、无全库新回归声明。compile/diff/USERlock通过。详见 evidence/a-condition-acceptance-20261011.txt。模型 G 全部截断，实际工程任务/真实产品 Reviewer/自主接续/A完整验收仍未证明，完整 Goal ACTIVE。
+
 2026-10-11 native bridge最终末门复验：原8d6141定向5pass/14deselected/.09s（helper身份读取后STOP三门拒发cap，强root存在清/换sequence拒）；独立差量确认期限与freeze残余MUST关闭，无新增确认MUST。此前实际G截断及原22项兼容不重复执行，最终compile/diff通过；仍无真实model/首任务资格。原始分段输入、命令、输出及SHA见 evidence/a-workflow-native-run-20261011.txt。
 
 2026-10-11 A native执行桥行为验收：原1060自然exit0，6pass21.75s（G截断实际清理及未重派，pure成功/失败/入口freeze）；原24672自然exit0，22pass/1既有warning39.83s。deadline独立MUST修复后只跑差量：原290bc9 pure9pass.09s，原144668 Source末发行synthetic四门4pass.09s。真实model/产品Reviewer/条件接纳/首任务未证明，不虚称全回归或自主完成；见 evidence/a-workflow-native-run-20261011.txt。

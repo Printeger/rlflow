@@ -1,5 +1,7 @@
 # 开发决策记录
 
+2026-10-11 A 条件接纳采用原三父事实的 protected append-only CAS，而非调用者上传 PASS、相同候选哈希或开发期审查替代真实独立会话。原 ACK thread_id 进入 Source usage；历史缺 ID/显式条件绑定不回填。接纳保留 goal_completed=false/dispatch_enabled=false，同请求重复只历史返回。最后新鲜 Controller/原 A 总窗口/STOP 门及历史 recorded_at 窗口一致；空 marker 必须有原事件。实际链暴露重复不可变证明的 30s/64MiB 开销，采用仅原事务 ReadBudget 的原始依赖复用，全部当前预算/Goal/Authority/Controller heads 逐次新读，不放宽上限或期限。独立窄审确认无新增 MUST。详见 HYBRID_A_CONDITION_ACCEPTANCE.md；需求驱动唯一接续仍待本地实装，真实任务资格不由 synthetic 测试升级。
+
 2026-10-11 A 执行桥复用原 Source/launch/STOP/结算，不引入另一个 Supervisor、caller receipt 或自动重试。固定原序列 deadline 在观察与 Source 发行末门重核；异常仍 STOP，历史结果不能升级为条件。上轮同A readonly Evaluator 已登记，受审候选 frozen stdin 与 baseline 明确区分；本轮将已有原入口接成有限执行及持久归档闭包。见 HYBRID_A_NATIVE_EXECUTION_BRIDGE.md。
 
 2026-10-11 CPU→Reviewer不临时清Budget指针/另建零账本，也不复用settled Engineer/CPU计划、claim或lease。新增受保护反向交接：exact CPU/原review cap、全部CPU原SETTLED/FREE/FD、current token，原Workspace全部关闭后正常shutdown与source实际退休；强留root+原正常退休tuple/source/complete-close digest，constructor独立重核再原子写Budget pointer/_owners/child。Safety或可变retired bool不能晋升，lost安装返回只取原child。admission→Pool→registry保持CPU准备和STOP同锁序；共享既有exact关闭/CAS helper不复制改其语义。此Owner尚无新Reviewer grant/角色plan/high预算，不把构造器能力误作模型来源、条件或自主任务验收。

@@ -847,6 +847,7 @@
     "hybrid_engineering_unit_stops": {"type": "object"},
     "hybrid_candidate_output_intents": {"type": "object"},
     "hybrid_candidate_output_results": {"type": "object"},
+    "hybrid_a_condition_acceptances": {"type": "object"},
     "hybrid_budget_entries": {"type": "object"},
     "hybrid_budget_goal_heads": {"type": "object"},
     "hybrid_budget_reservation_heads": {"type": "object"},

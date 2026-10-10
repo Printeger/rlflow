@@ -109,12 +109,25 @@ class NativeModelOwner(FixtureRuntimeOwner):
         cpu=json.loads(row['parent']);engineer=json.loads(prior._workflow_handoff_raw[1])
         if any(cpu['policy_source'][k]!=loaded[k] for k in ('proposal_hash','approval_hash','config_hash','scope_hash')):
             raise Conflict('current Reviewer parent approval changed')
-        with self.store.read_connection() as db:
-            db.execute('BEGIN');read=ReadBudget(db,PREPARATION_READ_BYTES)
+        def prove(db,read):
+            # Immutable original dependencies only, within this exact owned
+            # writer/read envelope. No cross-transaction or current-head cache.
+            proof=(root,retirement,row['material'],row['parent'],prior._workflow_handoff_raw[1])
+            old=getattr(read,'_a_review_parent_proof',None)
+            if old is not None and old[0] is root and old[1] is retirement and old[2:]==proof[2:]:return
             for parent in (cpu,engineer):
                 if self.budget._point(db,entry_key(parent['request']),read)!=parent:
                     raise Conflict('original Reviewer parent whole event changed')
                 self.budget._dependencies(db,parent,read)
+            read._a_review_parent_proof=proof
+        active=self.controller._token_active
+        if active is not None:
+            if active[3]!=threading.get_ident() or not active[0].in_transaction:
+                raise PermissionError('original Reviewer parent writer required')
+            prove(active[0],active[2])
+        else:
+            with self.store.read_connection() as db:
+                db.execute('BEGIN');prove(db,ReadBudget(db,PREPARATION_READ_BYTES))
         material=from_cpu(loaded['record']['contract']['proposal'],json.loads(self.plans.registry._raw),cpu,engineer)
         if canonical(material)!=row['material']:raise Conflict('original Reviewer material changed')
         return material,cpu,engineer
@@ -761,6 +774,16 @@ class NativeModelOwner(FixtureRuntimeOwner):
     def collect_native_result(self,lease):
         """Original completed result capability, or None for a finite pending step."""
         return self.sources.collect_native_result(self,lease)
+
+    def accept_workflow_conditions(self,lease,token,*,idempotency_key,expected_state_version):
+        """Original machine+Reviewer evidence CAS, never a caller PASS or G."""
+        from .hybrid_a_condition_service import ConditionAcceptanceService
+        self._actual();self.controller._refuse_nested_writer()
+        with self._workflow_cpu_admission_lock,self.pool._lock:
+            service=self.store._hybrid_a_condition_service
+            if service is None:service=ConditionAcceptanceService(self.budget)
+            return service.accept(lease,token,idempotency_key=idempotency_key,
+                expected_state_version=expected_state_version)
 
     def _check_workflow_native_deadline(self,lease):
         self._issued(lease)

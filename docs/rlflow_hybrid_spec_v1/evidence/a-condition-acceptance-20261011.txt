@@ -1,0 +1,91 @@
+A ORIGINAL CONDITION ACCEPTANCE — LOCAL IMPLEMENTATION EVIDENCE
+Date: 2026-10-11; baseline f0c991e; branch hybrid-v1.
+Original full Goal remains ACTIVE. Real task NOT_EXECUTED.
+Real model CLI/API/G: not authorized and not invoked. GPU/B/C/instinctRL HOLD unchanged.
+All model start paths use synthetic NOT_A_TOKEN private cache and intercepted G.
+Synthetic Source/ACK/result substitutions are explicit in tests, NOT qualification.
+
+Delivery behavior:
+Original ACK thread_id -> model_session_id in trusted usage publication.
+Explicit approved condition full-hash -> verifier mapping; absent historical metadata never backfilled.
+Original Engineer result -> actual managed CPU PASS -> separate Evaluator/result -> protected append-only condition CAS.
+All original Source caps/whole events/dependencies/current approval/Controller/current Budget/STOP/FREE rechecked.
+Bounded original SQL header/payload, original A window in live/final and historical validation.
+No Goal completion or dispatch enabled by evidence; identical retry is history only, no reactivation.
+
+Commands use PYTHONPATH=. PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q.
+
+Initial schema/usage append-only compatibility:
+tests/test_hybrid_a_workflow_profile.py tests/test_hybrid_native_model_usage.py
+Original session 15077 / output d245fd: exit0, 41 passed, 1 existing warning, 3.74s.
+Ran before Store/CAS additions; reused for unchanged schema fields, not claimed whole candidate regression.
+
+New pure/mutation/bounded SQL tests:
+tests/test_hybrid_a_condition_acceptance.py -k 'not actual_cpu'
+First collection output 71bba3: ImportError, new test imported ACK from incorrect module.
+Corrected to original hybrid_usage_source; no product semantic changes.
+Output a0a6da: exit0, 10 passed, 1 deselected, 1 existing warning, .26s.
+
+Affected deterministic regression:
+First invocation included nonexistent tests/test_store.py; output56aada exit4, no tests ran.
+Corrected exact file list:
+tests/test_store_policy.py tests/test_contracts.py tests/test_hybrid_protocol.py tests/test_hybrid_budget_ledger.py
+tests/test_hybrid_native_model_result.py tests/test_hybrid_native_model_stream.py
+Original94377 / output a78f7d: exit0, 142 passed, 1 existing warning,19.24s.
+
+Actual integration, synthetic models only:
+tests/test_hybrid_a_condition_acceptance.py -k actual_cpu
+Original98345 / output08679d: exit1,1 failed,10 deselected,135.45s.
+ActualCPU PASS and independent Evaluator registration completed; startup RELEASE_INTENT reached original material 30s deadline.
+Root cause: each guard independently reopened/expanded immutable two-parent histories.
+Repair: reuse authenticated immutable proof only in exact Controller-owned db/read transaction, strong original root/retirement/raw identity.
+No 30s deadline increase, no current approval/head/window/material checks removed.
+Original59517 / output290968: exit1,1 failed,16 deselected,150.41s.
+Startup now reached TEST G interception; Reviewer synthetic result/fullSTOP/SETTLED/FREE completed.
+New failure: acceptance repeated source/whole-event expansion through direct read.object exhausted64MiB.
+Repair: original immutable closure authenticated once in exact same ReadBudget, canonical parents/sources/controller identity.
+All Budget/Goal/Authority/Controller current heads bypass cache; every current guard still recomputes links.
+No read budget increased; no duplicate/restarted running test.
+Original43051 / output f43606: exit0,1 passed,15 deselected,1 existing warning,219.76s.
+Verified actual managed CPU PASS; two SYNTHETIC model sessions distinct; readonly Evaluator ACCEPT same executed candidate.
+StaleCAS rejects; original condition fact commits before deliberately lost COMMIT-return;
+identical retry returns duplicate/history only with one version increment; changed request samekey rejects.
+Two approved required conditions PASS with original three event refs; goal_completed=false/dispatch_enabled=false.
+Same/missing session, UNKNOWN, REVISE, wrong candidate and foreign Source data reject.
+Pool unchanged and occupied0; snapshot recover==audit==replay.
+
+Independent readonly review /root/finite_app_review_63:
+Original A current-window omission MUST fixed in guard/final pure sample.
+Same window in historical validate_links/transition/replay/complete MUST fixed.
+Marker presence iff original acceptance event_count>0 fixed, marker-only projection cannot qualify.
+Reviewer immutable parent optimization and condition closure optimization reviewed: no current authorization caching.
+Final narrow review: no new confirmed MUST; reviewer did not rerun tests or invoke models.
+This development review is not the product independent model Reviewer.
+
+New narrow tests, not repeated old passed cases:
+Output79ef97: new marker1 passed; five new final-harness cases failed because fixture timestamps used+00:00 instead of requiredZ.
+Corrected test-only timestamps; removed redundant same-harness case; no product gate relaxation.
+Output9793ad: final_sample4 passed,12 deselected,1 existing warning,.19s.
+Output48a95f: historical_acceptance1 passed,16 deselected,1 existing warning,.19s.
+Output59c71b: tests/test_hybrid_a_session_publication.py1 passed,1 existing warning,.19s.
+Original publisher harness obtains session from ACK, not caller runtime or result data; still synthetic, not issuer qualification.
+
+Store history/snapshot necessary regression:
+tests/test_history_v2.py tests/test_hybrid_snapshot.py tests/test_hybrid_snapshot_job.py tests/test_snapshot_maintenance.py
+Original1792 / output acbc6b: natural exit0,112 passed,286.85s.
+Original history/snapshot worker/maintenance behavior and cold-state compatibility remain passed.
+No previous passed test or live test restarted. No new all-repository regression claim.
+
+Final checks:
+Selected modules compileall and git diff --check exit0.
+User untracked package-lock.json retained/unstaged with SHA256:
+becc7e2a36dfcad4ffe934b5ff2f0f68187611d6c0641bd63d81367651cfbf09
+All listed original test sessions naturally terminal before submission.
+Changes/evidence included in the commit containing this file; no push.
+
+Remaining direct local implementation:
+Fresh original acceptance consumption; budget-accounted unique demand-driven continuation plan/grant/lease and finite execution.
+Preserve Source/Owner responsibility, candidate packet vs readonly baseline and previous-stage full retirement.
+Then approved A real nonpreset engineering task: real modification/tests, separate real Reviewer, conditions and continuation evidence.
+Real model run alone awaits existing small A contract approval, not a prerequisite for these code changes.
+Other recovery enhancement deferred. No production migration/push or instinctRL writes.

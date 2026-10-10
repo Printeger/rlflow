@@ -1,5 +1,7 @@
 # 阻塞与证据缺口
 
+2026-10-11 A 条件接纳本地链已通过：实际 CPU PASS→不同 SYNTHETIC 模型会话/Reviewer→完整 STOP/SETTLED/FREE→原 condition CAS→丢 COMMIT 返回后幂等→recover=audit=replay。首非预设真实任务仍 NOT_EXECUTED；开发期只读独立审查与 synthetic 产品 Reviewer 均不能作为真实模型评审资格。剩余直接本地缺口是原接纳事实的当前消费、唯一接续及同 A 额度/Owner/候选接线和有限执行，不是运行授权阻塞。原小额 A 合同未批准只阻实际模型调用；GPU/B/C/instinctRL HOLD 不变，完整 Goal ACTIVE，其他恢复增强后置。证据 evidence/a-condition-acceptance-20261011.txt。
+
 2026-10-11 当前直接缺口更新：同A readonly Evaluator登记和原 native有限执行/归档桥已本地接通；未执行真实模型，首非预设任务 NOT_EXECUTED。小额A运行合同未批准仅阻真实调用；本地条件接纳CAS、一次需求驱动接续仍可开发，不作为整个Goal阻塞。GPU/B/C/instinctRL HOLD不变，完整目标ACTIVE。原G截断/纯synthetic测试不作真实来源资格，证据见 HYBRID_A_NATIVE_EXECUTION_BRIDGE.md。
 
 2026-10-11 CPU→Reviewer 同Budget原Owner交接已本地实装：原reviewer cap+全部CPU SETTLED/FREE/FD/current token→原Workspace close→正常CPU/source退休→原子安装唯一NativeModelOwner。不可变root/退休tuple/source/完整close摘要独立核验，单独Safety/retired bool不升级；admission→Pool→registry，无清Budget指针或另建账本，lost constructor return回原child。原25346自然exit0 1pass111.45s，actual CPU PASS/fullSTOP/Pool0/原reviewcap与丢安装返回同Owner；旧Native/no启动74415终态1pass12.28s。独立只读窄审无确认MUST，原关闭/normal shutdown丢回执和Safety-only拒构造三项3727自然终态3pass/1deselected/1warning255.65s，均原scope证据通过，不重启已过安装项。compile/diff/USERlock通过，证据 evidence/a-workflow-reviewer-handoff-20261011.txt 与 HYBRID_A_REVIEWER_PARENT.md。未授Reviewer grant/新角色plan/high配额/生成或条件资格；下一原Evaluator plan/已执行candidate绑定+同A登记/重放/高配额→真实Review/usage→条件CAS/一次需求接续。模型父仍显式synthetic/G截断，只有CPU与Owner交接实际执行；首真实task NOT_EXECUTED。小额A实际调用待原合同批准仅阻运行，不阻开发；GPU/B/C/instinctRL HOLD不变，Goal ACTIVE。

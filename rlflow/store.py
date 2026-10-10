@@ -77,7 +77,7 @@ PRIVATE_HOT_SECTIONS = frozenset(('tool_sources','tool_receipts','tool_scan',
     'hybrid_workspace_facts','hybrid_workspace_heads','hybrid_workspace_claims',
     'hybrid_runtime_installation_intents','hybrid_runtime_installation_publications',
     'hybrid_working_plan_intents','hybrid_working_plan_results','hybrid_cpu_trial_assessments','hybrid_cpu_unit_stops','hybrid_engineering_unit_stops',
-    'hybrid_candidate_output_intents','hybrid_candidate_output_results'))
+    'hybrid_candidate_output_intents','hybrid_candidate_output_results','hybrid_a_condition_acceptances'))
 
 
 class ObjectMap(dict):
@@ -151,6 +151,7 @@ class Store:
         self._hybrid_cpu_unit_control_service = None
         self._hybrid_engineering_unit_control_service = None
         self._hybrid_candidate_output_service = None
+        self._hybrid_a_condition_service = None
         self._existing_identity = None
         self.root = Path(root).resolve()
         (self.root / "runtime").mkdir(parents=True, exist_ok=True)
@@ -242,7 +243,7 @@ class Store:
                      '_hybrid_draft_auth_owner', '_hybrid_draft_service', '_hybrid_preparation_service',
                      '_hybrid_controller_service', '_hybrid_admission_service', '_hybrid_budget_service',
                      '_hybrid_workspace_service', '_hybrid_installation_service', '_hybrid_working_plan_service',
-                     '_hybrid_cpu_assessment_service','_hybrid_candidate_output_service','_hybrid_cpu_unit_control_service','_hybrid_engineering_unit_control_service'):
+                     '_hybrid_cpu_assessment_service','_hybrid_candidate_output_service','_hybrid_cpu_unit_control_service','_hybrid_engineering_unit_control_service','_hybrid_a_condition_service'):
             setattr(store, name, None)
         db = sqlite3.connect(store.db.as_uri() + '?mode=ro', uri=True, timeout=5)
         try:
@@ -444,6 +445,18 @@ class Store:
             value=next(v for s,k,v in decoded['put'] if k)
             if event['input_versions']!=canonical(event_inputs(value)).decode():
                 raise Conflict('engineering stop intent original inputs differ')
+            payload=decoded;preparation_decoded=True
+        from .hybrid_a_condition_acceptance import SECTION as condition_section,EVENT as condition_event,validate_transition as condition_transition,event_inputs as condition_inputs
+        if (event['event_type']==condition_event or any(s==condition_section for s,k,v in payload.get('put',[])) or
+                any(s==condition_section for s,k in payload.get('delete',[])) or condition_section in payload.get('set',{})):
+            from .hybrid_reads import ReadBudget
+            read=ReadBudget(db,PREPARATION_READ_BYTES)
+            decoded={**payload,'put':[[s,k,read.decode(v)] for s,k,v in payload.get('put',[])]}
+            condition_transition(decoded,lambda s,k:({} if s in state else None) if k=='' else state.get(s,{}).get(k),
+                event_type=event['event_type'],key=event['idempotency_key'],object_id=event['object_id'],producer=event['producer'],
+                version=event['new_state_version'],registration=self._goal_registration(db))
+            value=next(v for s,k,v in decoded['put'] if k)
+            if event['input_versions']!=canonical(condition_inputs(value)).decode():raise Conflict('condition acceptance canonical inputs differ')
             payload=decoded;preparation_decoded=True
         from .hybrid_candidate_output import SECTIONS as output_sections,EVENTS as output_events,validate_transition as output_transition
         if (event['event_type'] in output_events or any(s in output_sections for s,k,v in payload.get('put',[])) or
@@ -745,6 +758,13 @@ class Store:
             stop_transition(payload,_authorization.lookup,event_type=event_type,key=key,object_id=object_id,
                 producer=producer,version=ver,registration=self._goal_registration(db))
             service.check_stop_write(db,payload,inputs,_authorization)
+        from .hybrid_a_condition_acceptance import SECTION as condition_section,EVENT as condition_event,validate_transition as condition_transition
+        if (event_type==condition_event or any(s==condition_section for s,k,v in payload['put']) or
+                any(s==condition_section for s,k in payload['delete'])):
+            service=self._check_a_condition_guard(db,_authorization)
+            condition_transition(payload,_authorization.lookup,event_type=event_type,key=key,object_id=object_id,
+                producer=producer,version=ver,registration=self._goal_registration(db))
+            service.check_live_write(db,payload,inputs,_authorization)
         from .hybrid_candidate_output import SECTIONS as output_sections,EVENTS as output_events,validate_transition as output_transition
         if (event_type in output_events or any(s in output_sections for s,k,v in payload['put']) or
                 any(s in output_sections for s,k in payload['delete'])):
@@ -953,6 +973,11 @@ class Store:
         return service
 
     def _preparation_complete(self, db, state):
+        from .hybrid_a_condition_acceptance import validate_complete as condition_complete,original_event as condition_original,EVENT as condition_event
+        from .hybrid_reads import ReadBudget
+        condition_complete(state,self._goal_registration(db),
+            lambda k:condition_original(self,db,k,ReadBudget(db,PREPARATION_READ_BYTES)),
+            db.execute('SELECT COUNT(*) FROM events WHERE event_type=? AND seq<=?',(condition_event,state['version'])).fetchone()[0])
         from .hybrid_cpu_unit_stop import validate_complete as stop_complete, EVENT as stop_event
         stop_complete(state,self._goal_registration(db),lambda k:self._cpu_unit_stop_event(db,k),
             db.execute('SELECT COUNT(*) FROM events WHERE event_type=? AND seq<=?',(stop_event,state['version'])).fetchone()[0])
@@ -1243,6 +1268,19 @@ class Store:
         if _decode(_parse(row['input_versions'].encode()))!=event_inputs(value):
             raise Conflict('budget original decoded scope inputs differ')
         return ((row['event_type'],row['producer'],row['object_id'],row['new_state_version']),expected_objects(value))
+
+    def bind_hybrid_a_conditions(self,service):
+        from .hybrid_a_condition_service import ConditionAcceptanceService
+        if type(service) is not ConditionAcceptanceService or service.store is not self:
+            raise TypeError('invalid original condition acceptance service')
+        with self.lock():
+            if self._hybrid_a_condition_service not in (None,service):raise Conflict('condition acceptance owner cannot be rebound')
+            self._hybrid_a_condition_service=service
+
+    def _check_a_condition_guard(self,db,guard):
+        service=self._hybrid_a_condition_service
+        if service is None:raise PermissionError('protected condition acceptance service required')
+        service.check_guard(db,guard);return service
 
     def bind_hybrid_candidate_output(self,service):
         from .hybrid_candidate_output_service import CandidateOutputService
@@ -1695,6 +1733,8 @@ class Store:
             from .hybrid_cpu_unit_stop import EVENT as stop_event
             from .hybrid_engineering_unit_stop import EVENT as engineering_stop_event
             from .hybrid_candidate_output import EVENTS as output_events
+            from .hybrid_a_condition_acceptance import EVENT as condition_event
+            if event_type==condition_event:raise PermissionError('condition acceptance requires actual guarded object writer')
             if event_type in output_events:raise PermissionError('candidate output requires actual guarded object writer')
             if event_type in (cpu_event,stop_event,engineering_stop_event) or event_type in working_plan_events or event_type in installation_events or event_type in (controller_event,admission_event,budget_event,workspace_event) or event_type in preparation_events or event_type in authority_events.values() or (event_type=='HYBRID_GOAL_DRAFTED' and self._hybrid_draft_auth_owner is not None):
                 raise PermissionError('Hybrid service events require guarded object transactions')
@@ -1771,6 +1811,9 @@ class Store:
                 from .hybrid_cpu_unit_stop import EVENT as stop_event, SECTION as stop_section
                 from .hybrid_engineering_unit_stop import EVENT as engineering_stop_event, SECTION as engineering_stop_section
                 from .hybrid_candidate_output import EVENTS as output_events,SECTIONS as output_sections
+                from .hybrid_a_condition_acceptance import EVENT as condition_event,SECTION as condition_section
+                if event_type==condition_event or any(s==condition_section for s,k in objects):
+                    self._check_a_condition_guard(db,authorization)
                 if event_type in output_events or any(s in output_sections for s,k in objects):
                     self._check_candidate_output_guard(db,authorization)
                 if event_type==cpu_event or any(s==cpu_section for s,k in objects):
