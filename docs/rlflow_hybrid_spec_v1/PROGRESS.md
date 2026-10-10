@@ -1,5 +1,9 @@
 # Hybrid v1 开发进度
 
+Checkpoint90 收尾：89提交f96dcbe。实际父SIGKILL baseline证明keeper/task已停止，真正缺口为failed transient unit永久保留；新source CollectMode=inactive-or-failed，manager精确复核，RemainAfterExit/原RefUnit/完整STOP门不变。实际含setsid后代原pidfd终态与unit GC；冷Store保持UNKNOWN/no terminal/no settled/no controls，受保护原pins冷Pool occupied1/no claims/读不写。baseline1pass11.62s；新故障+正常fullSTOP/FREE+deadline3pass52.31s；追加Pool断言仅受影响故障1pass11.67s。High无新MUST，compile/diff通过；原4旧failed保留无新积累，USERlock不动。证据checkpoint-90-owner-crash/及HYBRID_LOCAL_CPU_PARENT_CRASH.md，进入提交，不是完整长期恢复/自治/新安装或全库资格。
+
+下一交付父崩溃后原批准任务的可信持久证据恢复，不仅增加测试/准备组件；不以GC补同Invocation STOP或FREE。真实模型链集中合同仍未答、不给模型/GPU调用授权；strictquota/长期资格/instinctRL准入仍缺，原Goal ACTIVE。
+
 Checkpoint89 收尾：88提交9302fb8。实际非零退出/期限终止现在归档原stdout/stderr、原唯一task waitpid状态与trusted控制原因；新execution闭schema、deadline覆盖、非成功强制machineFAIL（合格metric也不PASS），旧success-only事件兼容。失败异常打印/flush在原sandbox+G之后，前G控制身份不输出；原128KiB cache前门、fullmanagedSTOP/settlement/Pool门不放宽。PublicReader可选execution与JS原退出状态重算接通；不授Review/ConditionEvidence。首95039终d5f56b 1pass期限/1fail非零41.03s，根因keeper异常os._exit吞stderr。修后仅受影响非零+原EXACT PASS/FAIL+4CLIstub96192终d10b1e 7pass60.49s；期限passed保留/不重复，65s旧证据不重复，更新其新归档断言但不称新长时通过。profile19pass0.08s、Node17pass80.46ms+实际公开失败DTO1pass67.75ms，High前端状态MUST关闭，无新MUST；current公开history读取86旧实际Store验证兼容。证据checkpoint-89-negative-evidence/及HYBRID_LOCAL_CPU_FAILURE_EVIDENCE.md，进入提交。
 
 下一推进实验/资源在原父进程崩溃后的安全恢复：先核真实持久UNKNOWN/资源终态与不可重放边界，再补有效恢复行为，不增加固定演示。真实模型链集中合同仍未答不调用，strictquota/全部异常恢复/24h8h与instinctRL实机资格未满足，原Goal ACTIVE/USERlock不动。

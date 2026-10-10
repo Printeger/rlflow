@@ -155,6 +155,11 @@ class OriginalServiceManager:
     def snapshot(self):
         self._check_socket()
         if self.unit_path is None:self.unit_path=self._call('GetUnit',b's',self.unit.encode(),return_type=b'o')
+        # The original RefUnit still preserves proofs through STOP/FD closure.
+        # After owner death its bus reference vanishes; failed transient units
+        # must not accumulate forever. This does not release business exposure.
+        if self._property('CollectMode',b's')!='inactive-or-failed':
+            raise Conflict('original finite manager collection policy differs')
         result={name:self._property(name,kind,interface) for name,kind,interface in
             (('InvocationID',b'ay',UNIT),('ActiveState',b's',UNIT),('SubState',b's',UNIT),
              ('MainPID',b'u',SERVICE),('ExecMainPID',b'u',SERVICE),('ExecMainCode',b'i',SERVICE),

@@ -1,5 +1,7 @@
 # 系统实施验收记录
 
+Checkpoint90：baseline99838/84c7e5 1pass11.62s；新策略26445/b3dc90实际崩溃、正常原fullSTOP/FREE、deadline3pass52.31s；最终受影响故障追加Pool冷读55148/aed070 1pass11.67s。死前原keeper/leader/setsid后代pidfd均终态、unit GC；原Store UNKNOWN/no terminal/no settled/no controls，原Pool occupied1/no claims且读取不写。High无新确认MUST；compile/diff与USERlock检查通过，无重复已过正常/期限/UI/65s/全库。证据checkpoint-90-owner-crash/，验收边界与命令见HYBRID_LOCAL_CPU_PARENT_CRASH.md；物理GC不是原同Invocation业务STOP或长期恢复/自治资格。
+
 Checkpoint89 原失败实验stdout/stderr/waitpid/control原因归档+原Budget/fullmanagedSTOP/FREE/cold消费实装。初1pass/1fail41.03s保留，异常flush根因修后非零及必要正常/stub回归7pass60.49s；已过期限不重复，旧65s不重复、不冒称修改断言后的新长时通过。纯19pass、Node17pass+实际失败DTO1pass，High唯一前端状态MUST关闭，旧86实际Store当前公开history兼容读取通过。证据checkpoint-89-negative-evidence/及HYBRID_LOCAL_CPU_FAILURE_EVIDENCE.md，机器FAIL不是科学结论/独立Review/自治完成，无全库/新安装/长跑资格声明。
 
 Checkpoint88：新actual配置负任务原执行65s后非零退出，初始授权60s不延长；原全managedSTOP/SETTLED/Pool0、wall69/start1、退出后原cold相等，55052终fb8bd6 1pass81.80s。CLIFAILED_NO_RESULT/exit3报告须history/context门；原0/1/2及context失败无最终报告由4stub回归0.19s验证，不称stub执行资格。High窄审无新MUST，compile/diff/原USERlock检查通过，无live/新activeunit。证据checkpoint-88-negative-runner/及HYBRID_LOCAL_CPU_NEGATIVE_RUN.md，非失败科研证据完整（日志未归档）/自治模型/安装全库或长跑验收。

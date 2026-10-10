@@ -218,6 +218,7 @@ class LocalCpuSourceOwner(FixtureUsageSourceOwner):
                 '--property=NoNewPrivileges=yes','--property=RestrictNamespaces=yes',
                 '--property=KillMode=control-group','--property=SendSIGKILL=yes','--property=TimeoutStopSec=2',
                 '--property=RuntimeMaxSec='+str(spec['seconds']+5),'--property=RemainAfterExit=yes',
+                '--property=CollectMode=inactive-or-failed',
                 str(Path('/usr/bin/python3').resolve()),'-I','-S','-c',script]
             row['command']=command
             owner._check_spawn_gate(runtime)

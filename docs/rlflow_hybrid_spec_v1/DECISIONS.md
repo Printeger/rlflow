@@ -1,5 +1,7 @@
 # 开发决策记录
 
+90 实测否定父死必留active服务假设，不改RemainAfterExit。采用新启动CollectMode=inactive-or-failed并snapshot精确核验：原RefUnit保住正常STOP证据，父死后允许失败单元物理GC。名字not-found仅诊断；原pidfd死前捕获证实进程退役，仍不能补已失manager业务证明。冷Budget UNKNOWN/Pool占槽和原历史不写保持；不清理历史failed单元，不退款、不冷接管。详HYBRID_LOCAL_CPU_PARENT_CRASH.md。
+
 89 负实验不由输出合格metric推出PASS：新原execution来自同task唯一waitpid与trusted control reason，非零/信号/期限机器FAIL，历史重算必须一致。旧success-onlyRESULT仍闭合兼容，不篡改旧事件。异常日志仅sandbox+G后有限type/message+finallyflush，task-owned不授评审；原所有缓存/归档/STOP/FREE界保留。PublicView同规则重算execution，独立前端矛盾PASS MUST关闭。分轮定向证据如实保留失败与源版本，不重复65s/期限已过场景。
 
 88 不为最长300s配置放宽既有60s新效应授权：G末门期限保留，原安全cleanup可在期限后执行，实际69s失败验证成立。CLI负执行结果区分FAILED_NO_RESULT/exit3与原机器0/1/2，最终report须原history+context退出成功；history/pool_after明确context前as-of，不升级晚期状态。非零退出stdout/stderr尚不归档，不能借打印合格metric伪PASS；下片按原task reaped/terminal证据保留有限失败诊断，不重新执行。

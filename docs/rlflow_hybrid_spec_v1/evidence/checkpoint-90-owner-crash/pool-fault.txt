@@ -1,0 +1,8 @@
+Command: env PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q tests/test_hybrid_local_cpu_parent_crash.py
+Session 55148; terminal aed070; exit 0
+.                                                                        [100%]
+1 passed in 11.67s
+
+Final fault-only revision additionally verifies protected original Pool cold attach,
+occupied=1, no reconstructed claims, unchanged Pool snapshot and Store version.
+JSON evidence is pretty-printed from actual pytest-750 artifacts, not a byte seal.
