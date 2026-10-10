@@ -1,5 +1,7 @@
 # 开发决策记录
 
+Checkpoint71：按70后独立架构结论交付T15结构化请求首切片，不向Agent发human operator/approver凭据，也不以另一数据库接受Core权威。request-only token目的与原bearer/session分离；独立inbox仅保存提议/冻结转交，人类原DraftService写未批准DRAFT，ADOPTED必须完整原Core来源证明。旧库精确DDL/index/meta/page校验且拒绝隐式修复，fork身份门先于继承锁，最后Auth复核先于COMMIT。客户端绑定可信loopback origin、原hash/rid与closed DTO，禁代理/重定向/特殊文件。产品skill仅wheel资源，无用户全局安装或付费自然语言测试。最后四路径窄修通过48pass，未变608输入及浏览器结果复用，不重复已过审查。详HYBRID_AGENT_REQUESTS.md。下一72沿原人类有限STOP coordinator实现实际清理回执，不把请求当取消锁存/已停止；原预算/权限边界与完整Goal不变。
+
 Checkpoint70 FINAL：原 Popen 实例 wait4 观察保留固定程序启动守卫与原 waitpid 锁，不全局替换 waitpid。用量仅原固定无后代参与者的内核生命周期，显式 sample 后经现认证 GET/SSE/UI 读取；读侧不执行、不升级旧槽、无预算结算。真实样本步长8，实时退休1/2加独立终态退休4；原creator/PID是收割门，installed hooks身份仅是观测门，失效不能阻断STOP；旧槽不可复活，并发退休读只用锁内捕获的局部状态。仅 Linux CPython3.12 支持，冷重启/缺观察为UNKNOWN。必要81项回归后只补8项受影响验收，不重复未变化审查与测试。write-page用于仓库交接与证据强度，没有创建外部Page；原strict/Reviewer/可信invoice与完整Goal验收不缩减。
 
 Checkpoint69实现边界：fixed cache子进程采用python -B -I -S、固定repo/dependency路径、无凭据环境、close_fds及原项目捕获身份；CPU10秒/AS1GiB/wall15秒/PDEATHSIG在应用依赖import前安装，仍属partial，不宣称硬控制预留。mark只mode=rw/timeout0/显式关闭短事务，最后IO后纯freeze复检；child在构造前及出版前复核原FS余量，不消费审计预留。ACK只在实际exit0且原完成版本/元数据核对后报告as-of，不以退出或旧64hex缓存单独证明成功。普通job收尾异常独立记录并继续其他原FD清理，未知job/owner不伪退休；同失败不原样重跑。write-page技能用于仓库交接状态与证据强度，未创建外部Page。

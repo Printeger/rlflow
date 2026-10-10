@@ -154,6 +154,45 @@ class AuthStore:
         with self._lock:
             return self._issue(principal, "bearer", None, ttl)
 
+    def issue_request_token(self, principal, *, ttl=300):
+        """Trusted provisioning for an agent suggestion inbox, NOT core writes.
+
+        This purpose is intentionally not accepted by resolve(..., 'bearer')
+        or any human session guard. Existing observation tokens stay read-only.
+        """
+        if (type(principal) is not Principal or principal.kind != 'agent'
+                or principal.roles != frozenset({'viewer'})
+                or type(ttl) is not int or not 1 <= ttl <= min(self.ttl, 300)):
+            raise ValueError('short-lived request-only agent scope required')
+        with self._lock:
+            return self._issue(principal, 'request', None, ttl)
+
+    @contextmanager
+    def request_guard(self, token, *, project_id):
+        """Hold revocation/expiry checks through an inbox transaction only.
+
+        Acquire the inbox writer first. This guard is never a Draft/Approval
+        guard and cannot authenticate any original core mutation.
+        """
+        with self._lock:
+            owner = threading.get_ident()
+            active = [True]
+            def check():
+                if not active[0] or threading.get_ident() != owner:
+                    raise PermissionError('request token guard is no longer active')
+                self._expire()
+                access = self._sessions.get(self._key(token)) if isinstance(token, str) and token.isascii() and 20 <= len(token) <= 128 else None
+                if (access is None or access.method != 'request'
+                        or access.principal.kind != 'agent'
+                        or access.principal.roles != frozenset({'viewer'})
+                        or not access.principal.allows(project_id)):
+                    raise PermissionError('live scoped request-only agent token required')
+                return access
+            try:
+                yield check
+            finally:
+                active[0] = False
+
     def resolve(self, token, method):
         if not isinstance(token, str) or not 20 <= len(token) <= 128:
             return None

@@ -1,0 +1,6 @@
+Processing /tmp/rlflow-cp71-final-wheel-WccAEu/rlflow_standalone-0.2.0-py3-none-any.whl
+Installing collected packages: rlflow-standalone
+Successfully installed rlflow-standalone-0.2.0
+
+[notice] A new release of pip is available: 25.0.1 -> 26.2.1
+[notice] To update, run: /home/mint/rl_dev/rlflow_standalone/.venv/bin/python -m pip install --upgrade pip

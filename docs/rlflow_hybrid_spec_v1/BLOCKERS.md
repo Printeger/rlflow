@@ -1,5 +1,7 @@
 # 阻塞与证据缺口
 
+Checkpoint71边界更新：结构化请求、人类转交、原DRAFT来源与实际安装client/skill已通过，无本切片新增需用户决定的阻塞。T15仍部分：A01自然语言自动触发/全局安装、完整项目配置/schema discovery及client STOP未验收，不能从skill文案/测试数量推算完成。72待实现请求STOP经人类原有限执行体收尾并报告真实取消/reap/FD关闭/Pool释放。原native执行/产品独立Reviewer授权与预算、严格cgroup delegation/OS任意树与配额、全局条件/invoice/B1/T21/T22/T23/长期及M5缺口继续保留；当前无需重复未答预算问题，也不擅自调用付费模型/GPU或迁移生产。证据见HYBRID_AGENT_REQUESTS.md与checkpoint-71-tests.txt。原Goal active，USERlock未改未stage。
+
 Checkpoint70 FINAL：没有剩余源码MUST、live测试或新增用户决定阻止本片提交。实际观测hook失效后的原HTTP STOP、不可复活撤回、并发退休读取与真实SSE展示均已验收，失败证据保留。严格cgroup/quota委派和产品Reviewer合同/额度仍沿用未答问题，无系统/生产/模型授权；终态内核用量不是可信invoice、预算结算、任意树或严格OS资源控制。原native/安装/B1/长期/T23/M5与完整Goal缺口保持，Goal active，USERlock未改未stage。
 
 Checkpoint69 FINAL：无剩余源码MUST、live测试或新用户决定阻止本片提交。14新case分轮通过，唯一必要回归80pass/1fail后原失败定向已修复；完整快照+真实STOP尾部恢复及实际15秒超时回收成立。当前仅固定可信cache进程的partial RLIMIT/物理FS余量门，不是独立硬控制资源预留、quota、任意树、OS总进程≤3或强sameUID隔离；不自动采纳UNKNOWN handoff/coldcap。session cgroup root拥有、未委派uid1000，严格OS正向仍需管理员准备CPU/memory/pids子树与独立quota；既有选择问题未答不视为授权，不写sysfs或改权限。原产品Reviewer隔离合同/非零额度问题不重复询问或调用；native/可信invoice/安装/B1/长期/T23/M5/完整Goal缺口保留，Goal active，USERlock未动。

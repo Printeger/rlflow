@@ -1,0 +1,5 @@
+WARNING: Requirement '/tmp/rlflow-cp71-final-wheel-WccAEu/rlflow-*.whl' looks like a filename, but the file does not exist
+
+[notice] A new release of pip is available: 25.0.1 -> 26.2.1
+[notice] To update, run: /home/mint/rl_dev/rlflow_standalone/.venv/bin/python -m pip install --upgrade pip
+ERROR: rlflow-*.whl is not a valid wheel filename.

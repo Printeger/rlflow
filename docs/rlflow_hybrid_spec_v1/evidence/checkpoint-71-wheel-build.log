@@ -1,0 +1,12 @@
+Processing /home/mint/rl_dev/rlflow_standalone
+  Preparing metadata (pyproject.toml): started
+  Preparing metadata (pyproject.toml): finished with status 'done'
+Building wheels for collected packages: rlflow-standalone
+  Building wheel for rlflow-standalone (pyproject.toml): started
+  Building wheel for rlflow-standalone (pyproject.toml): finished with status 'done'
+  Created wheel for rlflow-standalone: filename=rlflow_standalone-0.2.0-py3-none-any.whl size=591058 sha256=698055c9c3a3ebd4ca9843a15ee41a1f46b4d65a2414c061591e80c5991b3326
+  Stored in directory: /tmp/pip-ephem-wheel-cache-0_bs9_wt/wheels/a7/dd/de/4ff772373f23860751f9c8a7f957d60d480d12a01600394091
+Successfully built rlflow-standalone
+
+[notice] A new release of pip is available: 25.0.1 -> 26.2.1
+[notice] To update, run: /home/mint/rl_dev/rlflow_standalone/.venv/bin/python -m pip install --upgrade pip

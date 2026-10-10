@@ -18,6 +18,8 @@ def parser():
     p = argparse.ArgumentParser(description="rlflow 独立控制面（项目 Runner 未配置）")
     p.add_argument("--state-dir", type=Path, default=COORDINATION / "research")
     sub = p.add_subparsers(dest="command", required=True)
+    from .agent_client import arguments as client_arguments
+    client_arguments(sub.add_parser('client', help='project-CWD request-only Hybrid skill client'))
     for name in ("doctor", "status", "pause", "resume", "dispatch", "self-test", "init-demo", "rebuild", "storage-audit", "storage-snapshot", "storage-export", "storage-recover", "rollback", "_daemon", 'restart-daemon'):
         command = sub.add_parser(name)
         if name == 'status':
@@ -114,6 +116,9 @@ def parser():
 
 def main(argv=None):
     a = parser().parse_args(argv)
+    if a.command == 'client':
+        from .agent_client import main as client_main
+        return client_main(a)  # Before legacy imports or any Store construction.
     try:
         if a.command in {"init-demo", "activate"}:
             raise Conflict("Legacy project migration/demo authorization is unavailable; use start --goal-file")

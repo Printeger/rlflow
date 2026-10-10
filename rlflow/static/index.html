@@ -80,6 +80,17 @@
           <p id="events-empty" class="empty">本次连接尚无新业务事件。面板保持静止。</p>
         </section>
       </div>
+      <section class="panel goals-panel" aria-labelledby="agent-request-title">
+        <div class="panel-heading"><h2 id="agent-request-title">Agent 目标建议</h2><button id="agent-request-refresh" type="button">读取请求</button></div>
+        <p id="agent-request-note" class="muted" role="status"></p>
+        <div id="agent-request-list" class="object-list"></div>
+        <div id="agent-request-private" hidden>
+          <pre id="agent-request-view"></pre>
+          <label class="check"><input id="agent-request-consent" type="checkbox">我已核对完整 proposal 与请求 hash，只将建议转交为不可执行 DRAFT；这不是批准。</label>
+          <button id="agent-request-forward" type="button" disabled>明确转交原草案服务</button>
+          <button id="agent-request-close" type="button">关闭并清除</button>
+        </div>
+      </section>
       <section class="panel goals-panel" aria-labelledby="goal-title">
         <div class="panel-heading"><h2 id="goal-title">Hybrid 目标与条件批准</h2><div class="controls"><button id="goal-refresh" type="button">读取最新 heads</button><button id="goal-next" type="button" disabled>下一页</button></div></div>
         <p class="boundary-note">HEAD_ONLY 是当前投影摘要，不是完整授权证明。human operator/approver 可私有审阅；条件批准不产生 lease，不启动执行。旧只读配置不安装这些接口。</p>

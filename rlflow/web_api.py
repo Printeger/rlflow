@@ -64,7 +64,7 @@ def create_app(projects, auth, *, origin="http://127.0.0.1:8765", max_streams=8,
                control_services=None, max_control_jobs=4, fixture_task_readers=None,
                fixture_runtime_services=None,cpu_assessment_readers=None,candidate_output_readers=None,
                fixed_unit_telemetry=None,cpu_unit_services=None,engineering_unit_services=None,
-               delivery_evidence_readers=None):
+               delivery_evidence_readers=None,agent_request_services=None):
     parsed = urlsplit(origin)
     if parsed.scheme not in {"http", "https"} or not parsed.netloc or parsed.path or parsed.query or parsed.fragment or parsed.username:
         raise ValueError("origin must be a canonical HTTP origin")
@@ -245,6 +245,13 @@ def create_app(projects, auth, *, origin="http://127.0.0.1:8765", max_streams=8,
     if control_services is not None:
         from .hybrid_control import install
         install(app,control_services,registry,auth,origin=origin,max_jobs=max_control_jobs)
+
+    if agent_request_services is not None:
+        if control_services is None:
+            raise ValueError('agent requests require original protected core controls')
+        from .hybrid_agent_requests import install as install_agent_requests
+        install_agent_requests(app,agent_request_services,control_services,registry,auth,
+                               origin=origin,max_jobs=max_control_jobs)
 
     if fixture_task_readers is not None:
         from .hybrid_fixture_runtime_reads import install as install_fixture_reads

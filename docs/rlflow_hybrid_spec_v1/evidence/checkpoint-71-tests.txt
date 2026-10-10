@@ -1,0 +1,63 @@
+Checkpoint71 FINAL evidence (2026-10-10, branch hybrid-v1)
+Base: 019e3a3cde8290801762c87c1368f03503d7fc28 (Checkpoint70).
+Original Goal M0-M5 remains ACTIVE. Development High review is not product Reviewer.
+No paid model, GPU, sysfs write, global skill install, production migration or push.
+USER package-lock.json untouched and unstaged; SHA256 becc7e2a36dfcad4ffe934b5ff2f0f68187611d6c0641bd63d81367651cfbf09.
+
+Test environment:
+cwd=/home/mint/rl_dev/rlflow_standalone
+PYTHONPATH=/home/mint/rl_dev/rlflow_standalone
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1
+Python .venv/bin/python 3.12.3
+No restarted/duplicate live test. All recorded test sessions reached terminal.
+
+R1 /tmp/rlflow-cp71-r1-bDf5t0
+Original session15271 terminal b290c8, exit1.
+pytest -q tests/test_hybrid_agent_requests.py tests/test_agent_client.py
+25 passed, 3 failed, 1 existing warning, 5.00s.
+Diagnosis before rerun: two disposable corruption fixtures hit original append-only event triggers; explicitly assert trigger protection then remove only disposable fixture triggers for damage injection. Third fixture invoked missing rlflow.__main__; use actual source entry python -m rlflow.cli. No production trigger weakening or added fake entry.
+Full failure retained in checkpoint-71-r1.log.
+
+R2 /tmp/rlflow-cp71-r2-BtWLiR
+Original session30131 terminal 9c6b4d, exit0.
+.venv/bin/python -m pytest -q tests/test_hybrid_agent_requests.py tests/test_agent_client.py tests/test_web_auth.py tests/test_hybrid_draft_service.py tests/test_hybrid_control_api.py tests/test_web_api.py tests/test_hybrid_reads.py tests/test_web_control_config.py
+228 passed, 1 existing Starlette warning, 48.38s.
+Original Chromium session22440 terminal2315ce, exit0:
+node --test web_checks/agent-request-browser.test.mjs
+1 passed; test17.686032586s, runner17.880390152s.
+Manifest612 paths, SHA7a72ca6586a1af64eaefd205a4f738127dbc70d8b45b93aa82d551f32c1bb69f.
+Both original pytest/browser terminal input checks612 OK, no source edits during tests.
+
+R3 /tmp/rlflow-cp71-r3-pxHeHZ
+Original session22095 terminal9fb7b4, exit0.
+.venv/bin/python -m pytest -q tests/test_hybrid_agent_requests.py tests/test_agent_client.py
+48 passed, 1 existing Starlette warning, 11.81s.
+Manifest612 paths SHA b99fe56eedbe974e269baea94272faefb1d2fba0f77fd249105e5d6e07fc1d2b; terminal check612 OK; root readback all612 still OK before documentation updates.
+R2->R3 exactly4 modified paths: rlflow/agent_client.py, rlflow/hybrid_agent_requests.py, tests/test_agent_client.py, tests/test_hybrid_agent_requests.py. Other608 unchanged.
+Narrow High fixes: closed exact original table DDL/PK index, SQL metadata prefetched bounds; returned request_id equals original project/mode/epoch/agent/key formula. Negative regression branches included.
+Final evidence is composed R2+R3, not a fresh final228 or full-repository run. Browser/JS/Auth/Core unchanged after R2; do not repeat their passed tests.
+
+Real behaviors covered:
+Request-only credentials cannot upgrade ordinary bearer; no Core changes before human forwarding; one original unapproved DRAFT with source-bound ADOPTED; request/actor/body/key/scope/epoch isolation; wrong returned hash/id/private DTO rejected; expiry at writer wait and last pre-COMMIT; fork before inherited Auth lock; missing/corrupt original source503; exact cold DB/no reset; shared strict bounded reads; lost inbox/core acknowledgement UNKNOWN/same-key reconciliation; concurrent human forwarding at most one DRAFT; explicit stale not auto-rebased; redirect/proxy refusal and FIFO/nonregular rejection; target cwd and CLI never construct local Store.
+Actual Chrome: private proposal/hash safe rendering, viewer cannot forward, lost committed response read-only adoption, one POST/one Core version/no workers, scope switch and held reads clear private DOM, logout and mobile overflow checks.
+
+Independent High /root/finite_app_review_63 read-only terminal review:
+All seven MUST groups closed: private UI clearing, last Auth check before commit, pre-lock fork/identity, source503 classification, SQL+ReadBudget bounds, exact cold schema/meta/page validation, closed client DTO/hash/id/regular file/origin/redirect/proxy.
+No new tests or edits by reviewer. R2 browser unchanged and reuse appropriate.
+
+Final wheel /tmp/rlflow-cp71-final-wheel-WccAEu
+.venv/bin/python -m pip wheel --no-deps --no-build-isolation --wheel-dir /tmp/rlflow-cp71-final-wheel-WccAEu .
+exit0. rlflow_standalone-0.2.0-py3-none-any.whl
+SHA256 698055c9c3a3ebd4ca9843a15ee41a1f46b4d65a2414c061591e80c5991b3326.
+First install used incorrect rlflow-*.whl filename and failed before installation; retained error log, diagnosed actual distribution underscore name. Wrapper status was not individual pip status, so no claimed captured pip exit code. No same-command retry.
+.venv/bin/python -m pip install --no-deps --target /tmp/rlflow-cp71-final-wheel-WccAEu/site /tmp/rlflow-cp71-final-wheel-WccAEu/rlflow_standalone-0.2.0-py3-none-any.whl
+exit0. Real installed-console probe original session73731 terminal d3b1de exit0.
+Probe uses tests.test_agent_client.hosted/config disposable fixtures, actual loopback server, original human login+CSRF forwarding, target cwd, PYTHONPATH installed site; verifies imported client outside checkout, console AWAITING_HUMAN/status -> human Core DRAFT -> ADOPTED/report original receipt, Core version1, no tasks/sessions/jobs, packaged skill resource and no request token output.
+This is client/skill installed artifact proof, not complete T23 or natural-language A01 proof. Old pre-R3 wheel not used as final evidence.
+
+Static checks: initial compileall, pip check, Node syntax checks for app/newpanel/newbrowser and skill-creator quick_validate passed. Last four Python paths recompiled after R3, git diff --check passed. JS/skill/dependencies unchanged, no redundant rerun. Final runtime/test/web input comparison and archive checksum readback performed after documentation updates; four existing state docs and new delivery/evidence are intentional post-test documentation only.
+Final readback:324/324 frozen rlflow/tests/web_checks paths OK. Full612 comparison differs only four intentional state docs (PROGRESS, DECISIONS, BLOCKERS, VALIDATION_REPORT); other608 unchanged. These documentation deltas are not runtime/schema changes. Generated checkout build directory moved recoverably to /tmp/rlflow-cp71-final-wheel-WccAEu/checkout-build, no material deletion.
+Staged default diff --check flags one trailing-space line copied verbatim from raw R1 pytest traceback. Preserve original failure bytes/SHA; git diff --cached --check excluding only checkpoint-71-r1.log passes, and git -c core.whitespace=-blank-at-eol diff --cached --check passes. No code/document whitespace errors or source edits for this raw-log exception.
+
+Delivery: HYBRID_AGENT_REQUESTS.md. Next72 is human-forwarded request STOP tied to existing real finite coordinator with physical cleanup and original receipt; not another authority or client kill endpoint.
+No new decision blocker for71. Existing native/model/Reviewer authorization and OS delegation, full conditions/installation/long-duration/fullGoal gaps remain.

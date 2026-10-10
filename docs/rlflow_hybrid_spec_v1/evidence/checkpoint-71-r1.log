@@ -1,0 +1,71 @@
+........FF....F.............                                             [100%]
+=================================== FAILURES ===================================
+____ test_corrupt_original_core_source_never_reports_adopted[event_payload] ____
+
+tmp_path = PosixPath('/tmp/pytest-of-mint/pytest-609/test_corrupt_original_core_sou1')
+change = 'event_payload'
+
+    @pytest.mark.parametrize('change', ['receipt', 'event_payload', 'event_missing'])
+    def test_corrupt_original_core_source_never_reports_adopted(tmp_path, change):
+        store, _, proposal, service, agent, args, _, _ = setup(tmp_path)
+        saved = submit(service, proposal, agent); accepted = forward(service, saved, args)
+        command = accepted['result']['command_id']
+        with store.connect() as db:
+            if change == 'receipt':
+                db.execute('DELETE FROM projection WHERE section=? AND object_key=?', (SECTIONS[2], command))
+            elif change == 'event_missing':
+                db.execute('DELETE FROM events WHERE idempotency_key=?', (command,))
+            else:
+                row = db.execute('SELECT payload FROM events WHERE idempotency_key=?', (command,)).fetchone()
+                value = json.loads(row[0]); value['put'] = [v for v in value['put'] if v[0] != SECTIONS[1]]
+>               db.execute('UPDATE events SET payload=?,payload_sha256=? WHERE idempotency_key=?', (canonical(value).decode(), sha(value), command))
+E               sqlite3.IntegrityError: append only
+
+tests/test_hybrid_agent_requests.py:175: IntegrityError
+____ test_corrupt_original_core_source_never_reports_adopted[event_missing] ____
+
+tmp_path = PosixPath('/tmp/pytest-of-mint/pytest-609/test_corrupt_original_core_sou2')
+change = 'event_missing'
+
+    @pytest.mark.parametrize('change', ['receipt', 'event_payload', 'event_missing'])
+    def test_corrupt_original_core_source_never_reports_adopted(tmp_path, change):
+        store, _, proposal, service, agent, args, _, _ = setup(tmp_path)
+        saved = submit(service, proposal, agent); accepted = forward(service, saved, args)
+        command = accepted['result']['command_id']
+        with store.connect() as db:
+            if change == 'receipt':
+                db.execute('DELETE FROM projection WHERE section=? AND object_key=?', (SECTIONS[2], command))
+            elif change == 'event_missing':
+>               db.execute('DELETE FROM events WHERE idempotency_key=?', (command,))
+E               sqlite3.IntegrityError: append only
+
+tests/test_hybrid_agent_requests.py:171: IntegrityError
+_ test_actual_single_cli_submit_then_status_without_local_core_or_secret_output _
+
+tmp_path = PosixPath('/tmp/pytest-of-mint/pytest-609/test_actual_single_cli_submit_0')
+
+    def test_actual_single_cli_submit_then_status_without_local_core_or_secret_output(tmp_path):
+        with hosted(tmp_path) as (store, auth, proposal, service, env):
+            root = config(tmp_path, env['RLFLOW_CONTROL_ORIGIN'])
+            proposal_path = root / 'proposal.json'; proposal_path.write_text(json.dumps(proposal))
+            environment = {**os.environ, **env, 'PYTHONPATH': str(Path(__file__).resolve().parents[1])}
+            call = subprocess.run([sys.executable, '-m', 'rlflow', 'client', 'submit-goal', '--proposal', str(proposal_path), '--key', 'cli_original'],
+                cwd=root, env=environment, capture_output=True, text=True, timeout=10)
+>           assert call.returncode == 0, call.stderr
+E           AssertionError: /home/mint/rl_dev/rlflow_standalone/.venv/bin/python: No module named rlflow.__main__; 'rlflow' is a package and cannot be directly executed
+E             
+E           assert 1 == 0
+E            +  where 1 = CompletedProcess(args=['/home/mint/rl_dev/rlflow_standalone/.venv/bin/python', '-m', 'rlflow', 'client', 'submit-goal'...standalone/.venv/bin/python: No module named rlflow.__main__; 'rlflow' is a package and cannot be directly executed\n").returncode
+
+tests/test_agent_client.py:76: AssertionError
+=============================== warnings summary ===============================
+.venv/lib/python3.12/site-packages/starlette/testclient.py:37
+  /home/mint/rl_dev/rlflow_standalone/.venv/lib/python3.12/site-packages/starlette/testclient.py:37: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = typing.Callable[[], typing.ContextManager[anyio.abc.BlockingPortal]]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_hybrid_agent_requests.py::test_corrupt_original_core_source_never_reports_adopted[event_payload]
+FAILED tests/test_hybrid_agent_requests.py::test_corrupt_original_core_source_never_reports_adopted[event_missing]
+FAILED tests/test_agent_client.py::test_actual_single_cli_submit_then_status_without_local_core_or_secret_output
+3 failed, 25 passed, 1 warning in 5.00s
