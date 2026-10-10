@@ -127,6 +127,9 @@ def derived_heads(value):
                 # Conservative G-attempt accounting, not a fabricated ACK:
                 # unknown send outcome can never refund an experiment start.
                 usage['experiment_starts']=int(runtime['cpu_trial_release_attempted'])
+            if runtime['origin']['kind']=='LOCAL_CONFIGURED_CPU':
+                usage['experiment_starts']=int(runtime['origin']['local_cpu']['purpose']=='research' and
+                                               runtime['local_cpu_release_attempted'])
             changed=settle_known(old_balance,reservation['amount'],usage,prior_status=reservation['status'])
             decision,reason='SETTLED','FIXTURE_SCOPE_TERMINATED'
         else:

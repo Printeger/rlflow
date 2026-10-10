@@ -1,0 +1,9 @@
+Target: tests/test_hybrid_local_cpu_runtime.py::test_actual_bound_manager_stop_survives_other_participant_failure[report]
+Initial launcher exit 1 before test collection: login shell auto-loaded ROS launch_testing pytest entry point; ModuleNotFoundError: No module named 'lark'. No task was started. Changed launcher to login=false with PYTEST_DISABLE_PLUGIN_AUTOLOAD=1; no dependency installation or product-code workaround.
+Original actual execution: session 2793, terminal chunk 5d0f8b, exit 0.
+.                                                                        [100%]
+1 passed in 16.63s
+Actual configured fork task, injected trusted-report read failure, original StopUnit call exactly once, JobRemoved(done), manager empty, original keeper gone, transport reaped, original source FDs closed. Missing report prevents terminal/FREE: original budget UNKNOWN/STOP_REQUESTED and pool occupied 1. Original safety retirement closes parent handles, does not refund or FREE.
+Original Store audit/replay/recover equal and version unchanged. After original owner exit, different process reads both tasks/task, source-verified retained reserve and unknown exposure equal original amount, controls unavailable, current liveness UNKNOWN, no managed terminal/result or ConditionEvidence. Exactly one original RELEASE_INTENT remains; no cold start/stop methods.
+abnormal-report-cold.json is copied actual JSON plus a trailing newline, not a byte seal.
+Independent incremental High read-only review: no new MUST; unknown exposure is a subset of retained reserved amount, not additional charge. No review tests run.

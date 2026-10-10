@@ -1,0 +1,9 @@
+Running as unit: rlflow-local-06a7e186833a450eb7492c1f4320db9c.service; invocation ID: 8afc8c000f4745a18cabbcd2d63744df
+<string>:38: SyntaxWarning: "is" with 'str' literal. Did you mean "=="?
+Finished with result: success
+Main processes terminated with: code=exited/status=0
+Service runtime: 31ms
+CPU time consumed: 21ms
+Memory peak: 1.5M
+Memory swap peak: 0B
+

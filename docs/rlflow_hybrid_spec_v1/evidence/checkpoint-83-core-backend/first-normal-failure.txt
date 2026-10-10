@@ -1,0 +1,52 @@
+Original tool/session outcome: {"exit_code":1,"chunk_id":"950a01"}
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_____ test_actual_configured_core_task_result_managed_stop_budget_and_free _____
+
+tmp_path = PosixPath('/tmp/pytest-of-mint/pytest-712/test_actual_configured_core_ta0')
+
+    def test_actual_configured_core_task_result_managed_stop_budget_and_free(tmp_path):
+        import time
+        tmp_path.chmod(0o700)
+        spec=_spec();spec['code']="""import json,collections,os,time
+    data=json.loads(open(WORK+'/payload.txt').read())
+    print(json.dumps(dict(sorted(collections.Counter(data).items()))),flush=True)
+    child=os.fork()
+    if not child:
+     os.setsid()
+     while True:time.sleep(1)
+    """
+        spec['inputs']={'payload.txt':'["blue","gold","blue","red","gold","blue"]'}
+>       with isolated_session(tmp_path,spec,approved=True,confirmation_reader=_confirm) as session:
+
+tests/test_hybrid_local_cpu_runtime.py:60: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib/python3.12/contextlib.py:144: in __exit__
+    next(self.gen)
+rlflow/isolated_local_cpu.py:135: in isolated_session
+    elif errors:raise errors[0]
+rlflow/isolated_local_cpu.py:116: in isolated_session
+    try:runtime.shutdown()
+rlflow/hybrid_fixture_runtime.py:1129: in shutdown
+    self.sources.shutdown()
+rlflow/hybrid_usage_source.py:562: in shutdown
+    self._cleanup_attempt(attempt)
+rlflow/hybrid_local_cpu_source.py:310: in _cleanup_attempt
+    self._check_pidfd(row,live=False)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <rlflow.hybrid_local_cpu_source.LocalCpuSourceOwner object at 0x7716f9b7fa40>
+attempt = {'accumulator': <rlflow.hybrid_usage_stream.Accumulator object at 0x7716f8ebf230>, 'anchor': b'', 'audit': None, 'chai..., 15859713, 33], [66306, 15990863, 33], [66306, 15990929, 33], [66306, 16001509, 33], [66306, 16001511, 33], ...], ...}
+
+    def _check_pidfd(self, attempt, *, live):
+        fd = attempt['fds'].get('pidfd')
+>       if fd is None: raise Conflict('original fixture pidfd missing')
+E       rlflow.store.Conflict: original fixture pidfd missing
+
+rlflow/hybrid_usage_source.py:482: Conflict
+----------------------------- Captured stdout call -----------------------------
+{"proposal": {"schema_version": "1.1", "project_id": "isolated_local_cpu", "data_mode": "fixture", "goal_id": "isolated_goal", "contract_version": 1, "objective": "Original configured local CPU task with managed STOP", "goal_kind": "research", "global_conditions": [{"id": "C1", "description": "Registered fixed verification passes", "required": true, "verification": {"method": "deterministic", "rule": "Exact registered result", "evidence_required": ["test_result"]}}, {"id": "C2", "description": "Independent product review passes", "required": true, "verification": {"method": "independent_review", "rule": "Separate read-only reviewer same candidate", "evidence_required": ["review_result"]}}], "scope": {"writable_paths": ["module/"], "protected_paths": [".rlflow/", "fixtures/acceptance/"], "allowed_command_templates": ["local_cpu"], "network_access": "none", "allowed_hosts": []}, "budget": {"model_sessions": 0, "model_input_tokens": 0, "model_output_tokens": 0, "model_token_enforcement": "hard_required", "gpu_device_seconds": 0, "experiment_starts": 3, "experiment_retries": 0, "wall_seconds": 300, "finalization_reserve_fraction": 0.2}, "stop_rules": ["Original configured CPU only; no model/GPU", "Keep UNKNOWN on missing original managed terminal proof"], "risk": "low", "approval_status": "UNAPPROVED", "allowed_tools": ["local_cpu"], "registry_bindings": {"tool_registry_hash": "sha256:25ade52bc796fe6ff0f2309187ff7ef4a63b01ab66493c45b74628731bcbf387", "command_registry_hash": "sha256:b9cdcb13557d83c87f5603f47e3c4a6080d3bc2c7035f680d77c9d7ec7a38965", "runtime_profile_hash": "sha256:fe5623d88e1800d618811756038c9735b0a4b5b5eaeaf209166bcf8ed54ec6ce", "resource_profile_hash": "sha256:ac3139b6c21f3f6583af318f091c7862ebad2f32c1904b210e3dbf57f9747d7c", "dataset_registry_hash": "sha256:94d91c129f7e5914d0ab21313ba73dbb94cc2089a7f94d8a659cd956174218ee"}, "evaluation_data": {"mode": "EXPLICIT_NONE", "datasets": [], "evaluation_rule": {"id": "local_cpu_rule", "version_hash": "sha256:b442dc9e87e9a90ea897f73ae276300b695d2a4c49bed19e352f04d26005dd60"}}}, "approval_scope_hash": "sha256:0305ea2b892eef1a8ed15d3e5eb5829839f2bc89c23a155100744098077d577b"}
+Type APPROVE sha256:0305ea2b892eef1a8ed15d3e5eb5829839f2bc89c23a155100744098077d577b for ONLY this isolated zero-model/GPU CPU spec:
+=========================== short test summary info ============================
+FAILED tests/test_hybrid_local_cpu_runtime.py::test_actual_configured_core_task_result_managed_stop_budget_and_free
+1 failed in 23.46s

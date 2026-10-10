@@ -1,0 +1,7 @@
+{
+  "chunk_id": "245573",
+  "wall_time_seconds": 0.00001188,
+  "exit_code": 1,
+  "original_token_count": 300,
+  "output": "Traceback (most recent call last):\n  File \"/home/mint/rl_dev/rlflow_standalone/rlflow/hybrid_protocol.py\", line 253, in validate_schema\n    Draft202012Validator(schema, registry=registry(), format_checker=FormatChecker()).validate(value)\n  File \"/home/mint/rl_dev/rlflow_standalone/.venv/lib/python3.12/site-packages/jsonschema/validators.py\", line 451, in validate\n    raise error\njsonschema.exceptions.ValidationError: '' should be non-empty\n\nFailed validating 'minLength' in schema:\n    {'type': 'string',\n     'minLength': 1,\n     'maxLength': 160,\n     'pattern': '^[A-Za-z0-9][A-Za-z0-9_.:-]*$'}\n\nOn instance:\n    ''\n\nThe above exception was the direct cause of the following exception:\n\nTraceback (most recent call last):\n  File \"<string>\", line 11, in <module>\n  File \"<string>\", line 11, in <genexpr>\n  File \"/home/mint/rl_dev/rlflow_standalone/rlflow/hybrid_fixture_runtime_reads.py\", line 104, in task\n    validate_schema(ID, reservation_id)\n  File \"/home/mint/rl_dev/rlflow_standalone/rlflow/hybrid_protocol.py\", line 258, in validate_schema\n    raise ProtocolError(f\"invalid contract field: {path or 'root'}\") from exc\nrlflow.hybrid_protocol.ProtocolError: invalid contract field: root\n"
+}

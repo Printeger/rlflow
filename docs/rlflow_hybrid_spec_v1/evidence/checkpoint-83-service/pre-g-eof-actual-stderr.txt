@@ -1,0 +1,8 @@
+Running as unit: rlflow-local-df4274ca50914491a30a4ee0b912a87b.service; invocation ID: 9024e6e0310c48c4b1e078f6aff9587b
+Finished with result: success
+Main processes terminated with: code=exited/status=0
+Service runtime: 25ms
+CPU time consumed: 20ms
+Memory peak: 8.9M
+Memory swap peak: 0B
+

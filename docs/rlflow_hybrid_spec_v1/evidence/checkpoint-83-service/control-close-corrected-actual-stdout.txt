@@ -1,0 +1,2 @@
+{"type": "TEST_ONLY_FAILURE_CLEANUP", "error": "[Errno 5] injected trusted ready report failure", "zero_g": true, "task_reaped": true, "original_fds_closed": true, "whole_scope_stopped": false}
+

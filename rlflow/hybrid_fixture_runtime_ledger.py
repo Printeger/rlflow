@@ -8,6 +8,7 @@ from .hybrid_goals import digest
 from .store import Conflict,canonical
 from .hybrid_cpu_trial import BINDING as CPU_BINDING, KIND as CPU_KIND, AUTHORIZATION as CPU_AUTHORIZATION
 from .hybrid_engineering_patch import BINDING as ENGINEERING_BINDING,KIND as ENGINEERING_KIND,AUTHORIZATION as ENGINEERING_AUTHORIZATION
+from .hybrid_local_cpu_profile import BINDING as LOCAL_BINDING,KIND as LOCAL_KIND,AUTHORIZATION as LOCAL_AUTHORIZATION
 
 PHASES = ('REGISTER_NO_HANDOFF', 'HANDOFF_UNKNOWN', 'PROCESS_REGISTERED',
           'RELEASE_INTENT', 'STARTED_AS_OBSERVED', 'STOP_REQUESTED',
@@ -39,10 +40,14 @@ DIAGNOSTIC_BINDING=obj({'profile':{'const':'FIXED_NATIVE_LOCAL_DIAGNOSTIC_V1'},
 DIAGNOSTIC_ORIGIN=obj({**PROTOCOL_ORIGIN['properties'],'kind':{'const':DIAGNOSTIC_KIND},
     'authorization':{'const':'LOCAL_NON_GENERATING_DIAGNOSTIC_ONLY'},
     'scenario':{'const':'native_diagnostic'},'native_diagnostic':DIAGNOSTIC_BINDING})
+LOCAL_ORIGIN=obj({**PROTOCOL_ORIGIN['properties'],'kind':{'const':LOCAL_KIND},
+    'authorization':{'const':LOCAL_AUTHORIZATION},'scenario':{'const':'local_cpu'},
+    'local_cpu':LOCAL_BINDING})
 ORIGIN={'type':'object','if':{'properties':{'kind':{'const':'PROTOCOL_CONFORMANCE'}},'required':['kind']},
     'then':PROTOCOL_ORIGIN,'else':{'if':{'properties':{'kind':{'const':CPU_KIND}},'required':['kind']},
     'then':CPU_ORIGIN,'else':{'if':{'properties':{'kind':{'const':DIAGNOSTIC_KIND}},'required':['kind']},
-    'then':DIAGNOSTIC_ORIGIN,'else':ENGINEERING_ORIGIN}}}
+    'then':DIAGNOSTIC_ORIGIN,'else':{'if':{'properties':{'kind':{'const':LOCAL_KIND}},'required':['kind']},
+    'then':LOCAL_ORIGIN,'else':ENGINEERING_ORIGIN}}}}
 nullable = lambda schema: {'oneOf': [schema, {'type': 'null'}]}
 CONTROL_BODY = obj({'action': enum('START_FIXED_CPU', 'STOP_FIXED_SCOPE'),
     'task_id': ID, 'expected_state_version': COUNT})
@@ -52,17 +57,23 @@ ENGINEERING_CONTROL_BODY = obj({'action':{'const':'START_FIXED_ENGINEERING'},
     'task_id':ID,'expected_state_version':COUNT})
 ENGINEERING_CONTROL_COMMAND = obj({**ENGINEERING_CONTROL_BODY['properties'],'actor_id':ID,
     'idempotency_key':ID,'command_id':ID,'request_hash':HASH})
+LOCAL_CONTROL_COMMAND = obj({**CONTROL_BODY['properties'],
+    'action':enum('START_LOCAL_CPU','STOP_LOCAL_CPU_SCOPE'),
+    'actor_id':ID,'idempotency_key':ID,'command_id':ID,'request_hash':HASH})
 RUNTIME = obj({'phase': enum(*PHASES), 'origin': ORIGIN,
     'registration': nullable(REFERENCE), 'previous': nullable(REFERENCE),
     'producer': nullable(PROCESS), 'started_ack_sha256': nullable(HASH),
     'terminal_proof_sha256': nullable(HASH), 'wall_seconds': COUNT})
 # Optional only for compatibility with already persisted44 facts. A new
 # command appears only at its actual accepting phase, then remains immutable.
-RUNTIME['properties'].update(start_command={'oneOf':[CONTROL_COMMAND,ENGINEERING_CONTROL_COMMAND]}, stop_command=CONTROL_COMMAND)
+RUNTIME['properties'].update(start_command={'oneOf':[CONTROL_COMMAND,ENGINEERING_CONTROL_COMMAND,LOCAL_CONTROL_COMMAND]},
+    stop_command={'oneOf':[CONTROL_COMMAND,LOCAL_CONTROL_COMMAND]})
 RUNTIME['properties'].update(cpu_trial_release_attempted={'type': 'boolean'},
                              cpu_trial_result=nullable({'type': 'object'}))
 RUNTIME['properties'].update(engineering_release_attempted={'type':'boolean'},
                             engineering_patch_result=nullable({'type':'object'}))
+RUNTIME['properties']['local_cpu_release_attempted']={'type':'boolean'}
+RUNTIME['properties']['local_cpu_terminal_proof']=nullable({'type':'object'})
 
 
 def control_command_id(request, actor_id, client_key):
@@ -83,6 +94,8 @@ def _control_links(request, old):
         body = {key: command[key] for key in CONTROL_BODY['properties']}
         allowed_action = ('START_FIXED_ENGINEERING' if name=='start_command' and
             runtime['origin']['kind']==ENGINEERING_KIND else action)
+        if runtime['origin']['kind']==LOCAL_KIND:
+            allowed_action='START_LOCAL_CPU' if name=='start_command' else 'STOP_LOCAL_CPU_SCOPE'
         if (runtime['phase'] != acceptance or command['action'] != allowed_action or
                 command['task_id'] != runtime['origin']['task_id'] or
                 command['expected_state_version'] != request['expected_state_version'] or
@@ -103,6 +116,24 @@ def validate_runtime(request, prior):
     value = request['fixture_runtime']; validate_schema(RUNTIME, value)
     current = phase(request)
     old = prior.get('fixture_runtime') if prior is not None else None
+    local=value['origin']['kind']==LOCAL_KIND
+    if local:
+        released=value.get('local_cpu_release_attempted')
+        if (type(released) is not bool or released and current not in PHASES[4:] or
+                (current=='STARTED_AS_OBSERVED' or value['started_ack_sha256'] is not None) and not released or
+                old is not None and old['local_cpu_release_attempted'] and not released or
+                released and old is not None and not old['local_cpu_release_attempted'] and
+                    (old['phase']!='RELEASE_INTENT' or old['producer'] is None)):
+            raise Conflict('configurable CPU original release phase differs')
+        if 'local_cpu_terminal_proof' in value:
+            proof=value['local_cpu_terminal_proof']
+            if current=='FIXTURE_SCOPE_STOPPED':
+                if proof is None:raise Conflict('original configured CPU durable terminal missing')
+                from .hybrid_local_cpu_result import validate_terminal
+                validate_terminal(proof,value)
+            elif proof is not None:raise Conflict('nonterminal configured CPU cannot archive terminal')
+    elif any(key in value for key in ('local_cpu_release_attempted','local_cpu_terminal_proof')):
+        raise Conflict('fixed capability cannot acquire configurable CPU release fields')
     trial = value['origin']['kind'] == CPU_KIND
     if trial:
         from .hybrid_cpu_trial import validate_result
@@ -141,8 +172,10 @@ def validate_runtime(request, prior):
             raise Conflict('fixture registration requires exact unregistered HELD origin')
         # This fixed CPU diagnostic does not spend/settle synthetic model tokens.
         amount = prior['amount']
-        if (amount['wall_seconds'] < 4 or
-                amount['experiment_starts'] != int(trial) or
+        needed_seconds=value['origin']['local_cpu']['task_seconds']+10 if local else 4
+        starts=int(value['origin']['local_cpu']['purpose']=='research') if local else int(trial)
+        if (amount['wall_seconds'] < needed_seconds or
+                amount['experiment_starts'] != starts or
                 any(n for k, n in amount.items() if k not in ('wall_seconds', 'experiment_starts'))):
             raise Conflict('fixed CPU runtime requires wall-only finite reservation')
         return value
@@ -187,6 +220,22 @@ def validate_original_links(value, lookup):
     from .hybrid_working_plan import SECTIONS, validate_record, validate_links
     from .hybrid_budget_ledger import SECTIONS as BUDGET
     request = value['request']; runtime = request['fixture_runtime']; origin = runtime['origin']
+    if origin['kind']==LOCAL_KIND:
+        from .hybrid_local_cpu_profile import approved_binding
+        from .hybrid_goals import SECTIONS as GOALS
+        from .hybrid_authority import SECTIONS as AUTHORITY
+        sources=value['policy_source'];record=lookup(GOALS[0],sources['contract_key']);approval=lookup(AUTHORITY[0],sources['approval_key'])
+        if record is None or approval is None:raise Conflict('configurable CPU original approval missing')
+        binding=approved_binding(record['contract']['proposal'],approval['registry_witness'],origin['program_sha256'])
+        binding.update(grant_id=origin['local_cpu']['grant_id'],
+            **{k:sources[k] for k in ('proposal_hash','approval_hash','config_hash','scope_hash')})
+        if canonical(binding)!=canonical(origin['local_cpu']):raise Conflict('configurable CPU original approved binding differs')
+        proof=runtime.get('local_cpu_terminal_proof')
+        if proof is not None and proof['configured_local_result'] is not None:
+            from .hybrid_local_cpu_result import validate_result
+            closed=proof['managed_service_proof']['task_closed']
+            spec=approval['registry_witness']['tools']['local_cpu']['definition']['spec']
+            validate_result(proof['configured_local_result'],origin,closed['task'],closed['stopped'],spec)
     if origin['kind']==DIAGNOSTIC_KIND:
         from .hybrid_native_diagnostic import approved_binding
         from .hybrid_goals import SECTIONS as GOALS

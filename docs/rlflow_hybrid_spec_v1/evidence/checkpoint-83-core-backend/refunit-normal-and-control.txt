@@ -1,0 +1,8 @@
+{
+  "session_id": 94632,
+  "chunk_id": "1117cd",
+  "exit_code": 1,
+  "result": "1 passed, 1 failed in 29.84s",
+  "normal": "test_actual_configured_core_task_result_managed_stop_budget_and_free PASSED; strict 2s manager STOP policy retained after RefUnit.",
+  "failure": "test_actual_bound_manager_stop_survives_other_participant_failure[control]: tests/test_hybrid_local_cpu_runtime.py:219 AssertionError 'failed' != 'inactive'. Actual SIGTERM-ignoring workload STOP escalated at bounded 2s, original manager job done; failed/timeout preserved. Expected state corrected to failed/failed Result=timeout with zero manager processes, not reclassified as successful task."
+}

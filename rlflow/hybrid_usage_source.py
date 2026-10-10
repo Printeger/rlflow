@@ -79,6 +79,7 @@ def _child_fork():
         owner._live = False
         for attempt in owner._attempts.values():
             descriptors = set(fd for fd in attempt['fds'].values() if fd is not None)
+            descriptors.update(owner._extra_fork_descriptors(attempt))
             process = attempt['producer']
             server=attempt.get('server')
             if server is not None:
@@ -156,13 +157,13 @@ class FixtureUsageSourceOwner:
                 if name == 'binary':
                     self._check_binary(attempt); continue
                 info = os.fstat(fd)
-                file_name = self._source_files()[name]
+                file_name = self._source_file(name)
                 original = attempt['identities'][file_name]
                 flags = fcntl.fcntl(fd, fcntl.F_GETFL)
                 if (not stat.S_ISREG(info.st_mode) or info.st_uid != os.geteuid() or info.st_nlink != 1 or
                         stat.S_IMODE(info.st_mode) != 0o600 or [info.st_dev, info.st_ino] != original or
-                        os.get_inheritable(fd) or (name in ('read', 'program','config','ready_read') and flags & os.O_ACCMODE != os.O_RDONLY) or
-                        (name not in ('read', 'program','config','ready_read') and (flags & os.O_ACCMODE != os.O_WRONLY or not flags & os.O_APPEND))):
+                        os.get_inheritable(fd) or (self._source_readonly(name) and flags & os.O_ACCMODE != os.O_RDONLY) or
+                        (not self._source_readonly(name) and (flags & os.O_ACCMODE != os.O_WRONLY or not flags & os.O_APPEND))):
                     raise Conflict('original private fixture source descriptor differs')
         read_fd = attempt['fds']['read']
         if read_fd is None: raise Conflict('original fixture usage reader closed')
@@ -172,6 +173,18 @@ class FixtureUsageSourceOwner:
 
     def _source_files(self):
         return SOURCE_FILES
+
+    def _readonly_source_keys(self):
+        return frozenset(('read','program','config','ready_read'))
+
+    def _source_file(self,name):
+        return self._source_files()[name]
+
+    def _extra_fork_descriptors(self,attempt):
+        return ()
+
+    def _source_readonly(self,name):
+        return name in self._readonly_source_keys()
 
     def _allocate(self, membership, claim, scenario, member):
         """Internal allocation only. Strong original attempt precedes file IO."""
@@ -509,8 +522,8 @@ class FixtureUsageSourceOwner:
                 else:
                     if name == 'binary':self._check_binary(attempt)
                     else:
-                        info = os.fstat(fd); key = self._source_files()[name]
-                        if [info.st_dev, info.st_ino] != attempt['identities'][key]:
+                        info = os.fstat(fd); key = self._source_file(name)
+                        if [info.st_dev, info.st_ino] != attempt['identities'].get(key):
                             raise Conflict('original fixture cleanup descriptor reused')
                 os.close(fd); attempt['fds'][name] = None
             except (OSError, Conflict) as error: errors.append(error)

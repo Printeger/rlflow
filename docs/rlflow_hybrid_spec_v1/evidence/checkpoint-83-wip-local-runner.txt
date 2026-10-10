@@ -1,0 +1,342 @@
+Checkpoint83 WIP / actual CPU kernel-substrate evidence / NOT final acceptance
+Baseline: a4b69d2 (82 functional delivery: f54f1fb). Date: 2026-10-10.
+Previous goal turn: PROGRESS (82 closure commit and current integration research
+changed authoritative evidence/next dependency), not a live-process wait.
+Resource proposal unanswered; no consent inferred. Product model/GPU calls=0.
+No instinctRL writes, GPU query, training, global installs/config or push.
+
+NEW CORE CONFIGURABLE CPU CONTRACT / BUDGET DIFFERENTIATION (still WIP)
+Previous turn PROGRESS: actual configured service and exact source/manager
+identity observations changed code/evidence; no live test restarted.
+Added pure hybrid_local_cpu_profile: bounded source/flat UTF8 inputs, explicit
+engineering/research purpose, memory/pids/one-core rate/wall limits; exact
+registry profile/config/evaluation rule hashes, zero model/GPU/retries policy.
+Trusted pins include original service/keeper/cgroup/sandbox plus exact installed
+system Python and ELF loader. Hashes are NOT a live capability or enforcement
+proof; eventual original owner must pin/check original bytes/FDs at effect.
+Distinct LOCAL_CONFIGURED_CPU origin and START_LOCAL_CPU/STOP_LOCAL_CPU_SCOPE
+contract in existing original runtime ledger, no borrowed fixed grant. Full
+historical original references and approval witness checks retained, newbinding
+checked against original approved registry/proposal. Wall reservation >=task
+seconds+10; exactly one experiment start reserved for research, zero engineering.
+Finalization reserve arithmetic remains unchanged: actual caller must reserve
+within approved available balance, never relax floor to make a sample pass.
+New monotone local_cpu_release_attempted requires existing producer plus prior
+RELEASE_INTENT on first true; no-handoff STOP cannot manufacture G-attempt.
+Budget terminal arithmetic consumes one research start only if G entered,
+zero engineering; unknown keeps original full exposure, not double charge.
+
+COMMANDS / TERMINAL OBSERVATIONS (not a final all-file invocation)
+Prefix PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q
+6c307e tests/test_hybrid_local_cpu_profile.py: exit0,13passed0.06s.
+  Closed fresh binding / changed code,input,module,model,wall,old tool denied;
+  input traversal/size and resource bool/unlimited/missing limits denied;
+  local registration bounds, fixed cannot gain local release/false ACK denied.
+127f1a only affected profile binding selector after adding Python/loader pins:
+  exit0,1passed0.17s. No new worker or manager launch.
+72a3cc NEW no-handoff STOP forged G-attempt selector: exit0,1passed0.06s.
+f601fa NEW conservative budget derivation 3cases: exit0,3passed0.07s.
+  Research pre-G/after-G and engineering after-G: pending full unknown exposure
+  conserved, terminal starts0/1/0, wall1 consumed, exposure zero only at supplied
+  synthetic terminal. Explicit pure DTO arithmetic, NOT actual Store/livegrant,
+  original task/manager provenance or authority to settle an actual run.
+Necessary shared ledger regression (code changed, not old82/full-suite repeat):
+c614b2 original process82962 -> a698e2 exit0,34passed/1warning16.37s,
+  tests/test_hybrid_budget_ledger.py. Existing Starlette anyio deprecation only.
+Necessary representative actual original SDK/Store/Pool no-handoff STOP:
+6c4b84 original process91293 -> d9c254 exit0,1passed10.46s,
+  tests/test_hybrid_fixture_runtime.py::test_durable_stop_before_spawn_is_zero_wall_and_never_releases.
+No new native/model calls, no old sandbox/keeper/service repeats. Both process
+handles terminal; no full original suite or product-autonomy claim.
+Independent original High readonly review: no confirmed MUST in new closed
+contract/arithmetic. Old owner/HostPool allowlists and public start remain
+unchanged and REFUSE new kind. No new opaque live grant/source/dispatch enabled.
+Current input SHA256:
+hybrid_local_cpu_profile.py 8ebd5766ca5bd92496160c4690b18c00a6c7e985c154f2d68fdfaed317743529
+hybrid_fixture_runtime_ledger.py e26ed4746ecbf9eab9398ac0b43d18b429ef4a888838022683f67b193cdb1342
+hybrid_budget_ledger.py 943abaaf8482a5e7023c48d1e84848764aea701a03ae9bcd616f99d933e280e2
+tests/test_hybrid_local_cpu_profile.py 16e1bf6ae53ccd2951154fa25492383ed95463931fc34fce18848b768994a1b3
+Compilation and diff whitespace checks exit0; unrelated USER lock unchanged.
+Next REQUIRED implementation: exact original configurable CPU owner/source with
+fresh approved grant -> durable original REGISTER/Pool claim -> HANDOFF_UNKNOWN
+before service launch -> original keeper/task+Invocation capture -> committed
+RELEASE_INTENT/finalAuth/TTL/STOP -> once G -> trusted actual results -> original
+whole managed service/source close & manager job proof -> budget settlement/FREE.
+Then failed Store/manager/source and cold recovery evidence. 83 cannot close or
+commit merely because these contract tests pass; full model autonomy/M0-M5 and
+real-machine long-run admission still missing. Goal stays ACTIVE.
+
+NEW ACTUAL FINITE CONFIGURED SERVICE CONSUMER (next continuation)
+Previous turn PROGRESS: keeper control protocol and actual failure/EOF/leader
+exit changed authoritative code/evidence; no live test awaited or restarted.
+Added hybrid_local_runner_service.serve(config path, frozen SHA): closed bounded
+private config, separate trusted keeper protocol vs candidate stdout/stderr,
+captured original InvocationID + keeper PID/start/boot + confined task PID/source
+SHA. Strong-register output FDs before identity IO. Original control EOF and
+producer exit drive task STOP/reap/protocol FD close; close original outputs
+and control before task_closed. Config hash is integrity, NOT authority/grant.
+Failed trusted ready/terminal report must clean known original task independently
+of output/control FD cleanup; retain uncertain original objects on exception.
+
+Actual command: PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q
+tests/test_hybrid_local_runner_service.py.
+2051f1 first actual service module: exit0,2passed0.15s (normal configurable task
+and pre-G controller EOF). Not fixed add/pi: task frequency analysis produces
+JSON apple1/pear3/plum2; leader exits0, setsid descendant exits from kill9.
+Normal service keeper PID1605481, task1605482, descendant1605484; distinct
+transport PID checked independently. Invocation4511001683824d80b75ca2a41c471da9.
+Original keeper pidfd ready after terminal; manager same Invocation/ExecMainPID,
+MainPID0/ExecMainCode1/ExecMainStatus0/Resultsuccess/SubStateexited confirmed.
+RemainAfterExit=yes intentionally keeps manager facts available; ActiveState
+still active at this read. Test owner then stops only its fresh UUID unit;
+this is NOT original Core manager stop job witness/Pool FREE proof.
+Actual task CPU1851usec, memory peak2097152, taskempty before keeper exit.
+f16853 after independent exception cleanup change: only affected positive,
+exit0,1passed0.08s; no old positive/kernel suite repeated.
+c95ff4 NEW ready-report failure: exit0,1passed0.07s. Original service report
+writer raises EIO before ready returns/G, still actual task killed/reaped,
+keeper/scope/protocol/output/control FDs closed, zero task output. Test-only
+cleanup diagnostic is explicitly NOT a runtime terminal result or FREE claim.
+Source error and exception context remain visible. All tests terminal.
+Raw artifacts /tmp/pytest-of-mint/pytest-699/test_configured_service_distin[01]/
+and pytest-701/test_original_ready_report_fai0/. Textual argv/protocol/manager
+readbacks/stop-result/failure stdout/stderr transcripts at checkpoint-83-service/
+(newline-normalized, not original byte seals; original bytes remain in tmp).
+Current service SHA22e0f8030453612c8055c7e956926e0f0a968c2c96e2740812a392ef694cb5b9.
+Current test SHA64f00988c714b635b847dc46c121af86cfce9de8c196565dded9da7a072e8c83.
+Compile/diff exit0; no rlflow-local-* units remain, user package lock unchanged.
+Readonly independent service review found one MUST: original_service_cleanup
+retained control FD but omitted captured original identity for safe recovery.
+Fixed record now retains original identity and creator PID/thread. Config
+FD early close failure also retains exact original FD/identity/creator on its
+own original exception; unknown identity never adopted/closed as original.
+36c330 affected original report-failure case exit0,1passed0.07s.
+61d8c8 new control-close injection exit1,1failed0.07s: test wrongly inherited
+parent-close injection into the gate child; child correctly aborted on its
+outside-FD close error, so ready wasn't reached. Root diagnosed actual trace
+and restricted injector to captured original keeper PID, not relaxing source
+validation. a7b904 corrected case exit0,1passed0.08s. Control close failure
+retains original FD+identity+creator; task/reap/other FDs close independently,
+then original test actor verifies same inode and closes it. No G/task output.
+Failure+corrected argv/stdout/stderr textual transcripts archived under
+checkpoint-83-service/control-close-injection-failed-* and control-close-corrected-*.
+Latest service SHA f33ca503fbf28f71c88195fbdd00300921fd48e75d824b47ce96245ed4aa87e0.
+Latest test SHA eb67a894e05c42925fb0e8e6592bb7873e3435cba3fd5a6b7a02599a62f2c0f9.
+These supersede historical service/test inputs immediately above, not the
+unchanged scope/sandbox/keeper evidence. Compile/diff passed, no units remain.
+Final narrow independent confirmation completed: control identity MUST closed,
+no remaining confirmed MUST in this service fragment. No duplicate tests by
+reviewer, no all-green/83 commit or Core/Pool FREE claim.
+NEXT REQUIRED VERTICAL CORE INTEGRATION (not another fixed demonstration):
+exact CPU owner/source/grant, fresh human approval binding code/input manifest
+and sandbox/keeper/service/program SHA/limits, original reservation CAS and
+Pool slot. HANDOFF_UNKNOWN must commit before actual service launch; manager,
+keeper and task identities never substitute transportPID. RELEASE_INTENT commit
+and final Auth/TTL/STOP precede G. Terminal combines original task/source closure,
+keeper pidfd + original manager binding/job, all original FDs before settlement
+and FREE. Lost launch/control/report/manager/source -> UNKNOWN, no relaunch,
+adoption or refund. Old Native/Fixture grants/general gates still deny this kind.
+83 remains WIP/uncommitted; no model/GPU permissions or long-run admission.
+
+NEW FINITE KEEPER / ACTUAL CONTROL CONSUMER (83 remains WIP)
+Added hybrid_local_runner_keeper.FiniteCpuKeeper, no Core/Pool authority.
+Original sandbox-ready receipt binds task PID/start/source SHA and membership;
+G requires complete ready proof. Partial pipe/fork handoff is strong-retained,
+cannot prepare/release again; STOP latches before any effects. Creator PID
+and thread pure fences precede cleanup. Bad original gate/pidfd records UNKNOWN
+without skipping still-valid task kill/all-children reap. Each original protocol
+FD closes independently; failures retained, no foreign descriptor adoption.
+Finite original read-only control pipe now consumes one G; EOF/STOP/deadline
+or original producer terminal automatically STOPs task and reaps descendants.
+This is a service-side protocol, NOT a Core authorization decision. External
+owner must prove original current approval/Registry/reservation before its G.
+
+All tests terminal; no old82, sandbox or cgroup repeats this continuation.
+Command prefix: PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q
+tests/test_hybrid_local_runner_keeper.py with affected selectors only:
+af8f49 initial preG/release: exit0,2passed0.12s.
+d82ef5 regular output source correction affected release: exit0,1passed0.08s.
+ebe9aa independent STOP/close correction release: exit0,1passed0.08s.
+3ced80 strong partial prepare retention release: exit0,1passed0.08s.
+8b85a7 original pidfd/reap/second-empty correction: exit0,2passed0.12s.
+0a88d9 ready-proof/creator fences correction: exit0,2passed0.13s.
+4455a9 NEW bad_ready/lost_fork: exit0,2passed0.13s; failed original
+  readiness/lost actual fork return -> zero G/output, STOP/reap/FD closure.
+90d7ad NEW wrong_owner/pidfd_signal/close_fault: exit0,3passed0.19s.
+  Actual foreign thread AND fork child cannot STOP/close; original FDs remain.
+  Injected original pidfd signal EIO still proves task empty/producer reaped,
+  protocol_cleanup_unknown=true; no whole-scope-stop claim.
+  Injected ready FD close EIO retains only failed original FD; all independent
+  closes continue; original-only retry closes it without any new task/G.
+b18357 NEW control_eof/producer_exit: exit0,2passed0.12s.
+  G-before EOF is not sent in first case: task produces nothing, STOP/reap.
+  Second configured task computes JSON frequency table blue2/green1/red3,
+  leader exits0; original task kills/reaps setsid descendant(status9).
+  Producer PID1605295 + descendant1605296 both reaped. Actual task usage
+  1657usec, memory peak2097152; whole_scope_stopped remains false.
+  Actual unit rlflow-local-fcc6f47ed47a4add9f3db5ae02549921.service,
+  invocation1ad459a77f5d4b8f8bf4fc9e126fc021. Client success not authority FREE.
+  Source task SHA0009d515fcce461d151676edc2936b723d03a1dc0fa123f91fa3ee9db5db8c60.
+  Original command/stdout/stderr/source files at /tmp/pytest-of-mint/pytest-698/
+  test_original_keeper_blocks_pr0 and pr1. Textual transcripts copied into
+  evidence/checkpoint-83-keeper/ (newline-normalized, not byte-identical seals).
+  Actual empty source-stderr files remain empty in original test paths;
+  transcript newline is NOT an observed task output. Generated service-code
+  SyntaxWarning about literal 'is True' is disclosed, not a task failure.
+Current keeper SHA6c522e7c196acd4d9354e9305cd9d32c7fe0a2f0419e5b87b3f75cd0ec48a6ff.
+Current test SHAdf4ffee898c6ef5d1ca52d6a65d8098bdddc9f8a9fd67b3335d49e1d4472fd95.
+Compile/diff exit0, zero rlflow-local-* loaded units. USER lock hash unchanged.
+Readonly original independent High confirmed three keeper source MUST closed;
+corresponding actual negative evidence above subsequently delivered. Scope
+preparation/close findings also closed. New control loop narrow readonly review
+completed: no confirmed MUST; no duplicate test execution by reviewer.
+Still NOT complete: exact configurable CPU Core owner/source/grant; fresh
+human approval/current immutable code-input/limit profile; budget CAS/claim;
+separate transport/keeper/task identities; same Invocation terminal after
+task-empty-before-keeper-exit/all reap/all original FD close; trustworthy CPU
+settlement/recovery. Old general start gates/owner allowlists remain denied.
+No new83 commit; no real model Engineer/independent product Reviewer autonomy,
+no production qualification/strict disk quota/long-run admission claimed.
+
+DELIVERY IN PROGRESS
+Continuation: previous turn was PROGRESS (sandbox code and actual behavior),
+not a wait. Added reusable hybrid_local_runner_cgroup.OriginalTaskScope:
+held original root/control/task + events/procs/stat/kill/limits FDs, original
+keeper PID/start/boot/thread/member checks, original direct fork-child entry,
+TASK_EMPTY (held events0 plus procs empty), bounded task kill, partial-close
+retry with original failed FD retained and no foreign adoption. Failed
+preparation cleanup carries only the original object in its original exception.
+Actual Core release/STOP latch/manager whole-scope proof still NOT delivered.
+
+Current cgroup implementation evidence (all terminal, no old sandbox repeats):
+a4dae5 original new cgroup module: exit0,2passed0.10s (actual service + deny
+  reconstruction from Controller). Actual candidate producer and setsid
+  descendant stopped by original keeper/task FD and both waitpid reaped.
+27a60e handle-identity/dict snapshot correction: affected positive exit0,
+  1passed0.11s. Old Controller-denial case not repeated.
+766d72 phased close correction: affected positive exit0,1passed0.11s.
+9a2433 new close-fault selector[True]: exit0,1passed0.10s; original events FD
+  pre-close failure retained, all other original FDs closed, retry succeeds.
+0e0aa4 selector[foreign]: exit1,1failed0.10s. Test wrongly assumed a new open
+  would reuse target FD after other lower FD numbers had been closed. Original
+  effect wasn't reached; raw argv/stdout/stderr remain at original pytest686
+  directory. Test changed to explicit external actor dup2 onto target, not a
+  relaxed original-source check.
+ef8bfa selector[foreign] corrected: exit0,1passed0.09s; no foreign close, cleanup
+  UNKNOWN persists even when external test actor later closes foreign FD.
+Original test artifacts: /tmp/pytest-of-mint/pytest-687/test_original_task_scope_stops0/
+  actual-command.json / actual-stdout.txt / actual-stderr.txt.
+Actual stdout of corrected foreign selector:
+{"terminal": {"task_empty": true, "whole_scope_stopped": false, "cpu_stat": "usage_usec 1853\nuser_usec 1853\nsystem_usec 0\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 0\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0", "memory_peak": 1835008, "keeper_still_live": true}, "closed": {"task_handles_closed": false, "whole_scope_stopped": false, "unknown": true}, "producer_reaped": true, "descendant_reaped": true}
+Actual service stderr: unit rlflow-local-d90baf3e454645d381e5d0b28fd73401.service,
+  InvocationID c78e8445d17043328b67393cfb3c8f50, success/exit0/runtime33ms.
+Client wait success here is NOT original manager proof or authority to FREE.
+Current cgroup source SHA e72867c1b17e87194ab45005f3c5c65c21133abd69ae698bcb0cd03345efff0c
+Current cgroup test SHA 281b8fec4c8db4e95c87113affb5f5d12bd8aae73ceae088329a24c8bfcbfedd
+The two hashes immediately above are historical foreign-case inputs, superseded
+by the following narrow preparation-cleanup correction (do not relabel them).
+High confirmed constructor initial/_write temporary FD close failures lacked
+registration and root fstat/uid rejection was outside cleanup. All opened
+temporaries now register before identity/read/close; success clears, failures
+strong-retain; root acquisition/validation included in original cleanup try.
+0d6684 only affected original close-fault selector[True]: exit0,1passed0.08s.
+c4c605 new actual preparation temporary-close failure: exit0,1passed0.05s.
+  Original failure carries exact original cleanup owner; all other original
+  descriptors close, original temporary FD remains; retry closes that FD,
+  no fork/release/G. Whole-scope-stopped remains false.
+Current latest cgroup SHA 65207db2d0740b86c100c8a95a8e44e26ae937ca453bd5c6ccbfe11356e70a8f
+Current latest test SHA 77a8aeb59afb55888cdb1ae994fe9f75f3785619bf10a304f9a7905ce141a4fd
+Independent High identified partial-close MUST, implemented correction and
+actual close/foreign cases above; final narrow readonly confirmation pending.
+Compile/diff checks passed. No rlflow-local-* units remained after tests.
+
+New hybrid_local_runner_sandbox.py confines an original single-thread CPU gate
+and descendants with held inode Landlock rules/no_new_privs/seccomp ABI fence.
+Configurable task fork/exec/private output works; only approved original ELF
+inodes including the root-owned exact ELF interpreter are executable.
+No general Core start/lease/Pool allowlist/HTTP authority is enabled yet.
+This is neither independent model review nor autonomous engineering acceptance.
+Task test code is generated by the test, not produced by an actual model.
+
+READONLY AND ACTUAL HOST FACTS
+Existing user manager has delegated cpu/memory/pids; parent goal shell remains
+outside worker cgroup. No system-wide privilege/config change was required.
+810abe actual isolated ephemeral unit rlflow-cp83-probe-20261010-a4b69d2:
+invocation 3c5a92b6889f47eaad1cdf434e5c417b, PID1603588, exit0, runtime13ms.
+Original service readback: memory.max67108864, swap0, cpu.max100000 100000,
+pids.max16. This is CPU feasibility, not authorization or all-scope STOP proof.
+
+CHRONOLOGICAL TESTS — NO FULL SUITE OR OLD82 REPEATS
+All invocations: PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q
+tests/test_hybrid_local_runner_sandbox.py [selectors below]. These are terminal
+tool observations; original complete failing stdout is not archived here.
+3d7abb: first two cases, exit1, 2failed0.24s.
+  Generated validation string SyntaxError; no task acceptance.
+  cgroup.events open after cgroup.kill: ENOENT; service manager removed group.
+c42362: affected two cases after first diagnostic adjustment, exit1,
+  2failed0.17s. Python exec EACCES; readelf identifies dynamic loader omitted
+  from exact executable set. Preheld events FD lseek after service removal:
+  ENODEV. This second same STOP failure changed diagnostic/implementation;
+  no further ordinary-service retry or promotion of directory disappearance.
+6db8bb: adjusted two cases, exit0, 2passed0.16s.
+  Exact root-owned loader FD admitted, not all /usr/lib execute rights.
+  Finite trusted service parent moves into control subgroup; enables delegated
+  controllers, creates independently limited task subgroup, forks original child
+  into task. Child stdin /dev/null, inherited sandbox; parent remains until Q
+  after original task.events populated0. RuntimeMaxSec20/parent Q wait15 bound.
+  Actual configurable candidate.py produced and independently fork/exec tested;
+  setsid descendant remains in original task cgroup, parent Controller outside.
+  TASK_EMPTY is proved while keeper alive, NOT entire managed service FREE.
+d47d68: new outside metadata/migration/queued-signal case, exit0,1passed0.06s.
+  Exact outside same-UID protected file mode/mtime/ctime/bytes/xattr unchanged;
+  cgroup migration and rt_sigqueueinfo/rt_tgsigqueueinfo denied; private write works.
+9ecad8: new async-fcntl victim case plus only affected fork/exec positive,
+  exit0,2passed0.14s. Independent disposable victim receives no SIGIO.
+4205fe: affected same two after ioctl/lease closure, exit0,2passed0.13s.
+  F_SETOWN/F_SETSIG/F_SETOWN_EX/F_NOTIFY/F_SETLEASE/O_ASYNC/ioctl denied;
+  ordinary NONBLOCK/FD_CLOEXEC/pipe IO and approved executable still work.
+471558: final affected positive after explicit single-thread guard/environment
+  whitelist, exit0,1passed0.08s. No other unchanged passed cases repeated.
+daabe6: independent-victim async/lease/ioctl plus new ioprio_set denial case,
+  exit0,1passed0.08s. ioprio_set251 is denied; actual independent victim's
+  ioprio_get252 value before/after unchanged. No attempt targeted Controller.
+All are distinct chronological evidence, NOT one all-four final invocation.
+py_compile of the two new modules exit0; no dependency change.
+
+INDEPENDENT HIGH READONLY SAFETY FINDINGS
+Existing original-authorized /root/finite_app_review_63 reviewed actual local
+sources/host state only. No product model/GPU execution or duplicated tests.
+Confirmed ABI3 metadata bypass MUST -> separate chmod/chown/time/xattr denies.
+Confirmed indirect fcntl async signalling MUST -> command/flag-specific denies.
+Root independently identified lease/ioctl route -> deny for this CPU policy.
+Future syscall numbers >=450 unqualified/denied; clone3 ENOSYS prevents
+CLONE_INTO_CGROUP/namespace escape; classic clone namespace flags denied.
+Outside sockets/signals/tracing/kernel IPC denied; no cgroup write permission.
+These restrictions require caller to close outside FDs, sanitize environment,
+pin executable/input/working inodes and enforce original bounded cgroup first.
+No disk hard quota provided; strict full-resource admission remains unqualified.
+
+REMAINING83 ACCEPTANCE / NEXT ACTION
+Move finite trusted keeper behavior into actual reusable original owner, bind
+InvocationID/MainPID/starttime/boot/task inode + held event/stat/source FDs.
+Original durable budget/registration/release/G/ACK chain must precede task effects.
+Close task after empty, then original keeper/manager terminal and all FDs before
+entire managed-scope FREE. systemd-run client Popen is NOT actual producer;
+its wait4 usage/client exit cannot prove task/keeper usage or terminal.
+Lost launch return/manager connection/cgroup disappearance -> UNKNOWN, no restart,
+no budget refund. Recovery must not cold-adopt source DTO/old capability.
+Actual configured engineering/experiment outputs plus queued/pre-G/running STOP,
+failed durable facts/restart and settlement still required before83 closure.
+No new checkpoint commit or all-green/Core/generalRunner claim yet.
+
+Final current WIP inputs (guard/env positive qualified, not entire product):
+sandbox SHA256 d881a0468a90ebaeb89ecb2196d1775c67c18d2006ffb11c0c912dadebd165aa
+tests SHA256 ca6090249909ee650f866e7a1f28ac4efb6a1eefb9fe3942c080933dd7489c47
+USER package-lock.json preserved/untracked/unstaged SHA256
+becc7e2a36dfcad4ffe934b5ff2f0f68187611d6c0641bd63d81367651cfbf09.
+
+Primary technical references consulted (not blanket backend qualification):
+https://github.com/systemd/systemd/blob/v255/docs/CGROUP_DELEGATION.md
+https://docs.kernel.org/userspace-api/landlock.html
+Landlock inheritance/ABI limitations and delegation leaf topology support this
+design; actual kernel observations above, not docs alone, establish behavior.

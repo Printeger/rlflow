@@ -1,0 +1,7 @@
+{
+  "chunk_id": "4e7738",
+  "wall_time_seconds": 0.00000675,
+  "exit_code": 0,
+  "original_token_count": 25,
+  "output": ".                                                                        [100%]\n1 passed in 18.90s\n"
+}

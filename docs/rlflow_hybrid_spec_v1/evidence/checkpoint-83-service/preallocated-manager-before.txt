@@ -1,0 +1,8 @@
+MainPID=1606578
+Result=success
+ExecMainPID=1606578
+ExecMainCode=0
+ExecMainStatus=0
+ActiveState=active
+SubState=running
+InvocationID=d57f978e60934320ace22cf19711a082

@@ -1,0 +1,199 @@
+"""Exact configurable CPU owner; original Core budget/Pool writers only.
+
+No model, GPU, production scope, fixed-profile grant upgrade or cold adoption.
+"""
+from dataclasses import dataclass
+import json
+import uuid
+
+from .hybrid_fixture_runtime import FixtureRuntimeOwner
+from .hybrid_local_cpu_profile import KIND, approved_binding, module_pins, validate_bound_spec
+from .hybrid_reads import ReadBudget
+from .store import Conflict, canonical, PREPARATION_READ_BYTES
+
+
+@dataclass(frozen=True,eq=False)
+class LocalCpuGrant:
+    id: str
+    raw: bytes
+
+
+class LocalCpuRunnerOwner(FixtureRuntimeOwner):
+    def _actual(self):
+        from .hybrid_fixture_runtime import _owners
+        if type(self) is not LocalCpuRunnerOwner or _owners.get(id(self)) is not self:
+            raise PermissionError('exact original configured CPU owner required')
+        super()._actual()
+
+    def _issued(self,lease):
+        attempt=super()._issued(lease)
+        if attempt['origin']['kind']!=KIND or attempt.get('local_cpu_grant') is None or canonical(attempt['origin'])!=lease.raw:
+            raise PermissionError('configured CPU owner cannot operate another kind')
+        return attempt
+
+    def issue_cpu_trial_grant(self,*args,**kwargs):raise PermissionError('no fixed CPU grant upgrade')
+    def issue_engineering_patch_grant(self,*args,**kwargs):raise PermissionError('no fixed engineering grant upgrade')
+
+    def _binding(self,loaded):
+        config=json.loads(self.plans.registry._raw)
+        binding=approved_binding(loaded['record']['contract']['proposal'],config,self.program_hash)
+        if config['tools']['local_cpu']['definition']['modules']!=module_pins():
+            raise Conflict('original approved CPU trusted programs changed')
+        return binding
+
+    def issue_local_cpu_grant(self,bundle,token,observation):
+        self._actual();self.controller._issued(token);self._plan_original(bundle,token,observation)
+        with self.pool._lock,self.store.read_connection() as db:
+            db.execute('BEGIN');read=ReadBudget(db,PREPARATION_READ_BYTES)
+            loaded=self.budget._load(db,self._ready_for_bundle(bundle)['request']['goal_ref'],read)
+            binding=self._binding(loaded)
+            spec=validate_bound_spec(json.loads(self.plans.registry._raw)['tools']['local_cpu']['definition']['spec'],binding)
+            modules=json.loads(self.plans.registry._raw)['tools']['local_cpu']['definition']['modules']
+            from .hybrid_goals import digest
+            if digest(modules)!=binding['modules_sha256']:raise Conflict('original approved CPU module pins changed')
+            binding.update({key:loaded[key] for key in ('proposal_hash','approval_hash','config_hash','scope_hash')})
+            with self._lock:
+                if len(self._local_cpu_grants)>=32:raise Conflict('finite configured CPU grants exceeded')
+                key='local_cpu_grant_'+uuid.uuid4().hex;binding['grant_id']=key
+                grant=LocalCpuGrant(key,canonical(binding))
+                self._local_cpu_grants[id(grant)]={'grant':grant,'bundle':bundle,'token':token,
+                    'observation':observation,'attempt':None,'spec_raw':canonical(spec),'modules_raw':canonical(modules)}
+                return grant
+
+    def _issued_local_cpu_grant(self,grant,bundle,token,observation):
+        self._actual();row=self._local_cpu_grants.get(id(grant))
+        if (type(grant) is not LocalCpuGrant or row is None or row['grant'] is not grant or
+                any(row[key] is not value for key,value in
+                    (('bundle',bundle),('token',token),('observation',observation)))):
+            raise PermissionError('same-original-plan configured CPU grant required')
+        return row
+
+    def _fresh_local_cpu(self,loaded,attempt):
+        grant=attempt['local_cpu_grant']
+        row=self._issued_local_cpu_grant(grant,attempt['bundle'],attempt['token'],attempt['observation'])
+        expected=self._binding(loaded)
+        expected.update(grant_id=grant.id,**{key:loaded[key] for key in
+                                         ('proposal_hash','approval_hash','config_hash','scope_hash')})
+        if row['attempt'] is not attempt or canonical(expected)!=grant.raw:
+            raise Conflict('current original configurable CPU approval differs')
+        if attempt['source'] is not None:
+            with self.sources._lock:self.sources._physical(self._original_source(attempt))
+
+    def _original_source(self,attempt):
+        from .hybrid_local_cpu_source import LocalCpuSourceOwner
+        if type(self.sources) is not LocalCpuSourceOwner:
+            raise PermissionError('exact original configured CPU source owner required')
+        self.sources._actual()
+        source=attempt['source']
+        row=(self.sources._issued(source) if source is not None else
+             self.sources._attempts.get(id(attempt['claim'])))
+        if row is None:return None
+        if (row['claim'] is not attempt['claim'] or row['membership'] is not self.membership or
+                row['scenario']!='runtime.local_cpu' or
+                (row['runtime'] is not attempt and not
+                 (source is None and row['runtime'] is None and not row['launch_entered']))):
+            raise PermissionError('same original configured CPU source/claim required before cleanup')
+        return row
+
+    def check_guard(self,db,guard):
+        self._issued(guard.attempt['lease'])
+        return super().check_guard(db,guard)
+
+    def _terminal_scope(self):return 'ORIGINAL_CONFIGURED_CPU_SERVICE'
+
+    def _stop_original_participant(self,lease):
+        attempt=self._issued(lease)
+        with self.pool._lock,self._lock,self.sources._lock:
+            retained=self._original_source(attempt)
+            if retained is not None:self.sources._cleanup_attempt(retained)
+            if attempt['spawn_entered'] and attempt['producer_identity'] is None:
+                raise Conflict('original service handoff UNKNOWN; no adoption/refund')
+
+    def _terminal_extra(self,attempt):
+        row=self._original_source(attempt)
+        return {'managed_service_proof':None if row is None else row.get('managed_terminal'),
+                'configured_local_result':None if attempt.get('local_result_raw') is None else
+                    json.loads(attempt['local_result_raw']),
+                'local_cpu_release_attempted':attempt['release_entered'],
+                'disk_enforcement':'PARTIAL_NO_HARD_QUOTA'}
+
+    def _check_terminal(self,attempt):
+        super()._check_terminal(attempt)
+        cached=None if attempt.get('local_result_raw') is None else json.loads(attempt['local_result_raw'])
+        if attempt['terminal']['configured_local_result']!=cached:
+            raise Conflict('original configured CPU cached result differs from terminal')
+        row=self._original_source(attempt)
+        if row is not None:
+            if row['status']!='CLOSED' or any(fd is not None for fd in row['fds'].values()):
+                raise Conflict('original configured CPU partial source closure required')
+            if attempt['spawn_entered'] and row.get('managed_terminal') is None:
+                raise Conflict('original full managed service terminal proof required')
+            if attempt['terminal']['managed_service_proof']!=row.get('managed_terminal'):
+                raise Conflict('original configured CPU managed proof changed')
+
+    def start(self,lease):
+        attempt=self._issued(lease)
+        if attempt.get('source_stop_latched') or attempt.get('physical_safety_freeze') or self._safety_freeze:
+            raise Conflict('original configured CPU STOP forbids dispatch')
+        return super().start(lease)
+
+    def poll(self,lease,*,seal=False):
+        value=super().poll(lease,seal=seal)
+        value.update(fixed_cpu_scope_only=False,configured_local_cpu_only=True)
+        return value
+
+    def collect_local_result(self,lease):
+        import hashlib
+        import os
+        attempt=self._issued(lease);row=self._original_source(attempt)
+        with self.sources._lock:
+            if attempt.get('local_result_raw') is not None:
+                return json.loads(attempt['local_result_raw'])
+            self.sources.poll(attempt['source'])
+            closed=row['task_closed']
+            if closed is None or not attempt['release_entered'] or not closed['stopped']['release_attempted']:
+                raise Conflict('original configured task terminal after G required')
+            if not any(item['pid']==closed['task']['pid'] and item['status']==0
+                       for item in closed['stopped']['reaped']):
+                raise Conflict('original configured task did not exit successfully')
+            output={}
+            for name,key in (('stdout','task_read'),('stderr','task_error_read')):
+                raw=os.pread(row['fds'][key],65537,0)
+                if len(raw)>65536:raise Conflict('bounded original task output required')
+                output[name]={'text':raw.decode(),'sha256':'sha256:'+hashlib.sha256(raw).hexdigest()}
+            from .hybrid_local_cpu_profile import evaluate_output
+            spec=self.sources._runtime_spec(row)
+            value={'lease_id':lease.id,'source_id':attempt['source'].id,
+                    'task':closed['task'],'outputs':output,
+                    'approved_spec_sha256':attempt['origin']['local_cpu']['spec_sha256'],
+                    'approved_acceptance':spec.get('acceptance'),
+                    'machine_acceptance':evaluate_output(spec,output),
+                    'independent_review_status':'NOT_PROVEN','condition_evidence':False}
+            # Reserve room inside unchanged Budget/terminal envelopes for the
+            # manager receipt and original references. UTF-8 byte bounds alone
+            # do not bound JSON escaping. A rejected result NEVER enters cache.
+            from .hybrid_goals import check_bytes
+            from .hybrid_protocol import ProtocolError
+            try:check_bytes(value,128*1024)
+            except ProtocolError as exc:
+                raise Conflict('configured CPU result exceeds canonical bound; result unavailable') from exc
+            attempt['local_result_raw']=canonical(value)
+            return json.loads(attempt['local_result_raw'])
+
+    def run_local_cpu(self,lease):
+        """Original configured task/result/STOP; machine FAIL never completes Goal."""
+        import time
+        attempt=self._issued(lease)
+        if attempt['terminal'] is not None:
+            self.stop_to_terminal(lease)
+            return self.collect_local_result(lease)
+        try:
+            self.start(lease)
+            end=time.monotonic()+self.sources._runtime_spec(self._original_source(attempt))['seconds']+2
+            while time.monotonic()<end:
+                self.poll(lease)
+                row=self._original_source(attempt)
+                if row['task_closed'] is not None:return self.collect_local_result(lease)
+                time.sleep(.01)
+            raise Conflict('finite configured CPU result deadline exceeded')
+        finally:self.stop_to_terminal(lease)

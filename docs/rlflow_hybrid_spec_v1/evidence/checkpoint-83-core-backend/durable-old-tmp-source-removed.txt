@@ -1,0 +1,7 @@
+{
+  "chunk_id": "6242f9",
+  "wall_time_seconds": 0.00000763,
+  "exit_code": 1,
+  "original_token_count": 157,
+  "output": "Traceback (most recent call last):\n  File \"<string>\", line 4, in <module>\n  File \"/home/mint/rl_dev/rlflow_standalone/rlflow/store.py\", line 230, in attach_existing\n    store.root = Path(root).resolve(strict=True)\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/lib/python3.12/pathlib.py\", line 1242, in resolve\n    s = self._flavour.realpath(self, strict=strict)\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<frozen posixpath>\", line 432, in realpath\n  File \"<frozen posixpath>\", line 476, in _joinrealpath\nFileNotFoundError: [Errno 2] No such file or directory: '/tmp/pytest-of-mint/pytest-726'\n"
+}

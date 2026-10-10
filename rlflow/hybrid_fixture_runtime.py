@@ -100,7 +100,8 @@ class FixtureRuntimeOwner:
     """Protected startup profile: exact fixed local CPU protocol participant."""
     def __init__(self, pool, membership, plans):
         from .hybrid_native_diagnostic import NativeDiagnosticOwner
-        if type(self) not in (FixtureRuntimeOwner, NativeDiagnosticOwner):
+        from .hybrid_local_cpu_runtime import LocalCpuRunnerOwner
+        if type(self) not in (FixtureRuntimeOwner, NativeDiagnosticOwner, LocalCpuRunnerOwner):
             raise TypeError('closed protected runtime owner type required')
         if type(pool) is not HostPoolOwner or type(plans) is not WorkingPlanService:
             raise TypeError('fixed original Pool/WorkingPlan owners required')
@@ -123,19 +124,25 @@ class FixtureRuntimeOwner:
             self._safety_freeze = False
             self._cpu_grants = {}; self._cpu_results = {}
             self._diagnostic_grants = {}
+            self._local_cpu_grants = {}
             self._engineering_grants = {}; self._engineering_results = {}
             self._candidate_materials = {}
             self._execution_units = {}
             self._start_materials = None
             self._engineering_units = self._execution_units  # Original SDK compatibility, same registry.
             diagnostic = type(self) is NativeDiagnosticOwner
-            self.program = Path(__file__).with_name('hybrid_native_diagnostic_gate.py' if diagnostic else 'hybrid_runtime_fixture.py')
+            local_cpu = type(self) is LocalCpuRunnerOwner
+            self.program = Path(__file__).with_name('hybrid_local_runner_service.py' if local_cpu else
+                'hybrid_native_diagnostic_gate.py' if diagnostic else 'hybrid_runtime_fixture.py')
             # Exact protected program, not any caller command or plan rewriting.
             raw = _read_bounded(self.program, 16384)
             self.program_raw = raw; self.program_hash = 'sha256:' + hashlib.sha256(raw).hexdigest()
             self._cpu_evaluator = Path(__file__).with_name('hybrid_cpu_trial.py')
             self._cpu_evaluator_hash = 'sha256:' + hashlib.sha256(_read_bounded(self._cpu_evaluator, 16384)).hexdigest()
-            if diagnostic:
+            if local_cpu:
+                from .hybrid_local_cpu_source import LocalCpuSourceOwner
+                self.sources = LocalCpuSourceOwner(pool)
+            elif diagnostic:
                 from .hybrid_native_diagnostic_source import NativeDiagnosticSourceOwner
                 self.sources = NativeDiagnosticSourceOwner(pool)
             else:
@@ -276,19 +283,23 @@ class FixtureRuntimeOwner:
             raise PermissionError('actual original same-plan CPU trial grant required')
         return row
 
-    def register(self, bundle, token, observation, claim, *, request_key, scenario='complete', cpu_grant=None,engineering_grant=None,diagnostic_grant=None):
+    def register(self, bundle, token, observation, claim, *, request_key, scenario='complete', cpu_grant=None,engineering_grant=None,diagnostic_grant=None,local_cpu_grant=None):
         """REGISTER/CANCEL compete on the ONE original ReservationHEAD CAS."""
         from .hybrid_protocol import ID, validate_schema
         from .hybrid_runtime_fixture import SCENARIOS
         from .hybrid_native_diagnostic import NativeDiagnosticOwner
+        from .hybrid_local_cpu_runtime import LocalCpuRunnerOwner
         self._actual(); self.controller._refuse_nested_writer()
         if self._safety_freeze: raise Conflict('fixture runtime permanently frozen for physical cleanup')
         self.controller._issued(token); original_claim = self.pool._issued_claim(claim)
         validate_schema(ID, request_key)
         diagnostic = type(self) is NativeDiagnosticOwner
-        if (type(scenario) is not str or scenario not in SCENARIOS|{'engineering_patch','native_diagnostic'} or
+        local = type(self) is LocalCpuRunnerOwner
+        if (type(scenario) is not str or scenario not in SCENARIOS|{'engineering_patch','native_diagnostic','local_cpu'} or
+                local != (scenario=='local_cpu') or not local and local_cpu_grant is not None or
                 diagnostic != (scenario == 'native_diagnostic') or not diagnostic and diagnostic_grant is not None):
             raise Conflict('closed runtime profile/owner required')
+        local_row=self._issued_local_cpu_grant(local_cpu_grant,bundle,token,observation) if local else None
         diagnostic_row = self._issued_diagnostic_grant(diagnostic_grant,bundle,token,observation) if diagnostic else None
         cpu_row = self._issued_cpu_grant(cpu_grant, bundle, token, observation) if scenario == 'cpu_trial' else None
         if scenario != 'cpu_trial' and cpu_grant is not None:
@@ -299,7 +310,7 @@ class FixtureRuntimeOwner:
             previous = self._attempts.get(request_key)
             if previous is not None:
                 if any(previous[name] is not value for name, value in
-                       (('bundle', bundle), ('token', token), ('observation', observation), ('claim', claim))) or previous['scenario'] != scenario or previous.get('cpu_grant') is not cpu_grant or previous.get('engineering_grant') is not engineering_grant or previous.get('diagnostic_grant') is not diagnostic_grant:
+                       (('bundle', bundle), ('token', token), ('observation', observation), ('claim', claim))) or previous['scenario'] != scenario or previous.get('cpu_grant') is not cpu_grant or previous.get('engineering_grant') is not engineering_grant or previous.get('diagnostic_grant') is not diagnostic_grant or previous.get('local_cpu_grant') is not local_cpu_grant:
                     raise Conflict('original fixture runtime request key reused')
                 attempt = previous
             else:
@@ -307,6 +318,7 @@ class FixtureRuntimeOwner:
                     raise Conflict('original CPU trial grant already belongs to another attempt')
                 if engineering_row is not None and engineering_row['attempt'] is not None:raise Conflict('original engineering grant already used')
                 if diagnostic_row is not None and diagnostic_row['attempt'] is not None:raise Conflict('original diagnostic grant already used')
+                if local_row is not None and local_row['attempt'] is not None:raise Conflict('original configured CPU grant already used')
                 if len(self._attempts) >= 32: raise Conflict('finite original fixture runtime attempts exceeded')
                 if original_claim['payload']['member_id'] != self.membership.id:
                     raise PermissionError('fixture runtime original Pool claim membership differs')
@@ -331,17 +343,22 @@ class FixtureRuntimeOwner:
                 if diagnostic_row is not None:
                     from .hybrid_native_diagnostic import KIND, AUTHORIZATION
                     origin.update(kind=KIND,authorization=AUTHORIZATION,native_diagnostic=json.loads(diagnostic_grant.raw))
+                if local_row is not None:
+                    from .hybrid_local_cpu_profile import KIND,AUTHORIZATION
+                    origin.update(kind=KIND,authorization=AUTHORIZATION,local_cpu=json.loads(local_cpu_grant.raw))
                 lease = FixtureExecutionLease(origin['lease_id'], canonical(origin))
                 attempt = {'lease': lease, 'origin': origin, 'bundle': bundle, 'token': token,
                     'observation': observation, 'claim': claim, 'scenario': scenario,
                     'intent': intent, 'ready': ready, 'claim_value': original_claim, 'entries': {}, 'source': None,
                     'spawn_entered': False, 'release_entered': False, 'started_ack': None,
                     'producer_identity': None, 'terminal': None, 'spawn_monotonic': None,
-                    'cpu_grant': cpu_grant,'engineering_grant':engineering_grant,'diagnostic_grant':diagnostic_grant}
+                    'cpu_grant': cpu_grant,'engineering_grant':engineering_grant,'diagnostic_grant':diagnostic_grant,
+                    'local_cpu_grant':local_cpu_grant}
                 self._attempts[request_key] = attempt; self._leases[id(lease)] = attempt
                 if cpu_row is not None: cpu_row['attempt'] = attempt
                 if engineering_row is not None:engineering_row['attempt']=attempt
                 if diagnostic_row is not None:diagnostic_row['attempt']=attempt
+                if local_row is not None:local_row['attempt']=attempt
             # Strong original attempt retained BEFORE all cross-database writes.
         # Runtime owner lock must NOT precede Store/Controller/Workspace locks.
         with self.pool._lock:
@@ -390,6 +407,7 @@ class FixtureRuntimeOwner:
             raise Conflict('fixture runtime current original Workspace lineage changed')
         loaded = self.budget._load(db, fact['request']['goal_ref'], read)
         if attempt.get('diagnostic_grant') is not None:self._fresh_diagnostic(loaded,attempt)
+        if attempt.get('local_cpu_grant') is not None:self._fresh_local_cpu(loaded,attempt)
         sources = source_binding(loaded)
         if attempt['cpu_grant'] is not None:
             row = self._issued_cpu_grant(attempt['cpu_grant'], attempt['bundle'], attempt['token'], attempt['observation'])
@@ -594,6 +612,9 @@ class FixtureRuntimeOwner:
                 result=self._engineering_results.get(id(attempt['lease']))
                 runtime.update(engineering_release_attempted=attempt['release_entered'],
                     engineering_patch_result=json.loads(result.raw) if phase=='FIXTURE_SCOPE_STOPPED' and result is not None else None)
+            if attempt.get('local_cpu_grant') is not None:
+                runtime['local_cpu_release_attempted']=attempt['release_entered']
+                runtime['local_cpu_terminal_proof']=attempt['terminal'] if phase=='FIXTURE_SCOPE_STOPPED' else None
             for name in ('start_command', 'stop_command'):
                 if prior is not None and name in prior: runtime[name] = prior[name]
             if command is not None:

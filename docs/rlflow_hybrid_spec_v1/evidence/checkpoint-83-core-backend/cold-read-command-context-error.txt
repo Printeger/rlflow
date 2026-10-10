@@ -1,0 +1,7 @@
+{
+  "chunk_id": "812437",
+  "wall_time_seconds": 0.00000694,
+  "exit_code": 1,
+  "original_token_count": 38,
+  "output": "Traceback (most recent call last):\n  File \"<string>\", line 1, in <module>\nAttributeError: '_GeneratorContextManager' object has no attribute 'execute'\n"
+}

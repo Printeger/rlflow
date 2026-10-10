@@ -1,0 +1,25 @@
+Running as unit: rlflow-local-2d022ff1798e49abb02b6c1c17b5150d.service; invocation ID: dd439e5754574504a250c64e26f73870
+Traceback (most recent call last):
+  File "<string>", line 18, in <module>
+  File "/home/mint/rl_dev/rlflow_standalone/rlflow/hybrid_local_runner_service.py", line 86, in serve
+    ready = keeper.prepare_gate(config['code'], config['work'],
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/mint/rl_dev/rlflow_standalone/rlflow/hybrid_local_runner_keeper.py", line 99, in prepare_gate
+    receipt = json.loads(raw)
+              ^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/json/__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/json/decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/json/decoder.py", line 355, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+Finished with result: exit-code
+Main processes terminated with: code=exited/status=1
+Service runtime: 19ms
+CPU time consumed: 19ms
+Memory peak: 1.5M
+Memory swap peak: 0B
+

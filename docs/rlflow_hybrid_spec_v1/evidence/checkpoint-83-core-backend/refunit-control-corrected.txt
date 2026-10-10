@@ -1,0 +1,8 @@
+{
+  "session_id": 92988,
+  "chunk_id": "0be3fc",
+  "exit_code": 0,
+  "command": "PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q 'tests/test_hybrid_local_cpu_runtime.py::test_actual_bound_manager_stop_survives_other_participant_failure[control]'",
+  "output": ".                                                                        [100%]\n1 passed in 15.10s\n",
+  "qualification": "Original manager JobRemoved(done), failed/timeout, MainPID0, no managed processes, original keeper kernel terminal, transport reaped, parent FD closed. Lost report remains UNKNOWN, occupied1; safety retirement does NOT refund or FREE."
+}

@@ -1,0 +1,124 @@
+Checkpoint83 ORIGINAL CORE/SOURCE WIP, NOT completed/autonomous acceptance
+Baseline HEAD a4b69d29bbaa3cb532e90844c397707a51a9aad3, functional82 f54f1fb.
+Original Goal ACTIVE. No product models/GPU/instinctRL writes/production/push.
+Resource proposal unanswered, no approval inferred; unrelated USER lock untouched.
+
+DELIVERED BEHAVIOR THIS CONTINUATION
+New exact LocalCpuRunnerOwner/LocalCpuSourceOwner only, original opaque grant
+registry and same-original plan/controller/workspace witnesses. Local registration
+uses existing original budget writer/CAS and Pool linked fact, no DTO grant or
+old fixed PI/add/native authority upgrade. Parent config/task output/input source
+FDs are original private sources, captured strongly before validation. Output
+dev/inode/uid supplied in hashed service config and independently checked before
+trusted service gate. Input FDs remain owned through independent STOP cleanup.
+Original zero-handoff scope stops/settles, 0 wall/0 experiment starts and FREE;
+failed original input FD close retains only that original handle, occupied1 and
+unsettled exposure until same-owner retry. No new worker is claimed from these
+Core tests: start and source manager/G backend remain explicitly DENIED.
+
+NECESSARY TEST INVOCATIONS / TERMINAL RESULTS (chronological, not one full green)
+All pytest prefix: PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q
+bf2ada tests/test_hybrid_local_runner_service.py::test_configured_service_distinguishes_transport_keeper_task_and_closes[preallocated]
+  exit0,1passed0.08s. Actual service, preallocated source identities checked.
+  Raw command/protocol/manager snapshots/stderr copied as newline-normalized text:
+  checkpoint-83-service/preallocated-* ; original pytest707 directory preserved.
+  Same Invocation/keeper/task/setsid descendant task-empty and FD closure, still
+  manager active(exited) before test-only stop; NOT Core full managed FREE.
+dde5bf original session33847 -> 408d75 exit0,1passed9.31s:
+  tests/test_hybrid_local_cpu_runtime.py (then one actual Core test only).
+  Continued that original running process, no duplicate/restart.
+30cad5 original session94692 -> 133831 exit0,4passed1warning51.31s:
+  tests/test_hybrid_local_cpu_runtime.py (then two actual Core tests)
+  tests/test_hybrid_fixture_runtime.py::test_real_gated_child_ack_stop_reap_and_slot_reuse
+  tests/test_hybrid_native_diagnostic.py::test_original_native_inflight_stop_sources_fork_and_readback
+  Required shared constructor/type/source-hook regression; real original gated
+  ACK/reap/FREE and native in-flight STOP/fork/coldread, not rerun82/fullsuite.
+  Existing DeprecationWarning: multi-threaded process fork may deadlock.
+6e5e6f original session57469 -> 85524b exit1,1failed4passed54.34s:
+  tests/test_hybrid_local_cpu_runtime.py after new approval/scope repairs.
+  Passed nohandoff/FDClose-retention, source marker/config laundering denial,
+  two-original-scopes wrong runtime/partial wrong claim before any FD cleanup.
+  Failed new test_registration_allocation_registry_drift_cannot_freeze_unapproved_spec:
+    hybrid_fixture_runtime.py:368 -> changed_registry tests:96
+    owner.plans.registry._raw=json.dumps(config).encode()
+    dataclasses.FrozenInstanceError: cannot assign to field '_raw'
+  Full raw traceback/fixture stdout in original tool transcript85524b; above is
+  an explicit diagnostic excerpt, not a byte seal/full captured output copy.
+  Root cause test-only: Registry is frozen. Explicit object.__setattr__ injection
+  and restoration now reach intended after-REGISTER/before-allocation fault.
+  Do not reclassify this failed run as green or rerun its unchanged passed cases.
+
+INDEPENDENT HIGH READONLY / ACTUAL REQUIRED REPAIRS
+Existing original-authorized finite_app_review_63 only, no writes/tests/product
+Reviewer claim. Confirmed approval→source closure MUST: allocation reread Registry
+and mutable local_allocated=False could skip config/input hash gates. Repair:
+original grant retains bounded canonical spec after spec/code/input hash proof;
+allocation checks current Registry against immutable grant but builds from frozen
+spec; every physical observation requires issued binding/marker consistency,
+actual config code/limits/seconds and original held input bytes/manifest against
+same original grant. cap own hash alone is never enough. Source remains partial
+and no handoff until all manager/source protocol acceptance is implemented.
+Confirmed STOP scope MUST: override omitted same original runtime check. Repair:
+before any cleanup exact SourceOwner issuer, claim/membership/scenario/runtime;
+partial only no-source/no-launch original allocation, terminal independently
+requires retained row CLOSED and every source FD closed. Copied partial owner
+also rejected before cleanup (late incremental finding, not hidden).
+Static review closed approval/config marker and scope/terminal repairs; exact
+partial copied-owner final review and affected test still in progress below.
+
+CURRENT ORIGINAL RUNNING CHECK / DO NOT DUPLICATE
+5227ce session29027, selected original test suite ONLY:
+  test_registration_allocation_registry_drift_cannot_freeze_unapproved_spec
+  test_stop_rejects_other_original_scope_before_any_source_cleanup (new copy check)
+  test_original_configured_cpu_grant_budget_pool_source_and_no_handoff_stop
+  test_original_input_close_failure_retained_without_free_or_duplicate_source
+Source/runtime/test inputs frozen during this invocation. Necessary last two
+affected by original SourceOwner guard; unchanged marker case not repeated.
+Terminal result will be appended after actual process ends, not assumed now.
+
+TERMINAL UPDATE (supersedes running status immediately above)
+Original session29027 -> 487f51 exit0,4passed44.80s, no restart/duplicate.
+Actual after-REGISTER Registry object.__setattr__ fault reaches approved spec
+gate: rejected before any source allocation, HANDOFF/G false; original cleanup.
+Both original scopes wrong runtime/partial wrong claim/copied partial owner
+denied before FD cleanup; other original scope remains occupied and unchanged.
+Necessary affected nohandoff/partial-close STOP cases passed with final helper.
+Independent High final readonly: copied-source MUST statically closed, no
+remaining confirmed MUST in reviewed delta. No tests/writes by Reviewer, no
+product independent model Reviewer claim or backend execution qualification.
+Final py_compile affected modules/tests fc1a84 exit0; whitespace check024c5c exit0.
+USER lock SHA still becc7e2a36dfcad4ffe934b5ff2f0f68187611d6c0641bd63d81367651cfbf09.
+No live tests, no stage/commit. New Core/source dispatch remains DENIED.
+
+Final affected source/test SHA256 (097073, after final tests; no edits while running)
+hybrid_local_cpu_runtime.py 2334fea51c23a328f26dfb1b527119f98e7edddcc75cbb17cb2aaeabc3cec7c9
+hybrid_local_cpu_source.py c295cd1e0e60fa76e3a77188fcb591235f33b6adb5841e6debdd0faf831da71b
+hybrid_local_cpu_profile.py 34ed04f34f827845eed982bccfd16b6a24596de6ce823056e97c17d9d9d846a0
+hybrid_usage_source.py bad4cfe4d7cddab5f2a6e4a2c046f2eab0fd543e92bc5528ba9a105c998bbec4
+hybrid_fixture_runtime.py d370d4e0cbe21e2c498d7f60797698e5d64368ab02837daddb8efdf6fdfc5b29
+hybrid_host_pool.py 38e438c8ca88566286c94317bebdef3536bb290407bb9b0216d98e87f7125afd
+isolated_local_cpu.py 1c6c890e8b0ae23636d23f45cc4762b4fa2f75272f8d32f17bdd02541ad48df0
+hybrid_local_runner_service.py 239885c447e77ec0660b757d6d98261b76f9f92d37561389d5360e65f7c518ad
+test_hybrid_local_cpu_runtime.py 013762e07feae402d794801ced30e0e36ab7cefa7e1c4ce40e71e4f73ab81454
+test_hybrid_local_runner_service.py f72ad1d643e102194847da6db745e359e9f5451896faae3e32fbed842c4831b1
+
+REMAINING SLICE ACCEPTANCE / NEXT
+No CHECKPOINT83 commit or executable local Core dispatch delivered yet. Enable
+only when same original approval/budget/Pool HANDOFF -> actual trusted service
+ready/keeper pidfd/task/Invocation -> final current STOP/authority/TTL fence ->
+one G -> trustworthy candidate result and independent configurable acceptance ->
+original task receipts/reap/FD closure + original keeper kernel terminal + same
+manager Invocation STOP completion and all transport/manager source handles ->
+conservative actual budget settlement/FREE/cold no-adoption recovery are proved.
+Manager client Popen is not keeper/task identity or its kernel usage. Need original
+manager JobRemoved(done) for exact returned StopUnit job; subscribe before effect,
+lost launch return/job/protocol is UNKNOWN, never blind reissue/refund/adopt.
+Official systemd255 reference verified readonly during this continuation:
+https://raw.githubusercontent.com/systemd/systemd/v255/man/org.freedesktop.systemd1.xml
+https://raw.githubusercontent.com/systemd/systemd/v255/src/systemd/sd-bus.h
+https://raw.githubusercontent.com/systemd/systemd/v255/man/sd_bus_add_match.xml
+Freedesktop man URL fetch403/inaccessible; switched to exact primary v255 source,
+not repeated same unavailable URL. No new manager connection/effect from research.
+Strict aggregate disk quota, real model Engineer/independent product Reviewer/
+ConditionEvidence/autonomous continuation and long recovery still NOT PROVEN.
+Fixed PI/add or synthetic confirmation does not meet real autonomous acceptance.
