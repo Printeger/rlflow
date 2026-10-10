@@ -1,5 +1,7 @@
 # 开发决策记录
 
+2026-10-11 CPU 同 Budget handoff 只承认原 normal shutdown 后的强留退休 tuple（原 root/source/Workspace 完整回执 digest），不相信可变 retired 布尔值或 Safety/UNKNOWN 退休。child 在原预算绑定安装点强留，lost constructor return 重取同 child；没有清指针窗口。close CAS 重链须先核 current token，再于同读快照证明 fact/event 双不存在及原 Workspace 前驱完全未变；已有 COMMIT 保留 exact 请求，部分来源不一致强拒。累计 CPU reservation 收取完整 task_seconds+10，STOP 不退款、不重置 A 窗口。测试合成 model publisher 与真实 CPU 执行证据严格分开，不能把 parser 演示算成首真实任务。
+
 2026-10-11 CPU派生分离 DATA 与权限：纯 from_engineer 只重算格式/候选/规则，不能认证 parent；原 Owner 必须独立验证 Source 原结果与持久 Budget/event/history、当前批准、实际 Pool FREE/完整STOP后才冻结 NativeCpuInput，消费须同 owner/lease/cap 强身份并重核。No-handoff SETTLED 不能满足 known usage/result；材料不携带执行权，原 CPU 单工具批准与 live constructor 不放宽。后续受保护 handoff 必须在同一 Budget 原绑定中核全部前Owner责任已闭，不能清指针重绑或凭JSON进入CPU。窗口与当前批准在最后材料序列化后重采样，后续 dispatch 仍须独立 Controller 最后效果门。
 
 2026-10-11 A envelope 已允许 JSON 指标验收，而候选 verification_spec 原先强制固定 stdout。复用现有闭合 validate_acceptance，把同一外部批准规则冻结进 spec，不新增方法、不改阈值、不相信模型自选测试。acceptance/stdout 二选一，原 stdout 默认路径保持；真实执行由原受管 CPU runner 完成，机器FAIL不因任务exit0而变PASS。其余同workflow接线采用顺序受保护Owner handoff，不临时清 Budget._fixture_runtime，不重绑Store服务，不用旧已结算reservation/WorkingPlan。父原event/完整history links、same live Goal/epoch/approval/envelope/known usage/result必须先成立，普通CPU/V1不升级。

@@ -98,7 +98,7 @@ class _FixtureRuntimeGuard:
 
 class FixtureRuntimeOwner:
     """Protected startup profile: exact fixed local CPU protocol participant."""
-    def __init__(self, pool, membership, plans):
+    def __init__(self, pool, membership, plans,*,_handoff=None):
         from .hybrid_native_diagnostic import NativeDiagnosticOwner
         from .hybrid_local_cpu_runtime import LocalCpuRunnerOwner
         from .hybrid_native_model_runtime import NativeModelOwner
@@ -107,16 +107,38 @@ class FixtureRuntimeOwner:
         if type(pool) is not HostPoolOwner or type(plans) is not WorkingPlanService:
             raise TypeError('fixed original Pool/WorkingPlan owners required')
         with pool._lock, _registry:
+            handoff=None
+            if _handoff is not None:
+                if type(self) is not LocalCpuRunnerOwner or type(_handoff) is not tuple or len(_handoff)!=2:
+                    raise PermissionError('closed original workflow CPU handoff required')
+                prior,cap=_handoff
+                if type(prior) is not NativeModelOwner:
+                    raise PermissionError('original retired model owner required')
+                handoff=prior._native_cpu_handoffs.get(id(cap))
+                root=prior._native_cpu_handoff_roots.get(id(cap))
+                retirement=prior._native_cpu_retirements.get(id(cap))
+                if (handoff is None or handoff['cap'] is not cap or handoff['raw']!=cap.raw or
+                        root is None or root[0] is not handoff or root[2] is not cap or
+                        root[6] is not prior or
+                        retirement is None or retirement[0] is not root or retirement[1] is not prior.sources or
+                        retirement[2]!=canonical({json.loads(p['observation'].raw)['workspace_id']:digest(json.loads(p['receipt']))
+                            for p in handoff['closes'].values() if p['receipt'] is not None}) or
+                        root[3:6]!=(handoff['raw'],handoff['material'],handoff['parent']) or
+                        not handoff['retired'] or handoff['child'] is not None or prior._live or
+                        prior.sources._live or id(prior) in _owners or prior.pool is not pool or
+                        prior.membership is not membership or prior.plans is not plans or
+                        plans.workspace.budget._fixture_runtime is not prior):
+                    raise PermissionError('original fully retired same-Budget CPU handoff required')
             registered = pool._issued_member(membership)
             if (registered['payload']['project_id'], registered['payload']['data_mode'], registered['payload']['store_epoch'],
                     registered['payload']['store_root']) != (plans.workspace.project_id,
                     plans.workspace.data_mode, plans.workspace.store_epoch, str(plans.store.root)):
                 raise Conflict('fixture runtime must use original same-application project membership')
             if (plans.workspace.data_mode!='fixture' and not
-                    (type(self) is NativeModelOwner and plans.workspace.data_mode=='live') or
+                    ((type(self) is NativeModelOwner or handoff is not None) and plans.workspace.data_mode=='live') or
                     plans.controller.owner['process'] != pool.process):
                 raise Conflict('fixed original fixture runtime process and scope required')
-            if len(_owners) >= 16 or getattr(plans.workspace.budget, '_fixture_runtime', None) is not None:
+            if len(_owners) >= 16 or handoff is None and getattr(plans.workspace.budget, '_fixture_runtime', None) is not None:
                 raise Conflict('finite fixed fixture runtime owner cannot be rebound')
             pool._physical(); self.pool, self.membership, self.plans = pool, membership, plans
             self.workspace = plans.workspace; self.budget = self.workspace.budget
@@ -133,6 +155,9 @@ class FixtureRuntimeOwner:
             self._candidate_materials = {}
             self._execution_units = {}
             self._start_materials = None
+            self._workflow_handoff=handoff
+            self._workflow_handoff_parent=None if handoff is None else (prior,cap)
+            self._workflow_handoff_raw=None if handoff is None else (root[4],root[5])
             self._engineering_units = self._execution_units  # Original SDK compatibility, same registry.
             diagnostic = type(self) is NativeDiagnosticOwner
             local_cpu = type(self) is LocalCpuRunnerOwner
@@ -157,6 +182,7 @@ class FixtureRuntimeOwner:
             else:
                 self.sources = FixtureUsageSourceOwner(pool)
             self.budget._fixture_runtime = self; _owners[id(self)] = self
+            if handoff is not None:handoff['child']=self
 
     def _actual(self):
         if (not self._live or os.getpid() != self.process['pid'] or identity(os.getpid()) != self.process or

@@ -1,5 +1,7 @@
 # 阻塞与证据缺口
 
+2026-10-11 同 A 原 Budget 的 Engineer→CPU 执行接线：受保护顺序 handoff 先核完整 SETTLED/FREE/FD 退休、原 Workspace close 回执，再原子安装唯一 CPU Owner，不清 Budget 指针、不复用旧 reservation/WorkingPlan。新 CPU workflow binding 持久原 parent/modules，cold replay 重算同批准 envelope；唯一 CPU stage 保守累计 task_seconds+10 且重核原窗口。显式合成模型父的实际 managed CPU 检查 PASS、完整 STOP/SETTLED/Pool0/audit=replay，四种 lost-return/no-COMMIT 故障原26166终态4pass/1warning322.47s；原预算/旧CPU/native兼容回归24367终态42pass/1warning55.97s。最后不可变退休凭据门原1388终态2pass/3deselected/1warning100.26s，含Safety退休标记不能伪造handoff及normal shutdown丢返回的实际CPU正例，独立窄审两项 MUST 已关闭。非真实模型/产品独立Review/首任务验收；下一自动派生新reservation/Workspace/plan/claim的执行桥，再不同Reviewer父接线→条件CAS→一次需求接续。实际小额A未批准不调用，GPU/B/C/instinctRL HOLD不变；本地开发无权限阻塞，Goal ACTIVE。证据 evidence/a-workflow-cpu-runtime-20261011.txt。
+
 2026-10-11 原 Engineer→同批准 CPU 冻结输入入口已本地实现；真实已结算模型父正向路径尚未实证，实际无handoff terminal正确拒绝。直接剩余开发缺口：原同Budget顺序Owner handoff、新CPU reservation/Workspace/plan/grant、唯一CPUstage/累计时间、live managed结果、不同Evaluator原会话/Review、条件CAS与一次自主接续。不是恢复扩展，也不能用本材料代替执行权。首真实task NOT_EXECUTED；运行小额A合同未批准，只阻实际模型调用，不阻本地代码开发；GPU/B/C/instinctRL HOLD不变，无新增用户决策事项。
 
 2026-10-11 通用CPU候选规则限制已修并实际验证JSON指标PASS/FAIL+完整STOP；仍未打通同A原审批。确证剩余阻断：旧CPU profile只收单工具/零模型审批；live constructor/ledger只收Native model；Budget runtime独占且shutdown不清指针；无原Engineer parent→CPU grant/pins/新plan派生和CPUstage累计时间接线。应按受保护顺序交接和新reservation/Workspace/WorkingPlan修，不借重绑/旧fixture/仅hash资格。其他恢复后置，首真实task NOT_EXECUTED；本地无权限阻塞，实际A小额合同待批，GPU/B/C/instinctRL HOLD不变。

@@ -1,0 +1,68 @@
+A original-Budget managed candidate CPU handoff, 2026-10-11
+Base commit: 6ffa163; candidate is this evidence's containing commit.
+Scope: original Engineer parent/modules replay, unique CPU stage/time accounting,
+same-Budget owner handoff, new CPU grant/source allocation/final window guards.
+Model parent is EXPLICIT synthetic source substitution; native G intercepted.
+Only managed CPU checks execute. NOT real model/task/Reviewer qualification.
+No real auth-cache read, model billing, GPU, B/C or instinctRL execution.
+
+All commands use PYTHONPATH=. PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q.
+51845 / b9338f: tests/test_hybrid_a_workflow_cpu.py tests/test_hybrid_a_workflow_accounting.py
+exit0: 27 passed / 1 existing warning / 12.86s.
+
+11849 / c1f87d: first new CPU integration, 1 failed / 43.29s.
+Cause: original native_setup fixture prohibited all Popen, including managed CPU.
+Test guard narrowed to exact CPU service; native G still forbidden.
+90156 / 8b4b4e: integration workspace_close/owner_install + accounting,
+2 failed, 15 passed / 108.44s.
+Same pidfd failure twice prompted original task-report/stderr diagnosis:
+2-second synthetic CPU deadline expired before Core finished G admission.
+Restored original 30-second fixture spec and full 40-second reservation.
+79762 / 989045: 3 failed / 171.23s (workspace_close/owner_install/owner_shutdown).
+Actual CPU executed and correctly recorded machine FAIL with complete STOP/FREE.
+Original stderr: NameError FILES. Test checks wrongly assumed FILES global.
+Changed test to import module.source.parse_entries in original candidate workdir;
+acceptance unchanged. Failed results are not silently treated as PASS.
+
+26166 / 666924 + 618e49: tests/test_hybrid_a_workflow_cpu_runtime.py
+exit0: 4 passed / 1 existing warning / 322.47s.
+Cases workspace_close committed lost return, owner_install lost return,
+normal owner_shutdown lost return, complete_close pre-COMMIT failure followed
+by Controller renewal/CAS change. Exact original retry, no second child.
+Actual CPU filters blank lines and checks import candidate module: PASS,
+condition_evidence false, SETTLED, Pool occupied0, unique CPU repeat denied,
+Store snapshot/recover == audit == replay.
+This run imported before final immutable retirement gate; separate focused
+gate proof below is required, not assumed covered by this earlier run.
+
+1388 / 13f70c: tests/test_hybrid_a_workflow_cpu_runtime.py
+-k 'safety_retirement or owner_shutdown'
+exit0: 2 passed / 3 deselected / 1 existing warning / 100.26s.
+Final gate proof: before-close-COMMIT failure + shutdown_safety + mutable
+retired=True cannot install child or replace Budget pointer/change Store.
+Positive normal shutdown lost return still recovers unique original child,
+actual candidate CPU PASS/full STOP/SETTLED/Pool0/replay.
+
+Final compileall and git diff --check exit0. USER package-lock unchanged,
+sha256 becc7e2a36dfcad4ffe934b5ff2f0f68187611d6c0641bd63d81367651cfbf09.
+All test sessions terminal, no repeat/restart of an ongoing session.
+
+24367 / d0bbdd:
+tests/test_hybrid_budget_ledger.py tests/test_hybrid_native_model_budget.py
+tests/test_hybrid_local_cpu_runtime.py::test_original_configured_cpu_grant_budget_pool_source_and_no_handoff_stop
+tests/test_hybrid_local_cpu_runtime.py::test_actual_configured_core_task_result_managed_stop_budget_and_free
+tests/test_hybrid_native_model_runtime.py::test_original_generating_grant_registers_frozen_source_but_cannot_launch
+exit0: 42 passed / 1 existing warning / 55.97s.
+
+Independent read-only finite_app_review_63: both confirmed MUST closed.
+Normal retirement proof strong tuple and exact no-COMMIT CAS rechain checked;
+no new confirmed source MUST. Reviewer did not run tests or modify files.
+Development review is NOT product autonomous Reviewer/task acceptance.
+
+Remaining: automatic derivation/dispatch of CPU reservation/Workspace/plan/claim,
+different original Reviewer session/accounting/parent derivation, machine+Review
+condition CAS acceptance and one unmet-requirement continuation; approved real
+nonpreset task evidence and authentic usage settlement still NOT_EXECUTED.
+Only previously proposed small A runtime contract awaits user approval;
+local implementation continues. GPU/B/C/instinctRL HOLD unchanged.
+No full-suite green, installation, long-run or complete Goal claim.

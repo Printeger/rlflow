@@ -233,8 +233,10 @@ def validate_runtime(request, prior):
     if value['phase'] != current: raise Conflict('fixture runtime action/phase differs')
     if request['data_mode']!='fixture':
         from .hybrid_native_model_profile import KIND as NATIVE_KIND
-        if (request['data_mode']!='live' or value['origin']['kind']!=NATIVE_KIND or
-                value['origin']['native_model'].get('workflow',{}).get('accounting_version')!='A_REGISTRATION_CEILINGS_V1'):
+        workflow=(value['origin'].get('native_model',{}) if value['origin']['kind']==NATIVE_KIND else
+            value['origin'].get('local_cpu',{}) if value['origin']['kind']==LOCAL_KIND else {})
+        if (request['data_mode']!='live' or
+                workflow.get('workflow',{}).get('accounting_version')!='A_REGISTRATION_CEILINGS_V1'):
             raise Conflict('live runtime requires original accounted native engineering workflow')
     if current == 'REGISTER_NO_HANDOFF':
         if (prior is None or prior['status'] != 'HELD' or
@@ -327,7 +329,26 @@ def validate_original_links(value, lookup):
         from .hybrid_authority import SECTIONS as AUTHORITY
         sources=value['policy_source'];record=lookup(GOALS[0],sources['contract_key']);approval=lookup(AUTHORITY[0],sources['approval_key'])
         if record is None or approval is None:raise Conflict('configurable CPU original approval missing')
-        binding=approved_binding(record['contract']['proposal'],approval['registry_witness'],origin['program_sha256'])
+        frozen=origin['local_cpu']
+        if 'workflow' in frozen:
+            from .hybrid_a_workflow_cpu import from_engineer
+            parent=lookup(BUDGET[0],frozen['workflow']['parent']['key'])
+            if (parent is None or digest(parent)!=frozen['workflow']['parent']['hash'] or
+                    parent['request']['store_epoch']!=request['store_epoch'] or
+                    any(parent['policy_source'][k]!=sources[k] for k in
+                        ('proposal_hash','approval_hash','config_hash','scope_hash'))):
+                raise Conflict('original same-approval CPU Engineer parent missing or changed')
+            from .hybrid_budget_ledger import validate_record as budget_record,validate_links as budget_links
+            budget_record(BUDGET[0],frozen['workflow']['parent']['key'],parent)
+            budget_links(parent,lookup)
+            # Replay uses the approved module digest; it never reads current
+            # disk bytes or upgrades a historical parent into live capability.
+            pins=frozen['workflow']['modules']
+            binding,spec=from_engineer(record['contract']['proposal'],approval['registry_witness'],
+                origin['program_sha256'],parent,pins)
+        else:
+            binding=approved_binding(record['contract']['proposal'],approval['registry_witness'],origin['program_sha256'])
+            spec=approval['registry_witness']['tools']['local_cpu']['definition']['spec']
         binding.update(grant_id=origin['local_cpu']['grant_id'],
             **{k:sources[k] for k in ('proposal_hash','approval_hash','config_hash','scope_hash')})
         if canonical(binding)!=canonical(origin['local_cpu']):raise Conflict('configurable CPU original approved binding differs')
@@ -335,7 +356,6 @@ def validate_original_links(value, lookup):
         if proof is not None and proof['configured_local_result'] is not None:
             from .hybrid_local_cpu_result import validate_result
             closed=proof['managed_service_proof']['task_closed']
-            spec=approval['registry_witness']['tools']['local_cpu']['definition']['spec']
             validate_result(proof['configured_local_result'],origin,closed['task'],closed['stopped'],spec)
     if origin['kind']==DIAGNOSTIC_KIND:
         from .hybrid_native_diagnostic import approved_binding

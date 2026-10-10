@@ -75,10 +75,20 @@ class LocalCpuSourceOwner(FixtureUsageSourceOwner):
                 binding=json.loads(runtime['local_cpu_grant'].raw)
                 grant=owner._issued_local_cpu_grant(runtime['local_cpu_grant'],runtime['bundle'],runtime['token'],runtime['observation'])
                 spec=validate_bound_spec(json.loads(grant['spec_raw']),binding)
-                validate_bound_spec(json.loads(owner.plans.registry._raw)['tools']['local_cpu']['definition']['spec'],binding)
                 pins=json.loads(grant['modules_raw'])
-                if (digest(pins)!=binding['modules_sha256'] or digest(json.loads(owner.plans.registry._raw)
-                        ['tools']['local_cpu']['definition']['modules'])!=binding['modules_sha256']):
+                config=json.loads(owner.plans.registry._raw)
+                if 'workflow' in binding:
+                    expected_spec,expected_pins=owner._workflow_allocation_material(runtime,binding,config)
+                    if spec!=expected_spec or pins!=expected_pins:
+                        raise Conflict('original workflow CPU allocation input changed')
+                    if (owner._workflow_handoff is None or digest(pins)!=config['tools']['native_model']
+                            ['definition']['spec']['cpu_modules_sha256']):
+                        raise Conflict('original workflow CPU allocation handoff or pins changed')
+                else:
+                    validate_bound_spec(config['tools']['local_cpu']['definition']['spec'],binding)
+                    if digest(config['tools']['local_cpu']['definition']['modules'])!=binding['modules_sha256']:
+                        raise Conflict('original approved CPU modules changed')
+                if digest(pins)!=binding['modules_sha256']:
                     raise Conflict('original approved CPU module pins changed before allocation')
                 row=self._allocate(owner.membership,claim,'runtime.local_cpu',member)
                 row['runtime']=runtime;row['runtime_owner']=owner

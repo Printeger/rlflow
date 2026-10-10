@@ -5,6 +5,7 @@ Source capability, then supply new workspace/reservation/plan capabilities.
 """
 import hashlib
 import json
+from copy import deepcopy
 
 from .hybrid_a_workflow_profile import validate_approval
 from .hybrid_engineering_candidate import transform,verification_spec
@@ -52,6 +53,7 @@ def from_engineer(proposal,config,program_sha256,parent,pins):
             'accounting_version':'A_REGISTRATION_CEILINGS_V1','envelope_sha256':approval['envelope_sha256'],
             'parent':{'key':entry_key(request),'hash':digest(parent)},
             'candidate_sha256':candidate.output_sha256,'acceptance_sha256':digest(envelope['cpu_acceptance']),
+            'modules':deepcopy(pins),
             'limits':{key:envelope[key] for key in
                 ('medium_sessions','high_sessions','controlled_seconds','wall_seconds')}}}
     return binding,spec

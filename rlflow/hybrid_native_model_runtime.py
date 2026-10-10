@@ -56,6 +56,9 @@ class NativeModelOwner(FixtureRuntimeOwner):
         self._native_launches={}
         self._native_releases={}
         self._native_cpu_inputs={}
+        self._native_cpu_handoffs={}
+        self._native_cpu_handoff_roots={}
+        self._native_cpu_retirements={}
         self._launch_active=None
         super().__init__(*args,**kwargs)
 
@@ -329,6 +332,154 @@ class NativeModelOwner(FixtureRuntimeOwner):
             if self.prepare_workflow_cpu_input(lease) is not cap:
                 raise Conflict('original workflow CPU input changed')
             return json.loads(row[2])
+
+    def _handoff_close_record(self,progress,field,token):
+        """Rechain CAS ONLY after original definite no-COMMIT and same predecessor."""
+        from .hybrid_workspace import fact_key,SECTIONS as WORKSPACE
+        request=progress[field];key=fact_key(request)
+        self.controller.check_token(token)
+        with self.store.read_connection() as db:
+            db.execute('BEGIN');read=ReadBudget(db,PREPARATION_READ_BYTES)
+            version=self.workspace._metadata(db)
+            present=db.execute('SELECT 1 FROM projection WHERE section=? AND object_key=?',
+                (WORKSPACE[0],key)).fetchone()
+            event=db.execute('SELECT 1 FROM events WHERE idempotency_key=?',(key,)).fetchone()
+            if present is None and event is None and version!=request['expected_state_version']:
+                predecessor=self.workspace._current(db,request,read,version)
+                if canonical(predecessor)!=progress[field+'_predecessor']:
+                    raise Conflict('original handoff close predecessor changed; no CAS rechain')
+                request={**request,'expected_state_version':version}
+                progress[field]=request
+            elif (present is None)!=(event is None):
+                raise Conflict('original handoff close COMMIT outcome uncertain; no CAS rechain')
+        return self.workspace.record(request,token,progress['observation'])['fact']
+
+    def handoff_workflow_cpu(self,lease,cap,*,token=None):
+        """Retire original settled model owner, then install ONE same-Budget CPU owner.
+
+        CPU still needs a fresh reservation, observation, plan and grant. No
+        original model input/output FD, claim or old WorkingPlan is reused.
+        """
+        from .hybrid_fixture_runtime import _registry,_owners
+        from .hybrid_local_cpu_runtime import LocalCpuRunnerOwner
+        from .hybrid_workspace import fact_key
+        import os
+        from .jobs import identity
+        if type(self) is not NativeModelOwner or os.getpid()!=self.process['pid'] or identity(os.getpid())!=self.process:
+            raise PermissionError('original creator process required for CPU handoff')
+        self.pool._actual()
+        root=self._native_cpu_handoff_roots.get(id(cap))
+        if (root is not None and root[6] is not self or
+                root is None and _owners.get(id(self)) is not self):
+            raise PermissionError('original registered handoff owner required')
+        if token is not None:self.controller._issued(token)
+        # Never hold the Runtime lock across a project writer. Pool serializes
+        # original scope transitions; registry serializes the sole owner swap.
+        with self.pool._lock,_registry:
+            old=self._native_cpu_handoffs.get(id(cap))
+            if old is not None:
+                if old['cap'] is not cap or old['lease'] is not lease or cap.raw!=old['raw']:
+                    raise PermissionError('original CPU handoff identity required')
+                root=self._native_cpu_handoff_roots.get(id(cap))
+                if (root is None or root[0] is not old or root[1] is not lease or root[2] is not cap or
+                        root[3:6]!=(old['raw'],old['material'],old['parent'])):
+                    raise PermissionError('original frozen CPU handoff binding required')
+                retirement=self._native_cpu_retirements.get(id(cap))
+                if retirement is not None and retirement[0] is root and retirement[1] is self.sources:
+                    old['retired']=True  # Original normal-retirement ACK only.
+                if old['child'] is not None:
+                    child=old['child']
+                    if (type(child) is not LocalCpuRunnerOwner or child.pool is not self.pool or
+                            child.membership is not self.membership or child.plans is not self.plans or
+                            child.budget is not self.budget or child._workflow_handoff is not old or
+                            child._workflow_handoff_parent!=(self,cap) or
+                            child._workflow_handoff_raw!=(root[4],root[5]) or self._live or self.sources._live):
+                        raise PermissionError('original same-Budget CPU handoff child required')
+                    child._actual()
+                    return child
+                if old['retired']:
+                    child=LocalCpuRunnerOwner(self.pool,self.membership,self.plans,_handoff=(self,cap))
+                    old['child']=child
+                    return child
+            material=self._issued_workflow_cpu_input(lease,cap)
+            cleanup_token=self._issued(lease)['token'] if token is None else token
+            self.controller.check_token(cleanup_token)
+            for attempt in self._attempts.values():
+                parent=attempt['entries'].get('FIXTURE_SCOPE_STOPPED')
+                if parent is None or parent['decision']!='SETTLED':
+                    raise Conflict('all original model attempts must be settled before CPU handoff')
+                self._verify_pool_link(attempt,'FIXTURE_FREE',parent)
+                from .store import sha
+                with self.pool._transaction() as db:
+                    free=self.pool._point(db,'fixture_free_'+sha([attempt['claim_value']['key'],attempt['lease'].id]))
+                    if free is None or free['payload']['project_fact_hash']!=digest(parent):
+                        raise Conflict('all original model attempts require committed FREE')
+            # Freeze admission only after all parent responsibility checks;
+            # cleanup failures keep this exact owner and original handles.
+            self._safety_freeze=True
+            row=old
+            if row is None:
+                row={'lease':lease,'cap':cap,'raw':cap.raw,'material':canonical(material),
+                    'parent':canonical(self._issued(lease)['entries']['FIXTURE_SCOPE_STOPPED']),
+                    'retired':False,'child':None,'closes':{}}
+                self._native_cpu_handoffs[id(cap)]=row
+                self._native_cpu_handoff_roots[id(cap)]=(row,lease,cap,row['raw'],row['material'],row['parent'],self)
+            elif row['material']!=canonical(material):
+                raise Conflict('original CPU handoff material changed')
+            # These are the original Workspace close writers, not a synthetic
+            # close witness. Complete runtime STOP was independently checked.
+            observations={id(a['observation']):a['observation'] for a in self._attempts.values()}
+            for observation in observations.values():
+                record=json.loads(observation.raw)
+                attempt=next(a for a in self._attempts.values() if a['observation'] is observation)
+                origin=attempt['ready']['source_context']['workspace_head']
+                progress=row['closes'].get(id(observation))
+                if progress is None:
+                    self.workspace._issued(observation)
+                    request={key:origin[key] for key in
+                        ('project_id','data_mode','goal_ref','workspace_id','reservation_id')}
+                    request['store_epoch']=self.workspace.store_epoch
+                    with self.store.read_connection() as db:
+                        db.execute('BEGIN');read=ReadBudget(db,PREPARATION_READ_BYTES)
+                        head=self.workspace._current(db,request,read,self.workspace._metadata(db))
+                    if head['state']!='HELD_PRE_RUNTIME':
+                        raise Conflict('original unclosed model Workspace required for handoff')
+                    request.update(operation='request_close',idempotency_key='cpu_handoff_close_'+record['workspace_id'],
+                        expected_state_version=self.store.version(),expected_workspace_revision=head['revision'])
+                    progress={'observation':observation,'request':request,'request_predecessor':canonical(head),
+                        'complete':None,'receipt':None}
+                    row['closes'][id(observation)]=progress
+                if progress['observation'] is not observation:
+                    raise PermissionError('original handoff close observation required')
+                receipt=self._handoff_close_record(progress,'request',cleanup_token)
+                if progress['complete'] is None:
+                    self.workspace.close_physical_pre_runtime(fact_key(receipt['request']),observation)
+                    progress['complete']={**progress['request'],'operation':'complete_close',
+                        'idempotency_key':'cpu_handoff_closed_'+record['workspace_id'],
+                        'expected_state_version':self.store.version(),
+                        'expected_workspace_revision':progress['request']['expected_workspace_revision']+1}
+                    from .hybrid_workspace import head as workspace_head
+                    progress['complete_predecessor']=canonical(workspace_head(receipt))
+                # Retained exact request resolves lost COMMIT/ACK through the
+                # original duplicate receipt even after the slot was retired.
+                progress['receipt']=canonical(self._handoff_close_record(progress,'complete',cleanup_token))
+            try:self.shutdown()
+            finally:
+                # Only this normal shutdown call, after original SETTLED/FREE
+                # and durable Workspace closes, may acknowledge actual full
+                # retirement after a lost return. Safety/UNKNOWN is not used.
+                if (not self._live and not self.sources._live and id(self) not in _owners and
+                        row['closes'] and all(p['receipt'] is not None for p in row['closes'].values())):
+                    roots=self._native_cpu_handoff_roots[id(cap)]
+                    closed=canonical({json.loads(p['observation'].raw)['workspace_id']:digest(json.loads(p['receipt']))
+                        for p in row['closes'].values()})
+                    self._native_cpu_retirements[id(cap)]=(roots,self.sources,closed)
+                    row['retired']=True
+            if self._live or self.sources._live or id(self) in _owners:
+                raise Conflict('original model owner retirement incomplete')
+            child=LocalCpuRunnerOwner(self.pool,self.membership,self.plans,_handoff=(self,cap))
+            row['child']=child
+            return child
 
     def _preflight_native_result_archive(self,lease,data):
         """Read-only size admission against original current Budget frame."""

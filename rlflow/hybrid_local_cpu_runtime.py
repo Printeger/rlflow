@@ -44,10 +44,56 @@ class LocalCpuRunnerOwner(FixtureRuntimeOwner):
 
     def _binding(self,loaded):
         config=json.loads(self.plans.registry._raw)
+        if self._workflow_handoff is not None:
+            binding,_,_=self._workflow_cpu_material(loaded)
+            return binding
         binding=approved_binding(loaded['record']['contract']['proposal'],config,self.program_hash)
         if config['tools']['local_cpu']['definition']['modules']!=module_pins():
             raise Conflict('original approved CPU trusted programs changed')
         return binding
+
+    def _workflow_cpu_material(self,loaded,*,config=None):
+        from .hybrid_a_workflow_cpu import from_engineer
+        from .hybrid_goals import digest
+        from .hybrid_budget_ledger import entry_key
+        row=self._workflow_handoff
+        if row is None or not row['retired'] or row['child'] is not self:
+            raise PermissionError('original workflow CPU handoff required')
+        if self._workflow_handoff_raw!=(row['material'],row['parent']):
+            raise PermissionError('original frozen workflow CPU handoff changed')
+        parent=json.loads(row['parent']);material=json.loads(row['material'])
+        with self.store.read_connection() as db:
+            db.execute('BEGIN');read=ReadBudget(db,PREPARATION_READ_BYTES)
+            original=self.budget._point(db,entry_key(parent['request']),read)
+            if original!=parent:raise Conflict('original workflow CPU parent event changed')
+            self.budget._dependencies(db,parent,read)
+        if any(parent['policy_source'][key]!=loaded[key] for key in
+                ('proposal_hash','approval_hash','config_hash','scope_hash')):
+            raise Conflict('current original CPU parent approval changed')
+        pins=module_pins()
+        config=json.loads(self.plans.registry._raw) if config is None else config
+        if digest(config)!=loaded['config_hash']:
+            raise Conflict('original workflow CPU registry changed')
+        binding,spec=from_engineer(loaded['record']['contract']['proposal'],config,
+            self.program_hash,parent,pins)
+        if material['binding']!=binding or material['spec']!=spec or material['pins']!=pins:
+            raise Conflict('original workflow CPU material changed')
+        return binding,spec,pins
+
+    def _workflow_allocation_material(self,attempt,binding,config):
+        """Also used on durable REGISTER allocation retries, before any IO."""
+        from .hybrid_goals import digest
+        if digest(config)!=binding['config_hash'] or binding!=attempt['origin']['local_cpu']:
+            raise Conflict('original workflow CPU allocation registry or binding changed')
+        request=attempt['entries']['REGISTER_NO_HANDOFF']['request']
+        with self.store.read_connection() as db:
+            db.execute('BEGIN');read=ReadBudget(db,PREPARATION_READ_BYTES)
+            loaded=self.budget._load(db,request['goal_ref'],read)
+            expected,spec,pins=self._workflow_cpu_material(loaded,config=config)
+        expected.update(grant_id=binding['grant_id'],**{key:loaded[key] for key in
+            ('proposal_hash','approval_hash','config_hash','scope_hash')})
+        if expected!=binding:raise Conflict('original workflow CPU allocation derivation changed')
+        return spec,pins
 
     def issue_local_cpu_grant(self,bundle,token,observation):
         self._actual();self.controller._issued(token);self._plan_original(bundle,token,observation)
@@ -55,8 +101,19 @@ class LocalCpuRunnerOwner(FixtureRuntimeOwner):
             db.execute('BEGIN');read=ReadBudget(db,PREPARATION_READ_BYTES)
             loaded=self.budget._load(db,self._ready_for_bundle(bundle)['request']['goal_ref'],read)
             binding=self._binding(loaded)
-            spec=validate_bound_spec(json.loads(self.plans.registry._raw)['tools']['local_cpu']['definition']['spec'],binding)
-            modules=json.loads(self.plans.registry._raw)['tools']['local_cpu']['definition']['modules']
+            if self._workflow_handoff is not None:
+                _,spec,modules=self._workflow_cpu_material(loaded)
+                validate_bound_spec(spec,binding)
+                from .hybrid_a_workflow_accounting import check_window
+                captured=self._ready_for_bundle(bundle)['source_context']['budget_reservation']
+                request={**captured['scope'],'action':'MARK_UNKNOWN','reservation_id':captured['reservation_id']}
+                head,_,_=self.budget._heads(db,request,read,self.budget._metadata(db))
+                if head is None or 'workflow' not in head or 'candidate_cpu_entry' in head['workflow']:
+                    raise Conflict('original unique CPU stage required')
+                now,_=self.controller._sample();check_window(head['workflow'],binding['workflow'],now)
+            else:
+                spec=validate_bound_spec(json.loads(self.plans.registry._raw)['tools']['local_cpu']['definition']['spec'],binding)
+                modules=json.loads(self.plans.registry._raw)['tools']['local_cpu']['definition']['modules']
             from .hybrid_goals import digest
             if digest(modules)!=binding['modules_sha256']:raise Conflict('original approved CPU module pins changed')
             binding.update({key:loaded[key] for key in ('proposal_hash','approval_hash','config_hash','scope_hash')})
@@ -84,8 +141,27 @@ class LocalCpuRunnerOwner(FixtureRuntimeOwner):
                                          ('proposal_hash','approval_hash','config_hash','scope_hash')})
         if row['attempt'] is not attempt or canonical(expected)!=grant.raw:
             raise Conflict('current original configurable CPU approval differs')
+        if 'workflow' in expected:
+            from .hybrid_a_workflow_accounting import check_window
+            active=self.controller._token_active
+            if active is None:raise PermissionError('original CPU workflow transaction required')
+            captured=attempt['ready']['source_context']['budget_reservation']
+            request={**captured['scope'],'action':'MARK_UNKNOWN','reservation_id':captured['reservation_id']}
+            head,_,_=self.budget._heads(active[0],request,active[2],self.budget._metadata(active[0]))
+            if head is None or head['workflow']['approval_sha256']!=loaded['approval_hash']:
+                raise Conflict('original CPU workflow head or approval changed')
+            now,_=self.controller._sample();check_window(head['workflow'],expected['workflow'],now)
         if attempt['source'] is not None:
             with self.sources._lock:self.sources._physical(self._original_source(attempt))
+
+    def _final_deadlines(self,guard,now,mono):
+        super()._final_deadlines(guard,now,mono)
+        binding=json.loads(guard.attempt['local_cpu_grant'].raw)
+        if 'workflow' in binding:
+            from .hybrid_a_workflow_accounting import check_window
+            from .hybrid_budget_ledger import SECTIONS as BUDGET
+            head=next(iter(guard.expected_heads[BUDGET[1]].values()))
+            check_window(head['workflow'],binding['workflow'],now)
 
     def _original_source(self,attempt):
         from .hybrid_local_cpu_source import LocalCpuSourceOwner

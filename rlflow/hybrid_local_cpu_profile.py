@@ -29,6 +29,14 @@ BINDING = obj({'profile': {'const': PROFILE}, 'code_sha256': HASH,
                'command_sha256': HASH, 'resource_sha256': HASH,
                'spec_sha256': HASH, 'grant_id': ID, 'proposal_hash': HASH,
                'approval_hash': HASH, 'config_hash': HASH, 'scope_hash': HASH})
+from .hybrid_a_workflow_accounting import LIMITS as WORKFLOW_LIMITS
+WORKFLOW=obj({'profile':{'const':'A_ENGINEERING_WORKFLOW_V2'},
+    'stage':{'const':'CANDIDATE_CPU'},'accounting_version':{'const':'A_REGISTRATION_CEILINGS_V1'},
+    'envelope_sha256':HASH,'parent':obj({'key':ID,'hash':HASH}),
+    'candidate_sha256':HASH,'acceptance_sha256':HASH,'limits':WORKFLOW_LIMITS,
+    'modules':obj({name:HASH for name in MODULES})})
+# Optional compatibility field; original links must independently derive it.
+BINDING['properties']['workflow']=WORKFLOW
 
 
 def validate_spec(spec):

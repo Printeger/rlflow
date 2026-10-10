@@ -16,11 +16,13 @@ LIMITS=obj({'medium_sessions':{'type':'integer','minimum':1,'maximum':6},
 HEAD=obj({'envelope_sha256':HASH,'approval_sha256':HASH,'first_engineer_entry':ID,
     'medium_sessions':COUNT,'high_sessions':COUNT,'controlled_seconds_charged':COUNT,
     'started_at':TIME})
+HEAD['properties']['candidate_cpu_entry']=ID
 
 
 def advance(value, prior):
     request=value['request']; runtime=request.get('fixture_runtime',{})
-    workflow=runtime.get('origin',{}).get('native_model',{}).get('workflow')
+    origin=runtime.get('origin',{})
+    workflow=origin.get('native_model',{}).get('workflow') or origin.get('local_cpu',{}).get('workflow')
     if prior is not None:
         validate_schema(HEAD,prior)
         if any(type(prior[field]) is not int for field in
@@ -32,6 +34,22 @@ def advance(value, prior):
         raise Conflict('closed original workflow accounting version required')
     validate_schema(LIMITS,workflow['limits']);limits=workflow['limits']
     if any(type(n) is not int for n in limits.values()):raise Conflict('exact workflow limits required')
+    if workflow['stage']=='CANDIDATE_CPU':
+        from .hybrid_local_cpu_profile import KIND,WORKFLOW
+        from .hybrid_budget_ledger import entry_key
+        validate_schema(WORKFLOW,workflow)
+        if (origin.get('kind')!=KIND or prior is None or
+                prior['approval_sha256']!=value['policy_source']['approval_hash'] or
+                'candidate_cpu_entry' in prior):
+            raise Conflict('original CPU workflow parent or unique stage required')
+        check_window(prior,workflow,timestamp(value['recorded_at']))
+        charge=value['prior_reservation']['amount']['wall_seconds']
+        if (origin['local_cpu']['purpose']!='engineering' or
+                charge<origin['local_cpu']['task_seconds']+10 or
+                prior['controlled_seconds_charged']+charge>limits['controlled_seconds']):
+            raise Conflict('workflow CPU controlled time quota exceeded')
+        return {**prior,'candidate_cpu_entry':entry_key(request),
+            'controlled_seconds_charged':prior['controlled_seconds_charged']+charge}
     if workflow['stage']!='FIRST_ENGINEER' or prior is not None:
         raise Conflict('workflow first Engineer already registered; no stage reset')
     binding=runtime['origin']['native_model']; charge=value['prior_reservation']['amount']['wall_seconds']
