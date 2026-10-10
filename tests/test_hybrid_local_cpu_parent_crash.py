@@ -40,7 +40,7 @@ def unit_state(unit):
     return dict(line.split('=',1) for line in result.stdout.splitlines() if '=' in line)
 
 
-def test_owner_crash_retires_physical_service_without_forging_budget_terminal(tmp_path):
+def test_owner_crash_retires_physical_service_without_forging_budget_terminal(tmp_path,monkeypatch):
     tmp_path.chmod(0o700)
     worker=subprocess.Popen([sys.executable,'-c',WORKER,str(tmp_path)],stdin=subprocess.PIPE,
         stdout=subprocess.PIPE,stderr=subprocess.PIPE,env={'PATH':'/usr/bin:/bin','LANG':'C.UTF-8'},bufsize=0)
@@ -143,7 +143,109 @@ def test_owner_crash_retires_physical_service_without_forging_budget_terminal(tm
             assert not pool._claims and not pool._claim_slots
             assert pool.snapshot()==before and store.version()==version
             (tmp_path/'crash-pool.json').write_text(json.dumps(before))
+            membership=pool.join_registered('isolated_local_cpu')
+            claim_key=before['heads'][0]['claim_key']
+            import copy,fcntl
+            copied=copy.copy(pool)
+            class DerivedPool(HostPoolOwner):pass
+            derived=copy.copy(pool);derived.__class__=DerivedPool
+            for other in (copied,derived):
+                with pytest.raises(PermissionError,match='registered physical retirement'):
+                    other.retire_local_cpu(membership,claim_key=claim_key,
+                        reservation_id=ready['reservation'],expected_version=before['version'])
+            with pytest.raises(Conflict,match='stale physical retirement'):
+                pool.retire_local_cpu(membership,claim_key=claim_key,
+                    reservation_id=ready['reservation'],expected_version=before['version']-1)
+            # Protected reconcile rereads original signed evidence, not the
+            # public DTO above. A forged report cannot retire an occupied slot.
+            report_path.write_text(json.dumps(forged)+'\n')
+            try:
+                with pytest.raises(Conflict,match='signature differs'):
+                    pool.retire_local_cpu(membership,claim_key=claim_key,
+                        reservation_id=ready['reservation'],expected_version=before['version'])
+                assert pool.snapshot()==before and store.version()==version
+            finally:report_path.write_bytes(report_original)
+            lock_fd=os.open(pool.root/'slot0',os.O_RDONLY|os.O_DIRECTORY|os.O_CLOEXEC)
+            try:
+                fcntl.flock(lock_fd,fcntl.LOCK_EX|fcntl.LOCK_NB)
+                with pytest.raises(BlockingIOError):
+                    pool.retire_local_cpu(membership,claim_key=claim_key,
+                        reservation_id=ready['reservation'],expected_version=before['version'])
+                assert pool.snapshot()==before and store.version()==version
+            finally:os.close(lock_fd)
+            original_close=os.close;failed_close=[]
+            def close_fault(fd):
+                retained=pool._slots.get(0)
+                if retained is not None and not retained.closed and fd==retained.fds[0]:
+                    failed_close.append(fd);raise OSError('injected retirement slot close failure')
+                return original_close(fd)
+            with monkeypatch.context() as patch:
+                patch.setattr(os,'close',close_fault)
+                with pytest.raises(Conflict,match='slot cleanup uncertain'):
+                    pool.retire_local_cpu(membership,claim_key=claim_key,
+                        reservation_id=ready['reservation'],expected_version=before['version'])
+            retained=pool._slots[0]
+            assert len(failed_close)==1 and retained.fds[0]==failed_close[0] and retained.fds[1] is None
+            assert not retained.closed and pool.snapshot()==before and store.version()==version
+            # Explicit cleanup of the retained exact new temporary object,
+            # not an automatic retry or recreation of the dead owner's claim.
+            retained.close()
+            import sqlite3
+            original_connect=sqlite3.connect
+            for commit_phase in ('before','after'):
+                injected=[]
+                class CommitFault(sqlite3.Connection):
+                    def commit(self):
+                        if not injected:
+                            injected.append(commit_phase)
+                            if commit_phase=='after':super().commit()
+                            raise OSError('injected physical retirement commit lost return '+commit_phase)
+                        return super().commit()
+                def connect(path,*args,**kwargs):
+                    if str(path).startswith((pool.root/'pool.db').as_uri()):kwargs['factory']=CommitFault
+                    return original_connect(path,*args,**kwargs)
+                with monkeypatch.context() as patch:
+                    patch.setattr(sqlite3,'connect',connect)
+                    with pytest.raises(OSError,match='commit lost return'):
+                        pool.retire_local_cpu(membership,claim_key=claim_key,
+                            reservation_id=ready['reservation'],expected_version=before['version'])
+                assert injected==[commit_phase] and store.version()==version
+                observed=pool.snapshot()
+                assert observed['occupied']==(1 if commit_phase=='before' else 0)
+                assert observed['version']==before['version']+(commit_phase=='after')
+            retired=pool.retire_local_cpu(membership,claim_key=claim_key,
+                reservation_id=ready['reservation'],expected_version=before['version'])
+            after=pool.snapshot();assert after['occupied']==0
+            assert after['heads'][0]['state']=='LOCAL_CPU_PHYSICALLY_RETIRED'
+            assert pool.retire_local_cpu(membership,claim_key=claim_key,
+                reservation_id=ready['reservation'],expected_version=before['version'])==retired
+            assert pool.snapshot()==after and store.version()==version
+            assert reader.task(ready['reservation'])['task']['recorded_budget_status']=='UNKNOWN'
+            (tmp_path/'crash-retirement.json').write_text(json.dumps(retired))
+            (tmp_path/'crash-retired-pool.json').write_text(json.dumps(after))
         finally:pool.shutdown()
+        # Another cold protected owner audits the retirement source and reuses
+        # the actual slot, without recreating the old execution or settling it.
+        moved_report=report_path.with_name('retired-report-held-by-test')
+        report_path.rename(moved_report)
+        pool=HostPoolOwner.trusted_attach(ready['application_root'],ready['descriptor_sha256'],ready['descriptor_identity'])
+        try:
+            assert pool.snapshot()==after
+            membership=pool.join_registered('isolated_local_cpu')
+            new=pool.claim(membership,expected_version=after['version'],request_key='new_after_physical_retirement')
+            assert json.loads(new.raw)['slot']==0 and pool.snapshot()['occupied']==1
+            new_before=pool.snapshot()
+            assert pool.retire_local_cpu(membership,claim_key=claim_key,
+                reservation_id=ready['reservation'],expected_version=before['version'])==retired
+            assert pool.snapshot()==new_before and pool.check(new)['claim_id']==new.id
+            closing=pool.request_close_no_handoff(new,expected_version=new_before['version'])
+            witness=pool.close_original(closing)
+            pool.complete_close(witness,expected_version=pool.snapshot()['version'])
+            assert pool.snapshot()['occupied']==0 and store.version()==version
+            assert reader.task(ready['reservation'])['task']['recorded_budget_status']=='UNKNOWN'
+            (tmp_path/'crash-reused-pool.json').write_text(json.dumps(pool.snapshot()))
+        finally:
+            pool.shutdown();moved_report.rename(report_path)
         (tmp_path/'crash-history.json').write_text(json.dumps(history))
         (tmp_path/'crash-recovery.json').write_text(json.dumps(recovered))
         (tmp_path/'crash-state.json').write_text(json.dumps(state))

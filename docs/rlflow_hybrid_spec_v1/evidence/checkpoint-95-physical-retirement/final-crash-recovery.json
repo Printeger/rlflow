@@ -1,0 +1,217 @@
+{
+  "schema_version": "1.1",
+  "project_id": "isolated_local_cpu",
+  "data_mode": "fixture",
+  "store_epoch": "store_a5efa20c8d5c40ed9a9597ee7352a471",
+  "as_of_state_version": 15,
+  "execution_enabled": false,
+  "reservation_id": "budget_reservation_c5a1d821c6e6c8a14b6515348e3a06ffda1ea4e19f90de129cd49ad8819bb288",
+  "recorded_budget_status": "UNKNOWN",
+  "task_evidence": {
+    "status": "ORIGINAL_TASK_EVIDENCE_RECOVERED",
+    "configured_local_result": {
+      "lease_id": "fixture_lease_0812b2deea774a819d5404d709b6a705",
+      "source_id": "fixture_source_191bb079844d49c0b73267c31356d073",
+      "task": {
+        "pid": 1621077,
+        "sandbox": "CPU_LOCAL_LANDLOCK_SECCOMP",
+        "source_sha256": "a61b3c1cbcf6dfaa2b6836214589b7676ebde0315b2650e5d0c8fe924c6832fb",
+        "starttime": "158509845"
+      },
+      "outputs": {
+        "stdout": {
+          "text": "checkpoint-before-crash\n",
+          "sha256": "sha256:799d81a81c08f3d1b2e844f2d8feaa4bf74b09b5524e70e5d09aa69201ed5619"
+        },
+        "stderr": {
+          "text": "",
+          "sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "approved_spec_sha256": "sha256:7112ff0d7cfdcfeddf7387e9a30f849d4fabd06464fc9f80ab20958ade6aa1e4",
+      "approved_acceptance": {
+        "method": "EXACT_STDOUT_UTF8",
+        "stderr_empty": true,
+        "stdout": "checkpoint-before-crash\n"
+      },
+      "machine_acceptance": {
+        "status": "FAIL",
+        "criteria_sha256": "sha256:21fef576b683882d19efd001bc21518dc7a1b0104ddf9364c291cafaef400948"
+      },
+      "execution": {
+        "status": "SIGNAL_EXIT",
+        "wait_status": 9,
+        "control_terminal_reason": "CONTROL_EOF"
+      },
+      "independent_review_status": "NOT_PROVEN",
+      "condition_evidence": false
+    },
+    "task_closed": {
+      "closed": {
+        "keeper_protocol_handles_closed": true,
+        "stop_latched": true,
+        "task_handles_closed": true,
+        "whole_scope_stopped": false
+      },
+      "config_sha256": "51d5386e25de674cafcd4e0b3cd536fe0724a49fb9cd8354e03cb6003f4d0626",
+      "keeper": {
+        "boot_id": "fa257cc3-1204-4e6f-88a5-a8a2ea7743aa",
+        "invocation_id": "02cc2af059a14a67918828af2fd3f861",
+        "pid": 1621076,
+        "starttime": "158509842"
+      },
+      "original_control_fd_closed": true,
+      "original_output_fds_closed": true,
+      "stopped": {
+        "control_terminal_reason": "CONTROL_EOF",
+        "cpu_stat": "usage_usec 2678\nuser_usec 1339\nsystem_usec 1339\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 4\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0",
+        "handoff_unknown": false,
+        "keeper_still_live": true,
+        "memory_peak": 2043904,
+        "protocol_cleanup_unknown": false,
+        "reaped": [
+          {
+            "pid": 1621077,
+            "status": 9
+          },
+          {
+            "pid": 1621079,
+            "status": 9
+          }
+        ],
+        "release_attempted": true,
+        "stop_latched": true,
+        "task_empty": true,
+        "whole_scope_stopped": false
+      },
+      "task": {
+        "pid": 1621077,
+        "sandbox": "CPU_LOCAL_LANDLOCK_SECCOMP",
+        "source_sha256": "a61b3c1cbcf6dfaa2b6836214589b7676ebde0315b2650e5d0c8fe924c6832fb",
+        "starttime": "158509845"
+      },
+      "type": "local_cpu.task_closed",
+      "whole_scope_stopped": false
+    },
+    "managed_scope_status": "UNKNOWN",
+    "controls_available": false,
+    "physical_scope_status": "ORIGINAL_CONTROLLED_SCOPE_CLOSED",
+    "physical_scope_proof": {
+      "original_binding": {
+        "keeper": {
+          "boot_id": "fa257cc3-1204-4e6f-88a5-a8a2ea7743aa",
+          "invocation_id": "02cc2af059a14a67918828af2fd3f861",
+          "pid": 1621076,
+          "starttime": "158509842"
+        },
+        "manager_producers_closed": true,
+        "owner": {
+          "boot_id": "fa257cc3-1204-4e6f-88a5-a8a2ea7743aa",
+          "pgid": 1621041,
+          "pid": 1621042,
+          "starttime": "158509001"
+        },
+        "process_view": {
+          "pid_namespace": [
+            5,
+            4026531836
+          ],
+          "proc_root": [
+            26,
+            1
+          ]
+        },
+        "scope": {
+          "control": [
+            31,
+            299894,
+            1000
+          ],
+          "keeper_producers_closed": true,
+          "path": "/user.slice/user-1000.slice/user@1000.service/app.slice/rlflow-local-abf90b283a5142bfb70d7ec69df20f47.service",
+          "protocol": "ORIGINAL_CONTROLLED_SCOPE_V1",
+          "root": [
+            31,
+            299843,
+            1000
+          ],
+          "task": [
+            31,
+            299945,
+            1000
+          ]
+        },
+        "transport": {
+          "boot_id": "fa257cc3-1204-4e6f-88a5-a8a2ea7743aa",
+          "pgid": 1621075,
+          "pid": 1621075,
+          "starttime": "158509842"
+        }
+      },
+      "keeper": {
+        "boot_id": "fa257cc3-1204-4e6f-88a5-a8a2ea7743aa",
+        "invocation_id": "02cc2af059a14a67918828af2fd3f861",
+        "pid": 1621076,
+        "starttime": "158509842"
+      },
+      "signed_task_closed": {
+        "closed": {
+          "keeper_protocol_handles_closed": true,
+          "stop_latched": true,
+          "task_handles_closed": true,
+          "whole_scope_stopped": false
+        },
+        "config_sha256": "51d5386e25de674cafcd4e0b3cd536fe0724a49fb9cd8354e03cb6003f4d0626",
+        "keeper": {
+          "boot_id": "fa257cc3-1204-4e6f-88a5-a8a2ea7743aa",
+          "invocation_id": "02cc2af059a14a67918828af2fd3f861",
+          "pid": 1621076,
+          "starttime": "158509842"
+        },
+        "original_control_fd_closed": true,
+        "original_output_fds_closed": true,
+        "stopped": {
+          "control_terminal_reason": "CONTROL_EOF",
+          "cpu_stat": "usage_usec 2678\nuser_usec 1339\nsystem_usec 1339\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 4\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0",
+          "handoff_unknown": false,
+          "keeper_still_live": true,
+          "memory_peak": 2043904,
+          "protocol_cleanup_unknown": false,
+          "reaped": [
+            {
+              "pid": 1621077,
+              "status": 9
+            },
+            {
+              "pid": 1621079,
+              "status": 9
+            }
+          ],
+          "release_attempted": true,
+          "stop_latched": true,
+          "task_empty": true,
+          "whole_scope_stopped": false
+        },
+        "task": {
+          "pid": 1621077,
+          "sandbox": "CPU_LOCAL_LANDLOCK_SECCOMP",
+          "source_sha256": "a61b3c1cbcf6dfaa2b6836214589b7676ebde0315b2650e5d0c8fe924c6832fb",
+          "starttime": "158509845"
+        },
+        "type": "local_cpu.task_closed",
+        "whole_scope_stopped": false
+      },
+      "original_processes_terminal": true,
+      "original_manager_job_recovered": false,
+      "current_unit_state": "NOT_OBSERVED",
+      "scope_observation": "HISTORICAL_ORIGINAL_INVOCATION"
+    },
+    "condition_evidence": false,
+    "execution_replayed": false,
+    "settlement_performed": false
+  },
+  "managed_terminal_recovered": false,
+  "controls_available": false,
+  "execution_replayed": false,
+  "settlement_performed": false
+}

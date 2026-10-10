@@ -1,5 +1,7 @@
 # 阻塞与证据缺口
 
+95已实际让认证父死scope退役后复用硬件slot，原预算UNKNOWN与预留保留。下一最小直接缺口：native真实Engineer执行+原生用量/全集STOP、独立只读产品Reviewer、版本绑定条件证据与Core接续、首个非预设实任务验收。两原start仍deny，产品Review/条件未实现，首次真实任务未运行；不是95测试可代替。集中模型/账户/额度合同未答不调用模型/GPU；本地实现继续，不新增生产权限。其他恢复增强后置，严格quota/科研/长跑/instinctRL资格仍未完成。
+
 94 已实际恢复父SIGKILL历史原完整受控scope物理闭包并认证v2/原PROCESS，仍managedjobUNKNOWN/controlsfalse/Pool1/预算UNKNOWN。下一把可信物理闭包接独立可恢复HostPool退役与预算未知曝险保留，不能重构旧FREE/STOP/退款；实际用量来源/严格quota/长期资格/完整自治仍缺。模型/GPU集中合同未答不调用，instinctRL只读HOLD/未准入；本地无新需用户决定阻塞。
 
 93 FINAL：High io_uring 与 RestartForceExitStatus 两项 MUST 均修并静态关闭，无剩余确证 MUST；最后原typed(aiai)解析门/负例与实际fullSTOP-FREE-alias25pass14.94s。原分轮产品失败与修复证据保留，下方待审/未提交为历史。所有测试terminal，当前compile/diff/USERlock通过，无新active unit；归档并进入本记录所属checkpoint提交。仅交付实际producer边界，完整coldFREE/预算Pool收敛与长期/自治/instinctRL资格仍未完成，Goal ACTIVE，不调用未批准模型/GPU。

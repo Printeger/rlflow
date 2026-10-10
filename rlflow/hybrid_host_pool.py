@@ -24,7 +24,7 @@ from .hybrid_installation_service import FixtureInstallationService
 from .hybrid_runtime_boundary import _held_chain, directory_chain, _chain_value
 from .hybrid_workspace_kernel import _fd_scope, _exclusive_lock, _private
 from .hybrid_host_pool_ledger import (CAPACITY, MAX_EVENTS, MAX_BYTES, closed, count,
-                                    pair, identifier, validate, parse, head, links, member)
+                                    pair, identifier, validate, parse, head, links, member, RETIRE, AVAILABLE)
 from .hybrid_runtime_installation import SECTIONS, validate_complete
 from .hybrid_reads import ReadBudget
 from .hybrid_goals import digest
@@ -502,6 +502,10 @@ All model, child process and native delegation handoff remain denied.
 
     def _verify_runtime_source(self, db, value):
         """Bounded historical Project event proof, never a reconstructed cap."""
+        if value['action'] == RETIRE:
+            from .hybrid_local_cpu_retirement import verify_retirement
+            verify_retirement(self, db, value)
+            return
         from .hybrid_host_pool_ledger import RUNTIME_ACTIONS
         if value['action'] not in RUNTIME_ACTIONS: return
         from .hybrid_budget_ledger import SECTIONS as BUDGET, EVENT, expected_objects, account_key, scope, validate_record
@@ -595,7 +599,7 @@ All model, child process and native delegation handoff remain denied.
         with self._transaction() as db:
             version, heads = self._state(db)
             return {'pool_id': self.binding['pool_id'], 'version': version, 'capacity': CAPACITY,
-                    'occupied': sum(h is not None and h['state'] != 'FREE' for h in heads),
+                    'occupied': sum(h is not None and h['state'] not in AVAILABLE for h in heads),
                     'heads': heads, 'execution_enabled': False, 'release_enabled': False}
 
     def _issued_member(self, membership):
@@ -753,7 +757,7 @@ All model, child process and native delegation handoff remain denied.
                     if len(self._attempts) >= MAX_EVENTS: raise Conflict('finite original pool attempt capacity reached')
                     number = None
                     for candidate, current in enumerate(heads):
-                        if current is not None and current['state'] != 'FREE': continue
+                        if current is not None and current['state'] not in AVAILABLE: continue
                         retained = self._slots.get(candidate)
                         if retained is not None and not retained.closed: continue
                         try: slot = _Slot(self, candidate)
@@ -790,6 +794,15 @@ All model, child process and native delegation handoff remain denied.
                 clock=lambda: self._claim_clocks(self._issued_claim(claim))):
             pass
         return result
+
+    def retire_local_cpu(self, membership, *, claim_key, reservation_id, expected_version):
+        """Protected current owner reconciliation, not adoption of an old grant.
+
+        Original project evidence is reopened internally. Budget is never written.
+        No caller-provided process, report, proof JSON or resource path is accepted.
+        """
+        from .hybrid_local_cpu_retirement import retire
+        return retire(self, membership, claim_key, reservation_id, expected_version)
 
     def _change(self, claim, action, expected_version, extra=None):
         original = self._issued_claim(claim); count(expected_version)

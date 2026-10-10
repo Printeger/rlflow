@@ -13,7 +13,9 @@ MAX_EVENTS = 4096
 MAX_BYTES = 16384
 RUNTIME_ACTIONS = {'FIXTURE_LINKED', 'FIXTURE_HANDOFF_UNKNOWN', 'FIXTURE_STOP_REQUESTED',
                    'FIXTURE_STOPPED', 'FIXTURE_FREE'}
-ACTIONS = {'REGISTER', 'CLAIM', 'UNKNOWN', 'CLOSE_INTENT', 'FREE'} | RUNTIME_ACTIONS
+RETIRE = 'LOCAL_CPU_PHYSICALLY_RETIRED'
+AVAILABLE = {'FREE', RETIRE}
+ACTIONS = {'REGISTER', 'CLAIM', 'UNKNOWN', 'CLOSE_INTENT', 'FREE', RETIRE} | RUNTIME_ACTIONS
 
 
 def closed(value, keys):
@@ -94,17 +96,27 @@ def validate(value):
                     raise Conflict('pool claim finite deadline required')
         else:
             names = ('claim_key', 'claim_hash', 'prior_key')
-            if action in RUNTIME_ACTIONS:
+            if action in RUNTIME_ACTIONS or action == RETIRE:
                 names += ('runtime_lease_id', 'project_fact_key', 'project_fact_hash')
                 if action == 'FIXTURE_FREE': names += ('close_witness_hash',)
+                if action == RETIRE: names += ('reservation_id', 'physical_proof_hash', 'signed_report', 'recovery_owner')
             if action == 'UNKNOWN': names += ('reason',)
             if action == 'FREE': names += ('close_witness_hash',)
             closed(payload, names)
             identifier(payload['claim_key']); identifier(payload['prior_key'])
-            if action in RUNTIME_ACTIONS:
+            if action in RUNTIME_ACTIONS or action == RETIRE:
                 identifier(payload['runtime_lease_id']); identifier(payload['project_fact_key'])
                 if type(payload['project_fact_hash']) is not str or not re.fullmatch('sha256:[0-9a-f]{64}', payload['project_fact_hash']):
                     raise Conflict('fixture runtime original project source digest required')
+            if action == RETIRE:
+                identifier(payload['reservation_id'])
+                process(payload['recovery_owner'])
+                from .hybrid_local_cpu_recovery import REPORT
+                validate_schema(REPORT,payload['signed_report'])
+                if payload['signed_report']['format'] != 'local_cpu_recovery/2':
+                    raise Conflict('physical retirement requires original v2 signed scope')
+                if type(payload['physical_proof_hash']) is not str or not re.fullmatch('sha256:[0-9a-f]{64}', payload['physical_proof_hash']):
+                    raise Conflict('original physical retirement proof digest required')
             if type(payload['claim_hash']) is not str or not re.fullmatch('sha256:[0-9a-f]{64}', payload['claim_hash']):
                 raise Conflict('original pool claim digest required')
             if action == 'UNKNOWN' and payload['reason'] not in ('OWNER_REQUESTED_UNKNOWN', 'REGISTRATION_PENDING'):
@@ -153,7 +165,7 @@ def links(value, lookup, members, *, current=None):
         prior = lookup(payload['prior_key']) if payload['prior_key'] is not None else None
         if payload['prior_key'] is not None and prior is None:
             raise Conflict('original prior FREE pool fact missing')
-        if prior is not None and (prior['pool_id'] != value['pool_id'] or prior['action'] not in ('FREE', 'FIXTURE_FREE') or prior['slot'] != value['slot'] or
+        if prior is not None and (prior['pool_id'] != value['pool_id'] or prior['action'] not in ('FREE', 'FIXTURE_FREE', RETIRE) or prior['slot'] != value['slot'] or
                                   prior['version'] >= value['version']):
             raise Conflict('pool claim cannot reuse occupied slot')
     else:
@@ -167,13 +179,14 @@ def links(value, lookup, members, *, current=None):
         allowed = {'UNKNOWN': {'CLAIM'}, 'CLOSE_INTENT': {'CLAIM', 'UNKNOWN'}, 'FREE': {'CLOSE_INTENT'},
             'FIXTURE_LINKED': {'CLAIM'}, 'FIXTURE_HANDOFF_UNKNOWN': {'FIXTURE_LINKED'},
             'FIXTURE_STOP_REQUESTED': {'CLAIM', 'FIXTURE_LINKED', 'FIXTURE_HANDOFF_UNKNOWN'},
-            'FIXTURE_STOPPED': {'FIXTURE_STOP_REQUESTED'}, 'FIXTURE_FREE': {'FIXTURE_STOPPED'}}[action]
+            'FIXTURE_STOPPED': {'FIXTURE_STOP_REQUESTED'}, 'FIXTURE_FREE': {'FIXTURE_STOPPED'},
+            RETIRE: {'FIXTURE_LINKED', 'FIXTURE_HANDOFF_UNKNOWN', 'FIXTURE_STOP_REQUESTED'}}[action]
         if prior['action'] not in allowed: raise Conflict('host pool no-handoff transition refused')
-        if action in RUNTIME_ACTIONS and prior['action'] in RUNTIME_ACTIONS and prior['payload']['runtime_lease_id'] != payload['runtime_lease_id']:
+        if (action in RUNTIME_ACTIONS or action == RETIRE) and prior['action'] in RUNTIME_ACTIONS and prior['payload']['runtime_lease_id'] != payload['runtime_lease_id']:
             raise Conflict('fixture pool original runtime lease lineage changed')
     if current is not None:
         if action == 'CLAIM':
-            if current['state'] != 'FREE' or current['key'] != payload['prior_key']:
+            if current['state'] not in AVAILABLE or current['key'] != payload['prior_key']:
                 raise Conflict('pool slot is not actually FREE')
         elif current != head(lookup(payload['prior_key'])):
             raise Conflict('host pool stale prior slot head')

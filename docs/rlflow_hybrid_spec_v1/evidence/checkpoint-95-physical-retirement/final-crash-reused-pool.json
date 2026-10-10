@@ -1,0 +1,18 @@
+{
+  "pool_id": "pool_8172d618edf945f89ac7e5b4c792a84a",
+  "version": 8,
+  "capacity": 3,
+  "occupied": 0,
+  "heads": [
+    {
+      "key": "free_f14b4e8f966bf2924e351f1fc8f7478fd1018be01b291fe3aed50c1bdff8ac8f",
+      "version": 8,
+      "state": "FREE",
+      "claim_key": "claim_32e5d6b8eae6f1831bb5d4e0b50c80bc8fd6aa1dba998d146f2b0341c3fb9e8b"
+    },
+    null,
+    null
+  ],
+  "execution_enabled": false,
+  "release_enabled": false
+}

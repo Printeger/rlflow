@@ -1,0 +1,18 @@
+{
+  "pool_id": "pool_5714bfdbd1614b4abe49c8f8a36f81c3",
+  "version": 5,
+  "capacity": 3,
+  "occupied": 0,
+  "heads": [
+    {
+      "key": "physical_retire_93d52cbf7ebf51f51d5b24ea7cd7ed5e5d4057f3e033a7f92c620147249c557a",
+      "version": 5,
+      "state": "LOCAL_CPU_PHYSICALLY_RETIRED",
+      "claim_key": "claim_8950c8efcc3c7c114a7f40c7d03d197ea11d73fc929ad0fb2022e5a95c6a825c"
+    },
+    null,
+    null
+  ],
+  "execution_enabled": false,
+  "release_enabled": false
+}

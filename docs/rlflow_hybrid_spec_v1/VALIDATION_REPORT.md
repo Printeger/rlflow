@@ -1,5 +1,7 @@
 # 需求包离线校验报告
 
+95 FINAL：认证原scope物理退役与真实槽位复用已交付，预算UNKNOWN/全额预留零改，独立状态不假FREE/Job/结算。实际最后1pass22.95s；必要旧Pool31pass98.63s、accounting3pass61.36s、capture2pass.07s；High MUST均关闭，编译/差量/USERlock/无新active通过。不同原774/777事件、公钥与签名内联证据归档checkpoint-95-physical-retirement/，不互换、不称全ledger字节seal或新全库。首个真实非预设模型工程任务仍NOT_EXECUTED；下一优先实装Engineer/产品Reviewer/ConditionEvidence/接续，其他恢复增强后置；完整Goal active/集中合同未答，不调用模型/GPU。
+
 94 FINAL：93提交38dc1bf。公开cold v2完整原scope物理证据实装，PROCESS前G绑定root/control/task+keeperInvocation/transport/owner/procview/协议/publickey，末签kill/reap/empty/singlekeeper原scope；pidfd整线程组而非leaderZ。实际3pass29.33s（父死CLI/paired篡改/Pool1、正常ownerlive拒/fullSTOPFREE、真实多线程leaderZ拒）；High FD MUST修后5pass.08s+foreign2pass.06s，final独立原766只读同值/namespace-scope-Invocation拒/FD和版本不变exit0。纯immutable/v1 30pass.14s、profile26pass.11s和共享旧Runtime冷回放1pass11.80s。旧temp原PROCESS补读FileNotFound保留；补采集后仅必要父死归档复验1pass14.12s，final770原公钥/event/report离线验签同scope exit0；分run不互换。High全部MUST关闭，compile/diff/USERlock/noactive检查通过，证据checkpoint-94-scope-recovery/及HYBRID_LOCAL_CPU_SCOPE_RECOVERY.md，归档进入本记录所属提交。非原Job/FREE/结算/模型自治/全库/安装/长跑完成；下一独立Pool物理退役与BudgetUNKNOWN保留安全对账，原Goal ACTIVE/不调用未批准模型GPU。
 
 93 FINAL：High io_uring 与 RestartForceExitStatus 两项 MUST 均修并静态关闭，无剩余确证 MUST；最后原typed(aiai)解析门/负例与实际fullSTOP-FREE-alias25pass14.94s。原分轮产品失败与修复证据保留，下方待审/未提交为历史。所有测试terminal，当前compile/diff/USERlock通过，无新active unit；归档并进入本记录所属checkpoint提交。仅交付实际producer边界，完整coldFREE/预算Pool收敛与长期/自治/instinctRL资格仍未完成，Goal ACTIVE，不调用未批准模型/GPU。

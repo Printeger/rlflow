@@ -1,0 +1,188 @@
+{
+  "local_cpu_recovery_public_key": "0dcf702945979718ee728bb1d3e8cdf2b8ddac0bb4b5d9bf325196234ff46c19",
+  "local_cpu_recovery_source": {
+    "chain": [
+      [
+        66306,
+        2,
+        33
+      ],
+      [
+        66306,
+        15859713,
+        33
+      ],
+      [
+        66306,
+        15990863,
+        33
+      ],
+      [
+        66306,
+        16001510,
+        33
+      ],
+      [
+        66306,
+        16001517,
+        33
+      ],
+      [
+        66306,
+        16008216,
+        33
+      ],
+      [
+        66306,
+        16009321,
+        33
+      ],
+      [
+        66306,
+        16009332,
+        33
+      ]
+    ],
+    "config_sha256": "51d5386e25de674cafcd4e0b3cd536fe0724a49fb9cd8354e03cb6003f4d0626",
+    "files": {
+      "task-report": [
+        66306,
+        16015057,
+        1000
+      ],
+      "task-stderr": [
+        66306,
+        16015056,
+        1000
+      ],
+      "task-stdout": [
+        66306,
+        16015055,
+        1000
+      ]
+    },
+    "path": "/tmp/pytest-of-mint/pytest-777/test_owner_crash_retires_physi0/rlflow-host-fixture-tgqnl7if/usage-source-fixture-_bznyam9/source-6fukhp94",
+    "source_id": "fixture_source_191bb079844d49c0b73267c31356d073",
+    "unit": "rlflow-local-abf90b283a5142bfb70d7ec69df20f47.service"
+  },
+  "local_cpu_release_attempted": false,
+  "local_cpu_scope_binding": {
+    "keeper": {
+      "boot_id": "fa257cc3-1204-4e6f-88a5-a8a2ea7743aa",
+      "invocation_id": "02cc2af059a14a67918828af2fd3f861",
+      "pid": 1621076,
+      "starttime": "158509842"
+    },
+    "manager_producers_closed": true,
+    "owner": {
+      "boot_id": "fa257cc3-1204-4e6f-88a5-a8a2ea7743aa",
+      "pgid": 1621041,
+      "pid": 1621042,
+      "starttime": "158509001"
+    },
+    "process_view": {
+      "pid_namespace": [
+        5,
+        4026531836
+      ],
+      "proc_root": [
+        26,
+        1
+      ]
+    },
+    "scope": {
+      "control": [
+        31,
+        299894,
+        1000
+      ],
+      "keeper_producers_closed": true,
+      "path": "/user.slice/user-1000.slice/user@1000.service/app.slice/rlflow-local-abf90b283a5142bfb70d7ec69df20f47.service",
+      "protocol": "ORIGINAL_CONTROLLED_SCOPE_V1",
+      "root": [
+        31,
+        299843,
+        1000
+      ],
+      "task": [
+        31,
+        299945,
+        1000
+      ]
+    },
+    "transport": {
+      "boot_id": "fa257cc3-1204-4e6f-88a5-a8a2ea7743aa",
+      "pgid": 1621075,
+      "pid": 1621075,
+      "starttime": "158509842"
+    }
+  },
+  "local_cpu_terminal_proof": null,
+  "origin": {
+    "attempt_id": "fixture_attempt_8c7b54b49fe34a429d8a9f7009989077",
+    "authorization": "ORIGINAL_APPROVED_LOCAL_CPU_ONLY",
+    "candidate_write_enabled": false,
+    "delegation_enabled": false,
+    "kind": "LOCAL_CONFIGURED_CPU",
+    "lease_id": "fixture_lease_0812b2deea774a819d5404d709b6a705",
+    "local_cpu": {
+      "approval_hash": "sha256:ba58b8e9df92b33ddc4f69f20ca80a6d4b4230c05d38f7d3f428bd986f67b753",
+      "code_sha256": "sha256:a61b3c1cbcf6dfaa2b6836214589b7676ebde0315b2650e5d0c8fe924c6832fb",
+      "command_sha256": "sha256:b7dfcaa528de3e5cdb10655077278f7ca2ce6c0826ee0ce56ca8c5e65d730434",
+      "config_hash": "sha256:cc76b31684707f9ac99b086495712c13c121923deff4ebe9b5a14cfeb2adfd92",
+      "grant_id": "local_cpu_grant_6922870ea16b4575a55117111dc8e58c",
+      "inputs_sha256": "sha256:44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "modules_sha256": "sha256:3135d588a0c844aa2628661c28d222d69b090d2d2fbdabb28d21c9132b89d633",
+      "profile": "CONFIGURED_LOCAL_CPU_V1",
+      "proposal_hash": "sha256:e81d8cc201aaa20c9e007e63d39cb4027e5d70d7478f74f6870fdeed48d2a1c7",
+      "purpose": "research",
+      "resource_sha256": "sha256:595acbd3322bda42d1fa70f1e3d7af9a0672ccb3b359b0109c534d071b4f7671",
+      "scope_hash": "sha256:65e5aae9faa1af54dff8a114a927a858df8a7afec1f78317a2815558b9f99c5c",
+      "spec_sha256": "sha256:7112ff0d7cfdcfeddf7387e9a30f849d4fabd06464fc9f80ab20958ade6aa1e4",
+      "task_seconds": 20
+    },
+    "member_id": "member_07eb639d3d324df3f07538ac67daad4836141cdeab8d4f95b80fb9af9cc271a6",
+    "model_enabled": false,
+    "nonce": "55019f544494455baa6879be6c887953",
+    "owner": {
+      "boot_id": "fa257cc3-1204-4e6f-88a5-a8a2ea7743aa",
+      "pgid": 1621041,
+      "pid": 1621042,
+      "starttime": "158509001"
+    },
+    "pool_claim": {
+      "hash": "sha256:d959712631cec1f2e43a71c1bf6979ccc80c4313f8a8bf5653423b10f0f18937",
+      "key": "claim_ce3608f364707e9fa12a7b1bdd9d19fcc014b8a0ba8ccc48eb1d95a022a135de"
+    },
+    "pool_id": "pool_8172d618edf945f89ac7e5b4c792a84a",
+    "program_sha256": "sha256:6717499bfdb0dcbe251f2097ebb09b9ae8bd9f9e17d94d5cff45ff195db73c47",
+    "scenario": "local_cpu",
+    "task_id": "fixture_task_b2aba6375a0c4aed869b7f9ec9d60e98",
+    "working_plan_intent": {
+      "hash": "sha256:18f6b034219301f625d2e600330d2826f039fb840963c38a500946d95aec5d3e",
+      "key": "working_plan_intent_5b14d65ab89e0bce8cbdd53258f2b2658d3005aa1a081bf020e4b59d71ae4fe5"
+    },
+    "working_plan_ready": {
+      "hash": "sha256:60f756513214a784ac67f2e9fe7558820dd0f67051a570bf8796840b64743fdd",
+      "key": "working_plan_ready_b9e40b1c287f99c0cbda0dec197f5c5a6d9e4f4c6acf8d903ed8a8a458050351"
+    }
+  },
+  "phase": "RELEASE_INTENT",
+  "previous": {
+    "hash": "sha256:0c527d98aadc09959dc15b164a53b854f410f06ac570ba6a9ed1868cc9db003e",
+    "key": "budget_entry_814db1b77e1197b7e5f443c81300656366685cbd2f0575677028e24e0b15f397"
+  },
+  "producer": {
+    "boot_id": "fa257cc3-1204-4e6f-88a5-a8a2ea7743aa",
+    "pgid": 1621076,
+    "pid": 1621076,
+    "starttime": "158509842"
+  },
+  "registration": {
+    "hash": "sha256:0bcc6b30db080f3525b22a5299f2fd5cd1f8c4bacb1a9b82275fca4d01f20fdd",
+    "key": "budget_entry_80fadf596f8a8968cc8075873d5453e1e3f9cd1066512fac60bb9245baeeb079"
+  },
+  "started_ack_sha256": null,
+  "terminal_proof_sha256": null,
+  "wall_seconds": 0
+}

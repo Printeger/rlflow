@@ -1,5 +1,7 @@
 # 开发决策记录
 
+95：容量物理退役与财务结算分离。原REGISTER/Project事件、公钥与实际kernel闭包由exact当前registered Pool内部核验；新LOCAL_CPU_PHYSICALLY_RETIRED和可复用判据不伪FIXTURE_FREE。完整有限signed envelope内联避免临时report删除破坏Pool回放；实际slot flock取得/关闭后才追加，失败原FD强留/不隐式重试，commit丢返回原key幂等不碰新claim。预算UNKNOWN全预留/磁盘责任不退款。95后用户明确优先真实工程模型链，其他恢复增强后置，见HYBRID_REAL_ENGINEERING_MINIMUM.md。
+
 94 冷恢复只证明历史原Invocation controlled producer集合物理闭合，不说当前同unitname永久空/复原Job或FREE。G前PROCESS冻结scope/完整keeper Invocation/transport/owner/procview/版本/publickey；v2签真实taskkill/reap/empty+singlekeeper scope，pidfd核完整线程组非leaderZ/PGID，namespace/boot不符拒。所有kernelFD清理失败强保留原fd/actualidentity，外层独立close；原v1不升格。下一物理Pool退役保BudgetUNKNOWN全曝险而非伪结算，详HYBRID_LOCAL_CPU_SCOPE_RECOVERY.md。
 
 93 FINAL：High io_uring 与 RestartForceExitStatus 两项 MUST 均修并静态关闭，无剩余确证 MUST；最后原typed(aiai)解析门/负例与实际fullSTOP-FREE-alias25pass14.94s。原分轮产品失败与修复证据保留，下方待审/未提交为历史。所有测试terminal，当前compile/diff/USERlock通过，无新active unit；归档并进入本记录所属checkpoint提交。仅交付实际producer边界，完整coldFREE/预算Pool收敛与长期/自治/instinctRL资格仍未完成，Goal ACTIVE，不调用未批准模型/GPU。

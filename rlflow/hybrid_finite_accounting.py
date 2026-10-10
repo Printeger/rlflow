@@ -109,8 +109,9 @@ class FiniteAccounting:
                     raise Conflict('original Pool member source missing')
                 projects.append(original['payload']['project_id'])
             occupied = project_occupied = 0
+            from .hybrid_host_pool_ledger import AVAILABLE
             for head in heads:
-                if head is None or head['state'] == 'FREE':
+                if head is None or head['state'] in AVAILABLE:
                     continue
                 occupied += 1
                 claim = pool._point(db, head['claim_key'])

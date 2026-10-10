@@ -1,0 +1,20 @@
+Checkpoint95; base1382d80; ordinary local CPU fixture, no model/GPU/production/push.
+Previous goal turn94=PROGRESS committed authentic historical scope closure.
+Environment .venv Python3.12; PYTEST_DISABLE_PLUGIN_AUTOLOAD=1.
+Every pytest argv prefix: env PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q
+Actual changed-case argv suffix: tests/test_hybrid_local_cpu_parent_crash.py::test_owner_crash_retires_physical_service_without_forging_budget_terminal
+21332a session3780 ->60d8a8 exit0 1pass20.00s initial retirement/idempotent/cold/reCLAIM; hash-only archive gap then corrected after independent analysis.
+a0027d session75239 ->8d8305 exit0 1pass21.10s inline archive/copy+subclass/stale/busy/absent report; not final close/commit-fault coverage.
+c2b98d session98298 ->cd3bab exit0 1pass21.78s final close-failure strong retention/no implicit retry; artifacts774 archived unchanged as crash-*.json.
+5fb96c session47114 ->e76fd0 exit0 1pass22.95s additionally actual retirement COMMIT before fail/after realcommit return loss; final original777 archived as final-crash-*.json. This is the final changed actual case, not four independent task qualification claims.
+47892e session6599 ->c0965b exit0 tests/test_hybrid_host_pool.py 31pass98.63s; final new-entry-only identity/capture/cleanup changes later covered by affected new case, unchanged old pool cases not repeated.
+8cb035 session72249 ->b2c05e exit0 tests/test_hybrid_finite_accounting.py 3pass61.36s/1 existing Starlette-anyio deprecation warning; final production code unchanged during run.
+fcb613 exit0 tests/test_hybrid_local_cpu_retirement.py 2pass.07s; capture first fstat and close failures retain actual FD/identity, explicit test cleanup afterward.
+No product/test failure in these runs. Exact tests frozen while live; no test restarted on wait expiration.
+Independent existing High finite_app_review_63 read-only design/review, no tests/writes/newagents: required distinct retirement authority+inline signed envelope, exact registered Pool identity, no implicit FDclose retry and exactopened report retention implemented. Final no remaining confirmed MUST; recommended COMMIT faults then passed22.95s.
+Source changes: hybrid_host_pool.py, hybrid_host_pool_ledger.py, hybrid_finite_accounting.py, new hybrid_local_cpu_retirement.py; new capture test, changed actual parent crash case.
+Final py_compile six changed/new source/test files exit0 54d541; diffcheck exit0; USER package-lock SHA becc7e2a36dfcad4ffe934b5ff2f0f68187611d6c0641bd63d81367651cfbf09 unchanged/untracked/notstaged.
+Read-only systemctl3df98c: four old failed units retained, no new active/failed units; no reset-failed/delete.
+Archived JSON normalized, no byte-seal/full-ledger/export/privatekey claim. Original774 and777 identity sets distinct and not interchangeable.
+2ef212 exit0 offline actual777 inline envelope==originalreport, originalPROCESS publickey signature and scope verified; fact2871bytes; oversized16KiB cpu_stat fails ledger byte bound; no execution started. offline-envelope-check.json records output.
+User latest priority: after95 actual nonpreset Engineer/independent product Review/ConditionEvidence/continuation; other recovery deferred unless direct blocker or confirmed safety. First model engineering task NOT_EXECUTED; no full-suite/install/longrun/autonomy qualification.
