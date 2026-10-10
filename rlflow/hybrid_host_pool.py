@@ -98,6 +98,9 @@ def _check_sql_fd(fd, expected):
 def _fork_prepare():
     _registry_lock.acquire()
     for owner in _owners.values(): owner._lock.acquire()
+    for owner in _owners.values():
+        host = getattr(owner, '_finite_execution_host', None)
+        if host is not None:host._snapshots.lock.acquire()
     # Python runs before-fork callbacks in REVERSE registration order. Owned
     # downstream components join this coordinator, not a later os callback.
     for name in sorted(_fork_extensions): _fork_extensions[name][0]()
@@ -105,6 +108,9 @@ def _fork_prepare():
 
 def _fork_parent():
     for name in reversed(sorted(_fork_extensions)): _fork_extensions[name][1]()
+    for owner in reversed(tuple(_owners.values())):
+        host = getattr(owner, '_finite_execution_host', None)
+        if host is not None:host._snapshots.lock.release()
     for owner in reversed(tuple(_owners.values())): owner._lock.release()
     _registry_lock.release()
 
@@ -115,6 +121,8 @@ def _fork_child():
     for owner in tuple(_owners.values()):
         domain = getattr(owner, '_disk_admission', None)
         if domain is not None:domain._fork_child_close()
+        host = getattr(owner, '_finite_execution_host', None)
+        if host is not None:host._snapshots.child_close()
         owner._live = False
         descriptors = set(owner._pins.values())
         for db, fd in owner._sql_active.values():
@@ -913,11 +921,20 @@ All model, child process and native delegation handoff remain denied.
         self._actual()
         with _registry_lock, self._lock:
             errors = []
+            host = getattr(self, '_finite_execution_host', None)
+            if host is not None and not host._snapshots.closed:
+                try:host._snapshots.close()
+                except Exception as error:errors.append(error)
             domain = getattr(self, '_disk_admission', None)
-            if domain is not None:domain.shutdown_owned()
+            domain_error = None
+            if domain is not None:
+                try:domain.shutdown_owned()
+                except (OSError, Conflict) as error:
+                    domain_error = error; errors.append(error)
             for slot in self._slots.values():
                 try: slot.close()
                 except (OSError, Conflict) as error: errors.append(error)
+            if domain_error is not None:raise domain_error
             if errors: raise Conflict('original pool shutdown cleanup remains uncertain') from errors[0]
             for name, fd in tuple(self._pins.items()):
                 try:

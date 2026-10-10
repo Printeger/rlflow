@@ -1,0 +1,75 @@
+Checkpoint69 background snapshot maintenance — FINAL
+Baseline: 88e5bfbcba98332c8a2f003c0a4c46503069437d
+Scope: original finite Host SDK -> one fixed child -> derived snapshot publication;
+no new business scheduler, HTTP operation, paid model, GPU, production migration,
+system permission change, or cold execution-capability adoption.
+
+R1: 2 failed / 2 teardown errors, 34.30s.
+Existing test Popen validator rejected the new exact fixed cache bootstrap before
+native Popen. The unknown handoff guard retained ownership. No cache child ran.
+The fixture now validates this exact new fixed entry; arbitrary programs remain denied.
+Raw: audit/hybrid-v1/checkpoint-69-job-r1.log; input/end-check manifests retained.
+
+R2: 2 passed, 35.28s; 338 source/schema/test input hashes matched at terminal.
+Actual original SDK creates independent PID, publishes version12 snapshot and ACK;
+business source_version/observation cursor/event count unchanged.
+Second project request rejected before its due mark; exact stopped child reaped.
+
+R3: 7 passed, 122.52s; 338 input hashes matched at terminal.
+Includes R2 behavior after necessary central gate/lifecycle changes, plus:
+- Last mark IO emergency freeze refuses update/launch.
+- Actual failed child over corrupt old BLOB never reports publication success.
+- Actual fork closes inherited job pidfd without killing original parent job.
+- Reused pidfd (/dev/null) never signalled/closed; original restored FD retries.
+- Real stopped job + controlled wait TimeoutExpired still closes original reserve;
+  owner/job retained until real reap and retry shutdown.
+
+R4: 2 passed / 7 deselected, 39.65s; 338 hashes matched at terminal.
+Reentrant original request refuses before any Pool health IO.
+Test-only fixed bootstrap trace SIGSTOP at real maintain SHA256 line, after actual
+canonical construction and complete lineage checks. Original SDK cancel finishes
+while child stopped, writes two real tail events. Child resumes publishing snapshot12.
+All original owners stop. Private SQLite backup -> attach_existing without DDL ->
+only clone projection cleared -> recover equals original audit (snapshot12 + tail2).
+No new Host/Runtime/lease constructed for copied data. Diagnostic trace is NOT
+production bootstrap-pin or strong OS sandbox evidence.
+
+R5: 3 passed / 9 deselected, 56.65s; 338 hashes matched at terminal.
+Low reported original FS availability: no due mark or Popen; original actual 8MiB
+reserve remains allocated and unconsumed. Real SDK mark + exact stopped/reaped job,
+then maintenance late callback resources failure or cooperative deadline exhaustion
+leaves due pending, last_complete0 and no partial snapshot. Late callback cases are
+maintenance-function differential evidence, NOT independently injected worker late IO.
+
+R6: 80 passed / 1 failed / 1 existing warning, 504.61s; session14024 terminal exit1;
+338 input hashes matched. Sole failure: original reserve shutdown OSError was
+wrapped as Conflict by new independent cleanup; fixed preserving exact original
+domain exception after all independent attempts, without retiring owner/pins.
+Necessary impacted regression: complete snapshot_maintenance, hybrid_host_pool,
+hybrid_host_execution, hybrid_finite_host_app modules plus reserve shutdown/fork cases.
+No unchanged UI/Node or whole repository rerun.
+
+R7: 3 passed / 1 assertion failure / 1 existing warning, 84.21s; 338 hashes matched.
+Original R6 failure and affected job wait-timeout independent cleanup now pass.
+Real fixed 15-second parent wall deadline reaps original SIGSTOP child, leaves due
+pending and allows the next original project request only after actual slot release.
+Writer inode replacement was refused before mark/Popen by the EARLIER original
+Pool member identity gate; new test expected later cache-specific error text.
+Only the exact test regex was corrected; production behavior unchanged.
+
+R8: sole prior failed case, 1 passed, 17.17s; session73951 terminal exit0;
+338 input hashes matched. Writer restored to original inode before fixture cleanup;
+this is file-name/inode replacement evidence, NOT Linux mount-namespace isolation.
+
+Final: 14 new cases explicitly combined per-run evidence; no claim of final full
+new-module or new whole-repository green. Necessary 81-case regression composed from
+R6's 80 passes plus R7's corrected sole failure (not a second unchanged full run).
+Independent High all source MUST closed; no live tests. compileall, pip check and
+git diff --check pass. Final338 input manifest SHA256:
+7ec244b22d671881cda46aac28d3989ebc1ec16bf1375d4b781fa672c6152038
+Raw logs and terminal input checks retained under audit/hybrid-v1; exact SHA256 list
+and per-run manifests archived beside this file. Partial RLIMIT bounds do not close
+strict cgroup/quota/control reservation,
+native arbitrary-tree execution, trusted invoice, product Reviewer or complete Goal.
+User package-lock remains untracked/untouched:
+becc7e2a36dfcad4ffe934b5ff2f0f68187611d6c0641bd63d81367651cfbf09

@@ -1,5 +1,9 @@
 # 开发决策记录
 
+Checkpoint69实现边界：fixed cache子进程采用python -B -I -S、固定repo/dependency路径、无凭据环境、close_fds及原项目捕获身份；CPU10秒/AS1GiB/wall15秒/PDEATHSIG在应用依赖import前安装，仍属partial，不宣称硬控制预留。mark只mode=rw/timeout0/显式关闭短事务，最后IO后纯freeze复检；child在构造前及出版前复核原FS余量，不消费审计预留。ACK只在实际exit0且原完成版本/元数据核对后报告as-of，不以退出或旧64hex缓存单独证明成功。普通job收尾异常独立记录并继续其他原FD清理，未知job/owner不伪退休；同失败不原样重跑。write-page技能用于仓库交接状态与证据强度，未创建外部Page。
+
+Checkpoint69最终决策：维护child复用原maintain一致只读构造、完整历史来源验证及短出版；原父捕获的DB/两锁/目录链/project/epoch才能attach，不以同名锁或Store(root)重建采纳执行能力。Pool→job锁序与health前pure重入早拒避免逆序；新维护IO后须重查期限，原FD每次kill/close前核身份；job收尾异常不能截断其他FD尝试，domain异常在独立尝试后仍原样raise，保持68兼容。一个原Host最多32原units共享1维护child/noqueue，业务3active claims不是项目或OS总进程上限；不因文档误述扩展新项目拒绝。实际构造/哈希前诊断STOP与隔离snapshot+tail恢复提供纵向行为证据；不把旧strict拒绝、同步分块代码或新增测试数量本身当交付。严格RES05、invoice/native/产品Reviewer与原Goal标准不缩减。
+
 Checkpoint68 FINAL：每原FS一个真实8MiB blank/最多3FS，原对象先登记，原FD/目录/inode/权限/size/stamp及实际st_blocks验证；完整FS覆盖才ready，分配块不加回余额。STOP物理来源先验、纯冻结在Pool等待前，未知不按路径截断；同operation包括失败memo避免fallback再次释放，新显式STOP可原FD恢复。已消费不补充、正常workerSTOP不冻结工程apply。R6保留67同body/key验收，仅owned/partial/unknown创建进入救援；明确pending无文件不永久冻结。R8定位共享Pool等待后，只读_current移出Pool，ACK&&Release才取原Pool并重读仍Release再经原guard写STARTED，STOP优先；真实效果与期限不变。parentFD只缺失时dup，经原目录验证后复用。Dashboard仅手动GET/固定阈值公式/credit≤32/认证晚回复清理，不gateSTOP。R9/R10实际通过，High差量关闭；write-page技能校准既有证据格式与最终状态，未创建外部Page。不扩大功能、权限或生产状态。
 
 Checkpoint67 FINAL：实际可用空间准入与真实应急预留分开，先交付拒绝实际RUN。原FS合并保守占额/最多3FS，floor128MiB+16MiB每claim不是Budget账单或SQLite保证；UNKNOWN/unbound failclosed。FREE后须真实_last或原取消明确cleanupComplete才退，资源IO在原最后Auth/TTL前，STOP无准入门。新诊断读取后重新认证/Conflict503；最终读取发现default executor无界提交，原27case终态后仅route/新test改独立ControlPool1，不共享STOP槽，真实future才释放，末2case通过，High四MUST关闭。r3 spawn teardown用既有原FD safety retirement不伪FREE；不改产品放宽门。文档技能校准仓库格式及证据强度，未创建外部Page，不重复未改bare/UI/Node全套。

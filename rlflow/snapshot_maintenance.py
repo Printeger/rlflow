@@ -11,7 +11,7 @@ import time
 from .store import canonical, Conflict
 
 
-def maintain(store,*,seconds=5,max_bytes=32*1024*1024,max_rows=100000,max_nodes=2000000):
+def maintain(store,*,seconds=5,max_bytes=32*1024*1024,max_rows=100000,max_nodes=2000000,_before_publish=None):
     if type(seconds) not in (int,float) or not math.isfinite(seconds) or seconds<=0 or any(type(v) is not int or v<1 for v in (max_bytes,max_rows,max_nodes)):
         raise ValueError('invalid snapshot maintenance bounds')
     deadline=time.monotonic()+seconds
@@ -128,6 +128,8 @@ def maintain(store,*,seconds=5,max_bytes=32*1024*1024,max_rows=100000,max_nodes=
             raw=canonical(state);check()
             if len(raw)>max_bytes:return False
             digest=hashlib.sha256(raw).hexdigest();check()
+            if _before_publish is not None:_before_publish()
+            check()
             with store.lock(nonblocking=True),sqlite3.connect(store.db,timeout=0) as db:
                 db.execute('BEGIN IMMEDIATE')
                 if store._goal_registration(db)!=registration:return False

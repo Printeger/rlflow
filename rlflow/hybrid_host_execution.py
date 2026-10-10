@@ -28,6 +28,8 @@ class HostExecutionService:
             pool._finite_execution_host = self
             from .hybrid_disk_admission import _DiskAdmission
             self._disk = _DiskAdmission(self)
+            from .hybrid_snapshot_job import _SnapshotJobs
+            self._snapshots = _SnapshotJobs(self)
 
     def _pure_identity(self):
         if (os.getpid() != self.pool.process['pid'] or not self.pool._live or
@@ -61,6 +63,7 @@ class HostExecutionService:
             if len(self._bindings) >= 32:
                 raise Conflict('finite host binding capacity reached')
             self._disk.bind(unit, attempt)
+            self._snapshots.bind(unit)
             self._bindings = (*self._bindings, unit)
         return unit.lease
 
@@ -89,6 +92,12 @@ class HostExecutionService:
     def cancel(self, lease):
         # Pure lookup then Unit's latch, before all owner/Pool/procfs IO.
         return self._unit(lease).cancel()
+
+    def request_snapshot_maintenance(self, lease):
+        return self._snapshots.request(lease)
+
+    def poll_snapshot_maintenance(self):
+        return self._snapshots.poll()
 
     def _cancel_units(self, units):
         self._pure_identity()
