@@ -310,6 +310,20 @@ class NativeModelSourceOwner(FixtureUsageSourceOwner):
         """
         return self._packet_step(source,result=True)
 
+    def _runtime_usage_publication(self, owner, lease):
+        """Original writer hook, NOT an audited-data or caller receipt API.
+
+        The native account/producer/G/EOF qualification issuer is not yet
+        implemented. Consequently there is no issued usage publication. Do
+        not use source fields, packet_result_data or complete=true as a cap.
+        """
+        from .hybrid_native_model_runtime import NativeModelOwner
+        self._actual()
+        if type(owner) is not NativeModelOwner or owner.sources is not self:
+            raise PermissionError('original native usage publisher owner required')
+        owner._issued(lease)
+        return None
+
     def poll(self, source):
         self._issued(source)
         raise PermissionError('native model producer qualification missing; use data-only packet decoding')

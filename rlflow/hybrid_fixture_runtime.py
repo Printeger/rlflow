@@ -646,6 +646,9 @@ class FixtureRuntimeOwner:
                 # flags, stdout or the mere presence/absence of a process.
                 runtime['native_model_handoff_attempted'] = phase=='HANDOFF_UNKNOWN' or bool(
                     prior and prior.get('native_model_handoff_attempted'))
+                if phase=='FIXTURE_SCOPE_STOPPED':
+                    publication=self._native_usage_publication(attempt)
+                    if publication is not None:runtime['native_model_usage']=publication
             for name in ('start_command', 'stop_command'):
                 if prior is not None and name in prior: runtime[name] = prior[name]
             if command is not None:
@@ -654,7 +657,9 @@ class FixtureRuntimeOwner:
             now, mono = self.controller._sample()
             if phase == 'REGISTER_NO_HANDOFF': decision, reason = 'HELD', 'FIXTURE_REGISTERED_NO_HANDOFF'
             elif phase == 'FIXTURE_SCOPE_STOPPED' and runtime.get('native_model_handoff_attempted'):
-                decision, reason = 'UNKNOWN', 'FIXTURE_EXPOSURE_RETAINED'
+                if runtime.get('native_model_usage') is not None:
+                    decision,reason='SETTLED','NATIVE_MODEL_USAGE_SETTLED'
+                else:decision, reason = 'UNKNOWN', 'FIXTURE_EXPOSURE_RETAINED'
             elif phase == 'FIXTURE_SCOPE_STOPPED': decision, reason = 'SETTLED', 'FIXTURE_SCOPE_TERMINATED'
             else: decision, reason = 'UNKNOWN', 'FIXTURE_EXPOSURE_RETAINED'
             original = {'schema_version': '1.0', 'request': request, 'request_hash': digest(request),

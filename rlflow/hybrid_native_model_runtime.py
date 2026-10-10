@@ -156,6 +156,20 @@ class NativeModelOwner(FixtureRuntimeOwner):
         self._issued(lease)
         raise PermissionError('native account/ELF/sandbox launch qualification not implemented; no model handoff')
 
+    def _native_usage_publication(self, attempt):
+        self._issued(attempt['lease'])
+        return self.sources._runtime_usage_publication(self,attempt['lease'])
+
+    def check_guard(self,db,guard):
+        self._issued(guard.attempt['lease'])
+        value=super().check_guard(db,guard)
+        recorded=json.loads(guard.raw)['request']['fixture_runtime']
+        expected=(self._native_usage_publication(guard.attempt)
+            if recorded['phase']=='FIXTURE_SCOPE_STOPPED' else None)
+        if recorded.get('native_model_usage')!=expected:
+            raise PermissionError('original issued native usage publication required')
+        return value
+
     def _final_deadlines(self,guard,now,mono):
         super()._final_deadlines(guard,now,mono)
         frozen=json.loads(guard.attempt['native_model_grant'].raw)

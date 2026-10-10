@@ -1,5 +1,7 @@
 # 首个真实工程自主闭环：最小交付清单
 
+2026-10-11 财务处理部分缩减：原Budget/phase builder/Native Guard已有完整usage publication消费与缺账保全分支，计CLI session1+全input/output/wall/overrun，不借零模型/旧历史；Source真实issuer仍缺且hook恒None，因此不是原用量发行或实际结算完成。下一须实装原账户/producer/G/EOF/audit→opaque cap，并接未知candidate同workflowCPU、不同Evaluator、条件CAS及接续；现首次真实task NOT_EXECUTED。小额A调用待批仅限runtime，GPU/B/C/HOLD不变。
+
 2026-10-11 失败来源数据补齐：成功之外原turn.failed/error可完整审计保存失败hash/未知usage，失败即使携合法PATCH/ACCEPT也不得候选或Review；错误观察不是实际CLI exit/EOF。下一仍须原账户+producer/EOF资格+usage publisher/原结算接线，并扩原workflowCPU/Evaluator/条件CAS/接续，不能仅凭此数据结果派发角色。首次真实任务NOT_EXECUTED，A合同待批只限制调用，GPU/B/C/HOLD不变。
 
 2026-10-11 接线缩减：原held stdout全prefix审计与原workflow grant快照/schema/路径到Candidate数据现可实际调用，拒caller换reader/越界/追加；仅合成数据验证、不具来源资格。下一最小实现为原账户/实际生产者+EOF/usage可信publisher及原结算，再同workflowCPUgrant、不同Evaluator、原条件CAS与一次接续；既有counter/STOP必须贯穿。首次真实task仍NOT_EXECUTED；A额度待批不阻本地实现，GPU/B/C/HOLD不变。

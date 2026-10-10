@@ -1,5 +1,7 @@
 # 阻塞与证据缺口
 
+2026-10-11 原Budget已支持完整native CLI usage publication按真实计数消费/显式overrun及缺账UNKNOWN，但actual issuer仍未实现，exact Source hook恒None/实际known settlement继续拒绝。下一代码最高依赖是原账户/producer-ready-G/EOF+独立cap发行（并核source/ready/audit），之后workflowCPU/独立Evaluator/条件CAS/接续。首次实任务NOT_EXECUTED；不因A运行合同待批停止本地实现，不增加恢复范围。GPU/B/C/instinctRL HOLD不变，无新增用户决定。
+
 2026-10-11 原失败事件现在可有限独立审计为冻结数据，候选/Review强制拒，失败缺计数未知不退款；尚不证明原账户/生产者/EOF。最高本地缺口仍可信usage publisher与原结算、同workflow CPU/独立Evaluator/条件CAS/接续，实际首任务NOT_EXECUTED。本地开发继续且无新增用户决定；实际调用仅待已提出小额A合同，GPU/B/C/instinctRL HOLD不变。
 
 2026-10-11 原audited stdout→Candidate数据已接通，但合成输入不是生成来源。当前直接实现缺口仍为原账户/producer-ready-G/EOF及可信用量publisher、原guard结算，继而同workflow候选CPU/不同原Evaluator/条件CAS/自主接续；全部尚需本地代码和首个真实任务证据。不等待运行许可停止代码开发，不把新数据接线称自主闭环。实际模型只按待批小额A合同，GPU/B/C/instinctRL HOLD不变，无新增用户决定。

@@ -86,6 +86,8 @@ RUNTIME['properties']['local_cpu_recovery_source']=RECOVERY_SOURCE
 RUNTIME['properties']['local_cpu_recovery_public_key']={'type':'string','pattern':'^[0-9a-f]{64}$'}
 RUNTIME['properties']['local_cpu_scope_binding']=SCOPE_RUNTIME
 RUNTIME['properties']['native_model_handoff_attempted']={'type':'boolean'}
+from .hybrid_native_model_usage import PUBLICATION as MODEL_USAGE
+RUNTIME['properties']['native_model_usage']=nullable(MODEL_USAGE)
 
 
 def control_command_id(request, actor_id, client_key):
@@ -137,8 +139,16 @@ def validate_runtime(request, prior):
                 old is not None and old.get('native_model_handoff_attempted') and not entered or
                 entered and old is not None and not old.get('native_model_handoff_attempted') and current!='HANDOFF_UNKNOWN'):
             raise Conflict('generating model original handoff latch differs')
+        usage=value.get('native_model_usage')
+        if usage is not None:
+            from .hybrid_native_model_usage import validate_publication
+            validate_publication(usage,value)
+        if old is not None and old.get('native_model_usage') is not None and usage!=old['native_model_usage']:
+            raise Conflict('original native usage publication changed')
     elif 'native_model_handoff_attempted' in value:
         raise Conflict('zero-model profile cannot acquire generating handoff fields')
+    if not generating and 'native_model_usage' in value:
+        raise Conflict('zero-model profile cannot acquire native usage publication')
     local=value['origin']['kind']==LOCAL_KIND
     if local:
         publication=value.get('local_cpu_recovery_source')

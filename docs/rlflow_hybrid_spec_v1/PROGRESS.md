@@ -1,5 +1,9 @@
 # Hybrid v1 开发进度
 
+本原Budget切片FINAL：copy-lease末assert原80817自然terminal1pass12.75s；High独立窄范围无新增确证MUST，所有本轮原测试终态、compile/diff/USERlock通过。本次提交只交付格式/原Budget处理/live拒伪，真实Source资格发行明确NOT_IMPLEMENTED，不能算实际结算/任务/A完成。下一仍优先发行者本地实现，不停止原Goal，ACTIVE。
+
+2026-10-11 native用量原Budget接线：新增闭usage格式与native STOP/原grant/producer/ACK/terminal绑定；原Budget完整记录消费session1/input不减cached/output/原wall，超预留/政策不clip，缺record handoff全额UNKNOWN。原builder+NativeOwner每个Guard重读exact Source发行hook；当前account/producer/G/EOF issuer未实现，hook恒None，auditedData/伪字段/callerJSON不能触发真实结算，旧历史不升级。纯format+新ledger math21pass.69s，旧modelBudget4pass1.63s；原caller字段/handoff缺proof2pass23.88s，shared原Budget82pass72.27s，各原handle自然terminal。High无确证MUST（仅格式/原消费/live拒伪，不代表publisher）；copy-lease末assert受影响原单case收尾。证据a-native-budget-consumption-20261011.txt。首次真实task仍NOT_EXECUTED；下一原usage cap发行资格→workflowCPU/独立Evaluator/条件CAS/接续。代码无新授权阻塞，A调用待批/GPU/B/C/HOLD不变，Goal ACTIVE。
+
 2026-10-11 原失败观测接线：turn.failed/error现可经heldFD独立重放归档FAILURE_OBSERVED及原事件hash/输出hash/保守usage；不作exit/EOF/完整用量或成功，失败自报计数忽略/complete=false，不发候选或Review。原packet_result_data返回冻结结果副本，无来源/结算写权；失败后suffix/retry仍锁存拒。shared41pass.11s；原failure+success2pass25.14s（93696自然terminal）；末failure-latch/Evaluator合法ACCEPT后失败及state重置仍拒7pass.06s。High无新增确证MUST，compile/diff/USERlock通过，证据a-native-failure-observation-20261011.txt。本地进展不是首个真实任务；原账户/producer/EOF+usage publisher结算→workflowCPU/独立Evaluator/条件CAS/接续仍待实现，调用只待小额A合同批准，GPU/B/C/HOLD不变，Goal ACTIVE。
 
 本切片FINAL：原29615自然结束2pass25.30s，独立High两项MUST及REGISTER retry出处补门均关闭，无新增确证MUST；compile/diff/USERlock通过。所有本轮测试terminal、无重复原handle/模型/GPU运行；归档并提交本地source实现快照，非A或98验收关闭。首次真实任务仍NOT_EXECUTED，下一原producer/EOF/usage可信publisher与结算继续本地开发，Goal ACTIVE。

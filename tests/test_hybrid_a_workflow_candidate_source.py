@@ -142,6 +142,32 @@ def test_original_failure_data_audit_does_not_publish_or_authorize_candidate(ori
     assert owner.store.audit()==owner.store.replay()
 
 
+def test_audited_usage_and_caller_source_fields_cannot_issue_settlement(original,monkeypatch):
+    owner,lease,source,row=registered(original,monkeypatch)
+    output(row);owner.sources.poll_packet_data(source);owner.sources.finish_packet_data(source)
+    data=owner.sources.packet_result_data(source)
+    assert data['usage']['complete']
+    # Neither completed audited usage nor mutable source/attempt cache claims
+    # are the original account/producer/G/EOF issuer.
+    row['native_model_usage']=data
+    row['account_qualified']=True;row['producer_qualified']=True;row['eof_qualified']=True
+    attempt=owner._issued(lease);attempt['native_model_usage']=data
+    versions=(owner.store.version(),owner.pool.snapshot()['version'])
+    assert owner.sources._runtime_usage_publication(owner,lease) is None
+    assert owner._native_usage_publication(attempt) is None
+    from rlflow.hybrid_fixture_runtime import FixtureExecutionLease
+    with pytest.raises(PermissionError):
+        owner.sources._runtime_usage_publication(owner,FixtureExecutionLease(lease.id,lease.raw))
+    assert (owner.store.version(),owner.pool.snapshot()['version'])==versions
+    with pytest.raises(PermissionError):owner.sources.seal(source)
+    owner.stop_to_terminal(lease)
+    runtime=owner._current(attempt)['fixture_runtime']
+    assert 'native_model_usage' not in runtime
+    assert owner.pool.snapshot()['occupied']==0
+    assert all(fd is None for fd in row['fds'].values())
+    assert owner.store.audit()==owner.store.replay()
+
+
 @pytest.mark.parametrize('damage',['unapproved_path','replacement_reader'])
 def test_original_candidate_refusal_latches_and_stop_remains_available(original,monkeypatch,damage):
     owner,lease,source,row=registered(original,monkeypatch)

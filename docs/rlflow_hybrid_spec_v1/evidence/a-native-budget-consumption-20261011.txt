@@ -1,0 +1,79 @@
+A native usage Budget integration slice; base d2aa5f6
+No model/API/GPU calls/credential reads; actual task NOT_EXECUTED.
+
+Delivered local behavior:
+Closed ORIGINAL_NATIVE_CLI_USAGE_V1 format binds source ID, original task,
+attempt/lease/grant/nonce/workspace/producer, packet/schema/input candidate,
+audited stream/output, ready/ACK/terminal hashes and complete CLI counters.
+Historical validator requires original native STOPPED + handoff + producer/
+ACK/terminal, checks original immutable grant bindings/cache<=input; nonnative
+runtime cannot borrow even a null native_model_usage field. Old model history
+without this field retains its previous UNKNOWN semantics, no upgrade.
+Original Budget STOP branch consumes complete record via settle_known:
+one CLI attempt session, all reported input incl cached, all output, original
+managed wall time. No clipping to reservation/policy; overrun remains visible.
+Missing publication after handoff retains complete UNKNOWN reservation/exposure.
+Known malformed publication rejects, never silently downgrades/refunds.
+No second ledger or bypass of original predecessor/HEAD/event/CAS/STOP gates.
+
+Live boundary:
+Original phase builder queries NativeOwner's same original Source publisher;
+NativeOwner check_guard repeats this for every active write/final check.
+NativeSource hook currently returns None UNCONDITIONALLY after checking exact
+owner/original lease. Account/producer/G/EOF issuer remains unimplemented.
+No source marker, caller receipt, mutable attempt/source fields, packet data or
+usage.complete JSON may create a publication. Therefore actual known model
+settlement remains unavailable. This is original Budget support, not a trusted
+source issuer, actual financial settlement or autonomous task completion.
+source_id/ready/stream/output fields remain format/binding data here; future
+opaque Source issuer MUST prove all against original physical/account/EOF
+facts independently. Pure validator and synthesized record are not that proof.
+Actual money/provider-request count is not inferred from CLI token/session data.
+
+Commands/results (unset PYTHONPATH, PYTEST_DISABLE_PLUGIN_AUTOLOAD=1):
+0d8b93 / original85354 / 5c8daf:
+  pytest tests/test_hybrid_native_model_budget.py
+  4passed1.63s/old Starlette warning; natural terminal, no restart.
+  Existing no-handoff vs UNKNOWN handoff/model approval/caller JSON boundaries.
+d8ec93:
+  pytest tests/test_hybrid_native_model_usage.py
+    tests/test_hybrid_native_model_budget.py
+    -k 'publication or consumption or complete_format'
+  21passed/4deselected.69s/old warning; closed publication damage cases and
+  synthetic complete protected-ledger arithmetic over original full phase
+  lineage. input12000/out1200 vs policies10000/1000 gives overrun2000/200;
+  cached3 not subtracted, entire reservation/unknown cleared only in known math.
+  This synthetic record proves arithmetic/schema, not live original issuance.
+36db85 / original85847 / 237e8a:
+  pytest tests/test_hybrid_a_workflow_candidate_source.py
+    tests/test_hybrid_native_model_runtime.py
+    -k 'caller_source_fields or original_handoff_without_producer'
+  2passed/27deselected23.88s; natural terminal. Complete audited synthetic data
+  plus fake source account/producer/EOF flags and usage caches cannot issue
+  receipt or mutate Store/Pool; no-handoff STOP Pool0/allFDclosed/audit=replay.
+  Original protected HANDOFF without producer still cannot forge NO_HANDOFF
+  terminal/FREE; UNKNOWN/full reserved/full exposure/Pool1 retained; original
+  safety cleanup leaves finance unknown. No model/G sent.
+e99913 / original15768 / 922ad3:
+  pytest tests/test_hybrid_budget_ledger.py tests/test_hybrid_budget_service.py
+  82passed72.27s/old warning; natural terminal, no restart. Shared original
+  Budget schema/domain/writer modified, so necessary regression run once.
+83ca00 / original80817 added copied-lease issuer refusal in affected case:
+  4d50f1:1passed/8deselected12.75s; original handle natural terminal. Copied
+  lease refused by original issuer hook; fake row qualification/data still no
+  publication, original STOP Pool0/allFDclosed/audit==replay. Earlier collected
+  case did not include this assertion, so only this affected case rerun, no
+  duplicate shared regression.
+Independent High: no new confirmed MUST in format/native writer/Budget/STOP
+  direct scope; emphasizes issuer qualification NOT_IMPLEMENTED. Did not run
+  tests; its last note preceded delivery of already-natural terminal handles.
+Compile/diff/USERlock passed; unchanged unrelated lock remains unstaged:
+becc7e2a36dfcad4ffe934b5ff2f0f68187611d6c0641bd63d81367651cfbf09.
+
+Next actual implementation (not permission-blocked code):
+Original account/producer-ready-G/real stdout+EOF qualification and independently
+issued usage cap -> original Budget branch now present -> same-workflow CPU
+candidate checks -> distinct original Evaluator -> condition CAS -> bounded
+autonomous next packet. Still no actual task/Review/acceptance/continuation.
+Small A runtime contract pending approval only for calls; GPU/B/C/instinctRL
+HOLD unchanged. Goal ACTIVE, no A/98/full-suite/install/long-run closure.

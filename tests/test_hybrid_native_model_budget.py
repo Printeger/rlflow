@@ -67,8 +67,9 @@ def test_generating_approval_and_reservation_cannot_borrow_zero_model_or_api_gra
     with pytest.raises(Conflict):approved_binding(proposal,bad,HASH)
 
 
-@pytest.mark.parametrize('handoff',[False,True])
-def test_native_stopped_without_original_usage_never_settles_handoff_tokens(ledger,handoff):
+@pytest.mark.parametrize('handoff,known_usage',[(False,False),(True,False),(True,True)],
+    ids=['no_handoff','unknown_handoff','complete_format_math_only'])
+def test_native_stopped_without_original_usage_never_settles_handoff_tokens(ledger,handoff,known_usage):
     _,_,binding=_binding();ledger=deepcopy(ledger)
     amount={**zero(),'model_sessions':1,'model_input_tokens':1000,'model_output_tokens':100,'wall_seconds':20}
     ledger['request']['amount']=amount;ledger['request_hash']=digest(ledger['request'])
@@ -87,7 +88,14 @@ def test_native_stopped_without_original_usage_never_settles_handoff_tokens(ledg
             runtime['registration']=(prior_runtime['registration'] if prior_runtime and prior_runtime['registration']
                                      else reference)
         if phase=='HANDOFF_UNKNOWN':runtime['native_model_handoff_attempted']=True
-        if phase=='FIXTURE_SCOPE_STOPPED':runtime['terminal_proof_sha256']=HASH
+        if phase=='PROCESS_REGISTERED':runtime['producer']={**runtime['origin']['owner'],
+            'pid':2,'pgid':2,'starttime':'2'}
+        if phase=='STARTED_AS_OBSERVED':runtime['started_ack_sha256']=HASH
+        if phase=='FIXTURE_SCOPE_STOPPED':
+            runtime['terminal_proof_sha256']=HASH
+            if known_usage:
+                from tests.test_hybrid_native_model_usage import publication
+                runtime['wall_seconds']=21;runtime['native_model_usage']=publication(runtime)
         value=deepcopy(ledger)
         request={name:ledger['request'][name] for name in ('project_id','data_mode','goal_ref','store_epoch')}
         request.update(action='FIXTURE_RUNTIME_'+phase,idempotency_key=phase,
@@ -98,15 +106,25 @@ def test_native_stopped_without_original_usage_never_settles_handoff_tokens(ledg
         derived_heads(value);ledger=value
     transition('REGISTER_NO_HANDOFF','HELD','FIXTURE_REGISTERED_NO_HANDOFF')
     if handoff:transition('HANDOFF_UNKNOWN','UNKNOWN','FIXTURE_EXPOSURE_RETAINED')
+    if known_usage:
+        for phase in ('PROCESS_REGISTERED','RELEASE_INTENT','STARTED_AS_OBSERVED'):
+            transition(phase,'UNKNOWN','FIXTURE_EXPOSURE_RETAINED')
     transition('STOP_REQUESTED','UNKNOWN','FIXTURE_EXPOSURE_RETAINED')
-    transition('FIXTURE_SCOPE_STOPPED','UNKNOWN' if handoff else 'SETTLED',
+    transition('FIXTURE_SCOPE_STOPPED','UNKNOWN' if handoff and not known_usage else 'SETTLED',
+        'NATIVE_MODEL_USAGE_SETTLED' if known_usage else
         'FIXTURE_EXPOSURE_RETAINED' if handoff else 'FIXTURE_SCOPE_TERMINATED')
     goal,reservation,project=heads(ledger)
-    assert reservation['status']==('UNKNOWN' if handoff else 'SETTLED')
-    assert project['reserved']==(amount if handoff else zero())
-    assert project['unknown_exposure']==(amount if handoff else zero())
-    assert project['consumed']==zero()
-    if handoff:
+    unresolved=handoff and not known_usage
+    assert reservation['status']==('UNKNOWN' if unresolved else 'SETTLED')
+    assert project['reserved']==(amount if unresolved else zero())
+    assert project['unknown_exposure']==(amount if unresolved else zero())
+    if known_usage:
+        assert project['consumed']=={**zero(),'model_sessions':1,'model_input_tokens':12000,
+            'model_output_tokens':1200,'wall_seconds':21}
+        assert goal['balance']['model_input_tokens']['overrun']==2000
+        assert goal['balance']['model_output_tokens']['overrun']==200
+    else:assert project['consumed']==zero()
+    if unresolved:
         forged=deepcopy(ledger);forged['decision']='SETTLED';forged['reason']='FIXTURE_SCOPE_TERMINATED'
         with pytest.raises(Conflict):derived_heads(forged)
         bad=deepcopy(ledger);bad['request']['fixture_runtime']['native_model_handoff_attempted']=False

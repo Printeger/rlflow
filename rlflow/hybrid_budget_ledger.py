@@ -56,7 +56,8 @@ ENTRY=obj({'schema_version':{'const':'1.0'},'request':REQUEST,'request_hash':HAS
     'prior_goal':nullable(HEADS[0]),'prior_reservation':nullable(HEADS[1]),'prior_project':nullable(HEADS[2]),
     'decision':enum('HELD','DENIED','UNKNOWN','CANCELLED','SETTLED'),
     'reason':enum('BUDGET_RESERVED','BUDGET_UNAVAILABLE','EXPOSURE_UNKNOWN','CORE_CANCELLED_BEFORE_RUNTIME',
-        'FIXTURE_REGISTERED_NO_HANDOFF','FIXTURE_EXPOSURE_RETAINED','FIXTURE_SCOPE_TERMINATED'),
+        'FIXTURE_REGISTERED_NO_HANDOFF','FIXTURE_EXPOSURE_RETAINED','FIXTURE_SCOPE_TERMINATED',
+        'NATIVE_MODEL_USAGE_SETTLED'),
     'accepted_state_version':POSITIVE,'execution_enabled':{'const':False}})
 
 
@@ -135,11 +136,18 @@ def derived_heads(value):
                 usage['experiment_starts']=int(runtime['origin']['local_cpu']['purpose']=='research' and
                                                runtime['local_cpu_release_attempted'])
             if generating and runtime['native_model_handoff_attempted']:
-                # Native original usage/source settlement is not implemented
-                # yet. Physical STOP is NEVER proof of zero model use.
-                if reservation['status']=='HELD':changed=mark_unknown(old_balance,reservation['amount'])
-                elif reservation['status']!='UNKNOWN':raise Conflict('generating model retained exposure required')
-                decision,reason='UNKNOWN','FIXTURE_EXPOSURE_RETAINED'
+                publication=runtime.get('native_model_usage')
+                if publication is not None:
+                    from .hybrid_native_model_usage import consumption
+                    usage=consumption(publication,runtime)
+                    changed=settle_known(old_balance,reservation['amount'],usage,
+                        prior_status=reservation['status'])
+                    decision,reason='SETTLED','NATIVE_MODEL_USAGE_SETTLED'
+                else:
+                    # Physical STOP and audited data alone prove no cost.
+                    if reservation['status']=='HELD':changed=mark_unknown(old_balance,reservation['amount'])
+                    elif reservation['status']!='UNKNOWN':raise Conflict('generating model retained exposure required')
+                    decision,reason='UNKNOWN','FIXTURE_EXPOSURE_RETAINED'
             else:
                 changed=settle_known(old_balance,reservation['amount'],usage,prior_status=reservation['status'])
                 decision,reason='SETTLED','FIXTURE_SCOPE_TERMINATED'

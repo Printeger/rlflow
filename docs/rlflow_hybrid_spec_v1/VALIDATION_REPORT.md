@@ -1,5 +1,9 @@
 # 需求包离线校验报告
 
+native Budget末affected原80817自然结束1pass12.75s，复制lease拒/伪资格不发行/原STOP与audit=replay通过。原85354/85847/15768均已terminal，不重启；独立High无本片MUST、compile/diff/USERlock通过。仅格式与原消费接线/拒伪资格，不支持真实source或实际结算声明。
+
+2026-10-11 native Budget消费：完整格式/跨绑定/缺账/超额pure及原ledger合成math21pass.69s；旧modelBudget4pass1.63s。原source complete数据与伪资格字段不能发行，实际无模型handoffSTOP Pool0/allFDclose；原HANDOFF缺producer仍UNKNOWN/fullreserve/Pool1，两case23.88s。shared BudgetLedger/Service82pass72.27s自然terminal，High无本片确证MUST。copy-lease末assert原affected单case收尾；证据evidence/a-native-budget-consumption-20261011.txt。当前Source发行hook恒None，未证明真实来源/用量结算/任务/Review/条件接续，不称A/98/全库通过，Goal ACTIVE。
+
 2026-10-11 原失败观测：new/shared41pass.11s，原93696 failure/success接线2pass25.14s/自然terminal；末纯failure/Evaluator7pass.06s。合成turn.failed审计+冻结copy+缺账未知+候选拒、STOP Pool0/allFDclosed/audit=replay通过，无真实CLI/生产者/EOF/用量结算资格。High无新增确证MUST，compile/diff/USERlock通过；原证据evidence/a-native-failure-observation-20261011.txt。不是A/98/首个真实任务或全库验收，Goal ACTIVE。
 
 原candidate source末审已关闭全部确证MUST；原29615终态exit0/2pass25.30s。所有本轮原handles自然结束，无模型/GPU调用。属于本地数据接线提交，不是首个真实任务/产品独立Review/A/98或全库验收；证据a-workflow-candidate-source-20261011.txt。

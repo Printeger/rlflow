@@ -1,5 +1,7 @@
 # 开发决策记录
 
+2026-10-11 native结算沿原Budget/CAS：格式验证与发行必须分离；native STOP可携完整usage publication但实际builder及Guard均核同exact Source原发行结果。当前原资格issuer缺失，hook恒None；不得从审计data/complete=true/缓存字段或hash声明发行。纯历史domain核原grant/phase/producer/ACK/terminal绑定，不恢复能力。完整记录按CLI session1/全input含cached/output/原wall消费，overrun不clip；缺record保持UNKNOWN全reservation，物理STOP资格独立保留。source_id/ready/stream/output尚须未来Source原cap发行核物理/account/EOF；不能把合成math或格式叫可信来源或实际结算。证据a-native-budget-consumption-20261011.txt。
+
 2026-10-11 失败不是解码损坏或免费执行：Codex CLI官方文档只列turn.failed/error，未建立失败完整计数/EOF保证。保留原事件hash的FAILURE_OBSERVED数据可独立FD重放，禁止因此授成功候选/Review，失败payload声称usage不作为结算。packet_result_data仅冻结审计数据copy，Source/Budget的资格门保持。错误可能非terminal，上游额外suffix本受限单turn仍拒，不自动retry/新调用。尚缺可信publisher/原结算，不以本失败观察切片替代首个真实任务。证据a-native-failure-observation-20261011.txt。
 
 2026-10-11 原审计候选：原source公开的数据接线不接受caller files/allowed_paths/EOF参数；允许路径从登记已核原Registry spec冻结，不信可变grant row，source独立保留原reader/transcript与原packet/schema/路径。完整FD前缀审计须独立decoder重放实际bytes并比较，冻结audit消息/result，拒同对象message替换；仅按冻结audit消息及原schema/snapshot变换。返回纯Candidate而非凭证，不执行检查/写项目/发Reviewer或结算。turn.completed和数据审计不能证明账户、原生产者或EOF；这些资格仍须原runtime与可信publisher实现，不借fixture成功或hash匹配晋升。证据a-workflow-candidate-source-20261011.txt。
