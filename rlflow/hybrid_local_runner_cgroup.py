@@ -196,6 +196,12 @@ class OriginalTaskScope:
                 if _read(fd).split()!=expected:raise RuntimeError('original scope contains additional producers')
             finally:self._close_temporary(fd)
 
+    def scope_binding(self):
+        self.check_single_keeper()
+        return {'path':self._path,'root':list(self._root_identity),
+                'control':list(self._control_identity),'task':list(self._task_identity),
+                'keeper_producers_closed':True,'protocol':'ORIGINAL_CONTROLLED_SCOPE_V1'}
+
     def task_empty(self):
         self.check()
         lines = dict(line.split() for line in _read(self._fds['cgroup.events']).splitlines())

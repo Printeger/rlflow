@@ -1,0 +1,89 @@
+{
+  "schema_version": "1.1",
+  "project_id": "isolated_local_cpu",
+  "data_mode": "fixture",
+  "store_epoch": "store_fabb86d35f294d66a6d66fa372dfc1de",
+  "as_of_state_version": 15,
+  "execution_enabled": false,
+  "task": {
+    "id": "fixture_task_3669c02ba8304838b294eb7edb4c7dfd",
+    "attempt_id": "fixture_attempt_92306e8de36e47c48fc1be7511308589",
+    "reservation_id": "budget_reservation_c5a1d821c6e6c8a14b6515348e3a06ffda1ea4e19f90de129cd49ad8819bb288",
+    "kind": "LOCAL_CONFIGURED_CPU",
+    "authorization": "ORIGINAL_APPROVED_LOCAL_CPU_ONLY",
+    "recorded_phase": "RELEASE_INTENT",
+    "recorded_at_state_version": 15,
+    "current_execution_status": "UNKNOWN",
+    "controls_available": false,
+    "source_coverage": "ORIGINAL_EVENT_VERIFIED",
+    "model_enabled": false,
+    "native_execution_enabled": false,
+    "candidate_write_enabled": false,
+    "delegation_enabled": false,
+    "actual_cost_status": "UNKNOWN",
+    "synthetic_tokens_settled": false,
+    "arbitrary_tree_stop": false,
+    "resource_release_status": "NOT_OBSERVED",
+    "recorded_wall_seconds": null,
+    "configured_local_cpu_only": true,
+    "fixed_cpu_scope_only": false,
+    "profile": "CONFIGURED_LOCAL_CPU_V1",
+    "approved_spec_sha256": "sha256:7112ff0d7cfdcfeddf7387e9a30f849d4fabd06464fc9f80ab20958ade6aa1e4",
+    "approved_code_sha256": "sha256:a61b3c1cbcf6dfaa2b6836214589b7676ebde0315b2650e5d0c8fe924c6832fb",
+    "approved_inputs_sha256": "sha256:44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+    "recorded_release_attempted": false,
+    "recorded_terminal_proof_sha256": null,
+    "local_result_status": "NOT_DURABLY_ARCHIVED",
+    "machine_acceptance_status": "UNKNOWN",
+    "independent_review_status": "NOT_PROVEN",
+    "condition_evidence": false,
+    "recorded_budget_status": "UNKNOWN",
+    "recorded_reserved_amount": {
+      "experiment_retries": 0,
+      "experiment_starts": 1,
+      "gpu_device_seconds": 0,
+      "model_input_tokens": 0,
+      "model_output_tokens": 0,
+      "model_sessions": 0,
+      "wall_seconds": 30
+    },
+    "recorded_unknown_exposure": {
+      "experiment_retries": 0,
+      "experiment_starts": 1,
+      "gpu_device_seconds": 0,
+      "model_input_tokens": 0,
+      "model_output_tokens": 0,
+      "model_sessions": 0,
+      "wall_seconds": 30
+    },
+    "cold_recovery_action": "READ_ONLY_HISTORY_NO_EXECUTION_REPLAY"
+  },
+  "events": [
+    {
+      "event_id": "budget_entry_61a42ae0a92d6eef1ebcd826c3aad2882f50ec82cd9391a39d9b089cd87afeac",
+      "state_version": 12,
+      "recorded_at": "2026-10-10T12:46:10.561144Z",
+      "recorded_phase": "REGISTER_NO_HANDOFF"
+    },
+    {
+      "event_id": "budget_entry_884188c6e59817fb1d5f3ebd41598d3ebc5959ee740a3941a2d0c145a9a5fdbc",
+      "state_version": 13,
+      "recorded_at": "2026-10-10T12:46:11.870115Z",
+      "recorded_phase": "HANDOFF_UNKNOWN"
+    },
+    {
+      "event_id": "budget_entry_5364a8b1a5598db30d83434e0bb03b07742fde8e4bc6ebab3080d445f80bfce4",
+      "state_version": 14,
+      "recorded_at": "2026-10-10T12:46:13.918437Z",
+      "recorded_phase": "PROCESS_REGISTERED"
+    },
+    {
+      "event_id": "budget_entry_8d654c87d34cf92fcc2192db6fda84f890ecc3b5d25c8ef88bc9d6c0de2d8a75",
+      "state_version": 15,
+      "recorded_at": "2026-10-10T12:46:14.760657Z",
+      "recorded_phase": "RELEASE_INTENT"
+    }
+  ],
+  "managed_terminal_proof": null,
+  "recorded_settled_usage": null
+}

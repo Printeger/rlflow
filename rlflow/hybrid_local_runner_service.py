@@ -108,13 +108,16 @@ def serve(config_path, expected_sha256):
                                     sources[0][0], sources[1][0], seconds=config['seconds'])
         close_keeper_producers()  # Task is already forked/confined; no new keeper producers.
         scope.check_single_keeper()
+        scope_binding=scope.scope_binding()
         receipt={'type': 'local_cpu.ready', 'config_sha256': expected_sha256,
-               'keeper': keeper_identity, 'task': ready}
+               'keeper': keeper_identity, 'task': ready,'scope_binding':scope_binding}
         if publication is not None:
             # Task already forked + confined; its memory contains no key.
             signer=Signer(publication['libcrypto_sha256']);receipt['recovery_public_key']=signer.public_key
         _emit(receipt)
         stopped = keeper.run_original_control(control)
+        closed_scope=scope.scope_binding()
+        if closed_scope!=scope_binding:raise RuntimeError('original closed service scope differs')
         closed = keeper.close_stopped_task()
         output_seals={}
         for index, (fd, identity) in enumerate(sources):
@@ -135,7 +138,8 @@ def serve(config_path, expected_sha256):
                'closed': closed, 'original_output_fds_closed': True,
                'original_control_fd_closed': True, 'whole_scope_stopped': False}
         if report is not None:
-            payload={'format':'local_cpu_recovery/1','task_closed':terminal,'outputs':output_seals}
+            payload={'format':'local_cpu_recovery/2','task_closed':terminal,'outputs':output_seals,
+                     'closed_scope':closed_scope}
             payload['signature']=signer.sign(payload)
             signer.close();signer=None
             raw=json.dumps(payload,

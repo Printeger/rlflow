@@ -90,6 +90,7 @@ def test_synthetic_publication_only_recovers_task_not_managed_scope(publication)
     value=recover(source,runtime,spec)
     assert value['configured_local_result']['machine_acceptance']['status']=='FAIL'
     assert value['managed_scope_status']=='UNKNOWN'
+    assert value['physical_scope_status']=='UNKNOWN' and value['physical_scope_proof'] is None
     assert not value['controls_available'] and not value['condition_evidence']
     assert not value['settlement_performed'] and not value['execution_replayed']
 

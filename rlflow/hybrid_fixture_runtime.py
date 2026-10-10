@@ -620,6 +620,9 @@ class FixtureRuntimeOwner:
                 public_key=(self._recovery_public_key(attempt,phase) if phase=='PROCESS_REGISTERED' else
                     None if prior is None else prior.get('local_cpu_recovery_public_key'))
                 if public_key is not None:runtime['local_cpu_recovery_public_key']=public_key
+                scope_binding=(self._recovery_scope_binding(attempt,phase) if phase=='PROCESS_REGISTERED' else
+                    None if prior is None else prior.get('local_cpu_scope_binding'))
+                if scope_binding is not None:runtime['local_cpu_scope_binding']=scope_binding
             for name in ('start_command', 'stop_command'):
                 if prior is not None and name in prior: runtime[name] = prior[name]
             if command is not None:

@@ -248,6 +248,19 @@ class LocalCpuSourceOwner(FixtureUsageSourceOwner):
             if current is None or any(current[key]!=keeper[key] for key in ('pid','starttime','boot_id')):
                 raise Conflict('original keeper kernel ready differs')
             row['producer_identity']=current;manager.bind_ready(keeper)
+            scope_binding=row['ready']['scope_binding']
+            from .hybrid_local_cpu_recovery import validate_scope,process_view
+            validate_scope(scope_binding,binding['unit'])
+            if manager._property('ControlGroup',b's',b'org.freedesktop.systemd1.Service')!=scope_binding['path']:
+                raise Conflict('original manager/top-level scope differs')
+            view=process_view()
+            for original in (current,row['transport_identity'],runtime['origin']['owner']):
+                info=os.stat(f"/proc/{original['pid']}/ns/pid")
+                if [info.st_dev,info.st_ino]!=view['pid_namespace']:
+                    raise Conflict('original service process namespace differs')
+            row['scope_process_view']=view
+            row['scope_runtime_raw']=canonical({'scope':scope_binding,'transport':row['transport_identity'],
+                'owner':runtime['origin']['owner'],'keeper':keeper,'manager_producers_closed':True,'process_view':view})
             fd=os.pidfd_open(current['pid']);row['fds']['pidfd']=fd;info=os.fstat(fd)
             row['pidfd_identity']=[info.st_dev,info.st_ino]
             self._check_pidfd(row,live=True)
@@ -271,9 +284,10 @@ class LocalCpuSourceOwner(FixtureUsageSourceOwner):
             if value.get('config_sha256')!=binding['config_sha256']:raise Conflict('original trusted report config differs')
             if value.get('type')=='local_cpu.ready' and row['ready'] is None and not row['protocol_rows']:
                 from .hybrid_local_cpu_result import TASK,KEEPER,HEX
+                from .hybrid_local_cpu_recovery import SCOPE
                 from .hybrid_protocol import obj,validate_schema
                 validate_schema(obj({'type':{'const':'local_cpu.ready'},'config_sha256':HEX,
-                    'keeper':KEEPER,'task':TASK,'recovery_public_key':HEX}),value)
+                    'keeper':KEEPER,'task':TASK,'recovery_public_key':HEX,'scope_binding':SCOPE}),value)
                 if value['task']['source_sha256']!=json.loads(row['runtime']['local_cpu_grant'].raw)['code_sha256'].removeprefix('sha256:'):
                     raise Conflict('original task approved source differs')
                 row['ready']=value

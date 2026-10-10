@@ -75,8 +75,10 @@ RUNTIME['properties'].update(engineering_release_attempted={'type':'boolean'},
 RUNTIME['properties']['local_cpu_release_attempted']={'type':'boolean'}
 RUNTIME['properties']['local_cpu_terminal_proof']=nullable({'type':'object'})
 from .hybrid_local_cpu_recovery import SOURCE as RECOVERY_SOURCE
+from .hybrid_local_cpu_recovery import SCOPE_RUNTIME
 RUNTIME['properties']['local_cpu_recovery_source']=RECOVERY_SOURCE
 RUNTIME['properties']['local_cpu_recovery_public_key']={'type':'string','pattern':'^[0-9a-f]{64}$'}
+RUNTIME['properties']['local_cpu_scope_binding']=SCOPE_RUNTIME
 
 
 def control_command_id(request, actor_id, client_key):
@@ -134,6 +136,18 @@ def validate_runtime(request, prior):
         if key is not None and old_key is None and (current!='PROCESS_REGISTERED' or publication is None):
             raise Conflict('original recovery public key must bind before G')
         if old_key is not None and key!=old_key:raise Conflict('original recovery public key changed')
+        scope=value.get('local_cpu_scope_binding');old_scope=None if old is None else old.get('local_cpu_scope_binding')
+        if scope is not None:
+            from .hybrid_local_cpu_recovery import validate_scope
+            validate_scope(scope['scope'],publication['unit'] if publication is not None else '')
+            if (scope['owner']!=value['origin']['owner'] or key is None or value['producer'] is None or
+                    any(item['boot_id']!=value['producer']['boot_id'] for item in (scope['transport'],scope['owner'])) or
+                    any(scope['keeper'][key]!=value['producer'][key] for key in ('pid','starttime','boot_id')) or
+                    len({scope['owner']['pid'],scope['transport']['pid'],value['producer']['pid']})!=3):
+                raise Conflict('original scope recovery producer lineage differs')
+        if scope is not None and old_scope is None and current!='PROCESS_REGISTERED':
+            raise Conflict('original scope recovery binding must precede G')
+        if old_scope is not None and scope!=old_scope:raise Conflict('original scope recovery binding changed')
         released=value.get('local_cpu_release_attempted')
         if (type(released) is not bool or released and current not in PHASES[4:] or
                 (current=='STARTED_AS_OBSERVED' or value['started_ack_sha256'] is not None) and not released or
@@ -149,7 +163,7 @@ def validate_runtime(request, prior):
                 validate_terminal(proof,value)
             elif proof is not None:raise Conflict('nonterminal configured CPU cannot archive terminal')
     elif any(key in value for key in ('local_cpu_release_attempted','local_cpu_terminal_proof',
-            'local_cpu_recovery_source','local_cpu_recovery_public_key')):
+            'local_cpu_recovery_source','local_cpu_recovery_public_key','local_cpu_scope_binding')):
         raise Conflict('fixed capability cannot acquire configurable CPU release fields')
     trial = value['origin']['kind'] == CPU_KIND
     if trial:

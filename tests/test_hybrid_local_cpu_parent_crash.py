@@ -85,6 +85,11 @@ def test_owner_crash_retires_physical_service_without_forging_budget_terminal(tm
         assert store.version()==version
         recovered=reader.recover_task_evidence(ready['reservation'])
         evidence=recovered['task_evidence'];assert evidence is not None
+        assert evidence['physical_scope_status']=='ORIGINAL_CONTROLLED_SCOPE_CLOSED'
+        physical=evidence['physical_scope_proof'];assert physical is not None
+        assert physical['original_processes_terminal'] and not physical['original_manager_job_recovered']
+        assert physical['keeper']==ready['keeper'] and physical['signed_task_closed']==evidence['task_closed']
+        assert physical['original_binding']['scope']['path'].endswith('/'+ready['unit'])
         result=evidence['configured_local_result'];assert result is not None
         assert result['outputs']['stdout']['text']=='checkpoint-before-crash\n'
         assert result['execution']['control_terminal_reason']=='CONTROL_EOF'
@@ -103,7 +108,13 @@ def test_owner_crash_retires_physical_service_without_forging_budget_terminal(tm
         with reader.snapshot() as (db,meta):
             head=reader._head(db,ReadBudget(db,16*1024**2),
                 ready['reservation'],meta['as_of_state_version'])[0]
+            process=reader._point(db,ReadBudget(db,16*1024**2),
+                head['fixture_runtime']['previous']['key'],meta['as_of_state_version'])
+            assert process['request']['fixture_runtime']['phase']=='PROCESS_REGISTERED'
+            (tmp_path/'crash-pre-g-process.json').write_text(json.dumps(process))
+            (tmp_path/'crash-recovery-binding.json').write_text(json.dumps(head['fixture_runtime']))
         source=Path(head['fixture_runtime']['local_cpu_recovery_source']['path'])
+        (tmp_path/'crash-v2-original-report.json').write_bytes((source/'task-report').read_bytes())
         output=source/'task-stdout';original=output.read_bytes()
         output.write_bytes(b'forged PASS\n')
         try:

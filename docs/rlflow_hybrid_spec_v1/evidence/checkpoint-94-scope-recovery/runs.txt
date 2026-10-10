@@ -1,0 +1,28 @@
+Checkpoint94 base38dc1bf. PYTEST_DISABLE_PLUGIN_AUTOLOAD=1; checkout .venv, local zero-model/GPU tests only.
+1 env PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q tests/test_hybrid_local_cpu_recovery.py tests/test_hybrid_local_cpu_parent_crash.py::test_owner_crash_retires_physical_service_without_forging_budget_terminal tests/test_hybrid_local_cpu_runtime.py::test_actual_configured_core_task_result_managed_stop_budget_and_free
+56614/9212ad exit0 26passed28.95s; initial implementation, before namespace/pidfd qualification.
+2 env PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q tests/test_hybrid_local_cpu_parent_crash.py::test_owner_crash_retires_physical_service_without_forging_budget_terminal
+34723/a1af12 exit0 1passed15.39s; view/pidfd first integration.
+3 env PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q tests/test_hybrid_local_cpu_scope_recovery.py tests/test_hybrid_local_cpu_parent_crash.py::test_owner_crash_retires_physical_service_without_forging_budget_terminal tests/test_hybrid_local_cpu_runtime.py::test_actual_configured_core_task_result_managed_stop_budget_and_free
+83309/789dff exit0 3passed29.33s. Final protocol/boundedstat/invocation, actual live-thread zombie reject, actual v2 crash/publicCLI/forgery/Pool1 and normal owner-live UNKNOWN/fullSTOPFREE.
+4 env PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q tests/test_hybrid_local_cpu_profile.py::test_original_scope_binding_frozen_at_process_before_g tests/test_hybrid_local_cpu_recovery.py
+9eebaf exit0 30passed.14s. Pure binding/v1/recovery.
+5 env PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q tests/test_hybrid_local_cpu_scope_recovery.py
+9abdde exit0 5passed.08s. After High kernel cleanup MUST, 4 FD fault cases and actual thread-group observation.
+6 env PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q tests/test_hybrid_local_cpu_scope_recovery.py::test_foreign_kernel_fd_is_retained_never_closed
+893776 exit0 2passed.06s. Foreign replacements not closed; other original FD independently closed.
+7 .venv/bin/python -c (readonly diagnostic in tool transcript; original766 Store, no file writes)
+1709/9d05d4 exit0: final helper actual v2 baseline unchanged; mocked wrong namespace + in-memory original scope/Invocation alterations refused, FDset/business version unchanged; BudgetUNKNOWN. final-readonly-cold-checks.json preserves exact values, derived from baseline actual766 and observed checks.
+8 env PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q tests/test_hybrid_local_cpu_profile.py
+191fbd exit0 26passed.11s. Full affected pure contract profile includes6 previously passed newguards, not26 new qualifications.
+9 env PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q tests/test_hybrid_fixture_runtime.py::test_original_terminal_snapshot_replay_recover_and_pool_cold_join
+60240/d42943 exit0 1passed11.80s. Shared original fixed Runtime lineage/cold join regression.
+10 Late original766 PROCESS archiving read .venv/bin/python -c, aa48ef exit1 FileNotFoundError old /tmp/pytest-of-mint/pytest-766/.../crash-history.json: pytest retention had deleted source. Original qualification unchanged, missing archival key not invented. Captured old history/recovery/report/Pool before deletion preserved actual-*.
+11 env PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q tests/test_hybrid_local_cpu_parent_crash.py::test_owner_crash_retires_physical_service_without_forging_budget_terminal
+97587/01217f exit0 1passed14.12s. ONLY necessary affected archival qualification rerun after test collects original verified preG PROCESS, pubkey/runtimebinding and exact report; final-crash-* is original770 distinctrun. Others not rerun.
+12 .venv/bin/python -c (archive event key + v2 payload verify and scope equality)
+34699c exit0: archived v2 signature and original pre-G scope binding verified.
+High final narrow FD MUST closed/no remaining confirmed MUST; reviewer no tests/writes. No new model/GPU/instinctRL/production actions.
+Compile11 changed production/test modules and git diff --check exit0; USER lock SHA becc7e2a36dfcad4ffe934b5ff2f0f68187611d6c0641bd63d81367651cfbf09 unchanged/untracked/not staged.
+Read-only systemctl exactly four historical failed rlflow units 373d5b/606bc0/826ea9/e1e192, no new active. No reset-failed/delete/push.
+All handles terminal. JSON formatted copies, not complete event byte seals or same-run interchangeable keys.

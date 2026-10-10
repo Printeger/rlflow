@@ -76,6 +76,12 @@ if not child:
         assert attempt['release_entered'] and runtime.pool.snapshot()['occupied']==1
         runtime.stop_to_terminal(lease)
         assert runtime._current(attempt)['status']=='SETTLED' and runtime.pool.snapshot()['occupied']==0
+        from rlflow.hybrid_budget_ledger import reservation_key
+        from rlflow.hybrid_local_cpu_reads import LocalCpuTaskReader
+        reader=LocalCpuTaskReader(runtime.store,project_id='isolated_local_cpu',store_epoch=runtime.plans.workspace.store_epoch)
+        warm=reader.recover_task_evidence(reservation_key(session['reserve']))
+        assert warm['task_evidence']['physical_scope_status']=='UNKNOWN'  # Original owner remains live.
+        assert warm['task_evidence']['physical_scope_proof'] is None
         proof=attempt['terminal']['managed_service_proof']
         assert proof['job']['result']=='done' and proof['keeper_kernel_terminal']
         assert proof['original_manager_connection_closed'] and proof['original_protocol_closed']

@@ -1,5 +1,7 @@
 # 需求包离线校验报告
 
+94 FINAL：93提交38dc1bf。公开cold v2完整原scope物理证据实装，PROCESS前G绑定root/control/task+keeperInvocation/transport/owner/procview/协议/publickey，末签kill/reap/empty/singlekeeper原scope；pidfd整线程组而非leaderZ。实际3pass29.33s（父死CLI/paired篡改/Pool1、正常ownerlive拒/fullSTOPFREE、真实多线程leaderZ拒）；High FD MUST修后5pass.08s+foreign2pass.06s，final独立原766只读同值/namespace-scope-Invocation拒/FD和版本不变exit0。纯immutable/v1 30pass.14s、profile26pass.11s和共享旧Runtime冷回放1pass11.80s。旧temp原PROCESS补读FileNotFound保留；补采集后仅必要父死归档复验1pass14.12s，final770原公钥/event/report离线验签同scope exit0；分run不互换。High全部MUST关闭，compile/diff/USERlock/noactive检查通过，证据checkpoint-94-scope-recovery/及HYBRID_LOCAL_CPU_SCOPE_RECOVERY.md，归档进入本记录所属提交。非原Job/FREE/结算/模型自治/全库/安装/长跑完成；下一独立Pool物理退役与BudgetUNKNOWN保留安全对账，原Goal ACTIVE/不调用未批准模型GPU。
+
 93 FINAL：High io_uring 与 RestartForceExitStatus 两项 MUST 均修并静态关闭，无剩余确证 MUST；最后原typed(aiai)解析门/负例与实际fullSTOP-FREE-alias25pass14.94s。原分轮产品失败与修复证据保留，下方待审/未提交为历史。所有测试terminal，当前compile/diff/USERlock通过，无新active unit；归档并进入本记录所属checkpoint提交。仅交付实际producer边界，完整coldFREE/预算Pool收敛与长期/自治/instinctRL资格仍未完成，Goal ACTIVE，不调用未批准模型/GPU。
 
 93 定向实际原keeper kernelfence与G/close拓扑拒通过，候选fork/exec/setsid不缩减；真实manager closed-producer typed policy及原completeSTOP/FREE/cold无回归。分轮3pass、13pass/1fail产品closed-RPC回归、修后14pass、5purecache、1actualmanager_close，证据与命令HYBRID_LOCAL_CPU_CLOSED_PRODUCERS.md/checkpoint-93-closed-producers/。父SIGKILL签名cold仍UNKNOWN/Pool1，完整冷协议/严格quota/自治/长跑未获资格，不重标82历史全量。

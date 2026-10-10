@@ -116,7 +116,24 @@ class LocalCpuRunnerOwner(FixtureRuntimeOwner):
             if prior is None or prior.get('local_cpu_recovery_public_key') is None:expected_key=None
         if recorded.get('local_cpu_recovery_public_key')!=expected_key:
             raise Conflict('original configured CPU recovery public key differs')
+        expected_scope=self._recovery_scope_binding(guard.attempt,recorded['phase'])
+        if recorded['phase'] in ('STOP_REQUESTED','FIXTURE_SCOPE_STOPPED'):
+            prior=json.loads(guard.raw)['prior_reservation'].get('fixture_runtime')
+            if prior is None or prior.get('local_cpu_scope_binding') is None:expected_scope=None
+        if recorded.get('local_cpu_scope_binding')!=expected_scope:
+            raise Conflict('original configured CPU scope recovery binding differs')
         return value
+
+    def _recovery_scope_binding(self,attempt,phase):
+        row=self._original_source(attempt)
+        if (phase in ('REGISTER_NO_HANDOFF','HANDOFF_UNKNOWN') or row is None or
+                attempt['producer_identity'] is None or row.get('scope_runtime_raw') is None):return None
+        expected={'scope':row['ready']['scope_binding'],'transport':row['transport_identity'],
+            'owner':attempt['origin']['owner'],'keeper':row['ready']['keeper'],
+            'manager_producers_closed':True,'process_view':row['scope_process_view']}
+        if canonical(expected)!=row['scope_runtime_raw']:
+            raise Conflict('original scope/transport recovery source differs')
+        return expected
 
     def _recovery_public_key(self,attempt,phase):
         row=self._original_source(attempt)

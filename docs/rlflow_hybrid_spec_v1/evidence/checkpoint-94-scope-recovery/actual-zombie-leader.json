@@ -1,0 +1,11 @@
+{
+  "original": {
+    "pid": 1619516,
+    "pgid": 1619515,
+    "starttime": "158371077",
+    "boot_id": "fa257cc3-1204-4e6f-88a5-a8a2ea7743aa"
+  },
+  "leader_state_before": "Z",
+  "whole_group_terminal_before": false,
+  "whole_group_terminal_after": true
+}

@@ -1,0 +1,75 @@
+{
+  "closed_scope": {
+    "control": [
+      31,
+      299158,
+      1000
+    ],
+    "keeper_producers_closed": true,
+    "path": "/user.slice/user-1000.slice/user@1000.service/app.slice/rlflow-local-212d5c6a72ea4b6dba46b159f403eb96.service",
+    "protocol": "ORIGINAL_CONTROLLED_SCOPE_V1",
+    "root": [
+      31,
+      299107,
+      1000
+    ],
+    "task": [
+      31,
+      299209,
+      1000
+    ]
+  },
+  "format": "local_cpu_recovery/2",
+  "outputs": {
+    "stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout": "799d81a81c08f3d1b2e844f2d8feaa4bf74b09b5524e70e5d09aa69201ed5619"
+  },
+  "signature": "0db05ec69eeee734ecfa659df2aab68ce4b69d3c9f39117cc6f589c6a90cd46bbdcd5aa801eae52b43ffd92b1582b3766fc6d01c3eb27a6e2591474aed20d804",
+  "task_closed": {
+    "closed": {
+      "keeper_protocol_handles_closed": true,
+      "stop_latched": true,
+      "task_handles_closed": true,
+      "whole_scope_stopped": false
+    },
+    "config_sha256": "80ea265bda8b528278e2d1a6b5c0daa308be0c2c63870c5c5cfcbe5f68ac3b66",
+    "keeper": {
+      "boot_id": "fa257cc3-1204-4e6f-88a5-a8a2ea7743aa",
+      "invocation_id": "f1a3dd18236a4ff3b5024bedde697167",
+      "pid": 1619977,
+      "starttime": "158411206"
+    },
+    "original_control_fd_closed": true,
+    "original_output_fds_closed": true,
+    "stopped": {
+      "control_terminal_reason": "CONTROL_EOF",
+      "cpu_stat": "usage_usec 2165\nuser_usec 721\nsystem_usec 1443\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 4\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0",
+      "handoff_unknown": false,
+      "keeper_still_live": true,
+      "memory_peak": 2359296,
+      "protocol_cleanup_unknown": false,
+      "reaped": [
+        {
+          "pid": 1619978,
+          "status": 9
+        },
+        {
+          "pid": 1619981,
+          "status": 9
+        }
+      ],
+      "release_attempted": true,
+      "stop_latched": true,
+      "task_empty": true,
+      "whole_scope_stopped": false
+    },
+    "task": {
+      "pid": 1619978,
+      "sandbox": "CPU_LOCAL_LANDLOCK_SECCOMP",
+      "source_sha256": "a61b3c1cbcf6dfaa2b6836214589b7676ebde0315b2650e5d0c8fe924c6832fb",
+      "starttime": "158411208"
+    },
+    "type": "local_cpu.task_closed",
+    "whole_scope_stopped": false
+  }
+}

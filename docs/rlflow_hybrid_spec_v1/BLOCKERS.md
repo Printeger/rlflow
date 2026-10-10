@@ -1,5 +1,7 @@
 # 阻塞与证据缺口
 
+94 已实际恢复父SIGKILL历史原完整受控scope物理闭包并认证v2/原PROCESS，仍managedjobUNKNOWN/controlsfalse/Pool1/预算UNKNOWN。下一把可信物理闭包接独立可恢复HostPool退役与预算未知曝险保留，不能重构旧FREE/STOP/退款；实际用量来源/严格quota/长期资格/完整自治仍缺。模型/GPU集中合同未答不调用，instinctRL只读HOLD/未准入；本地无新需用户决定阻塞。
+
 93 FINAL：High io_uring 与 RestartForceExitStatus 两项 MUST 均修并静态关闭，无剩余确证 MUST；最后原typed(aiai)解析门/负例与实际fullSTOP-FREE-alias25pass14.94s。原分轮产品失败与修复证据保留，下方待审/未提交为历史。所有测试terminal，当前compile/diff/USERlock通过，无新active unit；归档并进入本记录所属checkpoint提交。仅交付实际producer边界，完整coldFREE/预算Pool收敛与长期/自治/instinctRL资格仍未完成，Goal ACTIVE，不调用未批准模型/GPU。
 
 93 已实际关闭keeper新增producer入口与非预期topology/manager生产者放行，原配置fork/setsid/fullSTOP/FREE及父死签名cold保持。仍未持久原顶层scope/transport/policy，不能从此warm限制冷释放UNKNOWN/占槽；下一原完整signed闭scope证据与安全预算/Pool对账。模型/GPU集中合同未答不调用，真实自治/strictquota/长期资格/instinctRL准入仍缺，本地实现无新需用户决定阻塞。

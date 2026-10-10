@@ -1,5 +1,7 @@
 # 开发决策记录
 
+94 冷恢复只证明历史原Invocation controlled producer集合物理闭合，不说当前同unitname永久空/复原Job或FREE。G前PROCESS冻结scope/完整keeper Invocation/transport/owner/procview/版本/publickey；v2签真实taskkill/reap/empty+singlekeeper scope，pidfd核完整线程组非leaderZ/PGID，namespace/boot不符拒。所有kernelFD清理失败强保留原fd/actualidentity，外层独立close；原v1不升格。下一物理Pool退役保BudgetUNKNOWN全曝险而非伪结算，详HYBRID_LOCAL_CPU_SCOPE_RECOVERY.md。
+
 93 FINAL：High io_uring 与 RestartForceExitStatus 两项 MUST 均修并静态关闭，无剩余确证 MUST；最后原typed(aiai)解析门/负例与实际fullSTOP-FREE-alias25pass14.94s。原分轮产品失败与修复证据保留，下方待审/未提交为历史。所有测试terminal，当前compile/diff/USERlock通过，无新active unit；归档并进入本记录所属checkpoint提交。仅交付实际producer边界，完整coldFREE/预算Pool收敛与长期/自治/instinctRL资格仍未完成，Goal ACTIVE，不调用未批准模型/GPU。
 
 93 生产者闭包必须实际限制：只在task先fork后给keeper内核fence，既不继承到候选也不留keeper新线程/exec/io_uring入口；root exact两个子组/control独原keeper，异常最后proof拒而非先阻断安全kill/reap。manager noRestart/空辅助与后续触发只作admission/final门，不置于STOP前置；只有after fullSTOP成功策略可绑定原context复用closed连接，ready/G不缓存。此原warm结果不持久不升coldFREE，下一需原scope/transport/policyPROCESS前持久签名闭包和跨账本对账，详HYBRID_LOCAL_CPU_CLOSED_PRODUCERS.md。
