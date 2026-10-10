@@ -1,0 +1,53 @@
+Goal continuation after ffc5539; original attachment reread fully (0f635f).
+Original worktree clean except USER package-lock.json (untouched/unstaged).
+Previous turn was actual progress, no test handle was live or restarted.
+
+New authoritative diagnosis changes the next implementation dependency:
+NATIVE_MODEL_PACKET_V1 freezes role/packet/candidate/schema into Registry tool,
+rule and resource profile. approved_binding compares the entire approved
+configuration, not merely execution-cost scope. issue_native_model_grant and
+_fresh_native_model compare same frozen hashes. Historical runtime links
+rederive the binding from protected Approval.registry_witness.
+Sources: hybrid_native_model_profile.py SPEC/registration/approved_binding;
+hybrid_native_model_runtime.py bind_packet/issue_native_model_grant/_fresh_native_model;
+hybrid_fixture_runtime_ledger.py validate_original_links MODEL_KIND branch.
+WorkingPlan copies original preparation role/profile/schema, no later caller
+role switch (working_plan_service prepare_plan; working_plan validate_links).
+
+78829: PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest
+ tests/test_hybrid_native_model_runtime.py::test_v1_approval_does_not_authorize_changed_candidate_or_reviewer_packet -q
+naturally terminal exit0 1 passed 5.11s (710dd4/c50986).
+Actual fresh original synthetic-DEV approval/Controller/WorkingPlan/Pool:
+changed Evaluator role packet and changed non-preset candidate bytes both refuse
+at original grant issue. No grant issued and Store/Pool versions unchanged.
+This is an observed A autonomy GAP, not successful product Review or permission
+to relax existing V1 approval. Existing approved V1 semantics must stay intact.
+
+Additional direct dependency independently confirmed and root inspected:
+hybrid_local_cpu_profile.approved_binding requires only local_cpu command/tool,
+network none and ALL model budget dimensions zero. verification_spec freezes
+candidate and checks in CPU spec. Native V1 requires only native_model/chatgpt.
+Thus even machine verification of a new unknown candidate cannot borrow the
+old zero-model CPU approval under the model Goal. Not a recovery enhancement.
+
+Independent High finite_app_review_63 confirmed all above source dependencies;
+no model/auth/provider/GPU/test calls or edits by agent. Minimal remedy:
+new versioned workflow approval envelope freezes allowed scope, account/model,
+role-specific schemas, trusted acceptance code/conditions and original resource
+ceilings, NOT all future candidate content. Owner derives each immutable packet
+from protected persisted original source/Candidate/test/Review facts, references
+parent key/hash/version, reserves a new attempt, and enforces current Controller,
+WorkingPlan/CAS, once-only grant and full STOP. Fresh and historical validators
+must check both approved envelope and original derived provenance. V1 remains
+closed and cannot automatically convert to this new approval/version.
+
+Acceptance that matters: actual unknown Engineer candidate -> original controlled
+CPU validation -> different producer/session Evaluator under SAME approved
+workflow/Registry -> protected condition acceptance -> bounded next packet;
+REVISE drives bounded repair without per-step human reapproval. Altered parent
+facts, role/schema/candidate/checks/budget/STOP or stale CAS refuse. Pure Candidate,
+caller PASS or dev agent review is not original evidence. Real task still
+NOT_EXECUTED; all existing launch denials unchanged, resource contract unapproved.
+This dependency correction supersedes simply adding credential/preflight parts
+before establishing the autonomous approval chain. No A resources increase or
+new user decision for local code. GPU/B/C/instinctRL HOLD unchanged; Goal ACTIVE.

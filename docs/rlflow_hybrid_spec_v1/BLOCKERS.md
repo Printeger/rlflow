@@ -1,5 +1,7 @@
 # 阻塞与证据缺口
 
+当前最高本地缺口是workflow批准与逐次派生出处边界，不是账户读取前置：V1 profile/grant/历史闭包锁死单一角色及候选，CPU旧合同要求全零模型维度，现不能实现同审批下未知candidate→验收→独立Review→下一packet。需新版本workflow envelope+protected派生facts，同时保留V1不升级和原新grant/预算/Controller/CAS/STOP。原A合同资源/账户不变，仅实际运行待已提出合同批准；本地改造继续，不增加每步人工审批；实际模型/任务仍NOT_EXECUTED，GPU/B/C/instinctRL HOLD不变。
+
 最新直接缺口缩减：固定native gate与原no-auth启动材料已本地实装，实际无G在内核限制后退出126、原材料正常/partial清理验证通过。仍缺原credential持有者/账户验证、实际producer-ready-G与原stdout/EOF用量publisher/结算；新gate的account=false ready或未发送G试验不能替代。独立Evaluator、条件CAS/接续与首个非预设真实工程task仍未完成。无新增用户决定阻塞本地开发；已提出A运行合同未答不调用模型，GPU/B/C/instinctRL HOLD不变，Goal ACTIVE。
 
 2026-10-10最新核对：原Goal ACTIVE，本地代码实现无新增用户决定阻塞；下方blocked为历史记录。新exact生成owner/source登记、冻结原packet/schema与部分分配清理已实现；原held stdout FD有界读取和全prefix审计为数据能力，不能证明模型/账户/EOF。剩余直接链路缺口：固定同PID ELF gate/原credential持有者与ready/producer证明；完整原计数的可信publisher及一次结算；独立产品Evaluator；条件publisher+Core CAS接纳/自主接续；首个非预设真实任务。start/spawn/release及模型source poll/seal仍拒绝，不能以REGISTER或调用decoder代替。已提出A合同未答仅阻止真实运行，不阻止上述本地实现；GPU/B/C/instinctRL HOLD未改变，不读取auth、不调用模型。

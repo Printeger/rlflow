@@ -1,5 +1,7 @@
 # 开发决策记录
 
+2026-10-11：V1只对单一预冻结packet安全，不是自主workflow授权。未知Engineer产出不能预签hash，但也不能删除原hash核验或让caller JSON充出处。新增版本由一次审批冻结范围/资源/角色schema/可信检查与条件，由Core原持久source/candidate/test/review事实派生逐次冻结输入，fresh与历史同时核envelope+出处。CPU验收也须workflow派生原grant，不借旧全零模型合同。此直接依赖前移，credential/producer接线仍需要但不以更多预备组件代替纵向链；同A小额合同不扩资源，V1不迁移/自动升级。
+
 末审直接STOP缺陷处理：不借内部finally-close失败无法交回原FD的pin/read helper。新Source为每次本片open立即强登记，身份未知不采纳/不假关闭，成功身份核后独立close；所有输入含祖先FD纳fork与终态门。只修当前直接接线所引入的闭包问题，不扩旧恢复工作；原共享diagnostic helper未改。
 
 新生成gate使用单独程序hash/fresh approval，不再将非执行runtime模块当gate。复用旧kernel helper但先核固定完整hash再加载，未改旧diagnostic helper；packet/schema经内核sealed copy后供CLI，不能借mode0600说等待G期间内容不可写。私有auth-private与work只准备empty目录，不指向现有auth home；显式env不继承API/proxy/账户fallback。原Source准备使用Controller.token_transaction+完整_held+final fresh，而非自行提供read snapshot给原guard；相同失败两case先根因诊断再改接线，不改校验器。Builtin provider retry仍未资格，argv没有retry override不证明零retry；ready不升级账号/用量/Review/条件权限。

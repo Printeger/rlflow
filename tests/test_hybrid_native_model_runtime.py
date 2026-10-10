@@ -114,6 +114,24 @@ def test_original_generating_grant_registers_frozen_source_but_cannot_launch(mod
     assert owner.store.audit()==owner.store.replay()
 
 
+def test_v1_approval_does_not_authorize_changed_candidate_or_reviewer_packet(model_runtime):
+    """Acceptance GAP probe: V1 cannot implement autonomous A workflow.
+
+    Correct refusal must remain for existing V1 approvals. A separately approved
+    workflow envelope is needed; silently widening V1 is not a valid repair.
+    """
+    owner,bundle,token,observation,claim=model_runtime
+    versions=(owner.store.version(),owner.pool.snapshot()['version'])
+    for role,files in (('Evaluator',FILES),('Engineer',{'module/source.py':'def normalize(value):\n    return str(value).strip()\n'})):
+        packet={**PACKET,'role':role,'files':files}
+        with pytest.raises(Conflict,match='packet/schema differs'):
+            owner.issue_native_model_grant(bundle,token,observation,packet=packet,output_schema=OUTPUT_SCHEMA)
+    assert not owner._native_model_grants
+    assert (owner.store.version(),owner.pool.snapshot()['version'])==versions
+    # This is a concrete inability evidence, not product Reviewer execution or
+    # a reason to ask for a new human approval after every autonomous step.
+
+
 def test_original_packet_tamper_rejected_and_physical_cleanup_remains_available(model_runtime):
     owner,bundle,token,observation,claim=model_runtime
     grant=owner.issue_native_model_grant(bundle,token,observation,packet=PACKET,output_schema=OUTPUT_SCHEMA)
