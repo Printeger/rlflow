@@ -1,5 +1,7 @@
 # 阻塞与证据缺口
 
+96关闭固定候选验收入口缺口：任意文本候选已实际在受管CPU物化/执行，不在Core执行。仍缺真实模型 exact source/kind/授权及原CLI用量结算（旧STOP零模型math不可借用）、最终Working writer晋升、独立只读产品Evaluator、条件publisher/CAS/自主接续与首个非预设实任务。共享检查进程的机器PASS非抗恶意证明，不升条件；未重开冷恢复或扩展功能。集中模型账户/额度合同未答仍阻塞真实调用，但不阻塞本地实现；不重复索权、不启GPU、不解instinctRL HOLD，原Goal ACTIVE。
+
 95已实际让认证父死scope退役后复用硬件slot，原预算UNKNOWN与预留保留。下一最小直接缺口：native真实Engineer执行+原生用量/全集STOP、独立只读产品Reviewer、版本绑定条件证据与Core接续、首个非预设实任务验收。两原start仍deny，产品Review/条件未实现，首次真实任务未运行；不是95测试可代替。集中模型/账户/额度合同未答不调用模型/GPU；本地实现继续，不新增生产权限。其他恢复增强后置，严格quota/科研/长跑/instinctRL资格仍未完成。
 
 94 已实际恢复父SIGKILL历史原完整受控scope物理闭包并认证v2/原PROCESS，仍managedjobUNKNOWN/controlsfalse/Pool1/预算UNKNOWN。下一把可信物理闭包接独立可恢复HostPool退役与预算未知曝险保留，不能重构旧FREE/STOP/退款；实际用量来源/严格quota/长期资格/完整自治仍缺。模型/GPU集中合同未答不调用，instinctRL只读HOLD/未准入；本地无新需用户决定阻塞。

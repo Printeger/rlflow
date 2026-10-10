@@ -1,5 +1,9 @@
 # 首个真实工程自主闭环：最小交付清单
 
+96进展：任意补丁已能按原hash/批准路径冻结，交现原受管CPU验证（不再固定AFTER或父Core exec），实测成功PASS/匹配文本后失败FAIL及完整STOP/SETTLED/FREE。接口和严格限制见HYBRID_ARBITRARY_ENGINEERING_CANDIDATE.md；本项仅为真实模型候选可承接的执行行为，不是首个实际任务。真实source/最终Working晋升与CAS、Reviewer及条件接续仍未实现，不以数据类替ModelReceipt。
+
+独立架构复核进一步确认最小前置：生成型exact owner/source/kind须独立批准，旧diagnostic零额度不可升级；真实provider凭据持有者/目的地/transport retry与次数边界不可由本地credential-empty receiver证明；旧Budget STOP math全部model维度为0，生成分支必须另按原CLI完整计数结算，缺计数保UNKNOWN与全预留。首次可采用完整小packet/no-model-tools入口，但仍必须真实Engineer→受管任意验收→全新只读Evaluator→原条件证据→至少一次批准范围内自主接续，不冒称通用工具或全Goal完成。
+
 95 后的优先级由用户明确收紧：优先首个非预设工程任务和独立产品评审；只有直接阻断这条链或确证安全问题继续补边界。其他恢复增强进入后续。完整最终系统目标不缩减；固定加法、π、AST 修补演示和故障注入不计本验收。
 
 当前源码核验：`execution_adapter.py:348` 与 `hybrid_working_plan_service.py:89` 的 start 仍无条件拒绝。82 native 只允许零模型本地诊断；`hybrid_usage_source.py` 原来源只证明 fixture 生产者，JSONL accumulator 本身不证明真实模型调用；`hybrid_delivery_evidence.py:180` 条件仍 UNASSESSED，独立 Review 仍 NOT_PERFORMED。95 解决真实父死资源退役，不使这些能力自动成立。

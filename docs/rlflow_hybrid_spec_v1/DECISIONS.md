@@ -1,5 +1,7 @@
 # 开发决策记录
 
+96：不将 fixed AFTER/父Core exec扩展成任意代码执行。封闭替换/新增/删除先校验允许路径和原hash，内存canonical冻结；可配置验收经已有fresh configured CPU完整批准执行，原项目不改。任意candidate/checks/rule/hash均进spec，变更需新原授权；pure Candidate不是ModelReceipt。共享验收子进程仍有恶意绕过语义风险，机器PASS只作执行观察，必须另真实独立Review/受保护条件接纳。新wrapper的成功sys.exit0误触旧异常门已修正常返回，不改旧keeper标准；正负原证据不同输入版本保留。其他恢复增强后置，真实生成profile/财务settlement为下一直接缺口。
+
 95：容量物理退役与财务结算分离。原REGISTER/Project事件、公钥与实际kernel闭包由exact当前registered Pool内部核验；新LOCAL_CPU_PHYSICALLY_RETIRED和可复用判据不伪FIXTURE_FREE。完整有限signed envelope内联避免临时report删除破坏Pool回放；实际slot flock取得/关闭后才追加，失败原FD强留/不隐式重试，commit丢返回原key幂等不碰新claim。预算UNKNOWN全预留/磁盘责任不退款。95后用户明确优先真实工程模型链，其他恢复增强后置，见HYBRID_REAL_ENGINEERING_MINIMUM.md。
 
 94 冷恢复只证明历史原Invocation controlled producer集合物理闭合，不说当前同unitname永久空/复原Job或FREE。G前PROCESS冻结scope/完整keeper Invocation/transport/owner/procview/版本/publickey；v2签真实taskkill/reap/empty+singlekeeper scope，pidfd核完整线程组非leaderZ/PGID，namespace/boot不符拒。所有kernelFD清理失败强保留原fd/actualidentity，外层独立close；原v1不升格。下一物理Pool退役保BudgetUNKNOWN全曝险而非伪结算，详HYBRID_LOCAL_CPU_SCOPE_RECOVERY.md。

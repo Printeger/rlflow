@@ -1,0 +1,47 @@
+Checkpoint96 original development observations; not real-model-task qualification.
+Prior committed input32bfe36; USER package-lock.json unstaged/unchanged SHA
+becc7e2a36dfcad4ffe934b5ff2f0f68187611d6c0641bd63d81367651cfbf09.
+
+Initial .venv/bin/python -m pytest tests/test_hybrid_engineering_candidate.py -q
+tool2cc0f7 exit1 BEFORE collection: login environment autoload ROS launch_testing
+plugin failed importing absent lark. No task was executed. Adjusted invocation
+to existing isolated pytest convention: login=false/PYTEST_DISABLE_PLUGIN_AUTOLOAD=1.
+No unrelated dependencies installed and no production/global config changed.
+
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest tests/test_hybrid_engineering_candidate.py -q
+original session16935 /03028f ->93dcad exit1:11passed/1failed14.49s.
+Actual candidate child checks emitted expected output but wrapper sys.exit(0)
+became Task exception SystemExit0 in unchanged keeper BaseException policy.
+Changed ONLY new wrapper:success natural return, nonzero explicit RuntimeError.
+No relaxation of original exit/error criteria. Pure11unchanged/not rerun.
+
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest tests/test_hybrid_engineering_candidate.py::test_actual_arbitrary_candidate_runs_only_in_managed_cpu_scope -q
+original session98262 /c583c9 ->d4452f exit0:1passed15.47s.
+Actual source /tmp/pytest-of-mint/pytest-779/test_actual_arbitrary_candidat0.
+Raw candidate/result/terminal/command + original launch/work input archived unchanged.
+SUCCEEDED wait0 /machinePASS /independentReviewNOT_PROVEN /condition_evidencefalse.
+All original scope STOP/FDclosed/SETTLED/Pool0; original in-memory input unchanged.
+
+Added payload declaration candidate_binding(base/patch/outputhash) so future
+source consumers can bind metadata to full approved spec; no new provenance.
+New negative check:print matched stdout then AssertionError -> original FAIL.
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest tests/test_hybrid_engineering_candidate.py::test_actual_failed_checks_cannot_pass_by_printing_expected_stdout -q
+original session19170 /541237 ->650260 exit0:1passed15.84s.
+Actual source /tmp/pytest-of-mint/pytest-780/test_actual_failed_checks_cann0.
+Final added metadata present in fail-input.json;positive input pre-metadata
+honestly retained in pass-input.json. Do not claim positive rerun on final spec.
+NONZERO_EXIT wait32000 /machineFAIL despite matched stdout; STOP/SETTLED/Pool0/allFDclosed.
+
+Independent development High reviewer:no confirmed source MUST. Requested
+positive execution+machine acceptance proof; jq original results tool3e5ab3
+confirmed SUCCEEDED/PASS and negative NONZERO_EXIT/FAIL. Positive test assertions
+strengthened accordingly after terminal;verified by original offline evidence,
+NOT a new pytest execution. Reviewer explicitly warns shared test child can
+tamper semantics;machine observation not independentReview/ConditionEvidence.
+
+Final py_compile new module/tests tool3e5ab3 exit0.
+Systemctl same original4OLDfailed units373d5b/606bc0/826ea9/e1e192;no new live unit.
+No repeated old CPU/diagnostic/recovery or whole-repo tests:production changes
+are additive module only,none of original runner/authority/settlement modules changed.
+Historical82 full4failed/2532passed/32skipped is NOT reclassified green.
+No actual generating model,productReviewer,GPU,paidAPI,production migration or push.

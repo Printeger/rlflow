@@ -1,5 +1,7 @@
 # 系统实施验收记录
 
+96：任意封闭文本patch→内存冻结候选→原configured CPU批准/预算/Pool→私有WORK物化→隔离子进程检查→原成功/失败结果→完整STOP/SETTLED/FREE实测。11pure/原SystemExit0失败已保留，修后仅正例1pass15.47s，metadata版新负例1pass15.84s；原结果离线execution/机器结论核验，不伪final positive rerun。High无源码MUST、共享测试语义限制公开；compile/diff/USERlock/无新active通过。证据checkpoint-96-arbitrary-candidate/，接口HYBRID_ARBITRARY_ENGINEERING_CANDIDATE.md。未执行真实模型/Reviewer，不升ConditionEvidence，不写原项目，不重开恢复增强；下项生成native source/预算结算与产品Review/接续。
+
 95：实际父死→原signedscope验真→独立Pool物理退役→冷源report移走审计→同slot新claim→旧请求不干扰→新claim收尾通过；UNKNOWN预留/旧Project版本全程不变。最后受影响实机1pass22.95s含真实COMMIT前失败/后丢返回与FD关闭失败保留；旧Pool31pass98.63s/accounting3pass61.36s/capture2pass.07s，High无剩余MUST。分轮与源身份详evidence/checkpoint-95-physical-retirement/runs.txt；无全库/安装/长跑/模型工程任务声明。下一按用户新优先级真实模型工程闭环，其他恢复后置，最小清单HYBRID_REAL_ENGINEERING_MINIMUM.md。
 
 94 FINAL：93提交38dc1bf。公开cold v2完整原scope物理证据实装，PROCESS前G绑定root/control/task+keeperInvocation/transport/owner/procview/协议/publickey，末签kill/reap/empty/singlekeeper原scope；pidfd整线程组而非leaderZ。实际3pass29.33s（父死CLI/paired篡改/Pool1、正常ownerlive拒/fullSTOPFREE、真实多线程leaderZ拒）；High FD MUST修后5pass.08s+foreign2pass.06s，final独立原766只读同值/namespace-scope-Invocation拒/FD和版本不变exit0。纯immutable/v1 30pass.14s、profile26pass.11s和共享旧Runtime冷回放1pass11.80s。旧temp原PROCESS补读FileNotFound保留；补采集后仅必要父死归档复验1pass14.12s，final770原公钥/event/report离线验签同scope exit0；分run不互换。High全部MUST关闭，compile/diff/USERlock/noactive检查通过，证据checkpoint-94-scope-recovery/及HYBRID_LOCAL_CPU_SCOPE_RECOVERY.md，归档进入本记录所属提交。非原Job/FREE/结算/模型自治/全库/安装/长跑完成；下一独立Pool物理退役与BudgetUNKNOWN保留安全对账，原Goal ACTIVE/不调用未批准模型GPU。
