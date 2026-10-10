@@ -1,0 +1,39 @@
+Scope: original no-G fixed Python producer, not model/task/A acceptance.
+Base commit: ad90856.
+
+Product behavior:
+Original REGISTER -> durable HANDOFF_UNKNOWN + matching Pool -> protected
+fixed Python sandbox gate spawn -> bound kernel ready -> PROCESS_REGISTERED.
+No G; no Codex exec; empty auth-private; account/usage qualification false.
+Original STOP reaps producer, closes stdin/all retained FDs, Pool occupied=0.
+Budget remains UNKNOWN with full reservation and unknown exposure.
+Store audit equals replay.
+
+Independent review: /root/finite_app_review_63, read-only.
+One MUST: Source override alone did not block inherited generic release.
+Fixed NativeModelOwner final _check_release_gate independently denies before
+release_entered or control-pipe write. Final narrow review confirms closed;
+no direct confirmed issue introduced. Reviewer did not rerun tests.
+
+Command:
+env -u PYTHONPATH PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q tests/test_hybrid_native_model_producer.py
+First handle 10674/output df7dcc: 1 failed, 1 teardown error, 12.26s.
+Diagnosis: original fixture forbids subprocess.Popen; no process created.
+Test correction permits only fixed Python gate argv; product guards unchanged.
+Handle 33611/output 40c75d: 1 passed in 17.80s.
+After confirmed MUST fix, affected handle 74295/output 38e531:
+.                                                                        [100%]
+1 passed in 20.16s
+Negative case explicitly invokes generic Source release with original lease
+and RELEASE_INTENT guard: denied before G; Python stays live; STOP succeeds.
+
+Existing native/grant + workflow first-registration regression:
+Handle 18791/output 30c858: 2 passed, 20 deselected in 26.24s.
+No restarting original handles; no duplicate unaffected tests/reviews.
+Compile/diff check and user package-lock SHA preserved.
+
+Not verified: account/model generation, native same-ELF exec, real EOF/usage
+issuer or financial settlement, actual engineering task, product Reviewer,
+condition acceptance or autonomous continuation. Source issuer still None.
+No full suite claim; prior historical full-suite failures remain recorded.
+A model contract awaiting approval; GPU/B/C/instinctRL HOLD unchanged.

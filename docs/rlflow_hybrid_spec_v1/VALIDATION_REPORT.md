@@ -1,5 +1,7 @@
 # 需求包离线校验报告
 
+2026-10-11 no-G 原 producer：首测试 1FAIL/1teardown ERROR12.26s，原因 fixture全局禁止Popen，未实际创建进程；原UNKNOWN保守保留未被放宽。仅允许固定 Python gate argv 后 1pass17.80s；旧 native/register 2pass/20deselected26.24s。High发现通用 Source release入口缺 Owner最终拒绝，修后原74295自然terminal：1pass20.16s，证明原 RELEASE_INTENT下写G前拒、producer仍Python、原STOP reap/allFDclosed/Pool0及UNKNOWN/fullreserve/audit=replay。定向独立复核确认唯一 MUST关闭，未重跑已过审查/测试；compile/diff/USERlock检查通过。证据 evidence/a-native-no-release-producer-20261011.txt。没有实际Codex/model/auth/GPU调用，不宣称真实任务、产品独立Review、条件接纳/接续、A/98或全库通过。
+
 native Budget末affected原80817自然结束1pass12.75s，复制lease拒/伪资格不发行/原STOP与audit=replay通过。原85354/85847/15768均已terminal，不重启；独立High无本片MUST、compile/diff/USERlock通过。仅格式与原消费接线/拒伪资格，不支持真实source或实际结算声明。
 
 2026-10-11 native Budget消费：完整格式/跨绑定/缺账/超额pure及原ledger合成math21pass.69s；旧modelBudget4pass1.63s。原source complete数据与伪资格字段不能发行，实际无模型handoffSTOP Pool0/allFDclose；原HANDOFF缺producer仍UNKNOWN/fullreserve/Pool1，两case23.88s。shared BudgetLedger/Service82pass72.27s自然terminal，High无本片确证MUST。copy-lease末assert原affected单case收尾；证据evidence/a-native-budget-consumption-20261011.txt。当前Source发行hook恒None，未证明真实来源/用量结算/任务/Review/条件接续，不称A/98/全库通过，Goal ACTIVE。

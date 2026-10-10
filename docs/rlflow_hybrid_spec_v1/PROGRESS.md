@@ -1,5 +1,7 @@
 # Hybrid v1 开发进度
 
+2026-10-11 原 no-G producer 已本地接通：原 HANDOFF/Pool/Controller 最终门下启动固定 Python sandbox gate，核真实 PID/nonce/冻结输入/内核 ready；不发 G、不 exec Codex、不读账户。原 STOP 实测 reap/关闭全部 FD/Pool0，财务 UNKNOWN/full reservation 不退款。独立 High 发现通用 release 入口绕过 Source deny，已加 Owner 最终无条件拒绝并实测原 RELEASE_INTENT 下写 G 前拒绝；定向复核确认 MUST 关闭。首 fixture Popen 禁令失败已定位，不放宽产品门；固定 Python 专用测试 1pass17.80s，最终受影响 1pass20.16s；旧 native/register 回归 2pass/20deselected26.24s，不重复。证据 evidence/a-native-no-release-producer-20261011.txt。首次真实任务仍 NOT_EXECUTED，无产品 Reviewer/条件接纳/接续证据；下一原账户+same ELF/G/EOF/usage cap发行，继而 workflow CPU/独立 Evaluator/条件 CAS/接续。A调用待小额合同批准，GPU/B/C/instinctRL HOLD不变，Goal ACTIVE；非A/98关闭或全库通过。
+
 本原Budget切片FINAL：copy-lease末assert原80817自然terminal1pass12.75s；High独立窄范围无新增确证MUST，所有本轮原测试终态、compile/diff/USERlock通过。本次提交只交付格式/原Budget处理/live拒伪，真实Source资格发行明确NOT_IMPLEMENTED，不能算实际结算/任务/A完成。下一仍优先发行者本地实现，不停止原Goal，ACTIVE。
 
 2026-10-11 native用量原Budget接线：新增闭usage格式与native STOP/原grant/producer/ACK/terminal绑定；原Budget完整记录消费session1/input不减cached/output/原wall，超预留/政策不clip，缺record handoff全额UNKNOWN。原builder+NativeOwner每个Guard重读exact Source发行hook；当前account/producer/G/EOF issuer未实现，hook恒None，auditedData/伪字段/callerJSON不能触发真实结算，旧历史不升级。纯format+新ledger math21pass.69s，旧modelBudget4pass1.63s；原caller字段/handoff缺proof2pass23.88s，shared原Budget82pass72.27s，各原handle自然terminal。High无确证MUST（仅格式/原消费/live拒伪，不代表publisher）；copy-lease末assert受影响原单case收尾。证据a-native-budget-consumption-20261011.txt。首次真实task仍NOT_EXECUTED；下一原usage cap发行资格→workflowCPU/独立Evaluator/条件CAS/接续。代码无新授权阻塞，A调用待批/GPU/B/C/HOLD不变，Goal ACTIVE。

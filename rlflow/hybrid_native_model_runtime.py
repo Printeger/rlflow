@@ -193,9 +193,34 @@ class NativeModelOwner(FixtureRuntimeOwner):
                     raise Conflict('original no-handoff registration required for gate materials')
                 return self.sources._prepare_model_gate(self,lease)
 
+    def prepare_no_release_producer(self,lease):
+        """Run the original Python sandbox gate only, NEVER G/model/auth.
+
+        This proves actual producer ownership under the original Pool/Budget
+        and STOP; it is not model execution consent or account qualification.
+        """
+        attempt=self._issued(lease)
+        with self.pool._lock:
+            if self._current(attempt)['fixture_runtime']['phase']!='REGISTER_NO_HANDOFF':
+                raise Conflict('original first no-release producer preparation required')
+            self.prepare_native_gate(lease)
+            value=self._write_phase(attempt,'HANDOFF_UNKNOWN')
+            self.pool._fixture_runtime_change(self,lease,'FIXTURE_HANDOFF_UNKNOWN',value)
+            with self._gate(attempt,'HANDOFF_UNKNOWN'):
+                attempt['producer_identity']=self.sources._runtime_spawn(self,lease)
+            self._write_phase(attempt,'PROCESS_REGISTERED')
+            return {'lease_id':lease.id,'phase':'PROCESS_REGISTERED',
+                'sandbox_ready':True,'model_released':False,'account_qualified':False,
+                'usage_qualified':False}
+
     def _check_spawn_gate(self, attempt):
         self._issued(attempt['lease'])
-        raise PermissionError('unqualified native generating spawn denied')
+        # Only original no-G Python gate. Source release still always denies.
+        return super()._check_spawn_gate(attempt)
+
+    def _check_release_gate(self, attempt):
+        self._issued(attempt['lease'])
+        raise PermissionError('original model qualification missing; no G at effect fence')
 
     def _retained_source(self, attempt):
         self.sources._actual()

@@ -3,6 +3,7 @@ import hashlib
 import json
 import os
 import stat
+import time
 from pathlib import Path
 
 from .hybrid_fixture_materials import _write_new
@@ -19,6 +20,7 @@ class NativeModelSourceOwner(FixtureUsageSourceOwner):
         self._packet_failures = set()
         self._gate_bindings = {}
         self._gate_inputs = {}
+        self._model_ready = {}
         super().__init__(pool)
 
     def _actual(self):
@@ -142,8 +144,44 @@ class NativeModelSourceOwner(FixtureUsageSourceOwner):
                 attempt['status'] = 'UNKNOWN'; raise
 
     def start_fixture(self, *args, **kwargs):raise PermissionError('generating source cannot run fixture')
-    def _runtime_spawn(self, *args, **kwargs):raise PermissionError('native generating launch unqualified')
+    def _runtime_spawn(self, owner, lease):
+        # Only the original fixed Python gate is spawned. Its control pipe
+        # receives no G here, so it cannot exec Codex or read account secrets.
+        return super()._runtime_spawn(owner,lease)
     def _runtime_release(self, *args, **kwargs):raise PermissionError('native generating release unqualified')
+
+    def _native_spawn_material(self, owner, attempt):
+        self._physical(attempt)
+        if self._gate_bindings.get(id(attempt['source'])) is None:
+            raise Conflict('original model gate materials required before producer preparation')
+        return (attempt['binary']['fd'],*(attempt['fds'][key] for key in
+            ('ready_write','config','packet','schema','helper')))
+
+    def _wait_ready(self, owner, attempt):
+        from .hybrid_native_model_gate import HELPER_SHA256
+        from .hybrid_goals import digest
+        runtime=attempt['runtime'];binding=runtime['origin']['native_model']
+        original=self._gate_bindings[id(attempt['source'])]
+        expected={'type':'model.sandbox.ready','pid':attempt['producer_identity']['pid'],
+            'nonce':runtime['origin']['nonce'],'config_sha256':digest(json.loads(original[1])),
+            **{key:binding[key] for key in ('packet_sha256','output_schema_sha256','role','binary_sha256')},
+            'helper_sha256':'sha256:'+HELPER_SHA256,'single_tgid':True,'landlock':True,
+            'no_new_privs':True,'packet_sealed':True,'schema_sealed':True,
+            'network_enforcement':'PARTIAL','account_qualified':False,
+            'binary_identity':list(attempt['binary']['stamp'][:2]),
+            'home_identity':list(original[4][-1][:2])+[os.geteuid(),0o700],
+            'work_identity':list(original[5][-1][:2])+[os.geteuid(),0o700]}
+        deadline=time.monotonic()+2
+        while time.monotonic()<deadline:
+            self._physical(attempt);self._check_pidfd(attempt,live=True)
+            raw=os.pread(attempt['fds']['ready_read'],4097,0)
+            if raw:
+                if raw!=canonical(expected)+b'\n':raise Conflict('original model sandbox receipt differs')
+                self._model_ready[id(attempt['source'])]=(attempt['source'],canonical(expected))
+                return
+            if attempt['producer'].poll() is not None:break
+            time.sleep(.01)
+        raise Conflict('original model sandbox not ready; no G')
 
     def _runtime_allocate(self, owner, lease):
         from .hybrid_native_model_runtime import NativeModelOwner

@@ -1,5 +1,7 @@
 # 开发决策记录
 
+2026-10-11 原生产者先接无释放物理链：复用原强保留 process/pidfd/stdin/FD 与 HANDOFF/Pool/final Controller gate，fixed Python helper 的原 ready 逐字绑定 PID、nonce、冻结材料和内核限制。Source 与 Owner 两处独立拒绝释放，特别是 Owner 最后副作用门不得依赖可绕过的 Source override。当前旧 single-participant STOP 仅证明未 exec 的固定 Python gate；不能推广真实模型线程/账户/EOF。物理 Pool0 与财务 UNKNOWN/fullreserve 分离，不以无 G 观察推断退款。后续原生成资格 issuer仍未实现。证据 evidence/a-native-no-release-producer-20261011.txt。
+
 2026-10-11 native结算沿原Budget/CAS：格式验证与发行必须分离；native STOP可携完整usage publication但实际builder及Guard均核同exact Source原发行结果。当前原资格issuer缺失，hook恒None；不得从审计data/complete=true/缓存字段或hash声明发行。纯历史domain核原grant/phase/producer/ACK/terminal绑定，不恢复能力。完整记录按CLI session1/全input含cached/output/原wall消费，overrun不clip；缺record保持UNKNOWN全reservation，物理STOP资格独立保留。source_id/ready/stream/output尚须未来Source原cap发行核物理/account/EOF；不能把合成math或格式叫可信来源或实际结算。证据a-native-budget-consumption-20261011.txt。
 
 2026-10-11 失败不是解码损坏或免费执行：Codex CLI官方文档只列turn.failed/error，未建立失败完整计数/EOF保证。保留原事件hash的FAILURE_OBSERVED数据可独立FD重放，禁止因此授成功候选/Review，失败payload声称usage不作为结算。packet_result_data仅冻结审计数据copy，Source/Budget的资格门保持。错误可能非terminal，上游额外suffix本受限单turn仍拒，不自动retry/新调用。尚缺可信publisher/原结算，不以本失败观察切片替代首个真实任务。证据a-native-failure-observation-20261011.txt。

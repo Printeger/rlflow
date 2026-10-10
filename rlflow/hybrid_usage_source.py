@@ -303,7 +303,7 @@ class FixtureUsageSourceOwner:
             if hashlib.sha256(os.pread(attempt['fds']['program'], 16385, 0)).hexdigest() != runtime['origin']['program_sha256'].removeprefix('sha256:'):
                 raise Conflict('fixed original CPU program changed before handoff')
             extra=() if runtime.get('engineering_grant') is None else (owner._engineering_input(runtime),)
-            native = runtime.get('diagnostic_grant') is not None
+            native = runtime.get('diagnostic_grant') is not None or runtime.get('native_model_grant') is not None
             if native:
                 extra=self._native_spawn_material(owner,attempt)
             owner._check_spawn_gate(runtime)
