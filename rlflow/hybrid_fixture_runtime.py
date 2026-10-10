@@ -191,6 +191,7 @@ class FixtureRuntimeOwner:
             self._review_parent_handoff=review_handoff
             self._review_parent_raw=None if review_handoff is None else (review_root[4],review_root[5])
             self._review_parent_owner=None if review_handoff is None else (prior_review,review_cap)
+            self._review_plan_sequence=None
             self._engineering_units = self._execution_units  # Original SDK compatibility, same registry.
             diagnostic = type(self) is NativeDiagnosticOwner
             local_cpu = type(self) is LocalCpuRunnerOwner

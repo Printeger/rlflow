@@ -1,0 +1,46 @@
+A local Reviewer registration slice, 2026-10-11
+Base: 4b5d4b7, branch hybrid-v1. Goal ACTIVE, full original acceptance unchanged.
+
+Authority: no real model generation/API/G/GPU; small A contract remains unapproved.
+CPU managed service actually runs. Engineer source explicitly synthetic, G intercepted.
+Reviewer only registers and stops before native launch. NOT real independent Review,
+NOT first nonpreset engineering task, NOT condition acceptance/continuation qualification.
+GPU/B/C/instinctRL HOLD unchanged. USER package-lock.json untouched/unstaged.
+
+Original test session 37594, final output fbf5f4, naturally exit 0:
+PYTHONPATH=. PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q tests/test_hybrid_a_workflow_reviewer_registration.py
+1 passed, 1 existing Starlette/AnyIO deprecation warning in 130.48s.
+Actual CPU machine PASS -> same original Budget new readonly Evaluator plan/grant/REGISTER.
+Executed candidate on protected frozen stdin differs from original baseline files.
+No launch capability -> start refused, no Reviewer process/model invoked.
+STOP -> SETTLED, Pool occupied 0, all original Source fds None.
+Counters medium=1/high=1/controlled_seconds_charged=660, unique review registration.
+Foreign CPU/wrong role/high quota/short charge/duplicate rejection tested on original registration DATA.
+Current duplicate grant rejected without Store/Pool mutation.
+Cold snapshot/recover == audit == replay.
+
+Original affected regression session 42388, final output 725df7, naturally exit 0:
+PYTHONPATH=. PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q tests/test_hybrid_a_workflow_accounting.py tests/test_hybrid_native_model_runtime.py
+35 passed, 1 existing Starlette/AnyIO deprecation warning in 136.29s.
+No full-suite rerun claimed; no duplicate/restarted tests.
+
+Independent readonly narrow review: /root/finite_app_review_63, no confirmed MUST.
+Candidate-vs-baseline binding, whole-event parents/scope/approval/replay,
+readonly Evaluator, original high ceiling/uniqueness, STOP lock order reviewed.
+Review explicitly withholds actual model/source/usage/condition qualification.
+
+compileall of all seven changed Python files exit 0; git diff --check exit 0.
+Frozen SHA256:
+49f2f9da59bbc3d165a1d8531050835796978b48aadbe1b4634946aa019ea791 rlflow/hybrid_a_workflow_accounting.py
+01d0e2b9d0c35f7b30c2517dd022e5582ae1a968ac7d2cb678e649913f56011d rlflow/hybrid_a_workflow_derivation.py
+10006aa13360871a2855dc886fc823e6e8dc63b688fabd3573aeb3620c352b77 rlflow/hybrid_fixture_runtime.py
+d3508fc3643e76e85b0502129fe5a2645af14dfc240ca39ca113bf9025c52026 rlflow/hybrid_fixture_runtime_ledger.py
+f7eada8048dab5fa0156478778100bf7cbf87b08c0b13eed06f77ca9e8950da2 rlflow/hybrid_native_model_profile.py
+1bff1b0d6548222c75560a70a6a1921ce122909155bafc09dcca55ae272fae65 rlflow/hybrid_native_model_runtime.py
+1fb54bc820133da4818a535d3dd3b170b14dce9dfd1b1114985f01497777398a tests/test_hybrid_a_workflow_reviewer_registration.py
+USER lock SHA256 becc7e2a36dfcad4ffe934b5ff2f0f68187611d6c0641bd63d81367651cfbf09.
+
+Next direct chain: same-A authenticated native Engineer/Reviewer execution orchestration
+and usage/result -> machine+Review condition acceptance CAS -> one demand-driven continuation
+-> first real nonpreset engineering task evidence. Recovery enhancements deferred.
+Only actual model execution requires the pending A contract approval; local code is not blocked.

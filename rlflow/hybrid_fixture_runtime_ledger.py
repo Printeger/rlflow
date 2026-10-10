@@ -307,13 +307,26 @@ def validate_original_links(value, lookup):
         if record is None or approval is None:raise Conflict('generating model original approval missing')
         frozen=origin['native_model']
         if 'workflow' in frozen:
-            from .hybrid_a_workflow_derivation import first_engineer
+            from .hybrid_a_workflow_derivation import first_engineer,independent_reviewer
             intent=lookup(SECTIONS[0],origin['working_plan_intent']['key'])
             ready=lookup(SECTIONS[1],origin['working_plan_ready']['key'])
             if intent is None or ready is None:raise Conflict('original workflow plans missing')
-            binding,_,_=first_engineer(record['contract']['proposal'],approval['registry_witness'],
-                origin['program_sha256'],intent,ready,frozen['workflow']['files'],
-                accounted='accounting_version' in frozen['workflow'])
+            if frozen['workflow']['stage']=='INDEPENDENT_REVIEW':
+                from .hybrid_budget_ledger import validate_record as budget_record,validate_links as budget_links
+                parents={}
+                for name,ref in frozen['workflow']['parents'].items():
+                    parent=lookup(BUDGET[0],ref['key'])
+                    if parent is None or digest(parent)!=ref['hash']:raise Conflict('original Reviewer parent missing or changed')
+                    if (any(parent['request'][k]!=request[k] for k in ('project_id','data_mode','goal_ref','store_epoch')) or
+                            any(parent['policy_source'][k]!=sources[k] for k in ('proposal_hash','approval_hash','config_hash','scope_hash'))):
+                        raise Conflict('original Reviewer parent scope or approval differs')
+                    budget_record(BUDGET[0],ref['key'],parent);budget_links(parent,lookup);parents[name]=parent
+                binding,_,_=independent_reviewer(record['contract']['proposal'],approval['registry_witness'],
+                    origin['program_sha256'],intent,ready,parents['cpu'],parents['engineer'])
+            else:
+                binding,_,_=first_engineer(record['contract']['proposal'],approval['registry_witness'],
+                    origin['program_sha256'],intent,ready,frozen['workflow']['files'],
+                    accounted='accounting_version' in frozen['workflow'])
         else:binding=approved_binding(record['contract']['proposal'],approval['registry_witness'],origin['program_sha256'])
         binding.update(grant_id=origin['native_model']['grant_id'],
             **{k:sources[k] for k in ('proposal_hash','approval_hash','config_hash','scope_hash')})

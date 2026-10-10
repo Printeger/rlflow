@@ -25,9 +25,14 @@ def bind_packet(packet, binding, intent, proposal):
     manifest = [{'name':name, 'bytes':len(text.encode('utf-8')),
         'sha256':'sha256:'+hashlib.sha256(text.encode('utf-8')).hexdigest(), 'mode':0o600}
         for name,text in sorted(files.items())]
+    review=binding.get('workflow',{}).get('stage')=='INDEPENDENT_REVIEW'
+    # Tools disabled: authoritative reviewed files are original CPU-parent
+    # bytes on held stdin. The readonly Working tree is only a baseline.
+    manifest_matches=(files==binding['workflow']['files'] and binding['role']=='Evaluator' and
+        not plan['write_roots']) if review else manifest==plan['working_tree']['files']
     if (packet['role'] != binding['role'] or plan['packet']['role'] != binding['role'] or
             packet['objective'] != proposal['objective'] or packet['conditions'] != proposal['global_conditions'] or
-            digest(files) != binding['candidate_sha256'] or manifest != plan['working_tree']['files'] or
+            digest(files) != binding['candidate_sha256'] or not manifest_matches or
             digest(packet) != binding['packet_sha256']):
         raise Conflict('actual packet differs from original plan/task/candidate role')
     return canonical(packet)
@@ -52,6 +57,14 @@ class NativeCpuInput:
 
 
 class NativeModelOwner(FixtureRuntimeOwner):
+    def shutdown(self):
+        self._actual();self._safety_freeze=True
+        with self._workflow_cpu_admission_lock:return super().shutdown()
+
+    def shutdown_safety(self):
+        self._actual();self._safety_freeze=True
+        with self._workflow_cpu_admission_lock:return super().shutdown_safety()
+
     def __init__(self,*args,**kwargs):
         self._native_launches={}
         self._native_releases={}
@@ -77,8 +90,111 @@ class NativeModelOwner(FixtureRuntimeOwner):
     def issue_cpu_trial_grant(self, *args, **kwargs):raise PermissionError('closed generating owner')
     def issue_engineering_patch_grant(self, *args, **kwargs):raise PermissionError('closed generating owner')
 
+    def _review_material(self,loaded):
+        from .hybrid_a_workflow_review import from_cpu
+        from .hybrid_budget_ledger import entry_key
+        row=self._review_parent_handoff;context=self._review_parent_owner
+        if row is None or context is None or row['child'] is not self or self._review_parent_raw!=(row['material'],row['parent']):
+            raise PermissionError('original same-Budget Reviewer handoff required')
+        prior,cap=context;root=prior._review_handoff_roots.get(id(cap));retirement=prior._review_retirements.get(id(cap))
+        if (root is None or root[0] is not row or root[2] is not cap or root[6] is not prior or
+                root[3:6]!=(cap.raw,row['material'],row['parent']) or retirement is None or
+                retirement[0] is not root or retirement[1] is not prior.sources or prior._live or prior.sources._live):
+            raise PermissionError('original normal CPU retirement proof required')
+        cpu=json.loads(row['parent']);engineer=json.loads(prior._workflow_handoff_raw[1])
+        if any(cpu['policy_source'][k]!=loaded[k] for k in ('proposal_hash','approval_hash','config_hash','scope_hash')):
+            raise Conflict('current Reviewer parent approval changed')
+        with self.store.read_connection() as db:
+            db.execute('BEGIN');read=ReadBudget(db,PREPARATION_READ_BYTES)
+            for parent in (cpu,engineer):
+                if self.budget._point(db,entry_key(parent['request']),read)!=parent:
+                    raise Conflict('original Reviewer parent whole event changed')
+                self.budget._dependencies(db,parent,read)
+        material=from_cpu(loaded['record']['contract']['proposal'],json.loads(self.plans.registry._raw),cpu,engineer)
+        if canonical(material)!=row['material']:raise Conflict('original Reviewer material changed')
+        return material,cpu,engineer
+
+    def _review_admission(self,loaded):
+        from .hybrid_a_workflow_accounting import check_window
+        material,cpu,engineer=self._review_material(loaded)
+        probe={k:cpu['request'][k] for k in ('project_id','data_mode','goal_ref','store_epoch','reservation_id')}
+        probe['action']='MARK_UNKNOWN'
+        with self.store.read_connection() as db:
+            db.execute('BEGIN');read=ReadBudget(db,PREPARATION_READ_BYTES)
+            head,_,_=self.budget._heads(db,probe,read,self.budget._metadata(db))
+        workflow=cpu['request']['fixture_runtime']['origin']['local_cpu']['workflow']
+        now,_=self.controller._sample();check_window(head['workflow'],workflow,now)
+        stage=cpu['prior_goal']['workflow']['candidate_cpu_entry'];spec=material['spec']
+        if (head['workflow'].get('candidate_cpu_entry')!=stage or stage in head['workflow'].get('review_entries',{}) or
+                head['workflow']['high_sessions']>=workflow['limits']['high_sessions'] or
+                head['workflow']['controlled_seconds_charged']+spec['seconds']+10>workflow['limits']['controlled_seconds']):
+            raise Conflict('original independent Reviewer quota or unique stage exhausted')
+        return material,cpu,engineer
+
+    def issue_workflow_reviewer_grant(self,bundle,token,observation):
+        self._actual();self.controller._issued(token)
+        with self.store.read_connection() as db:
+            db.execute('BEGIN');loaded=self.budget._load(db,self._ready_for_bundle(bundle)['request']['goal_ref'],ReadBudget(db,PREPARATION_READ_BYTES))
+        material,_,_=self._review_admission(loaded)
+        return self.issue_native_model_grant(bundle,token,observation,packet=material['packet'],output_schema=material['schema'],_workflow='reviewer')
+
+    def prepare_workflow_reviewer_plan(self,token):
+        """New readonly Evaluator plan. Reviewed candidate is held packet DATA."""
+        from .hybrid_budget import zero
+        from .hybrid_budget_ledger import reservation_key
+        from .hybrid_preparation import intent_key
+        from .store import sha
+        self._actual();self.controller._issued(token);self.controller.check_token(token)
+        if not self._workflow_cpu_sequence_lock.acquire(blocking=False):raise Conflict('Reviewer preparation already active')
+        try:
+            if self._review_plan_sequence is not None:raise Conflict('original Reviewer preparation already attempted; no remint')
+            row=self._review_parent_handoff
+            if row is None:raise PermissionError('original CPU Reviewer handoff required')
+            parent=json.loads(row['parent'])
+            with self.store.read_connection() as db:
+                db.execute('BEGIN');read=ReadBudget(db,PREPARATION_READ_BYTES)
+                loaded=self.budget._load(db,parent['request']['goal_ref'],read)
+            material,_,_=self._review_admission(loaded);spec=material['spec']
+            key='a_review_'+sha(material['parents']);scope={k:parent['request'][k] for k in ('project_id','data_mode','goal_ref','store_epoch')}
+            sequence={'token':token,'phase':'PREPARATION','observation':None,'bundle':None}
+            self._review_plan_sequence=sequence
+            def step(phase,call,field=None):
+                with self._workflow_cpu_admission_lock:
+                    self._actual()
+                    if self._safety_freeze:raise Conflict('Reviewer preparation frozen for cleanup')
+                    sequence['phase']=phase;value=call()
+                    if field is not None:sequence[field]=value
+                    return value
+            request={'idempotency_key':key+'_prepare','project_id':scope['project_id'],'data_mode':scope['data_mode'],
+                'goal_ref':scope['goal_ref'],'role':'Evaluator','context':{'text':
+                    'Review the executed candidate supplied in the protected frozen model input packet. '
+                    'The readonly WorkingCopy is the original source baseline, not the candidate.'}}
+            step('PREPARATION',lambda:self.workspace.preparation.prepare(request));intent=intent_key(request)
+            reserve={**scope,'idempotency_key':key+'_reserve','expected_state_version':self.store.version(),
+                'action':'RESERVE','preparation_intent_key':intent,'purpose':'EXECUTION',
+                'amount':{**zero(),'model_sessions':1,'model_input_tokens':spec['model_input_tokens'],
+                    'model_output_tokens':spec['model_output_tokens'],'wall_seconds':spec['seconds']+10}}
+            sequence['reserve']=reserve;step('RESERVE',lambda:self.budget.record(reserve,token))
+            observation=step('STAGE',lambda:self.workspace.stage(intent,ttl_seconds=60),'observation')
+            acquire={**scope,'idempotency_key':key+'_workspace','expected_state_version':self.store.version(),
+                'expected_workspace_revision':0,'workspace_id':json.loads(observation.raw)['workspace_id'],
+                'reservation_id':reservation_key(reserve),'operation':'acquire','ttl_seconds':60}
+            step('ACQUIRE',lambda:self.workspace.record(acquire,token,observation))
+            bundle=step('PLAN',lambda:self.plans.prepare_plan(token,observation,key+'_plan'),'bundle')
+            step('INTENT',lambda:self.plans.persist_intent(bundle,token,observation,expected_version=self.store.version()))
+            step('PUBLISH',lambda:self.plans.publish(bundle,token,observation,expected_version=self.store.version()))
+            sequence['phase']='READY';return bundle,observation
+        finally:self._workflow_cpu_sequence_lock.release()
+
     def _binding(self, loaded, *, workflow=None, intent=None, ready=None):
         if workflow is not None:
+            if workflow['stage']=='INDEPENDENT_REVIEW':
+                from .hybrid_a_workflow_derivation import independent_reviewer
+                _,cpu,engineer=self._review_material(loaded)
+                binding,_,_=independent_reviewer(loaded['record']['contract']['proposal'],
+                    json.loads(self.plans.registry._raw),self.program_hash,intent,ready,cpu,engineer)
+                if binding['workflow']!=workflow:raise Conflict('original Reviewer derivation changed')
+                return binding
             from .hybrid_a_workflow_derivation import first_engineer
             binding,_,_=first_engineer(loaded['record']['contract']['proposal'],
                 json.loads(self.plans.registry._raw),self.program_hash,intent,ready,workflow['files'])
@@ -98,7 +214,13 @@ class NativeModelOwner(FixtureRuntimeOwner):
         with self.pool._lock, self.store.read_connection() as db:
             db.execute('BEGIN'); read = ReadBudget(db, PREPARATION_READ_BYTES)
             loaded = self.budget._load(db, self._ready_for_bundle(bundle)['request']['goal_ref'], read)
-            if _workflow:
+            if _workflow=='reviewer':
+                from .hybrid_a_workflow_derivation import independent_reviewer
+                _,cpu,engineer=self._review_material(loaded)
+                binding,derived,schema=independent_reviewer(loaded['record']['contract']['proposal'],
+                    json.loads(self.plans.registry._raw),self.program_hash,intent,ready,cpu,engineer)
+                if packet!=derived or output_schema!=schema:raise Conflict('original Reviewer packet/schema required')
+            elif _workflow is True:
                 from .hybrid_a_workflow_derivation import first_engineer
                 binding,derived,schema=first_engineer(loaded['record']['contract']['proposal'],
                     json.loads(self.plans.registry._raw),self.program_hash,intent,ready,packet['files'])
@@ -375,7 +497,7 @@ class NativeModelOwner(FixtureRuntimeOwner):
         if token is not None:self.controller._issued(token)
         # Never hold the Runtime lock across a project writer. Pool serializes
         # original scope transitions; registry serializes the sole owner swap.
-        with self.pool._lock,_registry:
+        with self._workflow_cpu_admission_lock,self.pool._lock,_registry:
             old=self._native_cpu_handoffs.get(id(cap))
             if old is not None:
                 if old['cap'] is not cap or old['lease'] is not lease or cap.raw!=old['raw']:

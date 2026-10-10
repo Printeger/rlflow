@@ -17,6 +17,7 @@ HEAD=obj({'envelope_sha256':HASH,'approval_sha256':HASH,'first_engineer_entry':I
     'medium_sessions':COUNT,'high_sessions':COUNT,'controlled_seconds_charged':COUNT,
     'started_at':TIME})
 HEAD['properties']['candidate_cpu_entry']=ID
+HEAD['properties']['review_entries']={'type':'object','maxProperties':2,'propertyNames':ID,'additionalProperties':ID}
 
 
 def advance(value, prior):
@@ -34,6 +35,24 @@ def advance(value, prior):
         raise Conflict('closed original workflow accounting version required')
     validate_schema(LIMITS,workflow['limits']);limits=workflow['limits']
     if any(type(n) is not int for n in limits.values()):raise Conflict('exact workflow limits required')
+    if workflow['stage']=='INDEPENDENT_REVIEW':
+        from .hybrid_native_model_profile import BINDING,KIND
+        from .hybrid_budget_ledger import entry_key
+        binding=origin['native_model'];validate_schema(BINDING,binding)
+        if (origin.get('kind')!=KIND or prior is None or
+                prior['approval_sha256']!=value['policy_source']['approval_hash'] or
+                binding['role']!='Evaluator' or binding['effort']!='high' or
+                workflow['cpu_registration']!=prior.get('candidate_cpu_entry') or
+                workflow['cpu_registration'] in prior.get('review_entries',{})):
+            raise Conflict('original unique independent Reviewer CPU stage required')
+        check_window(prior,workflow,timestamp(value['recorded_at']))
+        charge=value['prior_reservation']['amount']['wall_seconds']
+        if (charge<binding['seconds']+10 or prior['high_sessions']+1>limits['high_sessions'] or
+                prior['controlled_seconds_charged']+charge>limits['controlled_seconds']):
+            raise Conflict('workflow independent Reviewer quota exceeded')
+        return {**prior,'high_sessions':prior['high_sessions']+1,
+            'controlled_seconds_charged':prior['controlled_seconds_charged']+charge,
+            'review_entries':{**prior.get('review_entries',{}),workflow['cpu_registration']:entry_key(request)}}
     if workflow['stage']=='CANDIDATE_CPU':
         from .hybrid_local_cpu_profile import KIND,WORKFLOW
         from .hybrid_budget_ledger import entry_key
