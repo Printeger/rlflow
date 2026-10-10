@@ -7,6 +7,7 @@ import pytest
 
 from rlflow.hybrid_budget_ledger import SECTIONS,project_key
 from rlflow.hybrid_usage_source import FixtureUsageSourceOwner
+from rlflow.store import Conflict
 from tests.test_hybrid_a_workflow_derivation import original,native_setup,FILES
 
 ACTUAL_POPEN=subprocess.Popen
@@ -33,6 +34,9 @@ def test_original_no_g_producer_stop_releases_physical_pool_not_unknown_tokens(o
     with pytest.raises(PermissionError):owner.sources._runtime_release(owner,lease)
     with pytest.raises(PermissionError):owner.start(lease)
     with pytest.raises(PermissionError):owner.sources.seal(attempt['source'])
+    with pytest.raises(Conflict,match='released producer'):
+        owner.sources.observe_native_exec(owner,lease)
+    assert id(attempt['source']) not in owner.sources._exec_observations
     # Even bypassing the Source override must hit the original Owner's last
     # effect fence before any write to the actual control pipe.
     owner._write_phase(attempt,'RELEASE_INTENT')
@@ -41,9 +45,27 @@ def test_original_no_g_producer_stop_releases_physical_pool_not_unknown_tokens(o
             FixtureUsageSourceOwner._runtime_release(owner.sources,owner,lease)
     assert not attempt['release_entered'] and row['producer'].poll() is None
     assert 'python' in os.readlink('/proc/'+str(row['producer'].pid)+'/exe')
+    # A caller flag is not ELF provenance. Do NOT write G; the original Python
+    # gate must be rejected as a native model and its probe FD retained to STOP.
+    attempt['release_entered']=True
+    try:
+        with pytest.raises(Conflict,match='stdout observation not ready'):
+            owner.sources.observe_native_exec(owner,lease)
+        assert id(attempt['source']) not in owner.sources._exec_observations
+        os.write(row['fds']['write'],b'{"type":"thread.started","thread_id":"synthetic_not_a_model"}\n')
+        with pytest.raises(Conflict,match='approved ELF'):
+            owner.sources.observe_native_exec(owner,lease)
+    finally:attempt['release_entered']=False
+    execution=owner.sources._exec_observations[id(attempt['source'])]
+    assert execution.value is None and execution.descriptors()
+    with pytest.raises(Conflict,match='already entered'):
+        attempt['release_entered']=True
+        try:owner.sources.observe_native_exec(owner,lease)
+        finally:attempt['release_entered']=False
     owner.stop_to_terminal(lease)
     assert row['producer'].poll() is not None and row['producer'].stdin.closed
     assert all(fd is None for fd in row['fds'].values())
+    assert execution.descriptors()==()
     assert owner.pool.snapshot()['occupied']==0
     current=owner._current(attempt)
     assert current['status']=='UNKNOWN'

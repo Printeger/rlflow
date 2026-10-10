@@ -25,6 +25,7 @@ class NativeModelSourceOwner(FixtureUsageSourceOwner):
         # Runtime callers cannot select another path or ask for keyring fallback.
         self._account_home = os.path.abspath(os.environ.get('CODEX_HOME',str(Path.home()/'.codex')))
         self._account_caches = {}
+        self._exec_observations = {}
         super().__init__(pool)
 
     def _actual(self):
@@ -85,13 +86,20 @@ class NativeModelSourceOwner(FixtureUsageSourceOwner):
 
     def _extra_fork_descriptors(self, attempt):
         cache=self._account_caches.get(id(attempt['source']))
-        return tuple(row['fd'] for row in self._gate_inputs.get(id(attempt['source']),[]) if row['fd'] is not None)+(cache.descriptors() if cache is not None else ())
+        execution=self._exec_observations.get(id(attempt['source']))
+        return (tuple(row['fd'] for row in self._gate_inputs.get(id(attempt['source']),[]) if row['fd'] is not None)
+            +(cache.descriptors() if cache is not None else ())
+            +(execution.descriptors() if execution is not None else ()))
 
     def _cleanup_attempt(self, attempt):
         errors=[]
         cache=self._account_caches.get(id(attempt['source']))
         try:super()._cleanup_attempt(attempt)
         except (OSError,Conflict) as error:errors.append(error)
+        execution=self._exec_observations.get(id(attempt['source']))
+        if execution is not None:
+            try:execution.close()
+            except (OSError,Conflict) as error:errors.append(error)
         if cache is not None:
             # A live producer may refresh/recreate auth.json. Never close the
             # cleanup capability or declare the copy gone before it is reaped.
@@ -111,6 +119,51 @@ class NativeModelSourceOwner(FixtureUsageSourceOwner):
         if errors:
             attempt['status']='UNKNOWN'
             raise Conflict('original generating input cleanup incomplete') from errors[0]
+
+    def observe_native_exec(self,owner,lease):
+        """Actual original producer ELF/stdio DATA, no account or G permission.
+
+        Missing or changed observations never certify EOF/usage. A failed
+        observation is retained for STOP, not replaced by caller flags.
+        """
+        from .hybrid_native_model_runtime import NativeModelOwner
+        from .hybrid_native_exec_observation import _ExecFDObservation
+        from .jobs import identity
+        self._actual()
+        if type(owner) is not NativeModelOwner or owner.sources is not self:
+            raise PermissionError('original native executable observation owner required')
+        runtime=owner._issued(lease);source=runtime['source'];attempt=self._issued(source)
+        with self._lock:
+            self._physical(attempt)
+            if not runtime['release_entered'] or attempt['producer'] is None:
+                raise Conflict('original released producer required for executable observation')
+            ready=self._model_ready.get(id(source))
+            if ready is None or ready[0] is not source:
+                raise Conflict('original same-source sandbox ready required')
+            # G is asynchronous. Do not consume the one bounded exec probe
+            # while the fixed Python gate is still legitimately transitioning.
+            # A stdout event is readiness DATA only; the kernel ELF check below
+            # remains mandatory, so fabricated JSON cannot supply provenance.
+            self.poll_packet_data(source)
+            reader=self._packet_origins[id(source)][1]
+            if reader.transcript.offset==0 or reader.transcript.state not in ('THREAD','TURN','MESSAGE','DONE'):
+                raise Conflict('native stdout observation not ready for executable probe')
+            def live():
+                self._physical(attempt);self._check_pidfd(attempt,live=True)
+                if (attempt['producer'].poll() is not None or
+                        identity(attempt['producer'].pid)!=attempt['producer_identity'] or
+                        runtime['producer_identity']!=attempt['producer_identity']):
+                    raise Conflict('original same-PID live producer required')
+            if id(source) in self._exec_observations:
+                raise Conflict('original executable observation already entered')
+            capture=_ExecFDObservation();self._exec_observations[id(source)]=capture
+            value=capture.observe(attempt['producer'].pid,
+                binary_identity=attempt['binary']['stamp'][:2],
+                stdout_identity=attempt['identities']['events.jsonl'],
+                stderr_identity=attempt['identities']['stderr.log'],check_live=live)
+            return {**value,'source_id':source.id,'lease_id':lease.id,
+                'elf_observed':True,'source_authenticated':False,'account_qualified':False,
+                'usage_qualified':False,'condition_evidence_enabled':False}
 
     def _prepare_current_account_cache(self,owner,lease):
         from .hybrid_native_model_runtime import NativeModelOwner

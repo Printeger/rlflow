@@ -1,5 +1,7 @@
 # 阻塞与证据缺口
 
+2026-10-11 原ELF/stdio观测与空stdout就绪门已实现且本地验证；它只是必要来源数据，不解决实际批准启动/G、服务端账户、完整stdout/真实EOF和原usage cap发行。首实任务NOT_EXECUTED，产品独立Reviewer/条件CAS/自主接续仍未完成。本地开发无新权限前置；仅实际模型调用等待既有小额A合同批准。GPU/B/C/instinctRL HOLD保持，其他恢复增强不前移。
+
 2026-10-11 当前文件账户cache的原私有transfer与STOP删除已实现；只用合成NOT_A_TOKEN测试，未读取真实cache，未改CLI配置或宿主状态。仍缺真实账户server资格、sameELF exec/G/真实EOF与原完整usage cap发行；文件不存在、权限不私有或keyring-only明确拒，不擅自迁移或新增login。后续同workflow CPU/独立Evaluator派生、条件CAS/接续仍待原parents，首任务NOT_EXECUTED。本地代码无新增用户决定；小额A运行合同未批准不调用，GPU/B/C/instinctRL HOLD保持。
 
 2026-10-11 原Evaluator审计输出消费已实装，不再只存在pure decoder；仍不具真实模型来源/独立性或接纳资格。同workflow新Reviewer派生、受管候选CPU、条件CAS和自主接续需原受保护parents接通；原账户/生成/EOF及opaque usage发行仍最高依赖。首实任务NOT_EXECUTED，小额A调用待批仅阻实际运行；GPU/B/C/instinctRL HOLD保持，本地无新增用户选择。

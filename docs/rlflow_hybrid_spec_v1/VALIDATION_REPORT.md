@@ -1,5 +1,7 @@
 # 需求包离线校验报告
 
+2026-10-11 执行映像观测：原34073终态4pass/1fail14.87s（新增负例漏Conflict import）；修后66413终态5pass20.37s。新增异步启动readiness后原60612终态1fail17.41s，定位_HeldPacketReader无offset，修为transcript.offset；仅受影响38015自然exit0，1pass20.20s。纯测试观测当前pytest进程，不新起模型；原集成只fixed Python noG，空stdout不创建probe、合成thread事件被实际ELF拒、重复失败拒、STOP allFDclosed/Pool0/UNKNOWN全预留/audit=replay。独立窄复核无新增MUST，证据evidence/a-native-exec-observation-20261011.txt。没有全库或真实task/产品Review/条件接续/A完成声明。
+
 2026-10-11 账户cache本地验证：纯5pass.03s；原87683 1fail/5pass11.24s定位native_setup覆写CODEX_HOME（隔离fake catalog无auth，不是真实cache），修夹具依赖顺序后只affected1pass14.67s。High target inode/dest冻结identity/最终门3MUST修后6pass15.28s；新rename/replacement/swap与末fresh后expiry/STOP→零secret read/零copy原96955终态5pass/6deselected25.01s；带合成cache的真实固定Python noG+STOP原50864终态1pass/10deselected20.51s，Pool0/UNKNOWN/host不改/copy删除/audit=replay。末missing-name+target fstat OSError独立关闭1pass/11deselected.09s，High全部MUST闭合。compile/diff/USERlock通过；各原handles terminal、不重启，命令见evidence/a-native-account-cache-20261011.txt。没有真实cache/CLI/model/G/GPU调用；不宣称账户资格/可信结算/首实任务/Review/条件接续/A或全库通过。
 
 Reviewer数据末验：原25591自然exit0，旧默认Engineer登记1pass/19deselected11.13s；独立原finite_app_review_63只读窄审无新增确证MUST，未重跑测试。全本轮handlesterminal/compile/diff/USERlock通过；归档 evidence/a-native-review-data-20261011.txt，不支持真实模型/独立产品Review或条件接续验收。

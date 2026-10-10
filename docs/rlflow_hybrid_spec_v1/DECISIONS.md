@@ -1,5 +1,7 @@
 # 开发决策记录
 
+2026-10-11 执行来源只采内核元数据，不接受release flag或stdout JSON作为模型身份：原Source按原producer核pidfd/starttime并持有/proc exe、fd1/fd2，对冻结ELF及held Source inode；前后live检查不是原子快照，不证明argv/输入实际消费、服务端账户、EOF或用量。stdout有效事件仅解决异步G/exec的采样就绪，不提升资格；空数据不进入probe，实际失败probe不可替换且partialFD必须STOP。下一须区分“原批准启动授权”与“执行后来源/账户资格”，防止以cache_staged预授可信用量或制造必须先exec才能start的循环。Source usage hook仍None，两个G门仍deny。
+
 2026-10-11 当前账户cache与认证资格分离：官方Authentication只支持文件/keyring语义与CLI强制ChatGPT/workspace退出行为，不能把opaque cache/JWT或复制成功视资格。先实装原当前文件cache隔离；不设置API/新账户/keyringfallback、不刷新/迁移宿主cache。Source调用不接受caller路径或effect callback，原同lease Controller/material guard与最后效果门保持。副本目的dirfd比原gate冻结devino，copy原inode精确绑定；改名/替换不能误删或假清理，删失败保原target/dirfd和UNKNOWN。先reap后删除，防活生产者重建cache；异常不跳过其他原FD独立关闭。真实模型refresh/账户server/EOF/usage issuer仍须后续原资格，不借本片升级。官方来源 https://learn.chatgpt.com/docs/auth ，证据evidence/a-native-account-cache-20261011.txt。
 
 2026-10-11 Reviewer消费不授Reviewer资格：沿用原heldFD完整独立重放及冻结completed消息，从原packet而非可变transcript核角色；output_schema与原grant候选hash同时核验。共享review_data只校验闭schema/同candidate/ACCEPT无MUST并freshcopy，不能把合成stdout、开发期High或caller PASS变独立性/条件证据。错数据沿原失败锁存；原physical STOP独立保留。官方Authentication说明缓存可能file/keyring、CLI强制workspace限制，但未确立缓存本身为本产品资格；本片不读凭据/切换存储/调用CLI。来源 https://learn.chatgpt.com/docs/auth 。

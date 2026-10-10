@@ -1,5 +1,7 @@
 # Hybrid v1 开发进度
 
+2026-10-11 原执行映像/stdio观测本地接通：原Source绑定同一lease/producer/pidfd/starttime与冻结ELF、stdout/stderr inode，实际/proc O_PATH逐一强持有、失败部分FD进STOP；观测返回fresh data，不发行账户/生成/usage/条件资格。异步启动先等原held stdout有效事件，空输出不占一次性probe；合成事件仍必须过真实ELF检查。纯4pass与受影响原Python gate合计5pass20.37s；新增readiness首次1fail17.41s定位错误Reader属性，改用原transcript.offset后仅原受影响1pass20.20s。独立窄审无新增MUST、所有原handles终态，证据evidence/a-native-exec-observation-20261011.txt。无G/model/真实凭据/GPU调用，首task NOT_EXECUTED，不是A/98闭合。下一原批准启动资格与后验来源/EOF/可信usage发行，再workflow CPU/不同Evaluator/条件CAS/接续；代码继续，A实际调用待既有小额合同批准，GPU/B/C/HOLD不变，Goal ACTIVE。
+
 2026-10-11 原账户文件缓存隔离已本地接通：Source构造只捕获当前CODEX_HOME路径，不读cache；原REGISTER Controller/material guard内，在首次secret pread与副本create前完整source核后执行原最终效果门。当前host auth.json只读NOFOLLOW/私有0600/nlink1/64KiB，复制至原冻结auth-private，不返回/记录内容或credential hash，不解析JWT/开keyring/改host文件。STOP先reap生产者再精确删原session副本并关闭全部原FD，失败仍UNKNOWN/保cap。原合成Store+真实固定Python noG验证1pass20.51s；主修负例5pass25.01s，末异常关闭1pass.09s，纯5pass.03s与受影响6pass15.28s。High3MUST及直接异常收尾MUST全部关闭，证据evidence/a-native-account-cache-20261011.txt；compile/diff/USERlock通过。只交付缓存transfer，account_qualified=false/start与G仍deny，非真实账户/模型/task/Review/A验收。下一原账户server资格+sameELF/G/EOF/usage cap发行→workflowCPU/不同Evaluator/条件CAS/接续。A小额调用待批只阻实际运行，GPU/B/C/HOLD保持，Goal ACTIVE。
 
 本Reviewer数据切片FINAL：旧Engineer原25591自然terminal1pass/19deselected11.13s；独立窄复核无新增确证MUST，compile/diff/USERlock通过，所有本轮handles已终态。仅原数据消费接线提交，不是产品独立Review/首个实任务/A完成。下一原生成资格与可信用量发行继续本地实现，Goal ACTIVE。

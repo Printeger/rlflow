@@ -1,0 +1,44 @@
+Base commit: 074f85d. Scope: held actual executable/stdio observation DATA.
+No G, native Codex/model/API, real credentials, GPU or production mutation.
+Actual task / independent product Reviewer / conditions / continuation:
+NOT_EXECUTED. Goal ACTIVE; pending small A contract unchanged.
+
+Original Source binds owner/lease/producer, frozen sandbox ready, original
+pidfd/starttime and held ELF/stdout/stderr inode. Kernel /proc O_PATH opens
+retain each FD before fallible fstat; before/after original live checks.
+Fresh canonical copies only. Point metadata is not atomic, not argv/input
+consumption, account/server identity, authenticated source, EOF or usage.
+Empty stdout does not consume one-shot probe; original held packet events
+are readiness DATA only. Synthetic thread JSON cannot pass real ELF check.
+Failed probes retain partial FDs for STOP; cannot be replaced by caller flags.
+Source issuer hook stays None; start/release final fences still deny G.
+
+Command:
+env -u PYTHONPATH PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q tests/test_hybrid_native_exec_observation.py tests/test_hybrid_native_model_producer.py
+First original34073/output0316f5: 4passed,1failed14.87s.
+Cause new integration negative lacked Conflict import; fixed import.
+Original66413/outpute2ee5c natural exit0:5passed20.37s.
+Pure4 observe current pytest executable/stdio, mismatched image/stdio and
+after-open live failure, partial close and immutable fresh-copy results.
+Original integration launches only fixed Python gate, never G/model.
+
+Additional readiness code:
+env -u PYTHONPATH PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q tests/test_hybrid_native_model_producer.py
+Original60612/output0fdcc1 natural exit1:1failed17.41s.
+Recovered exact handle from session record; did NOT restart/repeat live test.
+Cause Reader exposes transcript.offset, not reader.offset. Fixed exact API.
+Original38015/outputf359f6 natural exit0:1passed20.20s.
+Empty stdout rejects before probe creation; synthetic thread event still
+rejects actual Python as approved model ELF. Failed observation cannot retry.
+Original STOP reaps process, closes source/gate/probe FDs, Pool0.
+Budget UNKNOWN/full reserved/full unknown exposure; Store audit == replay.
+
+Independent read-only /root/finite_app_review_63 reviewed initial FD helper
+and final readiness amendment, no new confirmed MUST_FIX. No duplicate tests.
+Compile/diff/user package-lock checks completed before commit.
+User lock SHA becc7e2a36dfcad4ffe934b5ff2f0f68187611d6c0641bd63d81367651cfbf09.
+No full suite / A / checkpoint98 / final Goal acceptance claim.
+Remaining: original authorized start and postexecution account/source/EOF,
+trusted usage issuer, same-workflow CPU, new independent Evaluator,
+conditional CAS and bounded continuation, first nonpreset real task result.
+GPU/B/C/instinctRL HOLD unchanged; runtime A contract still unapproved.
