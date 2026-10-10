@@ -80,6 +80,40 @@ def test_frozen_configured_source_binding_and_budget_registration():
     with pytest.raises(Conflict,match='reservation'):validate_runtime(request,prior)
 
 
+def test_recovery_publication_binds_before_dispatch_and_remains_immutable():
+    request,prior=registration_request()
+    publication={'source_id':'original_source','path':'/original','chain':[[1,2,3],[1,4,3]],
+        'config_sha256':'a'*64,'unit':'rlflow-local-'+'b'*32+'.service',
+        'files':{'task-report':[1,5,0],'task-stdout':[1,6,0],'task-stderr':[1,7,0]}}
+    runtime=request['fixture_runtime'];runtime['local_cpu_recovery_source']=publication
+    with pytest.raises(Conflict,match='before dispatch'):validate_runtime(request,prior)
+    del runtime['local_cpu_recovery_source']
+    old=deepcopy(runtime);prior.update(fixture_runtime=old,last_entry_key='registration',last_entry_hash=HASH)
+    runtime.update(phase='HANDOFF_UNKNOWN',previous={'key':'registration','hash':HASH},
+        registration={'key':'registration','hash':HASH},local_cpu_recovery_source=publication)
+    request['action']=ACTIONS[1]
+    assert validate_runtime(request,prior)==runtime
+    prior['fixture_runtime']=deepcopy(runtime);prior.update(last_entry_key='handoff',last_entry_hash=HASH)
+    runtime.update(phase='PROCESS_REGISTERED',previous={'key':'handoff','hash':HASH},producer=runtime['origin']['owner'])
+    request['action']=ACTIONS[2]
+    runtime['local_cpu_recovery_public_key']='e'*64
+    assert validate_runtime(request,prior)==runtime
+    runtime['local_cpu_recovery_source']=deepcopy(publication)
+    runtime['local_cpu_recovery_source']['config_sha256']='c'*64
+    with pytest.raises(Conflict,match='publication changed'):validate_runtime(request,prior)
+    del runtime['local_cpu_recovery_source']
+    with pytest.raises(Conflict,match='publication changed'):validate_runtime(request,prior)
+    runtime['local_cpu_recovery_source']=publication
+    prior.update(fixture_runtime=deepcopy(runtime),last_entry_key='process',last_entry_hash=HASH)
+    runtime.update(phase='RELEASE_INTENT',previous={'key':'process','hash':HASH})
+    request['action']=ACTIONS[3]
+    assert validate_runtime(request,prior)==runtime
+    runtime['local_cpu_recovery_public_key']='f'*64
+    with pytest.raises(Conflict,match='public key changed'):validate_runtime(request,prior)
+    del runtime['local_cpu_recovery_public_key']
+    with pytest.raises(Conflict,match='public key changed'):validate_runtime(request,prior)
+
+
 def test_configured_acceptance_is_frozen_bounded_and_not_implicit_success():
     from rlflow.hybrid_local_cpu_profile import evaluate_output,validate_bound_spec
     proposal,config,spec=approved_sources()

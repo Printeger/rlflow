@@ -1,5 +1,9 @@
 # Hybrid v1 开发进度
 
+Checkpoint91 收尾：90提交fe93ab7。父SIGKILL后可显式恢复原任务输出/退出原因并按原spec重算，新增公开history --recover-task-evidence；原路径/inode/config在HANDOFF前持久，task真实fork+confine后 keeper才生成内存Ed25519私钥，原ready公钥PROCESS在G前持久/后续不可变，close+fsync原报告签完整domain payload。冷原event/approval+公钥/libcrypto pin/chain/inode/stable read验真；不升级managerSTOP/FREE/结算，UNKNOWN/占槽不变。首未签1fail/2pass45.62s为测试缺事务，接线修后1pass13.54s；独立source-integrity/partial/FIFO/FD MUST修，签版实机4pass65.30s；最终异常read-close修后49pass9.09s及当前CLI原signed冷读同值exit0，不重复未受影响实机。High所有MUST关闭，compile/diff/USERlock检查通过，证据checkpoint-91-crash-recovery/及HYBRID_LOCAL_CPU_EVIDENCE_RECOVERY.md，进入提交。不是安装/全库/长跑/自主闭环完成。
+
+下一安全收敛原scope残留与UNKNOWN占槽，必须真实恢复协议与预算/Pool一致，不重建失去的旧STOP能力。模型集中合同未答不调用，strictquota/24h8h/科研自治/instinctRL准入未完成，原Goal ACTIVE。
+
 Checkpoint90 收尾：89提交f96dcbe。实际父SIGKILL baseline证明keeper/task已停止，真正缺口为failed transient unit永久保留；新source CollectMode=inactive-or-failed，manager精确复核，RemainAfterExit/原RefUnit/完整STOP门不变。实际含setsid后代原pidfd终态与unit GC；冷Store保持UNKNOWN/no terminal/no settled/no controls，受保护原pins冷Pool occupied1/no claims/读不写。baseline1pass11.62s；新故障+正常fullSTOP/FREE+deadline3pass52.31s；追加Pool断言仅受影响故障1pass11.67s。High无新MUST，compile/diff通过；原4旧failed保留无新积累，USERlock不动。证据checkpoint-90-owner-crash/及HYBRID_LOCAL_CPU_PARENT_CRASH.md，进入提交，不是完整长期恢复/自治/新安装或全库资格。
 
 下一交付父崩溃后原批准任务的可信持久证据恢复，不仅增加测试/准备组件；不以GC补同Invocation STOP或FREE。真实模型链集中合同仍未答、不给模型/GPU调用授权；strictquota/长期资格/instinctRL准入仍缺，原Goal ACTIVE。

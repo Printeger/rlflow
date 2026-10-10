@@ -615,6 +615,11 @@ class FixtureRuntimeOwner:
             if attempt.get('local_cpu_grant') is not None:
                 runtime['local_cpu_release_attempted']=attempt['release_entered']
                 runtime['local_cpu_terminal_proof']=attempt['terminal'] if phase=='FIXTURE_SCOPE_STOPPED' else None
+                recovery=self._recovery_source(attempt)
+                if recovery is not None:runtime['local_cpu_recovery_source']=recovery
+                public_key=(self._recovery_public_key(attempt,phase) if phase=='PROCESS_REGISTERED' else
+                    None if prior is None else prior.get('local_cpu_recovery_public_key'))
+                if public_key is not None:runtime['local_cpu_recovery_public_key']=public_key
             for name in ('start_command', 'stop_command'):
                 if prior is not None and name in prior: runtime[name] = prior[name]
             if command is not None:

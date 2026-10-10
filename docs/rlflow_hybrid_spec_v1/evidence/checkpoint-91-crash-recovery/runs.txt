@@ -1,0 +1,32 @@
+Checkpoint 91, isolated zero-model/GPU CPU development verification only.
+
+Unsigned initial command:
+env PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q tests/test_hybrid_local_cpu_parent_crash.py tests/test_hybrid_local_cpu_runtime.py::test_actual_configured_core_task_result_managed_stop_budget_and_free tests/test_hybrid_local_cpu_runtime.py::test_original_configured_cpu_grant_budget_pool_source_and_no_handoff_stop
+28866 / c4f4fd, exit 1: 1 failed, 2 passed in 45.62s
+Failure excerpt: rlflow.store.Conflict: actual historical transaction budget required
+Test called internal _head outside a transaction, after public recovery and fresh CLI had succeeded. Corrected test to reader.snapshot, not product authority.
+Affected unsigned fault-only command:
+env PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q tests/test_hybrid_local_cpu_parent_crash.py
+1137 / 60c453, exit 0: 1 passed in 13.54s
+Unsigned pure suite: 4a5f3b, exit 0, 43 passed in 0.26s.
+Unsigned crash-*.json are pre-signature evidence, NOT final source authenticity qualification.
+
+High review then required authenticated content (paired report/output mutation), partial allocation handling, and NONBLOCK FIFO refusal. Signature and original public-key binding implemented; no widening of STOP/FREE.
+Signed pure suite before final FD cleanup: bd5e75, exit 0, 48 passed in 0.29s.
+Signed actual command:
+env PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q tests/test_hybrid_local_cpu_parent_crash.py tests/test_hybrid_local_cpu_runtime.py::test_actual_configured_core_task_result_managed_stop_budget_and_free tests/test_hybrid_local_cpu_runtime.py::test_original_configured_cpu_grant_budget_pool_source_and_no_handoff_stop 'tests/test_hybrid_local_cpu_negative_result.py::test_actual_negative_result_archived_stopped_and_cold[deadline]'
+84597 / e999f5, exit 0:
+....                                                                     [100%]
+4 passed in 65.30s (0:01:05)
+
+Final narrow FD cleanup: admission checks historical file identity; cleanup checks the identity of this reader's actual opened FD. Independent closes; uncertain/failed handles retained on exception. FIFO/replacement negative checks FD set returns to baseline.
+Final affected command (includes real partial allocation failure, NO service dispatch/G):
+env PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q tests/test_hybrid_local_cpu_recovery.py tests/test_hybrid_local_cpu_profile.py tests/test_hybrid_local_cpu_cli_reporting.py tests/test_hybrid_local_cpu_runtime.py::test_partial_recovery_allocation_failure_preserves_original_no_launch_cleanup
+4747 / 5e24da, exit 0: 49 passed in 9.09s
+Previous signed actual execution cases not repeated: final change touches exceptional read cleanup only. Final current CLI read 61c1cf exit 0 matched signed original crash recovery exactly, without execution/settlement.
+Signed JSON copied/pretty-printed from actual pytest-755; publication-binding is an original event-verified runtime projection, not a whole-event byte seal. Task report signature covers canonical content, not archive whitespace. No private key archived.
+
+Final added source/public-key immutable transition assertions:
+env PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q tests/test_hybrid_local_cpu_profile.py::test_recovery_publication_binds_before_dispatch_and_remains_immutable
+a185bc, exit 0: 1 passed in 0.06s
+Test-only addition; no execution or product source changes after signed final cleanup verification.

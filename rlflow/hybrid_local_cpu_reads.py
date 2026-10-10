@@ -10,6 +10,32 @@ from .hybrid_local_cpu_profile import KIND, AUTHORIZATION
 class LocalCpuTaskReader(FixtureTaskReader):
     _accepted_origin_kind=KIND
 
+    def recover_task_evidence(self,reservation_id):
+        """Explicit original task evidence read, never a control/recovery grant."""
+        from .hybrid_protocol import ID,validate_schema
+        from .hybrid_reads import ReadBudget
+        from .hybrid_authority import SECTIONS as AUTHORITY
+        from .hybrid_preparation_sources import historical_sources
+        from .hybrid_local_cpu_recovery import recover
+        validate_schema(ID,reservation_id)
+        with self.snapshot() as (db,meta):
+            read=ReadBudget(db,16*1024**2)
+            pair=self._head(db,read,reservation_id,meta['as_of_state_version'])
+            if pair is None:return None
+            head,entry=pair;runtime=head['fixture_runtime']
+            publication=runtime.get('local_cpu_recovery_source')
+            evidence=None
+            if publication is not None:
+                original=historical_sources(self.store,db,entry['policy_source'],read)
+                approval=original[AUTHORITY[0]][entry['policy_source']['approval_key']]
+                spec=approval['registry_witness']['tools']['local_cpu']['definition']['spec']
+                evidence=recover(publication,runtime,spec,
+                    approval['registry_witness']['tools']['local_cpu']['definition']['modules'].get('libcrypto'))
+            return self.output({**meta,'reservation_id':reservation_id,
+                'recorded_budget_status':head['status'],'task_evidence':evidence,
+                'managed_terminal_recovered':False,'controls_available':False,
+                'execution_replayed':False,'settlement_performed':False},256*1024)
+
     def _point(self,db,read,key,version):
         value=super()._point(db,read,key,version)
         if value['request'].get('fixture_runtime',{}).get('origin',{}).get('kind')==KIND:

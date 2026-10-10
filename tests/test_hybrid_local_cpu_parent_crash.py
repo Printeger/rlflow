@@ -11,14 +11,16 @@ import time
 from rlflow.hybrid_local_cpu_reads import LocalCpuTaskReader
 from rlflow.hybrid_host_pool import HostPoolOwner
 from rlflow.store import Store
+from rlflow.hybrid_reads import ReadBudget
 
 WORKER=r'''
 import json,sys,time
 from pathlib import Path
 from rlflow.isolated_local_cpu import isolated_session
 from rlflow.hybrid_budget_ledger import reservation_key
-spec={'purpose':'research','code':'import os,time\np=os.fork()\nif not p:os.setsid()\nwhile True:time.sleep(1)',
-    'inputs':{},'seconds':20,'limits':{'memory_max':67108864,'cpu_max':'100000 100000','pids_max':12}}
+spec={'purpose':'research','code':'import os,time\nprint("checkpoint-before-crash",flush=True)\np=os.fork()\nif not p:os.setsid()\nwhile True:time.sleep(1)',
+    'inputs':{},'seconds':20,'limits':{'memory_max':67108864,'cpu_max':'100000 100000','pids_max':12},
+    'acceptance':{'method':'EXACT_STDOUT_UTF8','stdout':'checkpoint-before-crash\n','stderr_empty':True}}
 with isolated_session(Path(sys.argv[1]),spec,approved=True,confirmation_reader=lambda p,c:'APPROVE '+c['scope_hash']) as s:
     runtime=s['runtime'];lease=s['lease'];runtime.start(lease)
     row=runtime.sources._issued(runtime._issued(lease)['source'])
@@ -81,6 +83,47 @@ def test_owner_crash_retires_physical_service_without_forging_budget_terminal(tm
         assert history['managed_terminal_proof'] is None and history['recorded_settled_usage'] is None
         assert not history['task']['controls_available'] and not history['task']['condition_evidence']
         assert store.version()==version
+        recovered=reader.recover_task_evidence(ready['reservation'])
+        evidence=recovered['task_evidence'];assert evidence is not None
+        result=evidence['configured_local_result'];assert result is not None
+        assert result['outputs']['stdout']['text']=='checkpoint-before-crash\n'
+        assert result['execution']['control_terminal_reason']=='CONTROL_EOF'
+        assert result['machine_acceptance']['status']=='FAIL'
+        assert not recovered['managed_terminal_recovered'] and not recovered['controls_available']
+        assert not recovered['execution_replayed'] and not recovered['settlement_performed']
+        assert store.version()==version and reader.task(ready['reservation'])['task']['recorded_budget_status']=='UNKNOWN'
+        # A genuinely cold public CLI consumes the same original report, not
+        # Python objects from the dead parent; not a new task execution.
+        cli=subprocess.run([sys.executable,'-m','rlflow.isolated_local_cpu','history',
+            '--root',ready['root'],'--store-epoch',ready['epoch'],'--reservation-id',ready['reservation'],
+            '--recover-task-evidence'],capture_output=True,text=True,timeout=15)
+        assert cli.returncode==0,cli.stderr
+        assert json.loads(cli.stdout)==recovered
+        # Same-inode output mutation cannot replace the trusted keeper seal.
+        with reader.snapshot() as (db,meta):
+            head=reader._head(db,ReadBudget(db,16*1024**2),
+                ready['reservation'],meta['as_of_state_version'])[0]
+        source=Path(head['fixture_runtime']['local_cpu_recovery_source']['path'])
+        output=source/'task-stdout';original=output.read_bytes()
+        output.write_bytes(b'forged PASS\n')
+        try:
+            import pytest
+            from rlflow.store import Conflict
+            with pytest.raises(Conflict,match='output hash differs'):reader.recover_task_evidence(ready['reservation'])
+        finally:output.write_bytes(original)
+        # Both originals can be modified without changing inode: the report
+        # signature must still reject forged hashes and a forged successful exit.
+        report_path=source/'task-report';report_original=report_path.read_bytes()
+        forged=json.loads(report_original)
+        forged['outputs']['stdout']=__import__('hashlib').sha256(b'forged PASS\n').hexdigest()
+        forged['task_closed']['stopped']['control_terminal_reason']='PRODUCER_EXIT'
+        for item in forged['task_closed']['stopped']['reaped']:
+            if item['pid']==forged['task_closed']['task']['pid']:item['status']=0
+        output.write_bytes(b'forged PASS\n');report_path.write_text(json.dumps(forged)+'\n')
+        try:
+            with pytest.raises(Conflict,match='signature differs'):reader.recover_task_evidence(ready['reservation'])
+        finally:output.write_bytes(original);report_path.write_bytes(report_original)
+        assert reader.recover_task_evidence(ready['reservation'])==recovered
         # Protected startup uses the actual before-crash installation pins,
         # not any reconstructed claim/source/manager capability. Only read.
         pool=HostPoolOwner.trusted_attach(ready['application_root'],ready['descriptor_sha256'],ready['descriptor_identity'])
@@ -91,6 +134,7 @@ def test_owner_crash_retires_physical_service_without_forging_budget_terminal(tm
             (tmp_path/'crash-pool.json').write_text(json.dumps(before))
         finally:pool.shutdown()
         (tmp_path/'crash-history.json').write_text(json.dumps(history))
+        (tmp_path/'crash-recovery.json').write_text(json.dumps(recovered))
         (tmp_path/'crash-state.json').write_text(json.dumps(state))
     finally:
         if worker.poll() is None:

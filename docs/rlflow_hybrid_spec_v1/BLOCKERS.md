@@ -1,5 +1,7 @@
 # 阻塞与证据缺口
 
+91 闭合有原PROCESS公钥的父崩溃任务日志/退出证据恢复及成对篡改拒绝，4实际case+49必要合同/partial收尾通过，High全部MUST关闭。仍缺同原完整manager scope终态与UNKNOWN/Pool占槽安全收敛协议；报告缺失/PROCESS未持久不能凭签名补业务STOP/FREE。真实模型/GPU集中合同未答不调用，strictquota/长跑/完整自治/instinctRL准入仍未完成；本地恢复协议实现无新增用户选择阻塞。
+
 90 已闭合新运行父死后的failed unit积累，实际故障/正常STOP/期限回归与原Pool冷占槽通过；并未闭合原任务日志/终态持久恢复，UNKNOWN/占槽仍保守保留。下一需可信前G绑定发布源和冷读验证，不能从GC推出FREE。真实模型/GPU集中合同未答不调用，strictquota/24h8h/自治和instinctRL准入仍缺；无新增阻塞普通本地实现的用户决定事项。
 
 89 闭合非零/超时原日志与退出原因归档缺口，机器FAIL强制/Review仍NOT_PROVEN；真实非零/期限、STOP/FREE/starts1/cold已验证。首stderr丢失FAIL已修，最终受影响7pass60.49s，High前端状态MUST关闭。下一完整父崩溃后的安全恢复/strictquota仍缺；真实模型/GPU集中合同仍未答不调用，实机长跑及instinctRL准入未完成。没有新增需用户决定才能推进普通本地的阻塞。

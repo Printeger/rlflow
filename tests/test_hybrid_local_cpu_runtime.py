@@ -140,6 +140,39 @@ def _spec():
 def _confirm(proposal,confirmation):return 'APPROVE '+confirmation['scope_hash']
 
 
+def test_partial_recovery_allocation_failure_preserves_original_no_launch_cleanup(tmp_path,monkeypatch):
+    from rlflow import hybrid_local_cpu_source as source_module
+    from rlflow.hybrid_local_cpu_reads import LocalCpuTaskReader
+    from rlflow.hybrid_budget_ledger import reservation_key
+    captured=[];allocate=LocalCpuSourceOwner._runtime_allocate;write=source_module._write_new
+    tmp_path.chmod(0o700)
+    def failed_report(path,raw):
+        if path.name=='task-report':raise OSError(5,'original report allocation failed')
+        return write(path,raw)
+    def retained(source,owner,lease):
+        try:return allocate(source,owner,lease)
+        finally:
+            attempt=owner._issued(lease);row=source._attempts.get(id(attempt['claim']))
+            captured.append((owner,attempt,row))
+            assert row is not None and not row.get('local_allocated')
+            assert owner._recovery_source(attempt) is None
+    monkeypatch.setattr(source_module,'_write_new',failed_report)
+    monkeypatch.setattr(LocalCpuSourceOwner,'_runtime_allocate',retained)
+    with pytest.raises(OSError,match='report allocation failed') as caught:
+        with isolated_session(tmp_path,_spec(),approved=True,confirmation_reader=_confirm):
+            pytest.fail('partial report allocation must not yield execution')
+    assert not getattr(caught.value,'__notes__',[])
+    owner,attempt,row=captured[0]
+    assert not attempt['spawn_entered'] and not attempt['release_entered']
+    assert not owner._live and all(fd is None for fd in row['fds'].values())
+    entry=attempt['entries']['FIXTURE_SCOPE_STOPPED'];assert entry['decision']=='SETTLED'
+    assert entry['request']['fixture_runtime']['producer'] is None
+    reader=LocalCpuTaskReader(owner.store,project_id='isolated_local_cpu',store_epoch=owner.plans.workspace.store_epoch)
+    key=entry['request']['reservation_id']
+    assert reader.task(key)['task']['recorded_budget_status']=='SETTLED'
+    assert reader.recover_task_evidence(key)['task_evidence'] is None
+
+
 @pytest.mark.parametrize('expected_status',['PASS','FAIL'])
 def test_actual_configured_machine_acceptance_runner_stop_and_original_cached_result(tmp_path,monkeypatch,expected_status):
     from rlflow.hybrid_local_cpu_manager import OriginalServiceManager

@@ -14,6 +14,7 @@ import threading
 
 from .hybrid_local_runner_cgroup import OriginalTaskScope, _inode, _start
 from .hybrid_local_runner_keeper import FiniteCpuKeeper
+from .hybrid_local_runner_signature import Signer
 
 
 def _emit(value):
@@ -60,7 +61,8 @@ def serve(config_path, expected_sha256):
             raise
     if (type(config) is not dict or set(config) not in
             ({'code', 'work', 'stdout', 'stderr', 'limits', 'seconds'},
-             {'code', 'work', 'stdout', 'stderr', 'limits', 'seconds','output_identities'})):
+             {'code', 'work', 'stdout', 'stderr', 'limits', 'seconds','output_identities'},
+             {'code', 'work', 'stdout', 'stderr', 'limits', 'seconds','output_identities','recovery_report'})):
         raise ValueError('closed finite CPU service config required')
     for name in ('work', 'stdout', 'stderr'):
         if type(config[name]) is not str or not Path(config[name]).is_absolute():
@@ -73,14 +75,27 @@ def serve(config_path, expected_sha256):
     control = None
     control_identity = None
     sources = []
+    report = None
+    report_identity = None
+    signer = None
     scope = keeper = None
     try:
         control = os.dup(0)
         control_identity = _inode(control)
+        publication=config.get('recovery_report')
+        if publication is not None:
+            if (type(publication) is not dict or set(publication)!={'path','identity','libcrypto_sha256'} or
+                    type(publication['path']) is not str or not Path(publication['path']).is_absolute()):
+                raise RuntimeError('closed original recovery publication required')
+            report=os.open(publication['path'],os.O_WRONLY|os.O_APPEND|os.O_NOFOLLOW|os.O_CLOEXEC)
+            report_identity=_inode(report);info=os.fstat(report)
+            if (list(report_identity)!=publication['identity'] or not stat.S_ISREG(info.st_mode) or
+                    stat.S_IMODE(info.st_mode)!=0o600 or info.st_nlink!=1 or info.st_size!=0):
+                raise RuntimeError('original empty recovery publication identity differs')
         for name in ('stdout', 'stderr'):
             original_outputs=config.get('output_identities')
             flags=os.O_APPEND if original_outputs is not None else os.O_CREAT|os.O_EXCL
-            fd = os.open(config[name], os.O_WRONLY | flags |
+            fd = os.open(config[name], (os.O_RDWR if publication is not None else os.O_WRONLY) | flags |
                          os.O_NOFOLLOW | os.O_CLOEXEC, 0o600)
             sources.append((fd, None))  # Retain BEFORE fallible identity IO.
             sources[-1] = (fd, _inode(fd))
@@ -90,28 +105,59 @@ def serve(config_path, expected_sha256):
         keeper = FiniteCpuKeeper(scope)
         ready = keeper.prepare_gate(config['code'], config['work'],
                                     sources[0][0], sources[1][0], seconds=config['seconds'])
-        _emit({'type': 'local_cpu.ready', 'config_sha256': expected_sha256,
-               'keeper': keeper_identity, 'task': ready})
+        receipt={'type': 'local_cpu.ready', 'config_sha256': expected_sha256,
+               'keeper': keeper_identity, 'task': ready}
+        if publication is not None:
+            # Task already forked + confined; its memory contains no key.
+            signer=Signer(publication['libcrypto_sha256']);receipt['recovery_public_key']=signer.public_key
+        _emit(receipt)
         stopped = keeper.run_original_control(control)
         closed = keeper.close_stopped_task()
+        output_seals={}
         for index, (fd, identity) in enumerate(sources):
             if _inode(fd) != identity:
                 raise RuntimeError('original task output source changed')
+            if publication is not None:
+                os.fsync(fd)
+                raw=os.pread(fd,65537,0)
+                output_seals[('stdout','stderr')[index]]=None if len(raw)>65536 else hashlib.sha256(raw).hexdigest()
             os.close(fd)
             sources[index] = (None, identity)
         if _inode(control) != control_identity:
             raise RuntimeError('original service control FD changed')
         os.close(control)
         control = None
-        _emit({'type': 'local_cpu.task_closed', 'config_sha256': expected_sha256,
+        terminal={'type': 'local_cpu.task_closed', 'config_sha256': expected_sha256,
                'keeper': keeper_identity, 'task': ready, 'stopped': stopped,
                'closed': closed, 'original_output_fds_closed': True,
-               'original_control_fd_closed': True, 'whole_scope_stopped': False})
+               'original_control_fd_closed': True, 'whole_scope_stopped': False}
+        if report is not None:
+            payload={'format':'local_cpu_recovery/1','task_closed':terminal,'outputs':output_seals}
+            payload['signature']=signer.sign(payload)
+            signer.close();signer=None
+            raw=json.dumps(payload,
+                sort_keys=True,separators=(',',':')).encode()+b'\n'
+            if (len(raw)>32768 or _inode(report)!=report_identity or os.fstat(report).st_size!=0 or
+                    os.write(report,raw)!=len(raw)):
+                raise RuntimeError('original recovery publication incomplete')
+            os.fsync(report)
+            os.close(report);report=None
+        _emit(terminal)
     except BaseException as exc:
         # Failure cannot leave a known task running just because its trusted
         # report/source write failed. Cleanup participants are independent;
         # uncertainty is retained and never emitted as successful terminal.
         failures = []
+        if signer is not None:
+            try:signer.close()
+            except BaseException as cleanup_exc:failures.append(('signer',repr(cleanup_exc)))
+        if report is not None:
+            try:
+                if report_identity is None or _inode(report)!=report_identity:
+                    raise RuntimeError('original recovery report FD identity uncertain')
+                os.close(report)
+            except BaseException as cleanup_exc:failures.append(('recovery_report',repr(cleanup_exc)))
+            else:report=None
         if keeper is not None and not keeper._closed:
             if not keeper._task_stopped:
                 try: keeper.stop_and_reap_task()
@@ -142,6 +188,7 @@ def serve(config_path, expected_sha256):
                                         'control': control, 'sources': sources,
                                         'control_identity': control_identity,
                                         'creator': creator, 'failures': failures}
+        exc.original_service_cleanup['recovery_report']={'fd':report,'identity':report_identity}
         raise
 
 

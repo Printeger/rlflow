@@ -1,5 +1,7 @@
 # 系统实施验收记录
 
+91 原任务证据恢复：实际签名父SIGKILL/原正常STOP-FREE/no-handoff/deadline84597/e999f5 4pass65.30s；最终异常read-cleanup修后4747/5e24da 49pass9.09s（48pure与真实partial allocation无派发清理），current公开CLI61c1cf exit0同原signed冷恢复，无执行。首未签28866/c4f4fd 1fail2pass45.62s测试缺事务，修1137/60c453 1pass13.54s只为未签版；不冒签名最终资格。High认证/partial/FIFO/FD MUST全闭，compile/diff/USERlock检查通过，无live。证据checkpoint-91-crash-recovery/及HYBRID_LOCAL_CPU_EVIDENCE_RECOVERY.md。UNKNOWN/占槽/无controls不变，任务报告不是managed scope STOP/结算/科研独立Review/自治/安装或长跑资格。
+
 Checkpoint90：baseline99838/84c7e5 1pass11.62s；新策略26445/b3dc90实际崩溃、正常原fullSTOP/FREE、deadline3pass52.31s；最终受影响故障追加Pool冷读55148/aed070 1pass11.67s。死前原keeper/leader/setsid后代pidfd均终态、unit GC；原Store UNKNOWN/no terminal/no settled/no controls，原Pool occupied1/no claims且读取不写。High无新确认MUST；compile/diff与USERlock检查通过，无重复已过正常/期限/UI/65s/全库。证据checkpoint-90-owner-crash/，验收边界与命令见HYBRID_LOCAL_CPU_PARENT_CRASH.md；物理GC不是原同Invocation业务STOP或长期恢复/自治资格。
 
 Checkpoint89 原失败实验stdout/stderr/waitpid/control原因归档+原Budget/fullmanagedSTOP/FREE/cold消费实装。初1pass/1fail41.03s保留，异常flush根因修后非零及必要正常/stub回归7pass60.49s；已过期限不重复，旧65s不重复、不冒称修改断言后的新长时通过。纯19pass、Node17pass+实际失败DTO1pass，High唯一前端状态MUST关闭，旧86实际Store当前公开history兼容读取通过。证据checkpoint-89-negative-evidence/及HYBRID_LOCAL_CPU_FAILURE_EVIDENCE.md，机器FAIL不是科学结论/独立Review/自治完成，无全库/新安装/长跑资格声明。

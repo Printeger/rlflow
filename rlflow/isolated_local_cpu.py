@@ -150,13 +150,16 @@ def main(argv=None):
     history.add_argument('--root',type=Path,required=True)
     history.add_argument('--store-epoch',required=True)
     history.add_argument('--reservation-id',required=True)
+    history.add_argument('--recover-task-evidence',action='store_true',
+        help='Read original durable keeper report and sealed outputs; no replay, STOP or settlement')
     args=parser.parse_args(argv)
     if args.command=='history':
         from .store import Store
         from .hybrid_local_cpu_reads import LocalCpuTaskReader
         store=Store.attach_existing(args.root,project_id='isolated_local_cpu',data_mode='fixture')
         reader=LocalCpuTaskReader(store,project_id='isolated_local_cpu',store_epoch=args.store_epoch)
-        value=reader.task(args.reservation_id,timeline=True)
+        value=(reader.recover_task_evidence(args.reservation_id) if args.recover_task_evidence else
+               reader.task(args.reservation_id,timeline=True))
         if value is None:parser.error('original configured CPU reservation not found')
         print(json.dumps(value,sort_keys=True),flush=True)
         return 0

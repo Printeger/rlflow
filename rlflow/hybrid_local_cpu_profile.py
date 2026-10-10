@@ -18,9 +18,10 @@ PROFILE = 'CONFIGURED_LOCAL_CPU_V1'
 KIND = 'LOCAL_CONFIGURED_CPU'
 AUTHORIZATION = 'ORIGINAL_APPROVED_LOCAL_CPU_ONLY'
 MODULES = ('hybrid_local_runner_service.py', 'hybrid_local_runner_keeper.py',
-           'hybrid_local_runner_cgroup.py', 'hybrid_local_runner_sandbox.py',
+           'hybrid_local_runner_cgroup.py', 'hybrid_local_runner_sandbox.py','hybrid_local_runner_signature.py',
            'hybrid_local_cpu_runtime.py', 'hybrid_local_cpu_source.py', 'hybrid_local_cpu_profile.py',
-           'hybrid_local_cpu_manager.py','hybrid_local_cpu_result.py', 'system_python', 'elf_loader', 'systemd_run', 'libsystemd')
+           'hybrid_local_cpu_manager.py','hybrid_local_cpu_result.py','hybrid_local_cpu_recovery.py',
+           'system_python', 'elf_loader', 'systemd_run', 'libsystemd','libcrypto')
 BINDING = obj({'profile': {'const': PROFILE}, 'code_sha256': HASH,
                'purpose': enum('engineering','research'),
                'task_seconds': {'type':'integer','minimum':1,'maximum':300},
@@ -119,10 +120,11 @@ def evaluate_output(spec,outputs):
 
 def module_pins():
     root=Path(__file__).parent
-    paths={name:root/name for name in MODULES if name not in ('system_python','elf_loader','systemd_run','libsystemd')}
+    paths={name:root/name for name in MODULES if name not in ('system_python','elf_loader','systemd_run','libsystemd','libcrypto')}
     paths.update(system_python=Path('/usr/bin/python3').resolve(strict=True),
                  elf_loader=Path('/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2'),
-                 systemd_run=Path('/usr/bin/systemd-run'),libsystemd=Path('/usr/lib/x86_64-linux-gnu/libsystemd.so.0'))
+                 systemd_run=Path('/usr/bin/systemd-run'),libsystemd=Path('/usr/lib/x86_64-linux-gnu/libsystemd.so.0'),
+                 libcrypto=Path('/usr/lib/x86_64-linux-gnu/libcrypto.so.3'))
     return {name:'sha256:'+hashlib.sha256(paths[name].read_bytes()).hexdigest() for name in MODULES}
 
 

@@ -21,7 +21,7 @@ from .jobs import identity
 from .hybrid_goals import digest
 
 TRUSTED_MODULES=('hybrid_local_runner_service.py','hybrid_local_runner_keeper.py',
-                 'hybrid_local_runner_cgroup.py','hybrid_local_runner_sandbox.py')
+                 'hybrid_local_runner_cgroup.py','hybrid_local_runner_sandbox.py','hybrid_local_runner_signature.py')
 
 
 class LocalCpuSourceOwner(FixtureUsageSourceOwner):
@@ -38,10 +38,11 @@ class LocalCpuSourceOwner(FixtureUsageSourceOwner):
     def start_fixture(self,*args,**kwargs):raise PermissionError('fixed source cannot start configurable task')
 
     def _source_files(self):
-        return {**SOURCE_FILES,'config':'launch.json','task_read':'task-stdout','task_error_read':'task-stderr'}
+        return {**SOURCE_FILES,'config':'launch.json','task_read':'task-stdout','task_error_read':'task-stderr',
+                'recovery_read':'task-report'}
 
     def _readonly_source_keys(self):
-        return super()._readonly_source_keys()|{'task_read','task_error_read'}
+        return super()._readonly_source_keys()|{'task_read','task_error_read','recovery_read'}
 
     def _source_file(self,name):
         if name.startswith('input:'):return 'work/'+name.removeprefix('input:')
@@ -108,8 +109,14 @@ class LocalCpuSourceOwner(FixtureUsageSourceOwner):
                     fd=os.open(row['path']/name,os.O_RDONLY|os.O_NOFOLLOW|os.O_CLOEXEC)
                     row['fds'][key]=fd;info=os.fstat(fd)
                     row['identities'][name]=[info.st_dev,info.st_ino]
+                _write_new(row['path']/'task-report',b'')
+                fd=os.open(row['path']/'task-report',os.O_RDONLY|os.O_NOFOLLOW|os.O_CLOEXEC)
+                row['fds']['recovery_read']=fd;info=os.fstat(fd)
+                row['identities']['task-report']=[info.st_dev,info.st_ino]
                 config={'code':spec['code'],'work':str(work),'stdout':str(row['path']/'task-stdout'),
                         'stderr':str(row['path']/'task-stderr'),'limits':spec['limits'],'seconds':spec['seconds'],
+                        'recovery_report':{'path':str(row['path']/'task-report'),
+                            'identity':[info.st_dev,info.st_ino,os.geteuid()],'libcrypto_sha256':pins['libcrypto']},
                         'output_identities':{name:[os.fstat(row['fds'][key]).st_dev,
                             os.fstat(row['fds'][key]).st_ino,os.geteuid()]
                             for name,key in (('stdout','task_read'),('stderr','task_error_read'))}}
@@ -263,6 +270,10 @@ class LocalCpuSourceOwner(FixtureUsageSourceOwner):
             binding=json.loads(row['source'].raw)['local_cpu_binding']
             if value.get('config_sha256')!=binding['config_sha256']:raise Conflict('original trusted report config differs')
             if value.get('type')=='local_cpu.ready' and row['ready'] is None and not row['protocol_rows']:
+                from .hybrid_local_cpu_result import TASK,KEEPER,HEX
+                from .hybrid_protocol import obj,validate_schema
+                validate_schema(obj({'type':{'const':'local_cpu.ready'},'config_sha256':HEX,
+                    'keeper':KEEPER,'task':TASK,'recovery_public_key':HEX}),value)
                 if value['task']['source_sha256']!=json.loads(row['runtime']['local_cpu_grant'].raw)['code_sha256'].removeprefix('sha256:'):
                     raise Conflict('original task approved source differs')
                 row['ready']=value

@@ -4,6 +4,7 @@ No model, GPU, production scope, fixed-profile grant upgrade or cold adoption.
 """
 from dataclasses import dataclass
 import json
+import os
 import uuid
 
 from .hybrid_fixture_runtime import FixtureRuntimeOwner
@@ -104,7 +105,34 @@ class LocalCpuRunnerOwner(FixtureRuntimeOwner):
 
     def check_guard(self,db,guard):
         self._issued(guard.attempt['lease'])
-        return super().check_guard(db,guard)
+        value=super().check_guard(db,guard)
+        recorded=json.loads(guard.raw)['request']['fixture_runtime']
+        expected=None if recorded['phase']=='REGISTER_NO_HANDOFF' else self._recovery_source(guard.attempt)
+        if recorded.get('local_cpu_recovery_source')!=expected:
+            raise Conflict('original configured CPU recovery publication source differs')
+        expected_key=self._recovery_public_key(guard.attempt,recorded['phase'])
+        if recorded['phase'] in ('STOP_REQUESTED','FIXTURE_SCOPE_STOPPED'):
+            prior=json.loads(guard.raw)['prior_reservation'].get('fixture_runtime')
+            if prior is None or prior.get('local_cpu_recovery_public_key') is None:expected_key=None
+        if recorded.get('local_cpu_recovery_public_key')!=expected_key:
+            raise Conflict('original configured CPU recovery public key differs')
+        return value
+
+    def _recovery_public_key(self,attempt,phase):
+        row=self._original_source(attempt)
+        if phase in ('REGISTER_NO_HANDOFF','HANDOFF_UNKNOWN') or row is None or row.get('ready') is None:
+            return None
+        if attempt['producer_identity'] is None:return None
+        return row['ready']['recovery_public_key']
+
+    def _recovery_source(self,attempt):
+        row=self._original_source(attempt)
+        if row is None or not row.get('local_allocated'):return None
+        binding=json.loads(row['source'].raw)['local_cpu_binding']
+        return {'source_id':row['source'].id,'path':str(row['path']),'chain':row['chain'],
+                'config_sha256':binding['config_sha256'],'unit':binding['unit'],
+                'files':{name:[*row['identities'][name],os.geteuid()]
+                    for name in ('task-report','task-stdout','task-stderr')}}
 
     def _terminal_scope(self):return 'ORIGINAL_CONFIGURED_CPU_SERVICE'
 

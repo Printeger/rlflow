@@ -1,5 +1,7 @@
 # 开发决策记录
 
+91 原inode不代表内容认证：独立MUST证明成对改报告/hash/输出可伪机器PASS，改为task fork/sandbox之后才生成内存私钥、原ready公钥G前持久、domain Ed25519签完整报告，冷仅原事件公钥验真。源路径/inodeHANDOFF前绑定，partial不发布；NONBLOCK拒FIFO，来源旧inode与本次opened FD清理身份分离。失去原managerjob的报告只证明任务证据，不退款、不FREE、无cold控制。分轮证据区分未签/最终签名版本，不改原验收合同。详HYBRID_LOCAL_CPU_EVIDENCE_RECOVERY.md。
+
 90 实测否定父死必留active服务假设，不改RemainAfterExit。采用新启动CollectMode=inactive-or-failed并snapshot精确核验：原RefUnit保住正常STOP证据，父死后允许失败单元物理GC。名字not-found仅诊断；原pidfd死前捕获证实进程退役，仍不能补已失manager业务证明。冷Budget UNKNOWN/Pool占槽和原历史不写保持；不清理历史failed单元，不退款、不冷接管。详HYBRID_LOCAL_CPU_PARENT_CRASH.md。
 
 89 负实验不由输出合格metric推出PASS：新原execution来自同task唯一waitpid与trusted control reason，非零/信号/期限机器FAIL，历史重算必须一致。旧success-onlyRESULT仍闭合兼容，不篡改旧事件。异常日志仅sandbox+G后有限type/message+finallyflush，task-owned不授评审；原所有缓存/归档/STOP/FREE界保留。PublicView同规则重算execution，独立前端矛盾PASS MUST关闭。分轮定向证据如实保留失败与源版本，不重复65s/期限已过场景。

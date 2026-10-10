@@ -1,0 +1,55 @@
+{
+  "format": "local_cpu_recovery/1",
+  "outputs": {
+    "stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdout": "799d81a81c08f3d1b2e844f2d8feaa4bf74b09b5524e70e5d09aa69201ed5619"
+  },
+  "signature": "075b9183f30309971f3b7c8889d27a2a4db1811c484a9576aa21ed80cd28d4b159b4ba54560bdcf6330f67961f920477f2df3c93d5a14c33fafc7500eb58ed00",
+  "task_closed": {
+    "closed": {
+      "keeper_protocol_handles_closed": true,
+      "stop_latched": true,
+      "task_handles_closed": true,
+      "whole_scope_stopped": false
+    },
+    "config_sha256": "9d788652343efdf8b27c98c31b30cdb1e83495b95432938125b12d0139d4b6de",
+    "keeper": {
+      "boot_id": "fa257cc3-1204-4e6f-88a5-a8a2ea7743aa",
+      "invocation_id": "ca236512fab64499ad740d2105bb7970",
+      "pid": 1616828,
+      "starttime": "158149834"
+    },
+    "original_control_fd_closed": true,
+    "original_output_fds_closed": true,
+    "stopped": {
+      "control_terminal_reason": "CONTROL_EOF",
+      "cpu_stat": "usage_usec 2314\nuser_usec 0\nsystem_usec 2314\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 4\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0",
+      "handoff_unknown": false,
+      "keeper_still_live": true,
+      "memory_peak": 1835008,
+      "protocol_cleanup_unknown": false,
+      "reaped": [
+        {
+          "pid": 1616829,
+          "status": 9
+        },
+        {
+          "pid": 1616831,
+          "status": 9
+        }
+      ],
+      "release_attempted": true,
+      "stop_latched": true,
+      "task_empty": true,
+      "whole_scope_stopped": false
+    },
+    "task": {
+      "pid": 1616829,
+      "sandbox": "CPU_LOCAL_LANDLOCK_SECCOMP",
+      "source_sha256": "a61b3c1cbcf6dfaa2b6836214589b7676ebde0315b2650e5d0c8fe924c6832fb",
+      "starttime": "158149837"
+    },
+    "type": "local_cpu.task_closed",
+    "whole_scope_stopped": false
+  }
+}

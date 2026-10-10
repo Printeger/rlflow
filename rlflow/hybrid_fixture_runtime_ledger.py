@@ -74,6 +74,9 @@ RUNTIME['properties'].update(engineering_release_attempted={'type':'boolean'},
                             engineering_patch_result=nullable({'type':'object'}))
 RUNTIME['properties']['local_cpu_release_attempted']={'type':'boolean'}
 RUNTIME['properties']['local_cpu_terminal_proof']=nullable({'type':'object'})
+from .hybrid_local_cpu_recovery import SOURCE as RECOVERY_SOURCE
+RUNTIME['properties']['local_cpu_recovery_source']=RECOVERY_SOURCE
+RUNTIME['properties']['local_cpu_recovery_public_key']={'type':'string','pattern':'^[0-9a-f]{64}$'}
 
 
 def control_command_id(request, actor_id, client_key):
@@ -118,6 +121,19 @@ def validate_runtime(request, prior):
     old = prior.get('fixture_runtime') if prior is not None else None
     local=value['origin']['kind']==LOCAL_KIND
     if local:
+        publication=value.get('local_cpu_recovery_source')
+        previous=None if old is None else old.get('local_cpu_recovery_source')
+        if publication is not None:
+            from .hybrid_local_cpu_recovery import validate_source
+            validate_source(publication)
+            if previous is None and current not in ('HANDOFF_UNKNOWN','STOP_REQUESTED'):
+                raise Conflict('recovery publication must bind before dispatch')
+        if previous is not None and publication!=previous:
+            raise Conflict('original recovery publication changed')
+        key=value.get('local_cpu_recovery_public_key');old_key=None if old is None else old.get('local_cpu_recovery_public_key')
+        if key is not None and old_key is None and (current!='PROCESS_REGISTERED' or publication is None):
+            raise Conflict('original recovery public key must bind before G')
+        if old_key is not None and key!=old_key:raise Conflict('original recovery public key changed')
         released=value.get('local_cpu_release_attempted')
         if (type(released) is not bool or released and current not in PHASES[4:] or
                 (current=='STARTED_AS_OBSERVED' or value['started_ack_sha256'] is not None) and not released or
@@ -132,7 +148,8 @@ def validate_runtime(request, prior):
                 from .hybrid_local_cpu_result import validate_terminal
                 validate_terminal(proof,value)
             elif proof is not None:raise Conflict('nonterminal configured CPU cannot archive terminal')
-    elif any(key in value for key in ('local_cpu_release_attempted','local_cpu_terminal_proof')):
+    elif any(key in value for key in ('local_cpu_release_attempted','local_cpu_terminal_proof',
+            'local_cpu_recovery_source','local_cpu_recovery_public_key')):
         raise Conflict('fixed capability cannot acquire configurable CPU release fields')
     trial = value['origin']['kind'] == CPU_KIND
     if trial:
