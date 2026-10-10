@@ -117,6 +117,9 @@ def test_original_generating_grant_registers_frozen_source_but_cannot_launch(mod
     assert not json.loads(attempt['source'].raw)['execution_qualified']
     versions=(owner.store.version(),owner.pool.snapshot()['version'])
     with pytest.raises(PermissionError,match='qualification'):owner.start(lease)
+    with pytest.raises(PermissionError,match='accounted A workflow'):
+        owner.prepare_native_launch(lease)
+    assert not owner._native_launches
     with pytest.raises(PermissionError):owner.sources.start_fixture(owner.membership,claim)
     assert (owner.store.version(),owner.pool.snapshot()['version'])==versions
     assert source['producer'] is None

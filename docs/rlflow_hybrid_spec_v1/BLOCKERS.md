@@ -1,5 +1,7 @@
 # 阻塞与证据缺口
 
+2026-10-11 原A first Engineer批准启动接线本地已实现，未携原launch cap仍拒，旧V1不升级；小额A合同待批仅阻工具实际G/model调用，不阻代码。真实来源/账户后验、完整stdout/EOF/usage issuer与同workflowCPU/新独立Evaluator/条件CAS/接续仍是开发缺口，首task NOT_EXECUTED。其他恢复增强后置，GPU/B/C/instinctRL HOLD未变，无新增用户决定。
+
 2026-10-11 原ELF/stdio观测与空stdout就绪门已实现且本地验证；它只是必要来源数据，不解决实际批准启动/G、服务端账户、完整stdout/真实EOF和原usage cap发行。首实任务NOT_EXECUTED，产品独立Reviewer/条件CAS/自主接续仍未完成。本地开发无新权限前置；仅实际模型调用等待既有小额A合同批准。GPU/B/C/instinctRL HOLD保持，其他恢复增强不前移。
 
 2026-10-11 当前文件账户cache的原私有transfer与STOP删除已实现；只用合成NOT_A_TOKEN测试，未读取真实cache，未改CLI配置或宿主状态。仍缺真实账户server资格、sameELF exec/G/真实EOF与原完整usage cap发行；文件不存在、权限不私有或keyring-only明确拒，不擅自迁移或新增login。后续同workflow CPU/独立Evaluator派生、条件CAS/接续仍待原parents，首任务NOT_EXECUTED。本地代码无新增用户决定；小额A运行合同未批准不调用，GPU/B/C/instinctRL HOLD保持。

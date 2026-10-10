@@ -1,5 +1,7 @@
 # 首个真实工程自主闭环：最小交付清单
 
+2026-10-11 第1项原批准启动接线已本地实现（原samelease launch cap→HANDOFF/Pool/gate/ready/原最后G门），不依赖先假定后验account资格；原V1/无cap仍拒。当前只拦截G的实际Python测试，真实调用未获批、首task NOT_EXECUTED。最小剩余优先：执行后原source+账户/完整stdout/EOF与可信usage cap发行及原结算→同workflow未知candidate CPUgrant→新不同Evaluator派生/原Review→条件CAS接纳→未完成需求一次接续。实际auth refresh清理只能在确证阻断首次运行时前移，不扩大其他恢复；小额A合同待批，GPU/B/C/HOLD不变。
+
 2026-10-11 第1项原同PID ELF/stdio观测已本地接线，但仅数据；实际批准启动/G、账户后验资格/完整stdout/真实EOF仍缺。优先剩余最小纵向实现：原批准启动→原成功/失败来源及usage cap→同workflow未知candidate受管CPU→新独立Evaluator→条件CAS接纳→依据未完成需求一次接续。须区分启动权限与后验资格，不能借缓存/JSON预授来源，也不能把A运行授权作为这些本地代码的前提。首真实非预设任务NOT_EXECUTED；当前仅Python noG与内核数据测试，小额A合同未经批准不调用，GPU/B/C/HOLD不变。
 
 2026-10-11 账户输入本地transfer已接原REGISTER/Controller最终效果门：当前host文件cache只读私有复制到原冻结session目录，敏感内容不入证据，原STOP先reap再精确删副本；仅合成cache验证。第1项仍需实际账户server/同ELF exec与G及完整stdout/真实EOF，cache_staged不是account_qualified。第2项可信usage cap发行，第3项同workflow未知candidate CPU与新独立Evaluator会话，第4项条件CAS/接续仍未完成；首非预设任务NOT_EXECUTED。A调用待既有小额合同批准，本地继续，GPU/B/C/HOLD不变。

@@ -1,12 +1,13 @@
-"""Original generating grant/registration; launch remains unqualified/denied.
+"""Original generating grant and approval-bound, same-lease native launch.
 
-This closes local approval/material/ledger ownership without reading credentials
-or turning declaration-only account/profile fields into execution qualification.
+Launching requires a separately issued original capability and current effects
+fences. It never promotes inputs into postexecution account/source/usage proof.
 """
 from dataclasses import dataclass
 import json
 import hashlib
 import uuid
+import threading
 
 from .hybrid_fixture_runtime import FixtureRuntimeOwner
 from .hybrid_native_model_profile import KIND, approved_binding
@@ -38,7 +39,18 @@ class NativeModelGrant:
     raw: bytes
 
 
+@dataclass(frozen=True, eq=False)
+class NativeModelLaunch:
+    id: str
+    raw: bytes
+
+
 class NativeModelOwner(FixtureRuntimeOwner):
+    def __init__(self,*args,**kwargs):
+        self._native_launches={}
+        self._launch_active=None
+        super().__init__(*args,**kwargs)
+
     def _actual(self):
         if type(self) is not NativeModelOwner:
             raise PermissionError('exact generating model owner required')
@@ -152,9 +164,79 @@ class NativeModelOwner(FixtureRuntimeOwner):
         if attempt['source'] is not None:
             with self.sources._lock:self.sources._physical(self.sources._issued(attempt['source']))
 
-    def start(self, lease):
-        self._issued(lease)
-        raise PermissionError('native account/ELF/sandbox launch qualification not implemented; no model handoff')
+    def prepare_native_launch(self,lease):
+        """Original approval-bound launch input, NOT postexecution qualification.
+
+        This performs no spawn or G. Runtime deployment must obtain its actual
+        user approval before invoking the launch path; tests never send G.
+        Historical V1 packet approvals are not upgraded into workflow starts.
+        """
+        attempt=self._issued(lease)
+        with self.pool._lock,self._gate(attempt,'REGISTER_NO_HANDOFF'):
+            if self._current(attempt)['fixture_runtime']['phase']!='REGISTER_NO_HANDOFF':
+                raise Conflict('original no-handoff phase required for native launch issue')
+            frozen=json.loads(attempt['native_model_grant'].raw)
+            if frozen.get('workflow',{}).get('accounting_version')!='A_REGISTRATION_CEILINGS_V1':
+                raise PermissionError('original accounted A workflow launch required')
+            if id(lease) in self._native_launches:
+                raise Conflict('original native launch already issued; no replacement')
+            source=attempt['source']
+            with self.sources._lock:
+                row=self.sources._issued(source);self.sources._physical(row)
+                cache=self.sources._account_caches.get(id(source))
+                if cache is None:raise PermissionError('original account-cache input qualification missing')
+                stamp=cache.check_staged()
+                if id(source) not in self.sources._gate_bindings:
+                    raise Conflict('original frozen native gate required')
+                self._final_effect_gate(self._active)
+                launch=NativeModelLaunch('native_launch_'+uuid.uuid4().hex,canonical({
+                    'lease_id':lease.id,'source_id':source.id,'grant_sha256':digest(frozen),
+                    'approval_sha256':frozen['approval_hash'],'cache_stamp':list(stamp)}))
+                self._native_launches[id(lease)]=(launch,launch.raw,attempt,source,cache,stamp)
+                return launch
+
+    def _check_launch(self,attempt,launch):
+        row=self._native_launches.get(id(attempt['lease']))
+        if (type(launch) is not NativeModelLaunch or row is None or row[0] is not launch or
+                launch.raw!=row[1] or row[2] is not attempt or row[3] is not attempt['source']):
+            raise PermissionError('original same-lease native launch qualification required')
+        if self.sources._account_caches.get(id(attempt['source'])) is not row[4] or row[4].check_staged()!=row[5]:
+            raise Conflict('original native launch cache input changed')
+        if attempt.get('source_stop_latched') or attempt.get('physical_safety_freeze') or self._safety_freeze:
+            raise Conflict('original native launch stopped; no new effects')
+        return row
+
+    def start(self, lease, *, launch=None):
+        attempt=self._issued(lease)
+        self._unit_check(attempt)
+        with self.pool._lock:
+            self._check_launch(attempt,launch)
+            if self._current(attempt)['fixture_runtime']['phase'] in ('STOP_REQUESTED','FIXTURE_SCOPE_STOPPED'):
+                raise Conflict('original native STOP prohibits start')
+            if self._launch_active is not None or self._start_materials is not None:
+                raise Conflict('nested native launch refused')
+            if self._control_service is not None:self._control_service._dispatch_entry(lease)
+            with self._material_context(attempt) as materials:
+                self._start_materials=(attempt,threading.get_ident(),materials)
+                self._launch_active=(attempt,launch,threading.get_ident())
+                try:
+                    if not attempt['spawn_entered']:
+                        value=self._write_phase(attempt,'HANDOFF_UNKNOWN')
+                        self.pool._fixture_runtime_change(self,lease,'FIXTURE_HANDOFF_UNKNOWN',value)
+                        with self._gate(attempt,'HANDOFF_UNKNOWN'):
+                            attempt['producer_identity']=self.sources._runtime_spawn(self,lease)
+                    if attempt['producer_identity'] is None:
+                        raise Conflict('original native spawn UNKNOWN; no relaunch')
+                    self._register_release(attempt)
+                    if not attempt['release_entered']:
+                        with self._gate(attempt,'RELEASE_INTENT'):
+                            self.sources._runtime_release(self,lease)
+                finally:
+                    self._launch_active=None;self._start_materials=None
+        # A G write is never an ACK, account qualification or model receipt.
+        return {'lease_id':lease.id,'phase':self._current(attempt)['fixture_runtime']['phase'],
+            'release_attempted':attempt['release_entered'],'source_authenticated':False,
+            'account_qualified':False,'usage_qualified':False,'condition_evidence_enabled':False}
 
     def _native_usage_publication(self, attempt):
         self._issued(attempt['lease'])
@@ -240,7 +322,19 @@ class NativeModelOwner(FixtureRuntimeOwner):
 
     def _check_release_gate(self, attempt):
         self._issued(attempt['lease'])
-        raise PermissionError('original model qualification missing; no G at effect fence')
+        active=self._launch_active
+        if active is None or active[0] is not attempt or active[2]!=threading.get_ident():
+            raise PermissionError('original model qualification missing; no G at effect fence')
+        self._check_launch(attempt,active[1])
+        self.sources._check_launch_ready(self,attempt['lease'])
+        # Original Controller/STOP/deadline is still the LAST IO/sample fence.
+        return super()._check_release_gate(attempt)
+
+    def _terminal_scope(self):return 'FIXED_NATIVE_SINGLE_TGID'
+
+    def stop_to_terminal(self,lease):
+        value=super().stop_to_terminal(lease)
+        return {**value,'fixed_cpu_scope_only':False,'scope':self._terminal_scope()}
 
     def _retained_source(self, attempt):
         self.sources._actual()

@@ -1,0 +1,54 @@
+Base commit: 9e8ab25. Scope: local original first Engineer launch wiring.
+Actual user small-A runtime contract still unapproved: ZERO real G, native
+Codex/model/API, real host credential access, GPU, B/C or production mutation.
+Tests use synthetic NOT_A_TOKEN under isolated fixture home and actual fixed
+Python gate only; every tested G write is intercepted BEFORE real pipe write.
+
+Original NativeModelLaunch issued only within original REGISTER gate/current
+phase and final Controller fence, original accounted A workflow, same original
+lease/source and staged private cache FD/inode/size/mtime/ctime.
+Exact object identity/raw retained, no copy/reissue/V1/historical upgrade.
+start(original launch) -> original HANDOFF/Pool -> original fixed gate ->
+original PROCESS/RELEASE_INTENT -> original cache/ready Source checks ->
+base final Controller/TTL/Auth/STOP effect fence -> one G write.
+Missing launch remains denied. Before pipe write release_entered is latched;
+lost write NEVER retried. Startup grants no ACK/account/source/usage/evidence.
+The executable/schema/packet kernel gate is unchanged and remains hash-bound.
+Native physical STOP scope explicitly FIXED_NATIVE_SINGLE_TGID, not fixed CPU;
+original kernel no-new-TGID constraints and actual original pidfd/reap remain.
+All gates/exec/cache FDs must close; cache deletion ambiguity retains UNKNOWN.
+
+Command:
+env -u PYTHONPATH PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q tests/test_hybrid_native_model_launch.py
+Original37314/output176cfe natural exit0:2passed37.66s.
+1 original cache + launch issue -> actual fixed Python sandbox ready ->
+TEST intercepted G PermissionError, ZERO actual G or model exec.
+Second start returns release attempted only and does not write/spawn again.
+Actual exe still Python, STOP reaped/closed all FDs/deleted session fake cache,
+Pool0/financialUNKNOWN; host fake cache unchanged; Store audit==replay.
+Missing cache and copied cap reject, no process creation.
+2 staged copy changed after launch issue: reject before HANDOFF/spawn/G;
+no-handoff STOP SETTLED/Pool0/audit==replay.
+
+Affected regression (no duplicated launch tests):
+env -u PYTHONPATH PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q tests/test_hybrid_native_account_cache.py tests/test_hybrid_native_model_producer.py tests/test_hybrid_native_model_runtime.py -k 'cache or no_g_producer or original_model_registration'
+Original12071/outputa57d67 natural exit0:
+13passed,20deselected65.87s. The final filter term matches no V1 test, disclosed;
+V1 was checked with the separate affected command below, not inferred.
+env -u PYTHONPATH PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q tests/test_hybrid_native_model_runtime.py -k original_generating_grant
+Original72244/outputdbdd04 natural exit0:1passed,19deselected11.67s.
+New cap issuance explicitly rejects V1; default start still denies.
+
+Independent original /root/finite_app_review_63 read-only static review:
+no confirmed direct MUST_FIX; original cap binding, last effects fence,
+lost-send behavior and nonqualification boundary reviewed.
+G interception/STOP-scope evidence subsequently provided; no new test runs.
+Compile/diff checks passed, USER lock SHA unchanged:
+becc7e2a36dfcad4ffe934b5ff2f0f68187611d6c0641bd63d81367651cfbf09.
+All original test handles terminal. No full-suite or actual task/A/98 proof.
+
+Next local implementation: execution-afterward original source/account/EOF
+and trusted usage issuer, same-workflow candidate CPU + different Evaluator,
+conditional CAS and one unmet-condition continuation. Source hook stays None.
+Actual first nonpreset engineering task remains NOT_EXECUTED; Goal ACTIVE.
+Real model calls wait for existing small A contract; GPU/B/C/instinctRL HOLD.

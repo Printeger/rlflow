@@ -20,6 +20,7 @@ class _AccountCache:
         self.rows=[];self.entered=False;self.staged=False;self.pending=False
         self.destination_fd=None
         self.target_fd=None;self.target_identity=None
+        self.staged_stamp=None
 
     def _keep(self,fd):
         row={'fd':fd,'identity':None};self.rows.append(row)
@@ -74,8 +75,29 @@ class _AccountCache:
             if count<=0:raise Conflict('private account-cache copy incomplete')
             remaining=remaining[count:]
         os.fsync(target)
+        after=os.fstat(target)
+        self.staged_stamp=(after.st_dev,after.st_ino,after.st_size,after.st_mtime_ns,after.st_ctime_ns)
         self.staged=True
         return {'cache_staged':True,'account_qualified':False,'model_released':False}
+
+    def check_staged(self):
+        """Pre-start input integrity only; never server/account authentication."""
+        if not self.staged or not self.pending or self.staged_stamp is None:
+            raise PermissionError('original staged account-cache input qualification required')
+        for row in self.rows:
+            if row['fd'] is None:raise Conflict('original account-cache input already closed')
+            info=os.fstat(row['fd'])
+            if row['identity'] is None or (info.st_dev,info.st_ino)!=row['identity']:
+                raise Conflict('original account-cache input descriptor changed')
+        directory=os.fstat(self.destination_fd)
+        if (directory.st_dev,directory.st_ino)!=self.destination_identity:
+            raise Conflict('original account-cache input directory changed')
+        for info in (os.fstat(self.target_fd),os.stat('auth.json',dir_fd=self.destination_fd,follow_symlinks=False)):
+            if ((info.st_dev,info.st_ino,info.st_size,info.st_mtime_ns,info.st_ctime_ns)!=self.staged_stamp or
+                    not stat.S_ISREG(info.st_mode) or info.st_uid!=os.geteuid() or
+                    stat.S_IMODE(info.st_mode)!=0o600 or info.st_nlink!=1):
+                raise Conflict('original account-cache input changed before release')
+        return self.staged_stamp
 
     def descriptors(self):
         return tuple(row['fd'] for row in self.rows if row['fd'] is not None)

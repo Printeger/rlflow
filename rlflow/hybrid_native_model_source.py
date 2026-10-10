@@ -1,4 +1,4 @@
-"""Original frozen generating packet FDs; no model launch qualification yet."""
+"""Original frozen generating FDs and launch fence; no usage/source cap yet."""
 import hashlib
 import json
 import os
@@ -234,7 +234,22 @@ class NativeModelSourceOwner(FixtureUsageSourceOwner):
         # Only the original fixed Python gate is spawned. Its control pipe
         # receives no G here, so it cannot exec Codex or read account secrets.
         return super()._runtime_spawn(owner,lease)
-    def _runtime_release(self, *args, **kwargs):raise PermissionError('native generating release unqualified')
+    def _check_launch_ready(self,owner,lease):
+        runtime=owner._issued(lease);attempt=self._issued(runtime['source'])
+        if owner.sources is not self or attempt['runtime'] is not runtime:
+            raise PermissionError('original same-source native launch required')
+        self._physical(attempt);self._check_pidfd(attempt,live=True)
+        ready=self._model_ready.get(id(attempt['source']))
+        if ready is None or ready[0] is not attempt['source']:
+            raise Conflict('original kernel-ready native producer required before G')
+        # Recheck the original producer's held ready bytes, not a caller flag.
+        if os.pread(attempt['fds']['ready_read'],4097,0)!=ready[1]+b'\n':
+            raise Conflict('original native sandbox ready changed before G')
+
+    def _runtime_release(self,owner,lease):
+        if owner._launch_active is None:
+            raise PermissionError('native generating release unqualified')
+        return super()._runtime_release(owner,lease)
 
     def _native_spawn_material(self, owner, attempt):
         self._physical(attempt)

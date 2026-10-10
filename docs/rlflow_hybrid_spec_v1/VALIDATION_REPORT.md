@@ -1,5 +1,7 @@
 # 需求包离线校验报告
 
+2026-10-11 原launch接线：37314/output176cfe自然exit0，2pass37.66s，真fixed Python sandbox但stdin.write TEST拦截G，zero模型/真实账户。cap copy拒、cache变化前handoff拒、lostG不重发；STOP原reap/allFD/copy闭合/Pool0/UNKNOWN，nohandoff分支SETTLED；audit=replay。12071/outputa57d67自然exit0，受影响cache+noG13pass/20deselected65.87s；72244/outputdbdd04自然exit0，V1拒新cap1pass/19deselected11.67s。独立只读原finite_app_review_63无确证MUST；编译/diff/USERlock通过，无重复测试/全库声明。证据evidence/a-native-launch-wiring-20261011.txt；非真实task/账户资格/产品Reviewer/usage settlement/条件/A完成。
+
 2026-10-11 执行映像观测：原34073终态4pass/1fail14.87s（新增负例漏Conflict import）；修后66413终态5pass20.37s。新增异步启动readiness后原60612终态1fail17.41s，定位_HeldPacketReader无offset，修为transcript.offset；仅受影响38015自然exit0，1pass20.20s。纯测试观测当前pytest进程，不新起模型；原集成只fixed Python noG，空stdout不创建probe、合成thread事件被实际ELF拒、重复失败拒、STOP allFDclosed/Pool0/UNKNOWN全预留/audit=replay。独立窄复核无新增MUST，证据evidence/a-native-exec-observation-20261011.txt。没有全库或真实task/产品Review/条件接续/A完成声明。
 
 2026-10-11 账户cache本地验证：纯5pass.03s；原87683 1fail/5pass11.24s定位native_setup覆写CODEX_HOME（隔离fake catalog无auth，不是真实cache），修夹具依赖顺序后只affected1pass14.67s。High target inode/dest冻结identity/最终门3MUST修后6pass15.28s；新rename/replacement/swap与末fresh后expiry/STOP→零secret read/零copy原96955终态5pass/6deselected25.01s；带合成cache的真实固定Python noG+STOP原50864终态1pass/10deselected20.51s，Pool0/UNKNOWN/host不改/copy删除/audit=replay。末missing-name+target fstat OSError独立关闭1pass/11deselected.09s，High全部MUST闭合。compile/diff/USERlock通过；各原handles terminal、不重启，命令见evidence/a-native-account-cache-20261011.txt。没有真实cache/CLI/model/G/GPU调用；不宣称账户资格/可信结算/首实任务/Review/条件接续/A或全库通过。
