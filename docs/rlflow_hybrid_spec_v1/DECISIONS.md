@@ -1,5 +1,7 @@
 # 开发决策记录
 
+Checkpoint68 FINAL：每原FS一个真实8MiB blank/最多3FS，原对象先登记，原FD/目录/inode/权限/size/stamp及实际st_blocks验证；完整FS覆盖才ready，分配块不加回余额。STOP物理来源先验、纯冻结在Pool等待前，未知不按路径截断；同operation包括失败memo避免fallback再次释放，新显式STOP可原FD恢复。已消费不补充、正常workerSTOP不冻结工程apply。R6保留67同body/key验收，仅owned/partial/unknown创建进入救援；明确pending无文件不永久冻结。R8定位共享Pool等待后，只读_current移出Pool，ACK&&Release才取原Pool并重读仍Release再经原guard写STARTED，STOP优先；真实效果与期限不变。parentFD只缺失时dup，经原目录验证后复用。Dashboard仅手动GET/固定阈值公式/credit≤32/认证晚回复清理，不gateSTOP。R9/R10实际通过，High差量关闭；write-page技能校准既有证据格式与最终状态，未创建外部Page。不扩大功能、权限或生产状态。
+
 Checkpoint67 FINAL：实际可用空间准入与真实应急预留分开，先交付拒绝实际RUN。原FS合并保守占额/最多3FS，floor128MiB+16MiB每claim不是Budget账单或SQLite保证；UNKNOWN/unbound failclosed。FREE后须真实_last或原取消明确cleanupComplete才退，资源IO在原最后Auth/TTL前，STOP无准入门。新诊断读取后重新认证/Conflict503；最终读取发现default executor无界提交，原27case终态后仅route/新test改独立ControlPool1，不共享STOP槽，真实future才释放，末2case通过，High四MUST关闭。r3 spawn teardown用既有原FD safety retirement不伪FREE；不改产品放宽门。文档技能校准仓库格式及证据强度，未创建外部Page，不重复未改bare/UI/Node全套。
 
 Checkpoint66 FINAL：原durable STOP→interrupt顺序保持；账本失败只原cap/pidfd物理安全收尾、UNKNOWN不FREE。FD独立尝试及部分原owner重试、operation首次cancel结果复用避免双清理。A回滚见证在新实际写attempt前消费，只有本次实际成功rollback再重签；前置CAS/读取拒绝未写不消费，未知COMMIT/rollback失败不重链。正常工程terminal失败不新增永久freeze；真实失败STOP已有freeze覆盖恢复后的apply。原126回归终态后仅两路径差量/3新组合，不重跑未变pass。文档技能校准仓库格式与证据强度，不创建外部Page；无模型/GPU/生产/USERlock权限扩展。

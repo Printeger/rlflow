@@ -3,6 +3,31 @@ const closed=(v,keys)=>v && typeof v==='object' && !Array.isArray(v) && Object.k
 const id=v=>typeof v==='string' && /^[A-Za-z0-9][A-Za-z0-9_.:-]{0,159}$/.test(v);
 const hash=v=>typeof v==='string' && /^sha256:[0-9a-f]{64}$/.test(v);
 const fail=()=>{throw Error('原全集 STOP 来源合同被拒绝');};
+export function checkDiskAdmission(v){
+  const integer=n=>Number.isSafeInteger(n) && n>=0;
+  if(!closed(v,['profile','new_run_admissible','unbound_occupied_claim','filesystems','stop_gated','audit_reserve_allocated','audit_reserves','emergency_frozen','reserve_profile','restart_credit_recovery','goal_completed']) ||
+    v.profile!=='PROCESS_LOCAL_FS_AVAILABLE_NOT_QUOTA' || v.reserve_profile!=='SMALL_BEST_EFFORT_NOT_COMMIT_GUARANTEE' ||
+    v.stop_gated!==false || v.restart_credit_recovery!==false || v.goal_completed!==false ||
+    !['new_run_admissible','unbound_occupied_claim','audit_reserve_allocated','emergency_frozen'].every(k=>typeof v[k]==='boolean') ||
+    !Array.isArray(v.filesystems) || !v.filesystems.length || v.filesystems.length>3 ||
+    !Array.isArray(v.audit_reserves) || v.audit_reserves.length>v.filesystems.length)fail();
+  for(const r of v.filesystems){
+    if(!closed(r,['available_bytes','available_inodes','promised_claims','required_bytes','required_inodes','admissible']) ||
+      !['available_bytes','available_inodes','promised_claims','required_bytes','required_inodes'].every(k=>integer(r[k])) ||
+      r.promised_claims>32 || r.required_bytes!==128*1024**2+r.promised_claims*16*1024**2 || r.required_inodes!==16+r.promised_claims*8 ||
+      typeof r.admissible!=='boolean' || r.admissible!==(r.available_bytes>=r.required_bytes && r.available_inodes>=r.required_inodes))fail();
+  }
+  for(const r of v.audit_reserves){
+    if(!closed(r,['allocated_bytes','logical_bytes','allocation_complete','released']) ||
+      !integer(r.allocated_bytes) || !integer(r.logical_bytes) || r.logical_bytes>8*1024**2 ||
+      typeof r.allocation_complete!=='boolean' || typeof r.released!=='boolean' ||
+      (r.released && r.logical_bytes!==0) ||
+      (r.allocation_complete && !r.released && (r.logical_bytes!==8*1024**2 || r.allocated_bytes<r.logical_bytes)))fail();
+  }
+  const ready=v.audit_reserves.length===v.filesystems.length && v.audit_reserves.every(r=>r.allocation_complete && !r.released);
+  if(v.audit_reserve_allocated!==ready || v.new_run_admissible!==(ready && !v.emergency_frozen && !v.unbound_occupied_claim && v.filesystems.every(r=>r.admissible)))fail();
+  return v;
+}
 export function checkFiniteScope(v){
   if(!closed(v,['schema_version','profile','scope_sha256','data_mode','execution_enabled','original_owner_available','stop_enabled','items','goal_completed','independent_review_status']) ||
     v.schema_version!=='1.1' || v.profile!=='ORIGINAL_FIXED_BOUND_UNITS_ONLY' || !hash(v.scope_sha256) || v.data_mode!=='fixture' ||
@@ -48,18 +73,31 @@ export class FiniteStopPanel{
     this.$('stop').addEventListener('click',()=>this.command());
     this.$('retry').addEventListener('click',()=>this.send(false));
     this.$('resume').addEventListener('click',()=>this.send(true));
+    this.$('disk-refresh').addEventListener('click',()=>this.loadDisk());
     this.clear();
   }
   scope(){const c=this.context();return c?{project:c.project,epoch:c.epoch,actor:c.session.principal_id,auth:c.authGeneration}:null;}
   ticket(){return {serial:this.serial,scope:JSON.stringify(this.scope())};}
   current(t){return t.serial===this.serial && t.scope===JSON.stringify(this.scope());}
-  clear(){++this.serial;this.profile=null;this.intent=null;this.result=null;this.reading=false;this.sending=false;this.$('scope').textContent='';this.$('receipt').textContent='';this.$('note').textContent='尚未读取；不会自动 POST。';this.buttons();}
+  clear(){++this.serial;this.profile=null;this.intent=null;this.result=null;this.reading=false;this.diskReading=false;this.sending=false;this.$('disk').textContent='';this.$('disk-note').textContent='手动读取同源空间/预留；不是 quota、账单或 COMMIT 保证。';this.$('scope').textContent='';this.$('receipt').textContent='';this.$('note').textContent='尚未读取；不会自动 POST。';this.buttons();}
   buttons(){
     const c=this.context();
     this.$('stop').disabled=!(c?.session.kind==='human' && c.session.roles.includes('operator') && this.profile?.stop_enabled && !this.intent);
     this.$('refresh').disabled=this.reading;
+    this.$('disk-refresh').disabled=this.diskReading;
     this.$('retry').hidden=!this.intent || !!this.result;this.$('retry').disabled=this.sending;
     this.$('resume').hidden=this.result?.status!=='PARTIAL_OR_UNKNOWN';this.$('resume').disabled=this.sending;
+  }
+  async loadDisk(){
+    if(!this.scope() || this.context().mode!=='fixture' || this.diskReading)return;
+    const t=this.ticket();this.diskReading=true;this.buttons();
+    try{
+      const v=checkDiskAdmission(await this.request('/api/v1/finite-host/disk-admission'));
+      if(!this.current(t))return;
+      this.$('disk').textContent=JSON.stringify(v,null,2);
+      this.$('disk-note').textContent=v.emergency_frozen?'原紧急冻结：拒绝新效果；STOP 保持独立。预留不保证关键事实写入成功。':'原 FS 可用量与已分配块（as-of）；读取不分配预留，不自动启动，STOP 不受空间门控制。';
+    }catch(e){if(this.current(t)){this.$('disk').textContent='';this.$('disk-note').textContent=`空间/预留 UNKNOWN (${e.message})；不证明可执行、释放或写入成功；STOP 保持独立。`;}}
+    finally{if(this.current(t)){this.diskReading=false;this.buttons();}}
   }
   async load(){
     if(!this.scope() || this.context().mode!=='fixture'){this.clear();return;}

@@ -291,7 +291,10 @@ class _OriginalUnitControl(FixtureRuntimeControlService):
             if type(_stop_details) is not bool or (_stop_details and command['action']!=self._stop_action):
                 raise ValueError('original STOP details only')
             if command['action']==self._stop_action:
-                try:receipt=self._accept_stop(command,operation.token,operation.csrf)
+                try:
+                    from .hybrid_disk_admission import prepare_stop
+                    prepare_stop(self.runtime, self.runtime._issued(self.unit.lease))
+                    receipt=self._accept_stop(command,operation.token,operation.csrf)
                 except BaseException as error:
                     # A prepared original human cancel is already latched.
                     # Disk/commit failure must not prevent original-cap safety

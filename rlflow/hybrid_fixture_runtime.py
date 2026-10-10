@@ -158,6 +158,8 @@ class FixtureRuntimeOwner:
             # be the final pure fence AFTER those checks, immediately before
             # physical G/pwrite or a new machine COMMIT.
             unit._check_final()
+        from .hybrid_disk_admission import check_final
+        check_final(self)
         if attempt.get('physical_safety_freeze'):
             raise Conflict('original attempt frozen after failed durable STOP')
 
@@ -829,12 +831,16 @@ class FixtureRuntimeOwner:
         attempt = self._issued(lease)
         receipt = self.sources.seal(attempt['source']) if seal else self.sources.poll(attempt['source'])
         ack = self.sources._runtime_started(self, lease)
-        with self.pool._lock:
-            current = self._current(attempt)['fixture_runtime']['phase']
-            if ack is not None and current == 'RELEASE_INTENT':
-                attempt['started_ack'] = ack
-                self._write_phase(attempt, 'STARTED_AS_OBSERVED', cleanup=True)
-                current = 'STARTED_AS_OBSERVED'
+        # Source-only observation must not wait for another project's effect.
+        # Any ACK fact still takes the original Pool lock and rechecks STOP.
+        current = self._current(attempt)['fixture_runtime']['phase']
+        if ack is not None and current == 'RELEASE_INTENT':
+            with self.pool._lock:
+                current = self._current(attempt)['fixture_runtime']['phase']
+                if current == 'RELEASE_INTENT':
+                    attempt['started_ack'] = ack
+                    self._write_phase(attempt, 'STARTED_AS_OBSERVED', cleanup=True)
+                    current = 'STARTED_AS_OBSERVED'
         return {'lease_id': lease.id, 'phase': current, 'source': json.loads(receipt.raw),
                 'fixed_cpu_scope_only': True, 'native_execution_enabled': False,
                 'actual_cost_status': 'UNKNOWN', 'synthetic_tokens_settled': False}
@@ -1025,6 +1031,8 @@ class FixtureRuntimeOwner:
         # when a durable STOP cannot be written. Normal core apply stays valid.
         attempt['source_stop_latched']=True
         try:
+            from .hybrid_disk_admission import prepare_stop
+            prepare_stop(self, attempt)
             self.request_stop(lease)  # Normal durable freezes still precede interrupt.
         except BaseException as error:
             self._freeze_failed_stop(attempt)

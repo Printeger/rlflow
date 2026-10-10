@@ -113,6 +113,8 @@ def _fork_child():
     global _registry_lock
     # Only CLOSE inherited descriptions. LOCK_UN would unlock the parent.
     for owner in tuple(_owners.values()):
+        domain = getattr(owner, '_disk_admission', None)
+        if domain is not None:domain._fork_child_close()
         owner._live = False
         descriptors = set(owner._pins.values())
         for db, fd in owner._sql_active.values():
@@ -911,6 +913,8 @@ All model, child process and native delegation handoff remain denied.
         self._actual()
         with _registry_lock, self._lock:
             errors = []
+            domain = getattr(self, '_disk_admission', None)
+            if domain is not None:domain.shutdown_owned()
             for slot in self._slots.values():
                 try: slot.close()
                 except (OSError, Conflict) as error: errors.append(error)

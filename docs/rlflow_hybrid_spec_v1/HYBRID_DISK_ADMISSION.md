@@ -1,5 +1,7 @@
 # 有限 Host 共享磁盘准入
 
+本页保留67历史验收。68已在同一接口增加实际有限预留、STOP救援与手动诊断，当前实现及其收尾证据见 [HYBRID_AUDIT_RESERVE.md](HYBRID_AUDIT_RESERVE.md)。以下“下一片/未分配”描述67提交时状态，不代表68已最终验收。
+
 Checkpoint 67 在原共享 Pool、已批准固定 CPU/工程 Unit 和认证 RUN 上增加可用空间准入。低磁盘或低 inode 在 HANDOFF 前拒绝新 RUN，恢复后原 body/key 可再次执行；实际 spawn、G 与工程 pwrite 的末门重新检查空间。STOP 不调用新工作门。基线为已提交的 66 `d3ab5e2`，41 不重新开启。
 
 ## 交付行为
@@ -24,7 +26,7 @@ r3 加强为真实 AuthStore.revoke 并覆盖实际 spawn/G 末门，三项主�
 
 ## 诊断接口
 
-GET /api/v1/finite-host/disk-admission 仅接受空查询和原全集可读会话或只读 bearer。200 响应含 profile、new_run_admissible、unbound_occupied_claim、filesystems、stop_gated、audit_reserve_allocated、restart_credit_recovery、goal_completed。每个 FS 含 available_bytes、available_inodes、promised_claims、required_bytes、required_inodes、admissible；不返回路径、凭据、原始能力或持久额度。容量拒绝 429 是诊断 future 任务槽，不是计费 Budget。401/404 保持原认证/不可见 scope 语义，非法查询 400，源故障 503。诊断不改变原 START/STOP 接口，也不触发自动采样或执行。
+GET /api/v1/finite-host/disk-admission 仅接受空查询和原全集可读会话或只读 bearer。200 响应含 profile、new_run_admissible、unbound_occupied_claim、filesystems、stop_gated、audit_reserve_allocated、restart_credit_recovery、goal_completed；68新增 audit_reserves、emergency_frozen、reserve_profile，见上述68文档。每个 FS 含 available_bytes、available_inodes、promised_claims、required_bytes、required_inodes、admissible；不返回路径、凭据、原始能力或持久额度。容量拒绝 429 是诊断 future 任务槽，不是计费 Budget。401/404 保持原认证/不可见 scope 语义，非法查询 400，源故障 503。诊断不改变原 START/STOP 接口，也不触发自动采样或执行。
 
 ## 剩余缺口与下一片
 

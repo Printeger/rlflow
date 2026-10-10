@@ -1,5 +1,7 @@
 # 阻塞与证据缺口
 
+Checkpoint68 FINAL：新增MUST和必要回归已关闭，无live测试、无新增用户决定阻止归档提交。原有限8MiB预留与故障安全STOP已验证，但不是硬quota、COMMIT保证、真实满FS、三实际FS、强sameUID或跨重启额度恢复。T21严格OS/控制隔离未完成：cgroup root属于root、未委派用户权限，严格执行不能启动，不擅改系统或用特权绕过；下一切片只在原权限内接实际能力准入/partial拒绝行为。产品Reviewer原新隔离合同/非零额度询问未答，不把开发High当产品Review、不调用付费模型。native/任意树/invoice/安装/B1/24hfixture8hUI/T23/M5/完整Goal缺口保留。详HYBRID_AUDIT_RESERVE.md及evidence/checkpoint-68-tests.txt；USERlock未动。
+
 Checkpoint67 FINAL：本片无剩余MUST或新增用户决定阻塞；唯一必要回归27pass及最后route2pass均真实终态，四High MUST关闭。新诊断无界队列已修独立容量1/真实future释放，不占STOP任务槽。未实分配应急空间，未关闭RES07/A26/T21；下一原私有FS有限预留无需新模型或系统权限。硬quota/独立卷/跨重启持久额度/生产迁移/大额预留仍需另行决定。产品Reviewer原询问未答，不调用付费模型/GPU；其余完整Goal缺口不变。详HYBRID_DISK_ADMISSION.md，原失败证据保留。
 
 Checkpoint66 FINAL：本片无剩余必须修复项或新增用户决定阻塞，126必要回归与最后3项实际恢复差量通过，原所有失败归档，无live测试。当前已完成原强cap账本故障安全STOP，仍未证明磁盘审计预留、严格OS配额、任意树或全主机资源保证；原cgroup无用户委派，不擅改系统。下一可在原私有项目内实施有限派发实际FS共享准入与小额应急预留；硬quota/独立卷/迁移/大额预留/删除证据仍需决定。产品Reviewer新合同与额度询问未答，不调用；T22/B1/长期/T23/M5缺口保持。详HYBRID_STOP_STORAGE_FAILURE.md；下方WIP为历史。

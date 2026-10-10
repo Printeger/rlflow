@@ -211,6 +211,32 @@ def test_actual_two_projects_cpu384_engineering_one_write_same_pool_STOP_FREE(sh
     assert cpu.runtime.store.root != engineering.runtime.store.root
     assert cpu.runtime.workspace.project_id != engineering.runtime.workspace.project_id
     assert cpu.runtime.pool is engineering.runtime.pool is host.pool
+    timings = []; returned = {}
+    def timed_call(obj, name, project, detail=None):
+        original_method = getattr(obj, name)
+        def measured(*args, **kwargs):
+            began = time.monotonic()
+            try:return original_method(*args, **kwargs)
+            finally:
+                ended = time.monotonic()
+                row = {'project': project, 'method': name, 'begin': began,
+                       'end': ended, 'duration': ended - began}
+                if detail is not None:row.update(detail())
+                timings.append(row)
+                if name == 'start':returned[project] = ended
+        monkeypatch.setattr(obj, name, measured)
+    for unit in units:
+        owner = unit.runtime; project = owner.workspace.project_id
+        attempt = owner._leases[id(unit.lease)]
+        def source_state(_attempt=attempt, _owner=owner):
+            source = _owner.sources._sources.get(id(_attempt['source']))
+            return {} if source is None else {'source_' + key: source[key]
+                                             for key in ('status', 'offset', 'end')}
+        for name in ('start', 'poll', '_current', '_write_phase'):
+            timed_call(owner, name, project, source_state)
+        timed_call(owner.sources, 'seal', project, source_state)
+    for name in ('apply', 'reconcile', 'accept_machine'):
+        timed_call(engineering.output, name, engineering.runtime.workspace.project_id)
     writes = []; original = os.pwrite
     monkeypatch.setattr(os, 'pwrite', lambda fd, data, offset: (writes.append((data, offset)), original(fd, data, offset))[1])
     for unit in units:
@@ -238,7 +264,11 @@ def test_actual_two_projects_cpu384_engineering_one_write_same_pool_STOP_FREE(sh
                           'duration', time.monotonic() - began,
                           'since_spawn', time.monotonic() - attempt['spawn_monotonic'], flush=True)
             monkeypatch.setattr(owner, name, timed)
-    results = host.run_many(requests(units))
+    try:results = host.run_many(requests(units))
+    finally:
+        for row in timings:
+            row['since_start_return'] = row['begin'] - returned[row['project']] if row['project'] in returned else None
+        print('shared_result_window_diagnostic', json.dumps(sorted(timings, key=lambda row: row['begin'])), flush=True)
     assert all(row['error'] is None for row in results), results
     assert [row['result']['status'] for row in results] == [
         'EXPERIMENT_MACHINE_VERIFIED_PENDING_REVIEW', 'MACHINE_ACCEPTED_PENDING_REVIEW']

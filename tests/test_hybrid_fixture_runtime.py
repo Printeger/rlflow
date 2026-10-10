@@ -12,6 +12,7 @@ import sqlite3
 import subprocess
 import sys
 import time
+from concurrent.futures import ThreadPoolExecutor
 
 import pytest
 
@@ -73,6 +74,51 @@ def observed(owner, lease):
         if value['phase'] == 'STARTED_AS_OBSERVED': return value
         time.sleep(.01)
     pytest.fail('original real child ACK not observed within finite deadline')
+
+
+def test_actual_started_readonly_poll_completes_while_other_thread_holds_pool(runtime):
+    owner, *_ = runtime
+    lease = register(runtime); owner.start(lease); observed(owner, lease)
+    attempt = owner._issued(lease)
+    versions = (owner.store.version(), owner.pool.snapshot()['version'])
+    entries = dict(attempt['entries'])
+    with ThreadPoolExecutor(max_workers=1) as executor:
+        with owner.pool._lock:
+            future = executor.submit(owner.poll, lease, seal=True)
+            value = future.result(timeout=2)
+    assert value['phase'] == 'STARTED_AS_OBSERVED'
+    assert versions == (owner.store.version(), owner.pool.snapshot()['version'])
+    assert attempt['entries'] == entries
+    owner.stop_to_terminal(lease)
+
+
+def test_actual_stop_in_readonly_poll_gap_prevents_late_ACK_fact(runtime, monkeypatch):
+    owner, *_ = runtime
+    lease = register(runtime); attempt = owner._issued(lease)
+    # Suppress only start's initial observation, not original spawn/G/ACK.
+    with monkeypatch.context() as patch:
+        patch.setattr(owner, 'poll', lambda *args, **kwargs: None)
+        owner.start(lease)
+    deadline = time.monotonic() + 3
+    while owner.sources._runtime_started(owner, lease) is None:
+        owner.sources.poll(attempt['source'])
+        if time.monotonic() >= deadline:pytest.fail('actual original ACK unavailable')
+        time.sleep(.01)
+    current = owner._current; intervened = []
+    def stop_after_read(original):
+        value = current(original)
+        if not intervened and value['fixture_runtime']['phase'] == 'RELEASE_INTENT':
+            intervened.append(True)
+            owner.request_stop(lease)
+        return value
+    with monkeypatch.context() as patch:
+        patch.setattr(owner, '_current', stop_after_read)
+        value = owner.poll(lease)
+    assert intervened and value['phase'] == 'STOP_REQUESTED'
+    assert attempt['started_ack'] is None
+    assert 'STARTED_AS_OBSERVED' not in attempt['entries']
+    assert current(attempt)['fixture_runtime']['phase'] == 'STOP_REQUESTED'
+    owner.stop_to_terminal(lease)
 
 
 def test_real_gated_child_ack_stop_reap_and_slot_reuse(runtime, monkeypatch):

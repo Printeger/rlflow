@@ -1,0 +1,123 @@
+Checkpoint 68 development acceptance; baseline 7f51cc7; full Goal ACTIVE.
+Status FINAL: R9 and R10 actual terminal; no live tests or unresolved MUST.
+Original finite CPU/engineering only; no paid model/GPU, production migration,
+system permission changes, push, protected-evidence deletion or cold adoption.
+USER package-lock SHA becc7e2a36dfcad4ffe934b5ff2f0f68187611d6c0641bd63d81367651cfbf09
+unchanged, never staged. One writer; independent GPT6.1Sol High readonly review.
+
+Python prefix: PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest
+All runs sequential; original live handles awaited to natural terminal.
+Each round freezes 335 paths, including schemas, source, tests and web checks.
+Chrome manifest was captured DURING frozen live run, not pre-launch.
+Raw logs remain audit/hybrid-v1/checkpoint-68-*. Public archival manifests/hash
+index bind the originals, including failed runs; no ephemeral fixture secrets
+copied into the documentation. Composite evidence, not final new-module/full
+library rerun. See HYBRID_AUDIT_RESERVE.md for exact behavior and limits.
+
+R1 original66555 terminale9405e exit0: 3pass/1oldwarning79.57s.
+Actual single-FS8MiB st_blocks; healthy engineering STOP permits AST21/oneapply;
+actual4MiB fallocate then ENOSPC before request/HANDOFF, unchanged Store versions;
+original body/key and original FD heal to CPU384; HTTP release before acceptance.
+High A/B/C review then required full-FS ready coverage, stamp/size guard and
+unknown statistics checked before low-space. Those source MUSTs were fixed.
+
+R2 original31239 terminalbf0dab exit0: 5pass/3deselect/1oldwarning86.12s.
+Controlled missing coverage (NOT multiple real FS); invalid-frsize failclosed,
+no blank consumption; actual truncate0/fsync fault same originalFD retry, no
+refill; changed observations forbid truncation; shutdown failure keeps live
+original owner and FD, explicit healed shutdown closes. All335 matched.
+
+R3 original52354 terminal450b03 exit0: 4pass/8deselect/1oldwarning79.15s.
+Actual pre-G HTTP STOP releases real blank; post-release Store ENOSPC still
+reaps, closes sourceFDs, Gfalse, terminalNone/occupied2; heal same key202, no
+extra Popen. Success variant202/occupied1. Same HTTP operation releaseEIO does
+not automatically reissue via fallback; explicit new STOP retries originalFD.
+Actual fork child closes inherited reserveFDs, parent's8MiB stays allocated.
+
+Node initial6pass136.24ms; final threshold validation6pass133.162ms.
+Final guards independently recompute128MiB+16MiB*credit and16+8*credit,
+credit<=32; reject self-reported lowered threshold, negative/33/malformed DTO.
+Chrome original33998 terminal4a09bc exit0: 1pass31.8298s. Actual cold manualGET
+[]/no allocation, real CPU384, real8MiB GET and Store/Pool unchanged; STOP and
+project/logout privateDOM clear. No unchanged browser rerun after validator
+negative-case delta. UI authorization/ticket late replies denied, no STOP gate.
+
+R4 original4620 terminal8285a7 exit0: 4pass/12deselect/1oldwarning87.11s.
+Real allocation fsync fault after8MiB sameFD heal/no HANDOFF; final Auth->pure
+freeze blocks G; actual pre-G releaseEIO still reaps/UNKNOWN occupied2, explicit
+STOP heals. Its pwrite parameter triggered EARLY intent gate, so it does NOT
+prove actual pwrite-last-effect. High found acceptance-position MUST.
+R5 original71416 terminal67a498 exit0: ONLY corrected pwrite parameter,
+1pass/15deselect/1oldwarning27.90s. Actual _Guard.last_effect->_apply_once,
+intent present/originalFD open/write_enteredFalse, original finalAuth then
+freeze, pwrite0. High closed that MUST. Other R4 passes not rerun.
+
+R6 original17216/PID1557406 terminalb6614c exit1:
+36pass/2fail/3warnings834.55s, 335end-check matched before any fix.
+Only necessary affected38: disk9, sharedHost11, finiteApp2, wholeSTOP9,
+shared/preG/HTTP/whole storage5, Poolfork2. Source/test freeze throughout14min;
+no parallel, restart or interrupt. NOT claimed regression green.
+Fail1 actual_HTTP_inode_denial_same_body_key_then_STOP_not_gated: no reserve
+and no HANDOFF, other STOP permanently froze domain, healed same key503.
+Fail2 actual_two_projects_cpu384_engineering_one_write_same_pool_STOP_FREE:
+CPU private4s result deadline exceeded; engineering accepted. No timeout change.
+
+R7 original90517 terminal exit0: 4pass/16deselect/1oldwarning89.28s.
+Only original fail1 plus three new recovery bodies. Explicit pending nofile
+remains retryable; original body/key and object heal, other low-space STOP does
+not freeze. Actual partial4MiB originalFD STOP consumes/freezes/no refill.
+creation_entered with no FD stays UNKNOWN/no truncation/adoption/occupied2,
+original shutdown_safety retires parent/sourceFDs, never fabricates FREE.
+High closed first root; found parentFD dup overwrite after retained-precreation
+interruption, subsequently fixed only-ifNone dup.
+
+R8 original70647 terminal307dde exit0: diagnostic-only original fail2,
+1pass63.33s. CPU poll5.117128782s, source.seal .010368837s, _current .015288299s;
+poll wait overlaps engineering apply5.128143676s. No source states captured
+(test used wrong map then); timestamps/durations still actual. Passing R8 is
+NOT closure: SEALED final iteration can break after wait while AUDITING needs
+another poll and breaches4s. High confirmed original Pool contention root.
+
+R9 original13911 terminalccaf3c exit0: 4pass/1oldwarning106.13s, all335matched.
+Command: -q -s
+tests/test_hybrid_fixture_runtime.py::test_actual_started_readonly_poll_completes_while_other_thread_holds_pool
+tests/test_hybrid_fixture_runtime.py::test_actual_stop_in_readonly_poll_gap_prevents_late_ACK_fact
+tests/test_hybrid_audit_reserve.py::test_actual_retained_precreation_parent_FD_is_reused_without_duplicate
+tests/test_hybrid_host_execution.py::test_actual_two_projects_cpu384_engineering_one_write_same_pool_STOP_FREE
+Actual postACK STARTED readonlypoll finishes while main thread holds original
+Pool, original Project/Pool versions+entries unchanged. Actual spawn/G/ACK,
+initial Release read then real STOP commit, lock re-read STOP prevents lateACK
+fact. Real duplicated parent FD retained across modeled precreation interruption,
+restore forbids another dup, same parent/noninherit/actual8MiB. Original shared
+CPU384, engineering21, exactly1pwrite, occupied0, original snapshots/recovery.
+Source-only poll noPool, ACK newwrite still originalPool+freshphase+guards;
+spawn/G/pwrite/STOP/collect locks and budgets unchanged. High delta no new MUST.
+R9 diagnostic source-state 'end' overwrote timestamp 'end' in printed row;
+duration/begin/status/offset remained actual. Post-terminal changed only labels
+to source_status/source_offset/source_end. No assertion/effect/body change;
+not repeating passed Host case merely for output metadata.
+
+R10 original28415 terminal11f3c4 exit0: necessary new poll-impact regression,
+12passed134.48s, no warnings; all335 frozen paths matched. Command -q:
+tests/test_hybrid_fixture_runtime.py::test_real_gated_child_ack_stop_reap_and_slot_reuse
+tests/test_hybrid_fixture_runtime.py::test_durable_stop_before_spawn_is_zero_wall_and_never_releases
+tests/test_hybrid_fixture_runtime.py::test_real_running_participant_stopped_after_authority_expiry
+tests/test_hybrid_fixture_runtime.py::test_actual_atomic_commit_lost_return_confirms_both_without_relaunch
+tests/test_hybrid_fixture_runtime.py::test_actual_missing_usage_or_wrong_ack_never_settles_model_tokens
+tests/test_hybrid_fixture_runtime.py::test_original_terminal_snapshot_replay_recover_and_pool_cold_join
+tests/test_hybrid_fixture_runtime.py::test_pool_free_tampered_project_source_is_rejected_by_current_and_cold_audit
+tests/test_hybrid_fixture_runtime.py::test_partial_original_pool_close_retry_never_frees_early
+tests/test_hybrid_fixture_runtime.py::test_partial_original_source_close_retains_exposure_until_retry
+tests/test_hybrid_fixture_runtime.py::test_actual_fork_denies_inherited_runtime_cap_and_closes_child_source_fds
+tests/test_hybrid_fixture_runtime.py::test_real_stop_prevents_further_original_usage_file_growth
+Parameterized missing/badACK makes12 cases. Original335 prelaunch frozen.
+No repeat R6's already-passed36 or unchanged Chrome/full-library suite.
+
+Compileall rlflow/tests, pipcheck and diffcheck passed after R9; no code change
+afterward. Final335 manifest and complete raw log/input/live/end hash index
+archived, originals retained. High final source/test delta has no new MUST.
+Only final staged audit/commit remains; full Goal ACTIVE.
+Review is development security review, not an independent product Reviewer.
+NOT proven: STOPCOMMIT guarantee/fullFS, quota, multi-realFS, strongsameUID,
+cold/restartcredit, RES07/A26/fullT21, native/arbitrarytree/invoice, productReview,
+positiveConditionEvidence, installation/B1/24hfixture8hUI/T23/M5/fullGoal.

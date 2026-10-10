@@ -61,6 +61,7 @@ class _FiniteExecutionOperation:
         if not self._operation_lock.acquire(blocking=False):
             raise Conflict('original execution unit already running; cancellation does not wait on this lock')
         self._operation_thread = threading.get_ident()
+        self._disk_stop_scope = {}
         try: yield
         finally:
             self._operation_thread = None
@@ -127,7 +128,7 @@ class _FiniteExecutionOperation:
                 return self._resume()
             self._check_operation()
             from .hybrid_disk_admission import check_effect
-            check_effect(self.runtime, attempt)
+            check_effect(self.runtime, attempt, allocate=True)
             self._check_operation(); self._request = request
             try:
                 self.runtime.start(self.lease)
