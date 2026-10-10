@@ -1,5 +1,7 @@
 # 需求包离线校验报告
 
+2026-10-11 账户cache本地验证：纯5pass.03s；原87683 1fail/5pass11.24s定位native_setup覆写CODEX_HOME（隔离fake catalog无auth，不是真实cache），修夹具依赖顺序后只affected1pass14.67s。High target inode/dest冻结identity/最终门3MUST修后6pass15.28s；新rename/replacement/swap与末fresh后expiry/STOP→零secret read/零copy原96955终态5pass/6deselected25.01s；带合成cache的真实固定Python noG+STOP原50864终态1pass/10deselected20.51s，Pool0/UNKNOWN/host不改/copy删除/audit=replay。末missing-name+target fstat OSError独立关闭1pass/11deselected.09s，High全部MUST闭合。compile/diff/USERlock通过；各原handles terminal、不重启，命令见evidence/a-native-account-cache-20261011.txt。没有真实cache/CLI/model/G/GPU调用；不宣称账户资格/可信结算/首实任务/Review/条件接续/A或全库通过。
+
 Reviewer数据末验：原25591自然exit0，旧默认Engineer登记1pass/19deselected11.13s；独立原finite_app_review_63只读窄审无新增确证MUST，未重跑测试。全本轮handlesterminal/compile/diff/USERlock通过；归档 evidence/a-native-review-data-20261011.txt，不支持真实模型/独立产品Review或条件接续验收。
 
 2026-10-11 Reviewer原FD消费：原10808终态1fail/34pass9.45s；失败在末候选拒绝类型预期，原review正消费已过，诊断为V1无workflow paths先PermissionError。改原冻结role检查前移后，仅受影响原5Reviewer cases/Engineer正例55900自然terminal6pass/8deselected65.02s，34pure已通过不重复。验证ACCEPT/REVISE/freshcopy、不改Store/Pool、错版本/ACCEPT+MUST/turn.failed锁存、篡改transcript role不能晋升Candidate，STOP Pool0/allFDclosed/audit=replay。旧Engineer夹具回归与独立窄审收尾，证据 evidence/a-native-review-data-20261011.txt。无真实model/Review/条件/A或全库通过声明，Goal ACTIVE。

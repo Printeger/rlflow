@@ -21,6 +21,10 @@ class NativeModelSourceOwner(FixtureUsageSourceOwner):
         self._gate_bindings = {}
         self._gate_inputs = {}
         self._model_ready = {}
+        # Capture the current host CLI cache location once, without opening it.
+        # Runtime callers cannot select another path or ask for keyring fallback.
+        self._account_home = os.path.abspath(os.environ.get('CODEX_HOME',str(Path.home()/'.codex')))
+        self._account_caches = {}
         super().__init__(pool)
 
     def _actual(self):
@@ -80,12 +84,22 @@ class NativeModelSourceOwner(FixtureUsageSourceOwner):
         return {'fd':fd,'stamp':stamp,'sha256':'sha256:'+value.hexdigest()}
 
     def _extra_fork_descriptors(self, attempt):
-        return tuple(row['fd'] for row in self._gate_inputs.get(id(attempt['source']),[]) if row['fd'] is not None)
+        cache=self._account_caches.get(id(attempt['source']))
+        return tuple(row['fd'] for row in self._gate_inputs.get(id(attempt['source']),[]) if row['fd'] is not None)+(cache.descriptors() if cache is not None else ())
 
     def _cleanup_attempt(self, attempt):
         errors=[]
+        cache=self._account_caches.get(id(attempt['source']))
         try:super()._cleanup_attempt(attempt)
         except (OSError,Conflict) as error:errors.append(error)
+        if cache is not None:
+            # A live producer may refresh/recreate auth.json. Never close the
+            # cleanup capability or declare the copy gone before it is reaped.
+            if attempt['producer'] is not None and attempt['producer'].poll() is None:
+                errors.append(Conflict('live original producer retains account-cache cleanup'))
+            else:
+                try:cache.close()
+                except (OSError,Conflict) as error:errors.append(error)
         for row in self._gate_inputs.get(id(attempt['source']),[]):
             if row['fd'] is None:continue
             try:
@@ -97,6 +111,25 @@ class NativeModelSourceOwner(FixtureUsageSourceOwner):
         if errors:
             attempt['status']='UNKNOWN'
             raise Conflict('original generating input cleanup incomplete') from errors[0]
+
+    def _prepare_current_account_cache(self,owner,lease):
+        from .hybrid_native_model_runtime import NativeModelOwner
+        from .hybrid_native_account_cache import _AccountCache
+        self._actual()
+        if type(owner) is not NativeModelOwner or owner.sources is not self:
+            raise PermissionError('original model account-cache owner required')
+        runtime=owner._issued(lease);source=runtime['source'];attempt=self._issued(source)
+        with self._lock:
+            owner._check_account_cache_gate(runtime)
+            self._physical(attempt)
+            if id(source) not in self._gate_bindings:
+                raise Conflict('original private session gate materials required')
+            if id(source) in self._account_caches:
+                raise Conflict('original account-cache attempt already entered')
+            identity=self._gate_bindings[id(source)][4][-1][:2]
+            cache=_AccountCache(self._account_home,attempt['path']/'auth-private',destination_identity=identity)
+            self._account_caches[id(source)]=cache
+            return cache.stage(lambda:owner._check_account_cache_gate(runtime))
 
     def _prepare_model_gate(self, owner, lease):
         """Private original materials only. No process, auth read or G."""

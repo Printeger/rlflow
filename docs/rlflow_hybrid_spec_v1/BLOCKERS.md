@@ -1,5 +1,7 @@
 # 阻塞与证据缺口
 
+2026-10-11 当前文件账户cache的原私有transfer与STOP删除已实现；只用合成NOT_A_TOKEN测试，未读取真实cache，未改CLI配置或宿主状态。仍缺真实账户server资格、sameELF exec/G/真实EOF与原完整usage cap发行；文件不存在、权限不私有或keyring-only明确拒，不擅自迁移或新增login。后续同workflow CPU/独立Evaluator派生、条件CAS/接续仍待原parents，首任务NOT_EXECUTED。本地代码无新增用户决定；小额A运行合同未批准不调用，GPU/B/C/instinctRL HOLD保持。
+
 2026-10-11 原Evaluator审计输出消费已实装，不再只存在pure decoder；仍不具真实模型来源/独立性或接纳资格。同workflow新Reviewer派生、受管候选CPU、条件CAS和自主接续需原受保护parents接通；原账户/生成/EOF及opaque usage发行仍最高依赖。首实任务NOT_EXECUTED，小额A调用待批仅阻实际运行；GPU/B/C/instinctRL HOLD保持，本地无新增用户选择。
 
 2026-10-11 原 no-G Python producer/ready/STOP 已实机接通，但不具模型生成资格。最高剩余本地实现：原账户绑定、same ELF exec/G/完整 stdout与真实 EOF资格及原 usage cap发行；随后同 workflow CPU、不同产品 Evaluator、条件 CAS与接续。首个真实工程任务 NOT_EXECUTED，非开发期 High审查可替代。小额 A合同未批准仅阻实际模型运行，不阻上述代码开发；GPU/B/C/instinctRL HOLD保持，无新增用户决定。

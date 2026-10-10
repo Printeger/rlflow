@@ -1,5 +1,7 @@
 # Hybrid v1 开发进度
 
+2026-10-11 原账户文件缓存隔离已本地接通：Source构造只捕获当前CODEX_HOME路径，不读cache；原REGISTER Controller/material guard内，在首次secret pread与副本create前完整source核后执行原最终效果门。当前host auth.json只读NOFOLLOW/私有0600/nlink1/64KiB，复制至原冻结auth-private，不返回/记录内容或credential hash，不解析JWT/开keyring/改host文件。STOP先reap生产者再精确删原session副本并关闭全部原FD，失败仍UNKNOWN/保cap。原合成Store+真实固定Python noG验证1pass20.51s；主修负例5pass25.01s，末异常关闭1pass.09s，纯5pass.03s与受影响6pass15.28s。High3MUST及直接异常收尾MUST全部关闭，证据evidence/a-native-account-cache-20261011.txt；compile/diff/USERlock通过。只交付缓存transfer，account_qualified=false/start与G仍deny，非真实账户/模型/task/Review/A验收。下一原账户server资格+sameELF/G/EOF/usage cap发行→workflowCPU/不同Evaluator/条件CAS/接续。A小额调用待批只阻实际运行，GPU/B/C/HOLD保持，Goal ACTIVE。
+
 本Reviewer数据切片FINAL：旧Engineer原25591自然terminal1pass/19deselected11.13s；独立窄复核无新增确证MUST，compile/diff/USERlock通过，所有本轮handles已终态。仅原数据消费接线提交，不是产品独立Review/首个实任务/A完成。下一原生成资格与可信用量发行继续本地实现，Goal ACTIVE。
 
 2026-10-11 原Reviewer FD消费接线：独立冻结的packet角色/schema/grant候选hash→审计review数据，ACCEPT/REVISE不变；错候选、未解MUST却ACCEPT、失败强拒且锁存，返回freshcopy不改Store/Pool/条件/usage。candidate也从原packet核角色，不信mutable transcript。首34pure pass，原Reviewer成功消费后末负例因无workflow paths先触PermissionError而1fail9.45s；诊断后角色检查前移，不放宽门。原5Reviewer cases+Engineer正例6pass/8deselected65.02s，55900自然terminal；旧默认Engineer夹具回归收尾，独立窄审收尾。证据 evidence/a-native-review-data-20261011.txt。当前只是原输出接线，非真实产品Review或任务；账户/生成/EOF/usage cap与同workflow CPU/不同Evaluator派生、条件CAS/接续仍缺。A小额调用待批不阻代码，GPU/B/C/HOLD不变，Goal ACTIVE。

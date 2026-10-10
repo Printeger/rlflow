@@ -1,0 +1,60 @@
+Base commit: f964bc6. Scope: private original file-cache transfer/STOP only.
+No actual host credentials, CLI, model, G, GPU, keyring, login or API used.
+Source captures CODEX_HOME path only; all tests create synthetic NOT_A_TOKEN
+under original isolated fixture CODEX_HOME or temporary private directories.
+Official docs searched and opened: https://learn.chatgpt.com/docs/auth
+File cache copying is supported; credentials are sensitive. Copying does NOT
+prove an authenticated account/workspace, model generation or complete usage.
+
+Behavior:
+Original REGISTER/material/Controller guard; complete source checks then final
+effect gate immediately before first secret pread and target create.
+Bounded host auth.json: readonly NOFOLLOW, current UID,0600,nlink1,1..65536bytes.
+Target dirfd must match original gate frozen devino. Target inode is registered.
+All opened FDs strongly retained immediately, included in fork cleanup.
+STOP reaps producer before deleting exact session copy; host cache untouched.
+Replacement/rename refuses cleanup, retains original target+directory handles,
+not a false FREE. Other FDs independently close even after target fstat failure.
+No credential content/digest/logging/JWT claims in return or durable evidence.
+start/release remain denied; account_qualified always false.
+
+Tests first:
+env -u PYTHONPATH PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q tests/test_hybrid_native_account_cache.py
+Pure first5 passed in.03s.
+87683/output2ea422: 1 failed,5 passed in11.24s.
+Cause native_setup overwrote earlier test CODEX_HOME with isolated catalog-only
+home; no auth.json there. Fix fixture dependency order, seed only fake home.
+Affected -k original_controller,25552/output1b7beb:1passed/5deselected14.67s.
+
+Independent read-only High /root/finite_app_review_63 found3MUST:
+1 exact original target inode cleanup, not any same-UID file;
+2 held destination dirfd vs original frozen gate identity;
+3 final deadline/Auth/STOP sample after complete source IO before secret effects.
+Fixed all3; affected file57916/output6eab1c:6passed15.28s.
+
+New targeted command:
+env -u PYTHONPATH PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q tests/test_hybrid_native_account_cache.py -k 'secret_inode or destination_open or final_effect'
+96955/outputeee392 natural exit0:5passed/6deselected25.01s.
+Rename/replacement preserve unrelated bytes+UNKNOWN handles; restored original
+identity allows cleanup. Destination swap/open/restore writes no auth file.
+Expiry/STOP injected after original final-source _fresh: zero secret pread,
+zero copy; original STOP Pool0 and FD closure.
+
+Updated original positive command -k original_controller:
+50864/outputd5db96 natural exit0:1passed/10deselected20.51s.
+Synthetic cache original copy -> real fixed Python sandbox gate only (no G)
+-> STOP reap -> original copy deleted/all cacheFD closed/Pool0/financialUNKNOWN.
+Host synthetic auth unchanged, Store audit==replay; no native Codex exec.
+
+Narrow fix review found1direct exception-cleanup MUST: missing-name branch
+target fstat exception skipped otherFD closes. Catch locally, retain pending
+original target+dirfd, continue independent closure. Targeted -k missing_name:
+output8a6b19 exit0:1passed/11deselected.09s. Other FDs close, ambiguous2retain;
+cleared fault+nlink0 proof closes all. Final High confirms all MUST closed.
+
+Compile/diff checks passed; user package-lock SHA unchanged:
+becc7e2a36dfcad4ffe934b5ff2f0f68187611d6c0641bd63d81367651cfbf09
+All original handles terminal; no repeated unaffected review/tests or full
+suite claim. Real task/independent product Reviewer/conditions/continuation
+NOT_EXECUTED. Account/server/ELF/G/EOF/usage issuer still incomplete.
+Small A contract awaits approval; GPU/B/C/instinctRL HOLD unchanged. Goal ACTIVE.

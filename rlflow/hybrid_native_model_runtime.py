@@ -213,6 +213,26 @@ class NativeModelOwner(FixtureRuntimeOwner):
                 'sandbox_ready':True,'model_released':False,'account_qualified':False,
                 'usage_qualified':False}
 
+    def prepare_current_account_cache(self,lease):
+        """Original approved session's opaque cache copy; does not grant G."""
+        attempt=self._issued(lease)
+        with self.pool._lock:
+            if self._current(attempt)['fixture_runtime']['phase']!='REGISTER_NO_HANDOFF':
+                raise Conflict('account-cache transfer only before original handoff')
+            self.prepare_native_gate(lease)
+            with self._gate(attempt,'REGISTER_NO_HANDOFF'):
+                return self.sources._prepare_current_account_cache(self,lease)
+
+    def _check_account_cache_gate(self,attempt):
+        self._issued(attempt['lease'])
+        guard=self._active
+        if guard is None or guard.attempt is not attempt or not self.pool._lock._is_owned():
+            raise PermissionError('original active Controller required before secret read/copy')
+        if self._current(attempt)['fixture_runtime']['phase']!='REGISTER_NO_HANDOFF':
+            raise Conflict('current original no-handoff account preparation required')
+        guard.check()
+        self._final_effect_gate(guard)
+
     def _check_spawn_gate(self, attempt):
         self._issued(attempt['lease'])
         # Only original no-G Python gate. Source release still always denies.

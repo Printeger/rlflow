@@ -1,5 +1,7 @@
 # 开发决策记录
 
+2026-10-11 当前账户cache与认证资格分离：官方Authentication只支持文件/keyring语义与CLI强制ChatGPT/workspace退出行为，不能把opaque cache/JWT或复制成功视资格。先实装原当前文件cache隔离；不设置API/新账户/keyringfallback、不刷新/迁移宿主cache。Source调用不接受caller路径或effect callback，原同lease Controller/material guard与最后效果门保持。副本目的dirfd比原gate冻结devino，copy原inode精确绑定；改名/替换不能误删或假清理，删失败保原target/dirfd和UNKNOWN。先reap后删除，防活生产者重建cache；异常不跳过其他原FD独立关闭。真实模型refresh/账户server/EOF/usage issuer仍须后续原资格，不借本片升级。官方来源 https://learn.chatgpt.com/docs/auth ，证据evidence/a-native-account-cache-20261011.txt。
+
 2026-10-11 Reviewer消费不授Reviewer资格：沿用原heldFD完整独立重放及冻结completed消息，从原packet而非可变transcript核角色；output_schema与原grant候选hash同时核验。共享review_data只校验闭schema/同candidate/ACCEPT无MUST并freshcopy，不能把合成stdout、开发期High或caller PASS变独立性/条件证据。错数据沿原失败锁存；原physical STOP独立保留。官方Authentication说明缓存可能file/keyring、CLI强制workspace限制，但未确立缓存本身为本产品资格；本片不读凭据/切换存储/调用CLI。来源 https://learn.chatgpt.com/docs/auth 。
 
 2026-10-11 原生产者先接无释放物理链：复用原强保留 process/pidfd/stdin/FD 与 HANDOFF/Pool/final Controller gate，fixed Python helper 的原 ready 逐字绑定 PID、nonce、冻结材料和内核限制。Source 与 Owner 两处独立拒绝释放，特别是 Owner 最后副作用门不得依赖可绕过的 Source override。当前旧 single-participant STOP 仅证明未 exec 的固定 Python gate；不能推广真实模型线程/账户/EOF。物理 Pool0 与财务 UNKNOWN/fullreserve 分离，不以无 G 观察推断退款。后续原生成资格 issuer仍未实现。证据 evidence/a-native-no-release-producer-20261011.txt。
