@@ -271,6 +271,12 @@ class FixtureUsageSourceOwner:
                     stdout=attempt['fds']['write'], stderr=attempt['fds']['stderr'],
                     env={'PATH': '/usr/bin:/bin'}, close_fds=True, pass_fds=(attempt['fds']['program'],*extra), start_new_session=True)
                 attempt['producer'] = process
+                try:
+                    from .hybrid_kernel_usage import _KernelUsageCapture
+                    attempt['kernel_usage'] = _KernelUsageCapture(process)
+                except Exception:
+                    # Missing passive OS observations never block original cleanup.
+                    attempt['kernel_usage'] = None
                 pipe = os.fstat(process.stdin.fileno()); attempt['stdin_identity'] = [pipe.st_dev, pipe.st_ino]
                 attempt['producer_identity'] = identity(process.pid)
                 if attempt['producer_identity'] is None or attempt['producer_identity']['pgid'] != process.pid:

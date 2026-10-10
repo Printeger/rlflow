@@ -1,0 +1,31 @@
+.....actual_authenticated_final_kernel_usage shared_project_0 {'status': 'KNOWN', 'source': 'LINUX_WAIT4', 'scope': 'FIXED_PARTICIPANT_LIFETIME', 'exit_code': 0, 'cpu_user_us': 10668, 'cpu_system_us': 2133, 'peak_rss_bytes': 76832768, 'reaped_at': '2026-10-10T01:19:41.311Z'}
+actual_authenticated_final_kernel_usage shared_project_1 {'status': 'KNOWN', 'source': 'LINUX_WAIT4', 'scope': 'FIXED_PARTICIPANT_LIFETIME', 'exit_code': 0, 'cpu_user_us': 9447, 'cpu_system_us': 2834, 'peak_rss_bytes': 83124224, 'reaped_at': '2026-10-10T01:19:54.770Z'}
+.actual_fixed_worker_known_sample {"schema_version": "1.0", "sampler_epoch": "sampler_5f44b0e4957f4da290a0e243790b7ddf", "sample_seq": 16, "sample_id": "sampler_5f44b0e4957f4da290a0e243790b7ddf:16", "observed_at": "2026-10-10T01:20:29.828Z", "project_id": "shared_project_0", "store_epoch": "store_7b4435e6e78c42b8a1088f6d1b154351", "data_mode": "fixture", "source_state_version": 15, "source": "CORE_OS_SAMPLE", "observability": "PARTIAL", "sample_age_seconds": 0.0014409630093723536, "host": {"cpu": {"scope": "HOST", "status": "KNOWN", "utilization_percent": 6.711111111111111}, "memory": {"scope": "HOST", "status": "KNOWN", "total_bytes": 32493395968, "available_bytes": 28075421696}, "disk": {"scope": "STATE_FILESYSTEM", "status": "KNOWN", "total_bytes": 1005867986944, "available_bytes": 578360926208}}, "gpu": {"scope": "GPU", "status": "UNKNOWN", "utilization_percent": null, "memory_used_bytes": null}, "workers": [{"execution_id": "ref_713021538998c32cc7bba89206770b8606b49de27a0029f0a20db1760adc2e98", "process": {"scope": "FIXED_WORKER_PROCESS", "status": "KNOWN", "cpu_seconds": 0.0, "rss_bytes": 11902976}, "heartbeat": {"status": "UNKNOWN", "counter": null, "age_seconds": null}, "final_usage": null}], "workers_truncated": false}
+actual_STOP_and_closed_owner_telemetry_UNKNOWN {"schema_version": "1.0", "sampler_epoch": "sampler_5f44b0e4957f4da290a0e243790b7ddf", "sample_seq": 18, "sample_id": "sampler_5f44b0e4957f4da290a0e243790b7ddf:18", "observed_at": "2026-10-10T01:20:29.828Z", "project_id": "shared_project_0", "store_epoch": "store_7b4435e6e78c42b8a1088f6d1b154351", "data_mode": "fixture", "source_state_version": 15, "source": "CORE_OS_SAMPLE", "observability": "PARTIAL", "sample_age_seconds": 8.563285211101174, "host": {"cpu": {"scope": "HOST", "status": "UNKNOWN", "utilization_percent": null}, "memory": {"scope": "HOST", "status": "UNKNOWN", "total_bytes": null, "available_bytes": null}, "disk": {"scope": "STATE_FILESYSTEM", "status": "UNKNOWN", "total_bytes": null, "available_bytes": null}}, "gpu": {"scope": "GPU", "status": "UNKNOWN", "utilization_percent": null, "memory_used_bytes": null}, "workers": [{"execution_id": "ref_713021538998c32cc7bba89206770b8606b49de27a0029f0a20db1760adc2e98", "process": {"scope": "FIXED_WORKER_PROCESS", "status": "UNKNOWN", "cpu_seconds": null, "rss_bytes": null}, "heartbeat": {"status": "UNKNOWN", "counter": null, "age_seconds": null}, "final_usage": null}], "workers_truncated": false}
+....................................fixed_cpu_phase_seconds HANDOFF_UNKNOWN 0.790685
+fixed_cpu_batch_seconds 1.546707
+fixed_cpu_phase_seconds STARTED_AS_OBSERVED 0.368314
+fixed_cpu_batch_seconds 0.336085
+fixed_cpu_phase_seconds STOP_REQUESTED 0.367883
+fixed_cpu_phase_seconds FIXTURE_SCOPE_STOPPED 0.366585
+fixed_cpu_phase_seconds FIXTURE_SCOPE_STOPPED 0.168463
+.fixed_cpu_phase_seconds FIXTURE_SCOPE_STOPPED 0.168723
+...........................shared_auth_HTTP_STOP_isolation {'cpu_G': False, 'other_store_unchanged': True, 'other_AST_cases': 21, 'occupied': 0}
+.shared_auth_HTTP_actual_results {'launches': 2, 'pwrites': 1, 'cpu_status': 'EXPERIMENT_MACHINE_VERIFIED_PENDING_REVIEW', 'engineering_AST': 21, 'worker_cpu_ns': 99790, 'billing': 'UNKNOWN'}
+.actual_two_original_Runs_STOP {'live_before_STOP': 1, 'other_Pool_wait': True, 'both_G': False, 'all_reaped': True, 'all_FDs_closed': True, 'occupied': 0}
+.actual_whole_bounds {'bad_auth_and_key_conflict_no_latch': True, 'capacity_rows': 32, 'overflow_all_latched': True, 'occupied': 0, 'human_STOP_facts': 0}
+.actual_pending_interrupt {'active_until_future_terminal': True, 'known_scope_not_recleaned': True, 'occupied': 0}
+.actual_partial_submit {'submitted': 1, 'bounded_inline_fallback': 1, 'occupied': 0}
+.actual_HTTP_zero_submission_safe_cleanup {'response': 429, 'all_latched': True, 'cleanup_scopes': 2, 'occupied': 0, 'human_STOP_facts': 0}
+.actual_HTTP_finite_STOP {'scopes': 2, 'cpu_G': False, 'occupied': 0, 'independent_from_original_Run': True, 'receipt_retry_no_writes': True}
+.actual_finite_STOP {'original_scopes': 2, 'all_latched_before_cleanup': True, 'cpu_G': False, 'other_spawn': False, 'occupied': 0, 'duplicate_cleanup': False}
+.actual_reverse_unknown_interrupted_resume {'known_scope_preserved': True, 'known_scope_not_recleaned': True, 'occupied': 0}
+.actual_finite_partial_resume {'initial_occupied': 1, 'remaining_unknown': True, 'mutated_JSON_not_authority': True, 'only_unknown_cleanup_resumed': True, 'occupied': 0}
+.
+=============================== warnings summary ===============================
+.venv/lib/python3.12/site-packages/starlette/testclient.py:37
+  /home/mint/rl_dev/rlflow_standalone/.venv/lib/python3.12/site-packages/starlette/testclient.py:37: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = typing.Callable[[], typing.ContextManager[anyio.abc.BlockingPortal]]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+81 passed, 1 warning in 722.93s (0:12:02)

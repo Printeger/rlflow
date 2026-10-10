@@ -1,0 +1,22 @@
+TAP version 13
+# Subtest: actual OS sample → existing SSE/Chrome → closed original owner UNKNOWN; other project unaffected
+not ok 1 - actual OS sample → existing SSE/Chrome → closed original owner UNKNOWN; other project unaffected
+  ---
+  duration_ms: 59788.157667
+  location: 'file:///home/mint/rl_dev/rlflow_standalone/web_checks/resource-telemetry-browser.test.mjs:10:1'
+  failureType: 'testCodeFailure'
+  error: 'page.waitForFunction: Timeout 30000ms exceeded.'
+  code: 'ERR_TEST_FAILURE'
+  name: 'TimeoutError'
+  stack: |-
+    TestContext.<anonymous> (/home/mint/rl_dev/rlflow_standalone/web_checks/resource-telemetry-browser.test.mjs:46:16)
+  ...
+1..1
+# tests 1
+# suites 0
+# pass 0
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 59987.156998

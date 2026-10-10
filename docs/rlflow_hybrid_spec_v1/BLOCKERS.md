@@ -1,5 +1,7 @@
 # 阻塞与证据缺口
 
+Checkpoint70 FINAL：没有剩余源码MUST、live测试或新增用户决定阻止本片提交。实际观测hook失效后的原HTTP STOP、不可复活撤回、并发退休读取与真实SSE展示均已验收，失败证据保留。严格cgroup/quota委派和产品Reviewer合同/额度仍沿用未答问题，无系统/生产/模型授权；终态内核用量不是可信invoice、预算结算、任意树或严格OS资源控制。原native/安装/B1/长期/T23/M5与完整Goal缺口保持，Goal active，USERlock未改未stage。
+
 Checkpoint69 FINAL：无剩余源码MUST、live测试或新用户决定阻止本片提交。14新case分轮通过，唯一必要回归80pass/1fail后原失败定向已修复；完整快照+真实STOP尾部恢复及实际15秒超时回收成立。当前仅固定可信cache进程的partial RLIMIT/物理FS余量门，不是独立硬控制资源预留、quota、任意树、OS总进程≤3或强sameUID隔离；不自动采纳UNKNOWN handoff/coldcap。session cgroup root拥有、未委派uid1000，严格OS正向仍需管理员准备CPU/memory/pids子树与独立quota；既有选择问题未答不视为授权，不写sysfs或改权限。原产品Reviewer隔离合同/非零额度问题不重复询问或调用；native/可信invoice/安装/B1/长期/T23/M5/完整Goal缺口保留，Goal active，USERlock未动。
 
 Checkpoint68 FINAL：新增MUST和必要回归已关闭，无live测试、无新增用户决定阻止归档提交。原有限8MiB预留与故障安全STOP已验证，但不是硬quota、COMMIT保证、真实满FS、三实际FS、强sameUID或跨重启额度恢复。T21严格OS/控制隔离未完成：cgroup root属于root、未委派用户权限，严格执行不能启动，不擅改系统或用特权绕过；下一切片只在原权限内接实际能力准入/partial拒绝行为。产品Reviewer原新隔离合同/非零额度询问未答，不把开发High当产品Review、不调用付费模型。native/任意树/invoice/安装/B1/24hfixture8hUI/T23/M5/完整Goal缺口保留。详HYBRID_AUDIT_RESERVE.md及evidence/checkpoint-68-tests.txt；USERlock未动。

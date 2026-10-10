@@ -124,7 +124,7 @@ function renderResources() {
   $('resource-disk').textContent=disk?.status==='KNOWN' ? `${bytes(disk.available_bytes)} / ${bytes(disk.total_bytes)}` : 'UNKNOWN';
   $('resource-note').textContent=value ? `CORE_OS_SAMPLE · PARTIAL · 本批 ${value.workers.length} worker${value.workers_truncated ? '（轮转未覆盖全部）' : ''} · ${value.observed_at} · ${value.sample_id}；仅最新样本，无历史曲线。` : '资源来源未启用/不可用不表示零；服务端心跳不刷新资源样本。';
   $('resource-workers').replaceChildren(...(value?.workers || []).filter(w=>w.process.scope==='FIXED_WORKER_PROCESS').map(w=>
-    text('p',`${w.execution_id.slice(0,18)} · FIXED_WORKER_PROCESS · ${w.process.status==='KNOWN' ? 'CPU '+w.process.cpu_seconds.toFixed(2)+'s / RSS '+bytes(w.process.rss_bytes) : 'UNKNOWN'}（原固定进程采样；非计费/模型活动/整树资源）`)));
+    text('p',`${w.execution_id.slice(0,18)} · FIXED_WORKER_PROCESS · ${w.process.status==='KNOWN' ? 'CPU '+w.process.cpu_seconds.toFixed(2)+'s / RSS '+bytes(w.process.rss_bytes) : 'UNKNOWN'}（原固定进程采样） · 终态累计 ${w.final_usage ? 'user '+(w.final_usage.cpu_user_us/1e6).toFixed(3)+'s / system '+(w.final_usage.cpu_system_us/1e6).toFixed(3)+'s / 峰值RSS '+bytes(w.final_usage.peak_rss_bytes)+' / exit '+w.final_usage.exit_code+' / '+w.final_usage.reaped_at : 'UNKNOWN'}（原固定参与者全生命周期；非当前内存、计费、模型活动或整树资源；仅本进程观察，不作预算结算）`)));
   for (const node of document.querySelectorAll('.worker-health')) {
     const worker=value?.workers.find(w=>w.execution_id===node.dataset.executionId),h=worker?.heartbeat,p=worker?.process;
     node.textContent=`worker loop ${h?.status || 'UNKNOWN'}${h?.age_seconds!==null && h?.age_seconds!==undefined ? ' · age '+h.age_seconds.toFixed(1)+'s' : ''} · supervisor ${p?.status==='KNOWN' ? 'CPU '+p.cpu_seconds.toFixed(2)+'s / RSS '+bytes(p.rss_bytes) : 'UNKNOWN'}（非模型活动/进程树）`;

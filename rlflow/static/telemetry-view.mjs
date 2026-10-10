@@ -25,7 +25,15 @@ export function checkTelemetry(v,scope) {
   need(Array.isArray(v.workers) && v.workers.length<=32 && typeof v.workers_truncated==='boolean');
   const seen = new Set();
   for (const w of v.workers) {
-    need(closed(w,['execution_id','process','heartbeat']) && opaque(w.execution_id) && !seen.has(w.execution_id));seen.add(w.execution_id);
+    need(closed(w,['execution_id','process','heartbeat',...(Object.hasOwn(w,'final_usage')?['final_usage']:[])]) && opaque(w.execution_id) && !seen.has(w.execution_id));seen.add(w.execution_id);
+    const final=w.final_usage;
+    if (final!==undefined && final!==null) {
+      need(closed(final,['status','source','scope','exit_code','cpu_user_us','cpu_system_us','peak_rss_bytes','reaped_at']) &&
+        w.process.scope==='FIXED_WORKER_PROCESS' && final.status==='KNOWN' && final.source==='LINUX_WAIT4' &&
+        final.scope==='FIXED_PARTICIPANT_LIFETIME' && Number.isSafeInteger(final.exit_code) && final.exit_code>=-255 && final.exit_code<=255 &&
+        count(final.cpu_user_us) && count(final.cpu_system_us) && count(final.peak_rss_bytes) &&
+        typeof final.reaped_at==='string' && final.reaped_at.endsWith('Z') && Number.isFinite(Date.parse(final.reaped_at)));
+    }
     need(['SUPERVISOR_PROCESS','FIXED_WORKER_PROCESS'].includes(w.process.scope));
     metric(w.process,w.process.scope,['cpu_seconds','rss_bytes']);
     const h = w.heartbeat;
@@ -68,7 +76,7 @@ export class TelemetryView {
     }
     for (const w of v.workers) {
       if (v.freshness==='STALE') {w.process.status='UNKNOWN';w.process.cpu_seconds=null;w.process.rss_bytes=null;}
-      if (v.source_state_version===null || v.source_state_version<(w.process.scope==='FIXED_WORKER_PROCESS'?this.fixedBarrier:this.barrier)) {w.process.status='UNKNOWN';w.process.cpu_seconds=null;w.process.rss_bytes=null;w.heartbeat={status:'UNKNOWN',counter:null,age_seconds:null};}
+      if (v.source_state_version===null || v.source_state_version<(w.process.scope==='FIXED_WORKER_PROCESS'?this.fixedBarrier:this.barrier)) {w.process.status='UNKNOWN';w.process.cpu_seconds=null;w.process.rss_bytes=null;w.heartbeat={status:'UNKNOWN',counter:null,age_seconds:null};if(Object.hasOwn(w,'final_usage'))w.final_usage=null;}
       else if (w.heartbeat.status!=='UNKNOWN') {w.heartbeat.age_seconds+=elapsed;w.heartbeat.status=w.heartbeat.age_seconds<=15?'FRESH':'STALE';}
     }
     return v;

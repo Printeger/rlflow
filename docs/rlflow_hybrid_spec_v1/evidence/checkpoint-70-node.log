@@ -1,0 +1,55 @@
+TAP version 13
+# Subtest: duplicate and late samples never renew age; heartbeat is independent of sample freshness
+ok 1 - duplicate and late samples never renew age; heartbeat is independent of sample freshness
+  ---
+  duration_ms: 1.860217
+  ...
+# Subtest: retired sampler cannot replace current epoch; execution updates invalidate old worker not HOST
+ok 2 - retired sampler cannot replace current epoch; execution updates invalidate old worker not HOST
+  ---
+  duration_ms: 0.279482
+  ...
+# Subtest: a newer sample from an older source version cannot undo domain generation barrier
+ok 3 - a newer sample from an older source version cannot undo domain generation barrier
+  ---
+  duration_ms: 0.218882
+  ...
+# Subtest: initial snapshot floor and unbound legacy slot suppress worker freshness
+ok 4 - initial snapshot floor and unbound legacy slot suppress worker freshness
+  ---
+  duration_ms: 0.256922
+  ...
+# Subtest: closed scope/status/bounds and malformed data are rejected without private extras
+ok 5 - closed scope/status/bounds and malformed data are rejected without private extras
+  ---
+  duration_ms: 0.473624
+  ...
+# Subtest: fixed worker scope, all-domain barrier, retirement identity and sample expiry
+ok 6 - fixed worker scope, all-domain barrier, retirement identity and sample expiry
+  ---
+  duration_ms: 0.341903
+  ...
+# Subtest: final kernel lifetime survives live expiry, but not a source barrier or mutation
+ok 7 - final kernel lifetime survives live expiry, but not a source barrier or mutation
+  ---
+  duration_ms: 0.649767
+  ...
+# Subtest: final kernel fields are closed, fixed-scope only, and never zero-filled on absence
+ok 8 - final kernel fields are closed, fixed-scope only, and never zero-filled on absence
+  ---
+  duration_ms: 0.474794
+  ...
+# Subtest: terminal withdrawal after live retirement has its own accepted identity
+ok 9 - terminal withdrawal after live retirement has its own accepted identity
+  ---
+  duration_ms: 0.612446
+  ...
+1..9
+# tests 9
+# suites 0
+# pass 9
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 71.263527

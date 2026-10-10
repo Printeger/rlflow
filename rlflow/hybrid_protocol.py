@@ -208,6 +208,10 @@ MEASURE = nullable({'type':'number','minimum':0})
 RESOURCE_PROCESS = obj({'scope':enum('SUPERVISOR_PROCESS','FIXED_WORKER_PROCESS'),'status':enum('KNOWN','UNKNOWN'),
                         'cpu_seconds':MEASURE,'rss_bytes':nullable(COUNT)})
 RESOURCE_HEARTBEAT = obj({'status':enum('FRESH','STALE','UNKNOWN'),'counter':nullable(COUNT),'age_seconds':MEASURE})
+FINAL_KERNEL_USAGE = obj({'status':{'const':'KNOWN'},'source':{'const':'LINUX_WAIT4'},
+    'scope':{'const':'FIXED_PARTICIPANT_LIFETIME'},
+    'exit_code':{'type':'integer','minimum':-255,'maximum':255},
+    'cpu_user_us':COUNT,'cpu_system_us':COUNT,'peak_rss_bytes':COUNT,'reaped_at':{**TIME,'pattern':'Z$'}})
 OBJECTS['Telemetry'] = obj({
     'schema_version':{'const':VERSION},'sample_id':ID,'sampler_epoch':ID,'sample_seq':{'type':'integer','minimum':1},
     'observed_at':{**TIME,'pattern':'Z$'},'project_id':ID,'store_epoch':ID,'data_mode':enum('live','fixture'),
@@ -224,6 +228,11 @@ OBJECTS['Telemetry'] = obj({
                'utilization_percent':{'type':'null'},'memory_used_bytes':{'type':'null'}}),
     'workers':{'type':'array','maxItems':32,'items':obj({'execution_id':OPAQUE_ID,
                'process':RESOURCE_PROCESS,'heartbeat':RESOURCE_HEARTBEAT})},'workers_truncated':{'type':'boolean'}})
+OBJECTS['Telemetry']['properties']['workers']['items']['properties']['final_usage'] = nullable(FINAL_KERNEL_USAGE)
+OBJECTS['Telemetry']['properties']['workers']['items']['allOf'] = [{
+    'if':{'properties':{'process':{'properties':{'scope':{'const':'SUPERVISOR_PROCESS'}}}}},
+    'then':{'properties':{'final_usage':{'type':'null'}}},
+}]
 
 
 @lru_cache(maxsize=1)

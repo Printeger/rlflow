@@ -1,0 +1,24 @@
+Checkpoint70 independent High review, original finite_app_review_63 reused.
+Read-only; reviewer started no tests and edited no files.
+
+Initial confirmed MUSTs:
+1. final withdrawal shared the old live retirement sample_id; SSE dedup and
+   TelemetryView.accept could retain invalid final forever after live expiry.
+2. A copy of the capture could be reaccepted by explicit sample.
+3. Combined hook identity in the reap gate could block original physical STOP.
+   Related latest-side binding check and unlocked retirement race were reviewed.
+
+Final static closure:
+Real sampling stride8, live offset1/2, independent final offset4 (max6).
+Locked local live_retirement, never read reset mutable retirement after unlock.
+_original checks creator/PID before inherited locks; physical poll/wait is not
+gated on observation hook completeness. _bound checks original installed hook
+identity only for snapshot/latest. Copies and hook loss withdraw final; restoring
+the pointer cannot revive the old slot; explicit new sampling may publish again.
+
+Reviewer verified actual test design at original preG live Source participant,
+authenticated HTTP STOP, reap/FD closure/G prohibition/other project isolation;
+concurrent deepcopy barrier after the read lock; real15second browser expiry and
+capture invalidation without a business-version event followed by SSE withdrawal.
+Final reviewer conclusion: no remaining MUST, pending actual test results then.
+Actual R4 and Chrome subsequently exited0; see separate raw logs.

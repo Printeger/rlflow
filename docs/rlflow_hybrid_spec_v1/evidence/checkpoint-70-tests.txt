@@ -1,0 +1,85 @@
+Checkpoint70 FINAL -- original fixed-participant kernel lifetime usage
+Base commit c04442e2ec1afb314ba879162593329b29113a25 (69 committed).
+No paid models, GPU, production state migration, sysfs or privilege changes.
+USER package-lock untracked/not staged; SHA
+becc7e2a36dfcad4ffe934b5ff2f0f68187611d6c0641bd63d81367651cfbf09.
+
+Delivered consumer:
+Original gated Source Popen instance -> wait4 original exact-PID reap -> explicit
+FixedUnitTelemetry.sample -> existing authenticated GET/SSE -> actual Dashboard.
+Final independent optional DTO: user/system CPU us, peak RSS bytes, exit_code,
+reaped_at. Fixed no-descendant participant lifetime only, not current memory,
+whole-tree consumption, model tokens, provider invoice or Budget settlement.
+Missing/external reap/unsupported environment/cold restart UNKNOWN, never zero.
+Read routes do not reap/sample/execute or upgrade an older immutable slot.
+Original bindings invalidate monotonically, independent final retirement ID.
+Observation hook loss does not add a physical STOP gate.
+
+Runs and exact strength:
+R1 command .venv/bin/python -m pytest -q -s tests/test_hybrid_kernel_usage.py
+exited1 during pytest plugin import, BEFORE test collection: inherited ROS plugin
+requires missing lark. No product test failure. Diagnosed, not identical rerun.
+R2 env -u PYTHONPATH PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 corrected environment;
+same new module exited0, 6pass/1existingwarning49.78s. Its input comparison was
+taken after edits, with4 differences; preserve as earlier implementation results,
+NOT frozen final acceptance. No claim about the exact moment of each edit.
+
+R3 sole session1001, terminal chunk a16f21, exit0:
+env -u PYTHONPATH PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q -s
+ tests/test_hybrid_kernel_usage.py tests/test_hybrid_resource_telemetry.py
+ tests/test_hybrid_usage_source.py tests/test_hybrid_fixture_runtime.py
+ tests/test_hybrid_fixture_runtime_profile.py tests/test_hybrid_finite_host_app.py
+ tests/test_hybrid_finite_host_stop.py
+81pass/1existingwarning722.93s. Mid-run and terminal340 manifest checks all match.
+Actual CPU result and engineering AST21, two Popen/one pwrite/Pool0; live worker
+plus other Run waiting on Pool cancel both beforeG, all reap/FDclose/Pool0; original
+unknown receipt/partial cleanup/explicit resume behavior retained.
+After R3 ended, exactly5 frozen paths changed for final reap/observation split,
+targeted new tests and browser fixture. Other335 paths unchanged, not rerun.
+
+R4 sole session44479, terminal ffb11a, exit0:
+env -u PYTHONPATH PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q -s
+ tests/test_hybrid_kernel_usage.py
+8pass/1existingwarning87.85s. Final340 source/test/schema inputs match.
+Real normal wait and poll, concurrent wait one reap, real SIGSTOP/SIGKILL exit-9,
+external waitpid gives absent usage, clock conversion failure does not discard
+successful reap, fork rejects before inherited waitpid lock. Real authenticated
+CPU/engineering final values only after sample, GET no poll/wait/sample, no version
+change, copy/hook invalidation independent+4, old slot never revives. Actual live
+preG worker _try_wait observer hook lost: HTTP STOP202, real reap/allFDclose/Gfalse,
+other Store unchanged, finalUNKNOWN. Concurrent explicit sample during old read
+deepcopy does not revive retired host metrics.
+
+Node web_checks/telemetry-view.test.mjs:9pass, exit0,71.263527ms. Includes closed
+final DTO, fixed-only scope, no missing->zero, stale retained final, source barrier
+withdrawal, immutable copies and independent final retirement/late-frame reject.
+Earlier8pass console result preceded the new ninth retirement case; not counted
+as a separate final suite.
+
+Chrome first run session54208, terminal ca8b4d, exit1: actual final display and
+owner-close withdrawal had passed; later project reload waited for known memory
+from a now>15second sample. Correct UNKNOWN, fixture assertion wrong. Diagnosed
+and fixed with private explicit other-owner sampling (no GET auto sample, no
+deadline widening). Raw failure preserved, no identical retry.
+Chrome final session96727 terminal1492cc exit0,1pass46135.176423ms:
+node --test web_checks/resource-telemetry-browser.test.mjs
+Actual loopback/SSE/Chrome, original fixed CPU run, real15second live expiry,
+no-business-event capture invalidation -> final+4 -> visible final withdrawal;
+restore pointer old slot remains null -> explicit new sample shows final again;
+owner close withdraws, other project retains independent version and explicit
+sample, reload correctly shows UNKNOWN, viewer makes no execution POST, logout
+clears resource DOM and no page errors.
+
+Final compileall rlflow/tests/server, pip check, Node syntax, git diff --check
+exit0; final340 inputs match. Independent High no remaining MUST; no live tests.
+Final manifest SHA
+3f1c51077c6f4a75e4a087b9f52a57b611eb326896cc6051939d756ae644a3dd.
+Raw logs and manifests retained with separately generated checksum inventory.
+This is R3 necessary regression plus final narrowed R4, NOT a second final81
+suite or full repository/strictT21/native/reviewer/fullGoal acceptance.
+
+Next: preserve T14/T21->T22 dependency order and original standards; inspect the
+actual native minimum execution/STOP authorization gap before choosing next slice.
+Strict positive OS controls still need administrator cgroup/quota delegation;
+product Reviewer isolation/model budget question remains unanswered, no consent.
+Current final observation slice has no new user decision blocking its commit.

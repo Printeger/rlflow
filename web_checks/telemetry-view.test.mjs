@@ -3,6 +3,8 @@ import assert from 'node:assert/strict';
 import {TelemetryView,checkTelemetry} from '../rlflow/static/telemetry-view.mjs';
 const scope={project:'project_test',mode:'fixture',epoch:'store_test'};
 const execution='ref_'+'a'.repeat(64);
+const finalUsage={status:'KNOWN',source:'LINUX_WAIT4',scope:'FIXED_PARTICIPANT_LIFETIME',exit_code:-9,
+  cpu_user_us:1000,cpu_system_us:2000,peak_rss_bytes:4096,reaped_at:'2026-10-08T00:00:01Z'};
 function sample(seq=1) {
   return {schema_version:'1.0',sample_id:`sampler_test:${seq}`,sampler_epoch:'sampler_test',sample_seq:seq,
     observed_at:'2026-10-08T00:00:00Z',project_id:scope.project,store_epoch:scope.epoch,data_mode:scope.mode,
@@ -63,4 +65,36 @@ test('fixed worker scope, all-domain barrier, retirement identity and sample exp
   Object.assign(retired.workers[0].process,{status:'UNKNOWN',cpu_seconds:null,rss_bytes:null});
   assert.ok(view.accept(retired,16001));assert.equal(view.current(16001).workers[0].process.status,'UNKNOWN');
   assert.equal(view.accept(newer,16002),false);
+});
+test('final kernel lifetime survives live expiry, but not a source barrier or mutation',()=>{
+  const value=sample();value.workers[0].process.scope='FIXED_WORKER_PROCESS';value.workers[0].final_usage=structuredClone(finalUsage);
+  const view=new TelemetryView(scope);assert.ok(view.accept(value,0));
+  value.workers[0].final_usage.exit_code=0;
+  const stale=view.current(16000);assert.equal(stale.workers[0].process.status,'UNKNOWN');
+  assert.deepEqual(stale.workers[0].final_usage,finalUsage);
+  stale.workers[0].final_usage.exit_code=0;assert.equal(view.current(16001).workers[0].final_usage.exit_code,-9);
+  view.invalidateFixedWorkers(2);assert.equal(view.current(16002).workers[0].final_usage,null);
+  assert.equal(view.accept(value,16003),false);
+});
+test('final kernel fields are closed, fixed-scope only, and never zero-filled on absence',()=>{
+  for(const mutate of [v=>v.workers[0].process.scope='SUPERVISOR_PROCESS',
+    v=>v.workers[0].final_usage.cpu_user_us=-1,v=>v.workers[0].final_usage.peak_rss_bytes=NaN,
+    v=>v.workers[0].final_usage.exit_code=256,v=>v.workers[0].final_usage.pid=1,
+    v=>v.workers[0].final_usage.reaped_at='not-a-date',v=>v.workers[0].final_usage.scope='TREE']) {
+    const value=sample();value.workers[0].process.scope='FIXED_WORKER_PROCESS';value.workers[0].final_usage=structuredClone(finalUsage);
+    mutate(value);assert.throws(()=>checkTelemetry(value,scope));
+  }
+  const value=sample();value.workers[0].final_usage=null;
+  assert.equal(checkTelemetry(value,scope).workers[0].final_usage,null);
+});
+test('terminal withdrawal after live retirement has its own accepted identity',()=>{
+  const value=sample(8);value.workers[0].process.scope='FIXED_WORKER_PROCESS';value.workers[0].final_usage=structuredClone(finalUsage);
+  const view=new TelemetryView(scope);assert.ok(view.accept(value,0));
+  const expired=structuredClone(value);expired.sample_seq=10;expired.sample_id='sampler_test:10';expired.sample_age_seconds=16;
+  assert.ok(view.accept(expired,10));assert.deepEqual(view.current(10).workers[0].final_usage,finalUsage);
+  const withdrawal=structuredClone(expired);withdrawal.sample_seq=14;withdrawal.sample_id='sampler_test:14';withdrawal.workers[0].final_usage=null;
+  assert.ok(view.accept(withdrawal,20));assert.equal(view.current(20).workers[0].final_usage,null);
+  assert.equal(view.accept(expired,30),false);
+  const fresh=structuredClone(value);fresh.sample_seq=16;fresh.sample_id='sampler_test:16';
+  assert.ok(view.accept(fresh,40));assert.deepEqual(view.current(40).workers[0].final_usage,finalUsage);
 });

@@ -25,16 +25,36 @@ test('actual OS sample → existing SSE/Chrome → closed original owner UNKNOWN
     const updated=await control('sample');
     assert.deepEqual(updated.versions,before.versions);
     await page.waitForFunction(id=>document.querySelector('#resource-note').textContent.includes(id),updated.samples[0].sample_id);
+    const final=await control('run_final');
+    assert.equal(final.samples[0].workers[0].final_usage.exit_code,0);
+    assert.equal(final.samples[0].workers[0].process.status,'UNKNOWN');
+    assert.equal(final.versions[1],before.versions[1]);
+    await page.waitForFunction(()=>document.querySelector('#resource-workers').textContent.includes('终态累计 user'));
+    assert.match(await page.locator('#resource-workers').textContent(),/峰值RSS .*exit 0/);
+    // Real expiry retires live metrics but retains final; no domain event drives withdrawal.
+    await page.waitForFunction(()=>document.querySelector('#resource-memory').textContent==='UNKNOWN');
+    const expired=await control('inspect');assert.ok(expired.samples[0].sample_age_seconds>=15);
+    const invalid=await control('invalidate_capture');
+    assert.equal(invalid.samples[0].sample_seq,expired.samples[0].sample_seq+4);
+    assert.deepEqual(invalid.versions,expired.versions);
+    await page.waitForFunction(()=>!document.querySelector('#resource-workers').textContent.includes('终态累计 user'));
+    const restored=await control('restore_capture');assert.equal(restored.samples[0].workers[0].final_usage,null);
+    await control('restore_sample');
+    await page.waitForFunction(()=>document.querySelector('#resource-workers').textContent.includes('终态累计 user'));
     const closed=await control('close_owner');
     assert.ok(closed.versions[0]>before.versions[0]); // Explicit original shutdown writes STOP, unlike GET/sample.
     assert.equal(closed.versions[1],before.versions[1]);
     await page.waitForFunction(()=>document.querySelector('#resource-memory').textContent==='UNKNOWN');
+    assert.doesNotMatch(await page.locator('#resource-workers').textContent(),/终态累计 user/);
     assert.match(await page.locator('#resource-note').textContent(),new RegExp(closed.samples[0].sample_id));
-    assert.equal(closed.samples[1].host.memory.status,'KNOWN');
+    const refreshed=await control('sample_other');
+    assert.equal(refreshed.samples[1].host.memory.status,'KNOWN');
+    assert.deepEqual(refreshed.versions,closed.versions);
     const select=page.locator('#project-select');await select.selectOption(projects[1]);
     await page.waitForFunction(()=>document.querySelector('#resource-memory').textContent.includes('GiB'));
     await page.reload();await page.waitForFunction(()=>document.querySelector('#resource-note').textContent.includes('CORE_OS_SAMPLE'));
     assert.equal(await page.locator('#resource-memory').textContent(),'UNKNOWN');
+    await control('sample_other');
     await page.locator('#project-select').selectOption(projects[1]);
     await page.waitForFunction(()=>document.querySelector('#resource-memory').textContent.includes('GiB'));
     const after=await control('inspect');assert.deepEqual(after.versions,closed.versions);assert.deepEqual(writes,[]);assert.deepEqual(errors,[]);

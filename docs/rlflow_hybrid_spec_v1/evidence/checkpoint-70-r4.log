@@ -1,0 +1,11 @@
+.....actual_authenticated_final_kernel_usage shared_project_0 {'status': 'KNOWN', 'source': 'LINUX_WAIT4', 'scope': 'FIXED_PARTICIPANT_LIFETIME', 'exit_code': 0, 'cpu_user_us': 10014, 'cpu_system_us': 2002, 'peak_rss_bytes': 74571776, 'reaped_at': '2026-10-10T01:32:53.495Z'}
+actual_authenticated_final_kernel_usage shared_project_1 {'status': 'KNOWN', 'source': 'LINUX_WAIT4', 'scope': 'FIXED_PARTICIPANT_LIFETIME', 'exit_code': 0, 'cpu_user_us': 7081, 'cpu_system_us': 5310, 'peak_rss_bytes': 80207872, 'reaped_at': '2026-10-10T01:33:06.872Z'}
+.actual_hook_loss_HTTP_STOP {'reaped': True, 'all_FDs_closed': True, 'G': False, 'final_usage': 'UNKNOWN', 'other_store_unchanged': True}
+..
+=============================== warnings summary ===============================
+.venv/lib/python3.12/site-packages/starlette/testclient.py:37
+  /home/mint/rl_dev/rlflow_standalone/.venv/lib/python3.12/site-packages/starlette/testclient.py:37: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = typing.Callable[[], typing.ContextManager[anyio.abc.BlockingPortal]]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+8 passed, 1 warning in 87.85s (0:01:27)
