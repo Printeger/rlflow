@@ -1,5 +1,7 @@
 # 开发决策记录
 
+Checkpoint79 FINAL：原RUN receipt不再丢掉body/key，独立immutable witness仅在202接纳、命令/body SHA核验及所有crypto后票据/任务/人类权限末门通过后建立。结果ID沿原Unit→CPU phase或工程intent/output/acceptance精确派生，拒合法格式foreign事实；cleanup两状态互斥，合法取消携fact/UNKNOWN仍保留。恢复独立PendingCommand，200封闭DTO；丢返回清本次显示、人工同key核对、不自动dispatch，STOP不等待恢复。app.request的expectedStatus是窄选项，默认其他API不变。无原余额字段则预算未读取，拒历史FREE/退款推断，不扩读域。High两MUST与测试crypto门诊断见evidence/checkpoint-79-tests.txt；下一80可信原预算/Pool消费，不从历史能力重建控制权，下方为历史。
+
 Checkpoint78 FINAL：普通START重试继续只读旧接纳回执，显式reconcile才进入原Unit.resume。先验证完整原HANDOFF、相同原actor/key/body/初始版本，再签发原human操作，原写guard决定缺失CPU机器事实能否补齐；工程不得自动重写，冷/关闭对象不得采纳cap。来源准备和结果核验都放独立有界真实future池，取消HTTP等待者不返还容量；原STOP通道保持独立。来源ProtocolError只在source域转503，非法外部请求仍400。返回原状态及全源核验后的fact ID/hash/版本，不从JSON恢复执行。安装验证用显式fixture-only失败选项，不改原审批/UTC；CPU缺决策/工程丢返回真实验收。测试撤权注入死锁改为原guard检查测试时钟过期，错计共享Pool及UNKNOWN teardown按原协议修；示例200覆盖202最小拆变量，不放宽检查。所有失败与High MUST关闭见 evidence/checkpoint-78-tests.txt；下一79显式Dashboard消费，不改变普通START语义，下方为历史。
 
 Checkpoint77 FINAL：冷历史装配不借Core-only宿主放宽可写状态限制，也不构造inbox或历史Runtime能力。新明确只读SDK使用原Store.attach_existing和三个原结果读器，抽出既有report DTO转换供原inbox与新读宿主共用，原inbox前后授权不变。每项来源与Store root/db/identity/epoch及目录/DB身份纯绑定，PID/关闭门在Auth/继承锁之前，副本重绑定503；独立有界read池真实future占槽，取消等待者不退款容量，shield保留drain。request-only按原request认证方法解析，不改AuthStore。原正常STOP历史被新进程真实HTTP/console消费，coldhost SIGKILL后只读重开成功不称执行崩溃恢复；业务事实不变不等于SQLite侧文件零写。High最后可变Store MUST定向关闭，详 evidence/checkpoint-77-tests.txt；下一78按原身份/UNKNOWN/reconcile协议验证实际失败，禁止自动cap/PID接管，下方为历史。

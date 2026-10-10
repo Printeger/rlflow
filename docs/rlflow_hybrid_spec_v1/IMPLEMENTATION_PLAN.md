@@ -1,5 +1,7 @@
 # 实施计划与依赖
 
+Checkpoint79 FINAL：原显式恢复已接入Dashboard，交付同body/key人工恢复、机器事实与UNKNOWN如实显示、原STOP独立。实际CPU缺决策补写一次/工程原提交事实读回/丢恢复返回人工重试及迟到隔离已验收，真实未知启动保留预算曝露与占槽；当前UI没有预算余额字段，明确未读取。下一Checkpoint80依赖原可信预算账本与共享池，交付现有Dashboard只读展示原预留/consumed/unknown曝露及当前原池占用，验收原正常执行/STOP释放与UNKNOWN不释放的可观察区别、跨项目隔离/坏源不零/读取不阻STOP；不引入新调度/支付/模型/GPU/迁移。独立产品Review/Condition门/native/strictOS/provider invoice/B1/长期/T22T23/完整M0–M5保持active，无新增用户决定阻塞。79证据见HYBRID_UNIT_RECONCILIATION.md/evidence/checkpoint-79-tests.txt，下方为历史。
+
 Checkpoint78 FINAL：原HTTP显式恢复已实装验收：同actor/key/body/初始版本、可信HANDOFF/原结果，CPU缺机器决策单次补写、工程丢返回原事实读回、不重复执行/效果，原正常STOP闭环。未知启动保持预算曝露和Pool占槽，不能从child死亡或历史JSON恢复能力。证据见 HYBRID_UNIT_RECONCILIATION.md。下一Checkpoint79依赖此原接口，将显式恢复接入现有Dashboard；交付行为是同body/key人工核对原命令、机器阶段/UNKNOWN/未释放曝露如实展示、恢复读取阻塞时原STOP独立。验收包括真实原失败→UI恢复→原来源事实/版本一致→STOP，拒不同actor/key/已关闭来源，不让START重试自动派发；不是仅准备组件或测试数增加。原native/产品Reviewer/Condition门/strictOS/invoice/B1/长期/全T22T23/M0–M5仍待后续依赖闭合，权限不扩，无新增用户决定阻塞，下方为历史。
 
 Checkpoint77 FINAL：已交付安装态原结果冷读→相同console→真实只读宿主kill/reopen，新token/项目范围/无写入口/原业务事实不变均验收。它不完成执行崩溃恢复：下一Checkpoint78必须先核原UNKNOWN、提交身份、预算预留与reconcile协议，再用全新隔离安装态实际失败交付保留预留、无重复worker/结算、迟到旧权/结果拒绝的可观察闭环；恢复只使用原可信身份，不从JSON/PID构造cap。先确认依赖与已有原失败证据，选择必要差量验证，禁止再叠仅准备组件或重复正常执行。原native/独立产品Reviewer/strictOS/invoice/B1/长期与完整T22T23/M0–M5保持；无新权限决定阻塞，paid/GPU/生产预算边界未变。77交付与37分轮/实装证据见 HYBRID_COLD_RESULT_HOST.md，下方为历史。

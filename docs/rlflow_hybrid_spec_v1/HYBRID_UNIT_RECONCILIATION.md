@@ -36,6 +36,16 @@ python -m rlflow.isolated_finite_example --parent /existing/private/disposable-p
 
 该选项只向新 fixture 注入有界的机器阶段失败；每个完整原提案仍须单独输入其 `APPROVE sha256:...`。它不会更新现有项目、续期旧授权或迁移原状态。
 
-下一切片将原显式恢复接入现有 Dashboard 消费端：保留同 body/key，展示真实 UNKNOWN 和未释放曝露，STOP 保持独立。不得让普通 START 重试自动升级成恢复或新执行。
+## Dashboard 显式恢复（Checkpoint79）
+
+CPU 和工程面板收到严格 HTTP 202 的原 START 回执后，保留本会话原 body/key。只有当前原 human operator、相同项目/epoch/任务和仍可用的原 owner 才能点“显式核对或恢复原命令”。它使用原 command ID、原 body/key 和当前 CSRF；普通 START 重试仍不恢复机器阶段。
+
+面板通过原固定 ASCII 合同的 SHA256 验证 command ID、body 摘要及 CPU/工程事实 ID 派生链。恢复只接受 HTTP 200 的封闭 DTO，显示原结果、事实摘要和记录版本，保留 Goal 未完成、独立 Review 未执行的缺口。丢返回或矛盾来源会清除本次恢复结果并显示 UNKNOWN；只允许再次人工核对同一命令，不自动重试。项目、身份、epoch 或任务变化以及退出登录会清除本地原命令上下文，迟到的网络或加密结果不能补回 DOM。
+
+恢复读取等待时，原 STOP 按钮仍独立可用。当前原接口没有预算余额字段，面板明确显示“预算未读取”，不推导 FREE、退款或余额；结果 JSON 也不证明当前执行或当前资源状态。
+
+真实 Chrome 故障链及前端负例的分轮证据见 [Checkpoint79 验收索引](evidence/checkpoint-79-tests.txt)。浏览器装配使用隔离的原测试 fixture，不冒称安装态、真实 UTC 或通用生产恢复；Checkpoint78 的安装证据独立保留。
+
+下一切片将可信原预算账本和共享池占用接入只读消费，验收是 UNKNOWN 曝露与真实 STOP 后占用变化可观察、跨项目不混用、未观测不显示零；不把历史结果升级为当前资源证明或供应商实际费用。
 
 该切片不构成控制宿主崩溃后执行接管、原生模型任务恢复或完整 M0–M5 验收。原独立产品 Reviewer、严格 OS 限额、供应商费用来源、B1 和长期运行验收仍保持原缺口；不调用付费模型、GPU 或生产状态迁移。

@@ -148,13 +148,15 @@ function setConnection(value) {
 }
 function problem(message) { $('error-banner').textContent = message; $('error-banner').hidden = !message; }
 async function request(url, options = {}) {
+  const {expectedStatus,...fetchOptions}=options;
   const requestAuth=authGeneration,requestGeneration=generation;
-  const response = await fetch(url, {credentials:'same-origin', cache:'no-store', ...options});
+  const response = await fetch(url, {credentials:'same-origin', cache:'no-store', ...fetchOptions});
   if (!response.ok) {
     if(response.status===401 && requestAuth===authGeneration && requestGeneration===generation) {agentRequests.clear();finiteStops.clear();cpuUnits.clear();engineeringUnits.clear();goals.clear();fixtures.clear();cpuAssessments.clear();candidateOutputs.clear();session=null;$('login-panel').hidden=false;closeStream();}
     const error = new Error(response.status === 401 ? '登录已到期，请重新登录；最后快照保留。' : `读取失败 (${response.status})；最后快照保留。`);
     error.status = response.status; throw error;
   }
+  if(expectedStatus!==undefined && response.status!==expectedStatus){const error=new Error(`命令响应状态不一致 (${response.status})；结果 UNKNOWN。`);error.status=response.status;throw error;}
   return response.json();
 }
 function closeStream() { if (source) source.close(); source = null; caughtUp = false; stopPulses(); }

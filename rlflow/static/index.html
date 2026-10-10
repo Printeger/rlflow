@@ -140,6 +140,8 @@
         <p id="engineering-unit-note" role="status"></p><p id="engineering-unit-live" class="muted"></p><pre id="engineering-unit-detail"></pre>
         <div class="controls"><button id="engineering-unit-run" disabled>明确执行已批准修复一次</button><button id="engineering-unit-stop" disabled>紧急 STOP 本范围</button><button id="engineering-unit-run-retry" hidden>手动重试原 Run body/key</button><button id="engineering-unit-run-abandon" hidden>清除本地 Run 意图</button><button id="engineering-unit-stop-retry" hidden>手动继续原 STOP 清理</button><button id="engineering-unit-stop-abandon" hidden>清除本地 STOP 意图</button></div>
         <pre id="engineering-unit-run-receipt" aria-label="工程 Run 接收事实"></pre><pre id="engineering-unit-stop-receipt" aria-label="工程 STOP 意图接收事实，不是 FREE"></pre>
+        <button id="engineering-unit-reconcile" type="button" hidden disabled>显式核对或恢复原工程命令（不重新执行）</button>
+        <p id="engineering-unit-reconcile-note" role="status"></p><pre id="engineering-unit-reconcile-detail" aria-label="工程原命令恢复事实，不是当前执行或 FREE 证明"></pre>
       </section>
       <section class="panel" aria-labelledby="cpu-unit-title">
         <div class="panel-heading"><h2 id="cpu-unit-title">已批准 CPU 实验 · 一次执行 / 本范围 STOP</h2><button id="cpu-unit-refresh" type="button">读取原 Unit</button></div>
@@ -147,6 +149,8 @@
         <p id="cpu-unit-note" role="status"></p><p id="cpu-unit-live" class="muted"></p><pre id="cpu-unit-detail"></pre>
         <div class="controls"><button id="cpu-unit-run" disabled>明确执行已批准实验一次</button><button id="cpu-unit-stop" disabled>紧急 STOP 本范围</button><button id="cpu-unit-run-retry" hidden>手动重试原 Run body/key</button><button id="cpu-unit-run-abandon" hidden>清除本地 Run 意图</button><button id="cpu-unit-stop-retry" hidden>手动继续原 STOP 清理</button><button id="cpu-unit-stop-abandon" hidden>清除本地 STOP 意图</button></div>
         <pre id="cpu-unit-run-receipt" aria-label="Run 接收事实"></pre><pre id="cpu-unit-stop-receipt" aria-label="STOP 意图接收事实，不是 FREE"></pre>
+        <button id="cpu-unit-reconcile" type="button" hidden disabled>显式核对或恢复原实验命令（不重新执行）</button>
+        <p id="cpu-unit-reconcile-note" role="status"></p><pre id="cpu-unit-reconcile-detail" aria-label="实验原命令恢复事实，不是当前执行或 FREE 证明"></pre>
       </section>
       <section class="panel" aria-labelledby="candidate-output-title">
         <div class="panel-heading"><h2 id="candidate-output-title">工程候选 · 实际写后测试与原始证据</h2><div class="controls"><button id="candidate-output-refresh" type="button">读取工程产出</button><button id="candidate-output-next" type="button" disabled>下一产出页</button></div></div>

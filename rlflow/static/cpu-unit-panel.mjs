@@ -1,5 +1,6 @@
 import {PendingCommand} from './goal-view.mjs';
 import {checkFixtureDetail,checkFixtureReceipt} from './fixture-view.mjs';
+import {bindOriginalRun,checkUnitReconciliation} from './unit-reconciliation.mjs';
 const closed=(v,keys)=>v && typeof v==='object' && !Array.isArray(v) && Object.keys(v).sort().join()===keys.slice().sort().join();
 const meta=['schema_version','project_id','data_mode','store_epoch','as_of_state_version','execution_enabled'];
 const fail=()=>{throw new Error('CPU Unit 来源不一致；未启用动作');};
@@ -25,6 +26,7 @@ export class OriginalUnitPanel{
   constructor({context,request,schedule=(f,n)=>setTimeout(f,n),cancel=id=>clearTimeout(id)},profile){
     Object.assign(this,{context,request,schedule,cancel,serial:0,unitProfile:profile});this.$=id=>document.getElementById(profile.path+'-'+id);
     this.$('refresh').addEventListener('click',()=>this.load());
+    this.$('reconcile').addEventListener('click',()=>this.recover());
     for(const kind of ['run','stop']){
       this.$(kind).addEventListener('click',()=>this.command(kind));
       this.$(kind+'-retry').addEventListener('click',()=>this.send(kind));
@@ -32,23 +34,34 @@ export class OriginalUnitPanel{
     }
     this.clear();
   }
-  scope(){const c=this.context();return c?{project:c.project,mode:c.mode,epoch:c.epoch,identity:c.session.principal_id,authGeneration:c.authGeneration}:null;}
+  scope(){const c=this.context();return c?{project:c.project,mode:c.mode,epoch:c.epoch,identity:c.session.principal_id,authGeneration:c.authGeneration,sessionKind:c.session.kind,roles:c.session.roles.slice().sort().join(',')}:null;}
   ticket(){return {serial:this.serial,scope:this.scope()};}
   current(t){return t.serial===this.serial && JSON.stringify(t.scope)===JSON.stringify(this.scope());}
   base(){return `/api/v1/projects/${encodeURIComponent(this.scope().project)}/${this.unitProfile.path}`;}
   note(v){this.$('note').textContent=v;}
+  retireIntents(){
+    for(const kind of ['run','stop']){this[kind]?.invalidate();this[kind]=null;this.$(kind+'-receipt').textContent='';}
+    this.recovery?.invalidate();this.recovery=null;this.originalRun=null;
+    this.$('reconcile-detail').textContent='';this.$('reconcile-note').textContent='无本会话原命令上下文；不会自动恢复或执行。';
+  }
   clear(){
     ++this.serial;this.cancel(this.timer);this.timer=null;this.reading=false;this.profile=null;this.floor=0;this.boundScope=null;this.blocked=false;this.connectionState='UNKNOWN';
-    for(const kind of ['run','stop']){this[kind]?.invalidate();this[kind]=null;this.$(kind+'-receipt').textContent='';}
+    this.retireIntents();
     this.$('detail').textContent='';this.note('尚未读取；不会自动执行。');this.buttons();
   }
-  bind(){const s=JSON.stringify(this.scope());if(s!==this.boundScope){this.boundScope=s;this.floor=0;}const c=this.context();if(Number.isSafeInteger(c?.version))this.floor=Math.max(this.floor,c.version);}
+  bind(){const s=JSON.stringify(this.scope());if(s!==this.boundScope){if(this.boundScope!==null)this.retireIntents();this.boundScope=s;this.floor=0;}const c=this.context();if(Number.isSafeInteger(c?.version))this.floor=Math.max(this.floor,c.version);}
+  recoveryAllowed(w=this.originalRun){
+    const c=this.context();return !!(w && c?.session.kind==='human' && c.session.roles.includes('operator') &&
+      c.mode==='fixture' && !this.blocked && this.profile?.original_owner_available &&
+      JSON.stringify(w.scope)===JSON.stringify(this.scope()) && this.profile.task.id===w.receipt.task_id);
+  }
   buttons(){
     this.bind();const c=this.context(),operator=c?.session.kind==='human' && c.session.roles.includes('operator');
     const live=operator && c?.mode==='fixture' && this.profile?.original_owner_available;
     this.$('run').disabled=!(live && !this.blocked && !this.run && !this.stop && !this.reading && !this.profile.cancel_requested && this.profile.task.recorded_phase==='REGISTER_NO_HANDOFF' && this.profile.as_of_state_version>=this.floor);
     // Emergency STOP intentionally does not wait for a RUN/read or fresh CAS.
     this.$('stop').disabled=!(live && !this.stop);
+    this.$('reconcile').hidden=!this.originalRun;this.$('reconcile').disabled=!this.recoveryAllowed() || this.recovery?.status==='IN_FLIGHT';
     this.$('refresh').disabled=this.reading;
     for(const kind of ['run','stop']){
       const p=this[kind];this.$(kind+'-retry').hidden=p?.status!=='UNKNOWN';this.$(kind+'-abandon').hidden=p?.status!=='UNKNOWN';
@@ -63,7 +76,7 @@ export class OriginalUnitPanel{
     if(this.reading)return;if(!this.scope() || this.scope().mode!=='fixture'){this.clear();return;}
     this.cancel(this.timer);this.timer=null;if(!automatic)this.blocked=false;
     const t=this.ticket();this.reading=true;this.buttons();
-    try{const v=await this.request(this.base());if(!this.current(t))return;this.unitProfile.check(v,t.scope);if(this.profile && v.as_of_state_version<this.profile.as_of_state_version)fail();this.profile=v;this.floor=Math.max(this.floor,v.as_of_state_version);this.$('detail').textContent=JSON.stringify(v,null,2);this.note(`原事件验证 · ${v.last_sdk_status || '尚无机器验收'} · 独立 Review NOT_PERFORMED · Goal 未完成。`);}
+    try{const v=await this.request(this.base());if(!this.current(t))return;this.unitProfile.check(v,t.scope);if(this.profile && v.as_of_state_version<this.profile.as_of_state_version)fail();if(this.profile && this.profile.task.id!==v.task.id)this.retireIntents();this.profile=v;this.floor=Math.max(this.floor,v.as_of_state_version);this.$('detail').textContent=JSON.stringify(v,null,2);this.note(`原事件验证 · ${v.last_sdk_status || '尚无机器验收'} · 独立 Review NOT_PERFORMED · Goal 未完成。`);}
     catch(e){if(this.current(t)){this.blocked=true;this.note(e.status===404?this.unitProfile.notInstalled:`来源不可用 (${e.message})；保留 as-of，不推断当前运行。`);}}
     finally{if(this.current(t)){this.reading=false;this.buttons();this.queue();}}
   }
@@ -71,19 +84,45 @@ export class OriginalUnitPanel{
     this.buttons();if(this.$(kind).disabled)return;
     const body={action:kind==='run'?this.unitProfile.start:this.unitProfile.stop,task_id:this.profile.task.id};
     if(kind==='run')body.expected_state_version=this.profile.as_of_state_version;
-    this[kind]=new PendingCommand(this.scope(),body,this.unitProfile.path+'_web_'+crypto.randomUUID());this.send(kind);
+    this[kind]=new PendingCommand(this.scope(),body,this.unitProfile.path+'_web_'+crypto.randomUUID());return this.send(kind);
   }
   async send(kind){
     const p=this[kind],t=this.ticket();if(!p || !p.matches(t.scope))return;let intent;try{intent=p.begin(t.scope);}catch{return;}
     this.buttons();this.note(kind==='stop'?'提交本范围紧急 STOP；接收不等于 FREE。':this.unitProfile.runNote);
     try{
-      const v=await this.request(this.base()+'/commands',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':this.context().session.csrf_token,'Idempotency-Key':intent.key},body:intent.body});
+      const v=await this.request(this.base()+'/commands',{method:'POST',expectedStatus:202,headers:{'Content-Type':'application/json','X-CSRF-Token':this.context().session.csrf_token,'Idempotency-Key':intent.key},body:intent.body});
       if(!this.current(t) || this[kind]!==p)return;this.unitProfile.receipt(v,JSON.parse(intent.body),t.scope.identity);
+      if(kind==='run'){
+        const witness=await bindOriginalRun(t.scope,intent,v,this.unitProfile);
+        if(!this.current(t) || this[kind]!==p || this.profile?.task.id!==v.task_id ||
+            this.context()?.session.kind!=='human' || !this.context().session.roles.includes('operator'))return;
+        this.originalRun=witness;
+      }
       this.floor=Math.max(this.floor,v.accepted_state_version);
       this.$(kind+'-receipt').textContent=JSON.stringify(v,null,2);
       if(kind==='stop'){p.unknown();p.acceptedStop=true;}else{p.finish();this[kind]=null;}
       this.note('原意图 ACCEPTED；不是当前执行或资源 FREE 证明。');this.buttons();await this.load();
     }catch(e){if(!this.current(t) || this[kind]!==p)return;p.unknown();this.note('结果 UNKNOWN；仅手动重试原 body/key。Run 不重新派发，STOP 继续原 scope 清理。');this.buttons();}
+  }
+  async recover(){
+    this.buttons();const w=this.originalRun,t=this.ticket();if(!this.recoveryAllowed(w) || this.recovery?.status==='IN_FLIGHT')return;
+    const p=this.recovery || new PendingCommand(w.scope,JSON.parse(w.body),w.key,w.body);this.recovery=p;
+    let intent;try{intent=p.begin(t.scope);}catch{return;}
+    this.$('reconcile-detail').textContent='';this.$('reconcile-note').textContent='显式核对原命令；不重启 worker，不重写工程文件。';this.buttons();
+    try{
+      const v=await this.request(this.base()+'/commands/'+encodeURIComponent(w.receipt.command_id)+'/reconcile',
+        {method:'POST',expectedStatus:200,headers:{'Content-Type':'application/json','X-CSRF-Token':this.context().session.csrf_token,'Idempotency-Key':intent.key},body:intent.body});
+      if(!this.current(t) || this.originalRun!==w || this.recovery!==p)return;
+      if(!this.recoveryAllowed(w)){p.unknown();this.$('reconcile-note').textContent='权限或来源已变化，恢复结果 UNKNOWN；未启用后续动作。';this.buttons();return;}
+      checkUnitReconciliation(v,w,this.unitProfile);
+      this.floor=Math.max(this.floor,v.result_fact?.recorded_state_version ?? w.receipt.accepted_state_version);
+      this.$('reconcile-detail').textContent=JSON.stringify(v,null,2);
+      this.$('reconcile-note').textContent=`原命令状态 as-of ${v.result.status} · Goal 未完成 / 独立 Review NOT_PERFORMED；当前执行 UNKNOWN，资源 NOT_OBSERVED，预算未读取，未证明未知曝露退还。`;
+      p.finish();this.recovery=null;this.buttons();await this.load();
+    }catch(e){
+      if(!this.current(t) || this.originalRun!==w || this.recovery!==p)return;
+      p.unknown();this.$('reconcile-detail').textContent='';this.$('reconcile-note').textContent=`恢复结果 UNKNOWN (${e.message})；只允许手动核对原 body/key，不重新执行，不推断 FREE 或退款。`;this.buttons();
+    }
   }
 }
 

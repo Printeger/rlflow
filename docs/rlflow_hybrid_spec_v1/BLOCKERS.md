@@ -1,5 +1,7 @@
 # 阻塞与证据缺口
 
+Checkpoint79 FINAL：本切片无剩余MUST/需用户决定阻塞；UI显式原命令恢复与真实故障/STOP消费已通过。当前预算只显示未读取，未交付Dashboard可信原账本余额和共享池当前占用，下一80按原来源补实际只读可观察闭环，拒无源零和unknown退款。浏览器原tests fixture使用合成native/catalog/clock，不是实装/realUTC恢复，High代码审查不是独立产品Review；78安装证据仍独立，79未重跑不变全库/后端。native/Condition门/产品Review/strictOS/provider invoice/B1/24h8h/T22T23/完整M0–M5保持缺口。详evidence/checkpoint-79-tests.txt；权限和USERlock不变，下方为历史。
+
 Checkpoint78 FINAL：本切片无未解决MUST或新增需用户决定阻塞。已安装原同进程保留能力的机器阶段失败恢复和可靠正常STOP已通过；真实Popen成功却丢返回的定向用例保留UNKNOWN预算/占槽，不允许cap/PID接管或虚假FREE。后者是原fixture测试，非安装宿主/活动worker崩溃后的自动恢复验收，不能计A22全覆盖。六新增case分轮与四受影响旧回归通过，所有注入/计数/示例失败保留；独立产品Review和Condition门、通用native产品执行、strictOS/provider invoice/B1/24h8h/T22T23/M0–M5仍未闭合。下一79交付Dashboard显式原key/body恢复及UNKNOWN曝露、独立STOP消费；不能把代码High审查当产品Review。当前无需新增paid/GPU/系统/生产权限；确需时给具体方案再问。详 evidence/checkpoint-78-tests.txt，USERlock原hash未变未stage，下方为历史。
 
 Checkpoint77 FINAL：冷结果宿主范围无剩余MUST、无新增需用户决定阻塞。已证明安装态原正常STOP历史在全新只读宿主及其强制结束后重开可读，未证明执行控制进程/活动worker崩溃、UNKNOWN预算恢复或原reconcile完整闭环，不能将本轮计为A22完成。历史machine verified不代替独立产品Review/条件门，执行UNKNOWN、资源NOT_OBSERVED、费用UNKNOWN不改变。单一新target与既有固定依赖，不宣称任意混装或完整安装资格。原native产品运行、Reviewer、严格OS/账单/B1/24h8h/T22T23/M0–M5缺口保持；下一78有界隔离诊断原失败/恢复协议、保留预留并拒重复执行。需新增付费/系统权限时提出具体问题，不从本轮只读权限推导扩权。37case分轮及实装终态见 evidence/checkpoint-77-tests.txt，USERlock未改未stage，下方为历史。

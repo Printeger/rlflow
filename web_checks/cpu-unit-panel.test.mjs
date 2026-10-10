@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {webcrypto} from 'node:crypto';
+import {webcrypto,createHash} from 'node:crypto';
 import {CpuUnitPanel,checkCpuUnit,checkCpuUnitReceipt} from '../rlflow/static/cpu-unit-panel.mjs';
 globalThis.crypto=webcrypto;
 const meta={schema_version:'1.1',project_id:'p',data_mode:'fixture',store_epoch:'e',as_of_state_version:4,execution_enabled:false};
@@ -9,7 +9,8 @@ const profile={...meta,task,control_api_installed:true,original_owner_available:
 class Element{constructor(){this.textContent='';this.disabled=false;this.hidden=false;}addEventListener(){}}
 const tick=()=>new Promise(r=>setImmediate(r));
 function setup(request){const nodes=new Map();globalThis.document={getElementById:id=>{if(!nodes.has(id))nodes.set(id,new Element());return nodes.get(id);}};let context={project:'p',mode:'fixture',epoch:'e',version:4,authGeneration:1,session:{principal_id:'human',kind:'human',roles:['operator'],csrf_token:'csrf'}};const jobs=new Map();let next=0;const panel=new CpuUnitPanel({context:()=>context,request,schedule:f=>{jobs.set(++next,f);return next;},cancel:id=>jobs.delete(id)});return {panel,jobs,setContext:v=>context=v,context:()=>context};}
-const receipt=body=>({schema_version:'1.1',command_id:'fixture_command_a',action:body.action,status:'ACCEPTED',accepted_state_version:body.action==='START_FIXED_CPU'?body.expected_state_version+1:17,request_hash:'sha256:'+'a'.repeat(64),actor_id:'human',task_id:body.task_id,recorded_phase:body.action==='START_FIXED_CPU'?'HANDOFF_UNKNOWN':'STOP_INTENT_ACCEPTED',execution_status:'UNKNOWN',native_execution_enabled:false,arbitrary_tree_stop:false,duplicate:false});
+const sha=raw=>createHash('sha256').update(raw).digest('hex');
+const receipt=(body,key='node')=>({schema_version:'1.1',command_id:'fixture_command_'+sha(JSON.stringify(['p','fixture','e','human',key])),action:body.action,status:'ACCEPTED',accepted_state_version:body.action==='START_FIXED_CPU'?body.expected_state_version+1:17,request_hash:'sha256:'+sha(JSON.stringify(Object.fromEntries(Object.keys(body).sort().map(k=>[k,body[k]])))),actor_id:'human',task_id:body.task_id,recorded_phase:body.action==='START_FIXED_CPU'?'HANDOFF_UNKNOWN':'STOP_INTENT_ACCEPTED',execution_status:'UNKNOWN',native_execution_enabled:false,arbitrary_tree_stop:false,duplicate:false});
 test('closed CPU source refuses false current/FREE/Review and wrong identity',()=>{
   const s={project:'p',mode:'fixture',epoch:'e'};assert.equal(checkCpuUnit(profile,s),profile);
   for(const v of [{goal_completed:true},{store_epoch:'other'},{independent_review_status:'PASSED'},{last_sdk_status:'RUNNING'},{task:{...task,resource_release_status:'FREE'}},{private_token:'secret'}])assert.throws(()=>checkCpuUnit({...profile,...v},s));
@@ -25,7 +26,7 @@ test('held RUN does not block emergency STOP; separate immutable intents and lat
   assert.equal(s.panel.$('run-receipt').textContent,'');assert.equal(s.panel.$('stop-receipt').textContent,'');assert.equal(calls.length,3);
 });
 test('UNKNOWN Run and accepted STOP are manual original body/key only; refresh never dispatches',async()=>{
-  const calls=[];let lose=true;const s=setup(async(url,options)=>{calls.push({url,options});if(!options)return profile;if(lose)throw new TypeError('Failed to fetch');return receipt(JSON.parse(options.body));});
+  const calls=[];let lose=true;const s=setup(async(url,options)=>{calls.push({url,options});if(!options)return profile;if(lose)throw new TypeError('Failed to fetch');return receipt(JSON.parse(options.body),options.headers['Idempotency-Key']);});
   await s.panel.load();s.panel.command('run');await tick();assert.equal(s.panel.run.status,'UNKNOWN');assert.equal(s.panel.$('stop').disabled,false);
   lose=false;await s.panel.send('run');s.panel.command('stop');await tick();assert.equal(s.panel.stop.status,'UNKNOWN');assert.equal(s.panel.stop.acceptedStop,true);await s.panel.send('stop');
   const writes=calls.filter(c=>c.options);assert.equal(writes.length,4);for(const [a,b] of [[writes[0],writes[1]],[writes[2],writes[3]]]){assert.equal(a.options.body,b.options.body);assert.equal(a.options.headers['Idempotency-Key'],b.options.headers['Idempotency-Key']);}
@@ -41,8 +42,13 @@ test('viewer or closed original never enables commands',async()=>{
   for(const mode of ['viewer','closed']){const s=setup(async()=>({...profile,original_owner_available:mode!=='closed'}));if(mode==='viewer')s.setContext({...s.context(),session:{...s.context().session,roles:['viewer']}});await s.panel.load();assert.equal(s.panel.$('run').disabled,true);assert.equal(s.panel.$('stop').disabled,true);s.panel.clear();}
 });
 test('accepted Run raises floor before older held GET settles while SSE offline',async()=>{
-  let resolveRead;const s=setup((url,options)=>options?Promise.resolve(receipt(JSON.parse(options.body))):new Promise(r=>resolveRead=r));
-  s.panel.profile=profile;s.panel.command('run');const wait=s.panel.load();await tick();
+  let resolveRead;const s=setup((url,options)=>options?Promise.resolve(receipt(JSON.parse(options.body),options.headers['Idempotency-Key'])):new Promise(r=>resolveRead=r));
+  s.panel.profile=profile;
+  // Original acceptance now additionally proves the command ID/body digest.
+  // Await that actual crypto operation, not an arbitrary one-loop delay.
+  const {PendingCommand}=await import('../rlflow/static/goal-view.mjs');
+  s.panel.run=new PendingCommand(s.panel.scope(),{action:'START_FIXED_CPU',task_id:task.id,expected_state_version:4},'node_run');
+  const sending=s.panel.send('run'),wait=s.panel.load();await sending;
   assert.equal(s.panel.run,null);assert.equal(s.panel.floor,5);resolveRead(profile);await wait;
   assert.equal(s.panel.$('run').disabled,true);assert.equal(s.panel.$('stop').disabled,false);assert.equal(s.jobs.size,0);s.panel.clear();
 });

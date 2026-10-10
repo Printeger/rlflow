@@ -1,0 +1,145 @@
+Checkpoint79 FINAL Dashboard explicit original-unit reconciliation
+2026-10-10; base c75d68e00314233a4c1b8d57c6618f4418c6ee59.
+Reconstructed index of actual tool outputs, NOT one combined raw test run.
+Original full M0-M5 Goal ACTIVE, scope/acceptance/permissions unchanged.
+
+DELIVERED BEHAVIOR
+CPU and engineering panels retain immutable original START context only after
+strict HTTP202, original actor/task/body/command digest validation, fixed original
+Unit fact-ID derivation, and final scope/pending/task/human-operator fences.
+Explicit recovery uses original command/body/key/initial version and current CSRF,
+requires original owner, accepts only HTTP200 and closed typed original DTO.
+No automatic recovery/re-dispatch/new CAS. A failed recovery clears this attempt's
+result, keeps manual same-key intent, displays UNKNOWN, never FREE or refund.
+All original context/private result is retired on project/Auth/epoch/task change
+or logout. STOP is an independent original command path during held recovery.
+Original response has no budget balances: UI says budget NOT READ, not zero;
+actual unknown_exposure preservation is separately proved by original fixture DB.
+
+NODE TESTS / ALL TERMINAL
+R1 node --test web_checks/cpu-unit-panel.test.mjs web_checks/engineering-unit-panel.test.mjs
+44485c exit1: 7pass/1fail,73.604ms. Old synthetic acceptedRun floor fixture used
+fixture_command_a/sha-a instead of actual digest, so new binding correctly rejected.
+Only fixture receipt generation updated to original SHA and original key; accepted
+floor case now awaits actual crypto completion rather than arbitrary setImmediate.
+2cc611 exit0: same original8case passed,76.406527ms.
+
+R2 node --test web_checks/unit-reconciliation.test.mjs
+f4f56e exit0:6pass80.686931ms, actual WebCrypto binding, closed typed response,
+same-body/key lost reply retries, STOP independence, viewer/closed method nonsend,
+late project/Auth/task HTTP replies and actual held crypto fences.
+
+R3 node --test web_checks/finite-stop-panel.test.mjs web_checks/goal-panel.test.mjs web_checks/fixture-panel.test.mjs
+a5bb76 exit0:29pass132.749931ms. Necessary old consumers of app.request default
+behavior and original STOP/auth/manual intents. Not a full browser/auth integration
+run and not a new full Python suite.
+
+R4 after independent High two DTO MUST fixes:
+node --test web_checks/unit-reconciliation.test.mjs web_checks/cpu-unit-panel.test.mjs web_checks/engineering-unit-panel.test.mjs
+e1decd exit1:13pass/0assertionfail/1cancelled84.606978ms. New fixed-ID crypto phases
+were all held by the test's old first-two-digest hook; later promises had no release.
+Root cause localized to test gate, not product bypass. Restore actual native crypto
+before releasing initial held digest results; subsequent real derivations execute
+and the same final Auth/task fence is still tested. No prod relaxation.
+node --test web_checks/unit-reconciliation.test.mjs
+d5a749 exit0:6pass79.084858ms. Added valid-format foreign fact/source/acceptance
+negatives and contradictory cleanup negatives; legitimate canceled facts with
+UNKNOWN cleanup remain accepted. Old8case already passed final source in e1decd.
+43 DISTINCT Node cases, split evidence, NOT one claimed 43-pass invocation.
+
+ACTUAL CHROME ORIGINAL FIXTURE / ALL TERMINAL
+R5 node --test web_checks/unit-reconciliation-browser.test.mjs
+Original session17717 -> original443b49 first success -> terminal6d91b3 exit0.
+2pass/0fail/0skip,85154.980331ms (first62745.061376ms, second22211.107819ms).
+Private fixture roots retained:
+ /tmp/rlflow-reconcile-browser-btSWvW : machine-failures
+ /tmp/rlflow-reconcile-browser-Rrudg8 : unknown-start
+Both real server processes/browser consumers exited in original finally.
+CPU first real202 reply deliberately delivered as200: no recovery witness. Manual
+START retry originalbody/key returned202 without resume/new Core event. Explicit
+recovery real200 then dropped reply; manual same-key retry returned same fact.
+CPU missing machine decision +1 event, repeat +0, other project version unchanged;
+Eng accept_machine actually COMMIT then injected lost return, recovery +0 events.
+Launches2,writes1,G2,collect2; all recovery deltas0; original normal STOP Pool0.
+Held Eng preparation used private bounded gate, original STOP accepted independently,
+project switch retired context before late recovery; no DOM refill/pageerror.
+Closed original owner profile remains readable; witness had already been retired
+on project switch (not proof of retained-witness closed-owner method rejection,
+which is proved by Node R2/R4). Logout private DOM cleared.
+Unknown-start really Popen'd original CPU child then lost its return before producer
+registration. Recovery UNKNOWN_RESULT_UNAVAILABLE/nullfact/Goalfalse; unchanged
+Core version/original budget/other-project version, no G/collect/new launch.
+Whole original STOP released other Eng claim but retained CPU claim. Final Pool1,
+launch1, budget {available:2,consumed:0,limit:3,overrun:0,reserved:1,unknown_exposure:1}.
+UI said budget unread/refund unproved. Lab child wait/reap and original
+shutdown_safety in finally do NOT adopt capability, refund or free UNKNOWN.
+
+R6 necessary affected browser only after new exact fact-ID/cleanup validation:
+node --test --test-name-pattern='actual missing decision' web_checks/unit-reconciliation-browser.test.mjs
+Original session68556 -> terminal9ad075 exit0,1pass/1name-filter skip,
+64973.705276ms; actual test64771.798585ms. UNKNOWN case was not repeated.
+Private retained root /tmp/rlflow-reconcile-browser-HXLNS4.
+Final real CPU/Eng statuses and counters match original R5 behavior, all four
+resume operations have launch/write/G/collect deltas0 and new_events [1,0,0,0].
+CPU original machine fact:
+ id/source cpu_assessment_8358f1f67031a1e8cc5426908c6ffdae62419b75e2fb23a09cc8865c3ecaee34
+ sha256:1f9ea3b4341ff05f1dc9dc672578fade8cbea1418bddb89b7a0e8d3cc92833bc
+ recorded_state_version20; same fact on lost reply retry.
+Eng original accepted fact:
+ id candidate_output_acceptance_9c77b9f42546a2f24933410eecbfc9b436ec275341ed8e02b2ae5f5151a1522f
+ source candidate_output_result_60c31081db24faebfff1dac19c28a24a4c6bc6ad7fd5c17ef53f008aca44b912
+ sha256:0f1e2dd7bc8e3bffd244ca2c985dfda31f68f53677d02decc5037ae94dd2ddbf
+ recorded_state_version21; Goalfalse/NOT_PERFORMED and +0 event readback.
+
+INDEPENDENT REVIEW
+Authorized existing High finite_app_review_63, read-only/no tests/no edits, design
+and final delta. Two concrete MUST: contradictory cleanup state/error relation;
+shape-valid engineering acceptance/source without exact original derived binding.
+Fix binds full CPU phase + engineering intent/output/acceptance ID chain into frozen
+witness; validator chooses original status-specific expected IDs. Only canceled
+scope/error=null and unknown cleanup/error=nonempty enforced; canceled-with-fact
+cleanup UNKNOWN remains valid. Both MUST statically closed; final affected real
+browser R6 passed. Code review is NOT original independent product Review.
+
+BOUNDARIES / REUSE
+Chrome uses existing original tests native/catalog/clock fixture, real fixed workers
+but not an installed/realUTC/production host. Held STOP scenario is original scope
+after normal worker completion, not active-worker pre-G STOP competition.
+Original Checkpoint78 installed machine failure/console/physical STOP and original
+backend authority/recovery guards remain unchanged and are reused, not rerun.
+No new full Python suite, installed execution, B1/soak/strictOS/provider invoice,
+native-model/product Reviewer/ConditionEvidence/fullA22/T22T23/M0-M5 claims.
+No paid model/GPU/global dependency installs/push/production migration.
+No duplicate live tests or original-handle restart. No identical repeated failure:
+each failing fixture/gate localized, changed before rerun; failed evidence retained.
+
+FINAL CHECKS
+383 final runtime/test/build/web input hashes in checkpoint-79-inputs.sha256;
+quiet check7ba026 exit0, compileall rlflow + fixture exit0, pip check no broken
+requirements. USER untracked package-lock.json remains unstaged and unchanged:
+becc7e2a36dfcad4ffe934b5ff2f0f68187611d6c0641bd63d81367651cfbf09.
+Packaging differential verification (no repeated worker execution): existing
+setuptools.build_meta used because optional python-build is not installed; no new
+dependency/global install. An initial candidate sdist was built before High fixes;
+it is retained but not used for qualification. Final fresh artifacts follow.
+Final sdist e045d1 exit0; tar extraction ceb83b exit0; wheel8a50ea exit0 built from
+that exact extracted sdist; --no-deps --no-compile isolated target install82f0fd exit0.
+ca6277 exit0 checked ALL338 original wheel payload files, including new module,
+byte-equal to checkout and actual installed target; no tests/imports/execution run.
+ sd /tmp/rlflow-cp79-package-1hXZJ9/final-sdist/rlflow_standalone-0.2.0.tar.gz
+ SHA f01bcb5089b718c74502d8693277d2ab90cd1269fb9d522dcfbe8eda00aa329a
+ wh /tmp/rlflow-cp79-package-1hXZJ9/final-wheel/rlflow_standalone-0.2.0-py3-none-any.whl
+ SHA c4b60baf211fd529871a8f65b2823bbda9b436f07bb0a94fe09099e33beaf95c
+ target /tmp/rlflow-cp79-package-1hXZJ9/site
+This proves packaging of final assets, not a new installed execution qualification.
+Final cb1519 quiet383-input check/diff check exit0; input inventory SHA
+287db4f78222ddb07cb52dbcff01ba5fad5e4a84314fef8984fb135be7f9ebce.
+327d0b read-only exact process-pattern check exit1/no matches: no original browser
+test/server/CPU worker remains live. No process kill or test restart was needed.
+
+NEXT DELIVERY / REMAINING GAPS
+Checkpoint80: trusted original ledger balances and original shared-pool occupancy
+consumed read-only in Dashboard, actual normal STOP release vs UNKNOWN retention,
+project/identity/version provenance and bad/unobserved source != numeric zero;
+read isolation must not block original STOP. Current79 budget is explicitly unread.
+No new user decision blocker. Full original Goal remains ACTIVE, no scope reduction.
