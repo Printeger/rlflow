@@ -179,15 +179,25 @@ def main(argv=None):
                  'reservation_id':reservation_key(session['reserve'])}
         # Emit recovery selector before G, including failures after handoff.
         print(json.dumps({'historical_recovery':locator,'cold_execution_replay':False}),flush=True)
-        result=runtime.run_local_cpu(lease)
+        result=None
+        execution_failed=False
+        try:result=runtime.run_local_cpu(lease)
+        except Exception:
+            # run_local_cpu's finally already attempted the original STOP.
+            # A failed task is not a machine FAIL verdict or a new retry.
+            # Context cleanup below must still succeed before final reporting;
+            # if it cannot, only the earlier recovery selector was published.
+            execution_failed=True
         from .hybrid_local_cpu_reads import LocalCpuTaskReader
         reader=LocalCpuTaskReader(runtime.store,project_id='isolated_local_cpu',store_epoch=locator['store_epoch'])
         report={'historical_recovery':locator,'result':result,
                 'history':reader.task(locator['reservation_id'],timeline=True),
                 'pool_after':runtime.pool.snapshot(),'model_calls':0,'gpu_calls':0,
-                'autonomous_goal_complete':False}
+                'autonomous_goal_complete':False,
+                'execution_outcome':'FAILED_NO_RESULT' if execution_failed else 'RESULT_ARCHIVED'}
     # Success is printed only after original context cleanup succeeds.
     print(json.dumps(report,sort_keys=True),flush=True)
+    if execution_failed:return 3
     return {'PASS':0,'FAIL':1,'NOT_CONFIGURED':2}[result['machine_acceptance']['status']]
 
 

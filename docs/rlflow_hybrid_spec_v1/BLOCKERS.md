@@ -1,5 +1,7 @@
 # 阻塞与证据缺口
 
+88 actual长时失败已证明原60s期限后全managedSTOP/SETTLED/PoolFREE/cold：wall69/start1，1pass81.80s；CLI负执行报告与context失败门实装，4stub合同回归通过，独立无新MUST。当前明确未解决实际失败任务输出与退出原因的持久归档，下一本地可补，不用再跑相同65s任务。真实模型/GPU集中合同仍未批准；strictquota/完整异常恢复/24h8h与instinctRL准入仍缺，无新增本地需用户决定事项。
+
 87 已闭合可配置实验原结果/计额到认证Dashboard的只读消费及独立有限读取容量。最终定向3pass38.73s、原未受影响8pass保留，真实Chrome与API、前端负例通过；独立增量容量MUST关闭。新应用完整安装/全库/长跑资格未由本片证明。模型Engineer/独立产品Reviewer条件接续仍待集中资源合同明确答复；strict diskquota、预算长时效、完整异常STOP/恢复及24h8h未完成，instinctRL只读HOLD。没有需要重复索权才能推进普通本地实现的新阻塞。固定统计任务机器PASS不算自主闭环。
 
 86 关闭数值实验验收与原计额cold消费缺口：JSON_METRICS_RANGE完整批准阈值→实际研究指标→原机器PASS/FAIL→G保守计experiment1/STOP/FREE→历史原Budget消费差量与cold重算。37907/fec1c4 21pass47.85s，必要原EXACT回归44715/1d8dbd 2pass43.33s。安装CLI统计任务15424/e92542 exit0/机器PASS/start1/wall4/Pool0，公开cold74085/602a2e exit0同原history；High无MUST，源码同wheel/compile/pipcheck/diff通过，无live。不是独立科研Review/科学结论/自主闭环，证据checkpoint-86-metrics/。

@@ -1,5 +1,9 @@
 # Hybrid v1 开发进度
 
+Checkpoint88 收尾：87提交5b01600。公开配置Runner异常不再只有traceback：原run不重试，resultNone/FAILED_NO_RESULT/exit3；只在原历史验证与context收尾成功后输出最终报告，不把异常升级机器FAIL/FREE/Review，原0/1/2不变。实测单次批准配置研究任务printmetric→实际65s等待→非零退出，过原60s Controller/workspace/Pool期后原安全STOP仍完整；实际wall69/start1/fullmanagedSTOP/SETTLED/Pool0，退出后cold同原history。55052终fb8bd6 exit0/1pass81.80s；报告合同stub4pass0.19s不算实际执行，High窄审无新增MUST，compile/diff/USERlockSHA检查通过，无live/新active unit，证据checkpoint-88-negative-runner/。不是科研结论/模型闭环/24h8h/全库或安装资格，进入归档提交。
+
+下一补非零退出与超时任务的原输出/退出原因持久诊断，保留机器UNKNOWN或失败而非将合格metric误判PASS；当前成功-only collector明确丢失败日志，是真实实验Runner缺口。真实模型链集中合同仍未批准不调用，instinctRL只读HOLD/strictquota/完整崩溃恢复/长跑准入未满足，原Goal ACTIVE。
+
 Checkpoint87 收尾：86提交9f1fd989。认证Dashboard现可消费原批准可配置CPU实验的实际输出/验收阈值/机器结论/原历史计额，私有managed证明不公开，exact启动reader门、末Auth/源版本/闭query不放宽；固定按钮按kind隔离，本地无控制。实际API初1pass16.26s/真实Chrome1pass24.13s（原median4→starts1→STOP/FREE→SSE与Reader一致→logout，无固定POST）、旧Node16pass、新实际DTO负例1pass。High新容量MUST已修独立ControlPool(2)，取消waiter不释放真实worker槽位、读取+版本核验同job、lifespan真实drain，不占STOP。必要旧读取回归首8pass/1fail/1setup error81.92s：漏fixture导入与重复使用已关闭app，终态后修接线；仅受影响最终3pass38.73s，真实held读满额/取消保槽/第三429/独立STOP-FREE/关闭等待及实际研究API均过，8项不重复。证据checkpoint-87-public-dashboard/，接口见HYBRID_LOCAL_CPU_DASHBOARD.md。Chrome为容量修复前同未改UI版本，非最终全库或安装资格；82全量4fail/2532pass/32skip不重标。87进入提交，原USERlock不改不stage。
 
 下一按用户优先推进真实Engineer/Reviewer链可用资格，先核现有原生模型/usage/Review能力与未批准集中合同之间的实际门；并补可配置实验的完整预算期限与长期恢复，不增加固定演示。真实模型/GPU合同仍未答，不调用；strict quota/完整异常STOP/24h8h/instinctRL实机准入仍缺。instinctRL只读HOLD，原Goal ACTIVE，无新增本地需用户决定阻塞。

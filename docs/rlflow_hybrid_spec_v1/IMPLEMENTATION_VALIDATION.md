@@ -1,5 +1,7 @@
 # 系统实施验收记录
 
+Checkpoint88：新actual配置负任务原执行65s后非零退出，初始授权60s不延长；原全managedSTOP/SETTLED/Pool0、wall69/start1、退出后原cold相等，55052终fb8bd6 1pass81.80s。CLIFAILED_NO_RESULT/exit3报告须history/context门；原0/1/2及context失败无最终报告由4stub回归0.19s验证，不称stub执行资格。High窄审无新MUST，compile/diff/原USERlock检查通过，无live/新activeunit。证据checkpoint-88-negative-runner/及HYBRID_LOCAL_CPU_NEGATIVE_RUN.md，非失败科研证据完整（日志未归档）/自治模型/安装全库或长跑验收。
+
 Checkpoint87 本切片证据见HYBRID_LOCAL_CPU_DASHBOARD.md及evidence/checkpoint-87-public-dashboard/。真实批准配置统计任务→原Budget→fullmanagedSTOP/FREE→认证API/SSE/Chrome原DTO一致→logout通过；隐私只剥离私有managed身份，不过滤用户任务输出。独立读池MUST修后新容量/旧撤权/真实研究API定向3pass38.73s；首轮8pass/1fail/1setup error81.92s原终态保留，失败根因漏fixture与已关闭app复用，未重复8已过项。浏览器1pass24.13s和API初1pass16.26s是容量修复前证据，UI未改/不重复；旧Node16pass与新实际DTO负例1pass。增量High静态无剩余确证MUST，非产品独立Reviewer。模型GPU0、不迁移生产/instinctRL；不虚称全库全绿、自治科研完成、新安装或长跑准入。
 
 Checkpoint82 FINAL：受限非生成 native 诊断/原scope可靠STOP/原账本退出后冷读本切片通过，独立High最终窄差量无新增已确认阻塞MUST，所有原测试/安装态进程已真实终止，证据已归档；提交以本记录所属Git checkpoint为准。必要回归77pass及测试误注入修复后单独1pass，非一次78pass；原全量4fail/2532pass/32skip与旧工程3s门压力精确分支缺口保持可见，不能称全库全绿或性能资格。此诊断自身20s门，不冒称模型Engineer、产品Reviewer、真人审批或自治闭环。最终包346payload逐字节相等、安装态native PID1602257 STOP/FREE/冷读实测通过；release392 SHA e44f7f68797315581b70ba8e595cdde2105533ab79ae811c096ddb070fe51d9e。下一按用户最新优先真实非预设Engineer→独立Reviewer→条件证据→自主接续与可配置Runner/预算/完整受管STOP/长期恢复；只读instinctRL接入研究，资源额度集中一次具体合同，达实机长跑准入才交另窗Goal prompt与资格包。未新增模型/GPU/生产权限，USERlock未改未stage，Goal ACTIVE/完整M0–M5未完成。下方正在归档/LIVE/WIP均历史。

@@ -1,5 +1,7 @@
 # 开发决策记录
 
+88 不为最长300s配置放宽既有60s新效应授权：G末门期限保留，原安全cleanup可在期限后执行，实际69s失败验证成立。CLI负执行结果区分FAILED_NO_RESULT/exit3与原机器0/1/2，最终report须原history+context退出成功；history/pool_after明确context前as-of，不升级晚期状态。非零退出stdout/stderr尚不归档，不能借打印合格metric伪PASS；下片按原task reaped/terminal证据保留有限失败诊断，不重新执行。
+
 87 公开实验原历史：新exact LocalCpuPublicTaskReader先走私有原whole-event验证，再仅投影outputs/approved_acceptance/machine_acceptance及原计额；managed proof不公开，HTTP无路径/控制/冷能力重建。固定动作必须匹配旧PROTOCOL_CONFORMANCE kind。本地输出不是Review或ConditionEvidence。独立审查确认默认executor无界MUST，最小修用独立ControlPool(2)，两个读步骤一个真实job、waiter取消仍占槽、lifespan真实drain，STOP池不共享；旧应用关闭后不重新打开其池。必要回归失败为测试接线，保留初失败，仅复验受影响项，不重复未变UI或全库。
 
 86 科研机器验收：批准spec可使用有限、ordered、inclusive JSON_METRICS_RANGE，原输出平坦metric集合必须恰等批准集合，bool/非有限/重复/额外字段等FAIL而非当科学有效性。原EXACT与None语义不变，历史validator与runtime用同evaluate_acceptance重算、重核完整原spec/hash/审批源，不能改阈值洗白归档。cold historical recorded_settled_usage仅来自同原终态事件derived项目consumed-prior consumed差量，非STOPPEDNone，不代表当前liveness/cost；实验开始计原research G-attempt1，失败验收也不退款/cached重跑不重复记。真实OLS PASS/FAIL与独立安装统计任务已验证，独立High无MUST；科学结论、产品Review/ConditionEvidence仍未证明。

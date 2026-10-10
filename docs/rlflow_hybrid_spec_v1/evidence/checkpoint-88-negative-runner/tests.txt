@@ -1,0 +1,21 @@
+Actual configured local CPU CLI failure after original TTL
+env PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q tests/test_hybrid_local_cpu_cli_failure.py
+Original session 55052, terminal fb8bd6, exit 0:
+1 passed in 81.80s (0:01:21)
+Task read approved measurements, printed a metric, waited 65 seconds, then
+exited nonzero. Original configured limit 90s, reserve100 wall/starts1.
+This is actual deadline/negative execution qualification, not a scientific
+result, independent Review, model invocation, autonomous research or long soak.
+
+CLI contract-only regression (stubs, NOT actual execution qualification)
+env PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q tests/test_hybrid_local_cpu_cli_reporting.py
+Terminal 9f0ea4, exit 0: 4 passed in 0.19s.
+Original PASS/FAIL/NOT_CONFIGURED exit 0/1/2 preserved; final JSON emitted only
+after context closes. Cleanup error propagates with no final result report;
+run called once, recovery selector preserved. No unchanged prior tests rerun.
+
+Independent incremental read-only review: /root/finite_app_review_63,
+no new confirmed MUST, no tests/writes. Original STOP and context cleanup
+remain required; final actual qualification completed by root after review.
+Report.json is a newline-normalized JSON copy, not a byte seal. All sessions
+terminal; no model/GPU or protected instinctRL/production writes.
