@@ -404,10 +404,17 @@ class LocalCpuSourceOwner(FixtureUsageSourceOwner):
                     parent_closed=(all(fd is None for fd in row['fds'].values()) and
                         (manager is None or manager.closed) and
                         (process is None or process.poll() is not None and process.stdin.closed and process.stdout.closed))
-                    physically_known=(process is None or manager is not None and manager.stopped_raw is not None and
-                                      self._kernel_terminals.get(id(row)) is row)
+                    # This retires only original parent handles, not the whole
+                    # managed scope. A lost StopUnit return/receipt must not
+                    # strand already closed parent owners forever, nor be
+                    # laundered into terminal/FREE. Keep the original keeper
+                    # kernel witness and transport reap mandatory after launch;
+                    # manager job proof is required only for full settlement.
+                    physically_known=(not row['launch_entered'] or process is not None and
+                                      self._kernel_terminals.get(id(row)) is row and process.poll() is not None)
                     if not parent_closed or not physically_known:errors.append(exc)
             if errors:raise errors[0]
             self._live=False;_owners.pop(id(self),None)
         return {'state':'ORIGINAL_PARENT_CLOSED_EXPOSURE_UNKNOWN','runtime_stopped':False,
-                'settlement_enabled':False,'refund_enabled':False}
+                'settlement_enabled':False,'refund_enabled':False,
+                'retirement_scope':'ORIGINAL_PARENT_HANDLES_ONLY','managed_scope_status':'UNKNOWN'}

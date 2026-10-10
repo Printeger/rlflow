@@ -1,5 +1,9 @@
 # 阻塞与证据缺口
 
+84 已闭合具体恢复卡点：真实StopUnit效果后原返回丢失，原keeper/transport终止及FD全闭可仅退役parentowner；失去同原kernel witness仍报错保留owner。始终UNKNOWN/占槽，不假fullSTOP/FREE，跨进程cold不重放。最终7090/12f8e2 3pass58.02s，High新scope门无MUST，证据checkpoint-84-stop-retirement.txt，无live测试。不是全体回执丢失/所有owner崩溃/实机长跑完成。
+
+新增已确证长期缺口：manager._originals未随成功Source退役删除，强引用整条owner链，累计128次拒绝任务；85按安全生命周期撤销closed exact登记，不增加容量掩盖泄漏。未完成cleanup必须保留原登记与UNKNOWN。此本地修复无需新用户决定；真实模型/GPU合同仍未批，保持原权限，完整Goal/24h8h/strictquota/科研自治未完成。
+
 83 本轮关闭缺口：真实丢可信报告后的原 Budget UNKNOWN/占槽曝险可在 owner 退出后跨进程 whole-event 验证；不 replay、不退款、不假 FREE。2793终5d0f8b 1pass16.63s。公共安装态可配置 `run` 与只读 `history` 已实际交付：15908/a494b8 exit0、48382/85ee07 exit0，history 同原终态；wheel payload 与当前全部顶层 rlflow Python 同字节，编译/依赖/diff通过，增量High无MUST，无live测试。首次 ROS pytest 插件缺lark发生collection前已改执行环境而非扩依赖。证据 checkpoint-83-core-backend/abnormal-report-*、installed-cli-*。
 
 未关闭：真实模型 Engineer→独立产品Reviewer→ConditionEvidence→自主接续、严格 aggregate 磁盘quota、StopUnit原返回丢失与 owner 异常退出的全部受管范围长期恢复、通用科研预算/任务验收、24h/8h和完整M0–M5。公开history仅原事实恢复，不是执行恢复。集中模型/GPU/时间/实验合同已提出但未获答复，不以自动续Goal授权；无需新用户决定即可继续本地零模型/GPU缺口。instinctRL保持只读HOLD，实机长跑尚未准入，另窗验证Goal prompt不可提前标资格完成。

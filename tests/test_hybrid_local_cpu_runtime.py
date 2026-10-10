@@ -391,6 +391,76 @@ print(json.dumps(detail))
         (tmp_path/'abnormal-cold.json').write_text(cold.stdout)
 
 
+def test_actual_lost_stop_return_retires_only_parent_preserves_cold_exposure(tmp_path,monkeypatch):
+    from rlflow.jobs import identity
+    from rlflow.hybrid_budget_ledger import reservation_key
+    tmp_path.chmod(0o700);spec=_spec()
+    spec['code']='import os,time; child=os.fork(); print(os.getpid(),flush=True); time.sleep(9)'
+    with isolated_session(tmp_path,spec,approved=True,confirmation_reader=_confirm) as session:
+        runtime=session['runtime'];lease=session['lease'];attempt=runtime._issued(lease)
+        row=runtime.sources._issued(attempt['source']);runtime.start(lease)
+        manager=row['manager'];original_call=manager._call;calls=[];actual_jobs=[]
+        def lose_return(method,*args,**kwargs):
+            value=original_call(method,*args,**kwargs)
+            if method=='StopUnit':
+                calls.append(method);actual_jobs.append(value)
+                raise OSError(5,'injected original StopUnit return lost AFTER actual manager effect')
+            return value
+        monkeypatch.setattr(manager,'_call',lose_return)
+        with pytest.raises(Conflict,match='partial cleanup retained'):runtime.stop_to_terminal(lease)
+        assert calls==['StopUnit'] and actual_jobs[0].startswith('/org/freedesktop/systemd1/job/')
+        assert manager.stop_entered and manager.stop_job is None and manager.stopped_raw is None
+        assert manager.closed and row['producer'].poll() is not None
+        assert identity(row['ready']['keeper']['pid']) is None
+        assert runtime.sources._kernel_terminals[id(row)] is row
+        assert all(fd is None for fd in row['fds'].values())
+        assert attempt['terminal'] is None and runtime.pool.snapshot()['occupied']==1
+        version=runtime.store.version()
+        with pytest.raises(Conflict,match='partial cleanup retained'):runtime.stop_to_terminal(lease)
+        assert calls==['StopUnit'] and runtime.store.version()==version
+        # Closed descriptors cannot reconstruct a lost kernel witness from
+        # DTOs, process names or a currently missing PID. Retain original owner.
+        original_witness=runtime.sources._kernel_terminals.pop(id(row))
+        with pytest.raises(Conflict,match='partial cleanup retained'):runtime.shutdown_safety()
+        assert runtime._live and runtime.sources._live and runtime.pool.snapshot()['occupied']==1
+        runtime.sources._kernel_terminals[id(row)]=original_witness
+        facts=runtime.shutdown_safety()
+        assert facts['state']=='PHYSICAL_CLOSED_EXPOSURE_UNKNOWN'
+        assert facts['retirement_scope']=='ORIGINAL_PARENT_HANDLES_ONLY'
+        assert facts['managed_scope_status']=='UNKNOWN'
+        assert not facts['pool_slots_freed'] and not facts['refund_enabled'] and not facts['runtime_stopped']
+        assert not runtime._live and not runtime.sources._live and calls==['StopUnit']
+        assert runtime.pool.snapshot()['occupied']==1
+        current=runtime.store.audit()
+        assert runtime.store.replay()==current and runtime.store.recover()==current
+        assert runtime.store.version()==version
+        root=str(runtime.store.root);epoch=runtime.plans.workspace.store_epoch
+        reservation=reservation_key(session['reserve']);amount=session['reserve']['amount']
+    import subprocess,sys
+    script="""import json,sys
+from rlflow.store import Store
+from rlflow.hybrid_local_cpu_reads import LocalCpuTaskReader
+store=Store.attach_existing(sys.argv[1],project_id='isolated_local_cpu',data_mode='fixture')
+version=store.version()
+reader=LocalCpuTaskReader(store,project_id='isolated_local_cpu',store_epoch=sys.argv[2])
+view=reader.task(sys.argv[3],timeline=True)
+assert reader.tasks()['items']==[view['task']]
+assert store.version()==version
+assert not hasattr(reader,'start') and not hasattr(reader,'stop')
+print(json.dumps(view))
+"""
+    result=subprocess.run([sys.executable,'-c',script,root,epoch,reservation],
+        capture_output=True,text=True,timeout=15,check=True)
+    view=json.loads(result.stdout);task=view['task']
+    assert task['recorded_phase']=='STOP_REQUESTED' and task['recorded_budget_status']=='UNKNOWN'
+    assert task['recorded_reserved_amount']==amount and task['recorded_unknown_exposure']==amount
+    assert task['current_execution_status']=='UNKNOWN' and not task['controls_available']
+    assert task['machine_acceptance_status']=='UNKNOWN' and not task['condition_evidence']
+    assert view['managed_terminal_proof'] is None
+    assert len([event for event in view['events'] if event['recorded_phase']=='RELEASE_INTENT'])==1
+    (tmp_path/'lost-stop-return-cold.json').write_text(result.stdout)
+
+
 def test_approved_trusted_module_pins_cannot_be_replaced_during_allocation(tmp_path,monkeypatch):
     tmp_path.chmod(0o700);allocate=LocalCpuSourceOwner._runtime_allocate;captured=[]
     def changed_modules(source,owner,lease):

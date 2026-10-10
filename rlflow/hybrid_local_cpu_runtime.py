@@ -19,6 +19,13 @@ class LocalCpuGrant:
 
 
 class LocalCpuRunnerOwner(FixtureRuntimeOwner):
+    def shutdown_safety(self):
+        value=super().shutdown_safety()
+        # Compatibility state names are not a whole managed-scope proof.
+        # Lost report/job receipts never become terminal/FREE by retirement.
+        return {**value,'retirement_scope':'ORIGINAL_PARENT_HANDLES_ONLY',
+                'managed_scope_status':'UNKNOWN'}
+
     def _actual(self):
         from .hybrid_fixture_runtime import _owners
         if type(self) is not LocalCpuRunnerOwner or _owners.get(id(self)) is not self:

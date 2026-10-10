@@ -1,0 +1,21 @@
+Checkpoint84 scope: lost original StopUnit method return, parent handle retirement only, retained UNKNOWN exposure, original owner exit and separate-process no-replay historical read. Not full managed scope STOP, settlement/FREE or long-run admission.
+Initial actual case before explicit retirement-scope fields: original session15443, terminal456b15 exit0:
+.                                                                        [100%]
+1 passed in 17.88s
+Final changed inputs: runtime explicit safety-return scope, source no-manager-job parent-only retirement gate, lost-return test including missing original kernel-cache negative. Necessary related report-loss and original manager-close retry cases included because same cleanup gate changed.
+Command: PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q tests/test_hybrid_local_cpu_runtime.py::test_actual_lost_stop_return_retires_only_parent_preserves_cold_exposure tests/test_hybrid_local_cpu_runtime.py::test_actual_bound_manager_stop_survives_other_participant_failure[report] tests/test_hybrid_local_cpu_runtime.py::test_actual_bound_manager_stop_survives_other_participant_failure[manager_close]
+Shell login=false; no ROS plugin loading or dependency change. Original session7090, intermediate8deafa two dots, terminal12f8e2 exit0:
+...                                                                      [100%]
+3 passed in 58.02s
+Real configured task forks. Test wraps original manager method: actual StopUnit succeeds, then injected OSError loses method return. Only one actual StopUnit; stop_entered true/stop_jobNone/stopped_rawNone, original keeper kernel terminal, transport reap, original manager/protocol/source FDs closed. Core STOP retry does not resend or change Store version. No terminal proof minted; BudgetSTOP_REQUESTED/UNKNOWN and Pool occupied1.
+Removing original kernel-cache witness rejects safety retirement, keeps original owners live and occupied1; restoring the SAME original witness permits parent-only retirement. Return retirement_scopeORIGINAL_PARENT_HANDLES_ONLY/managed_scope_statusUNKNOWN, runtime_stoppedfalse/refundfalse/pool_slots_freedfalse. Does not claim descendants/whole scope are stopped.
+Original audit/replay/recover equal/version unchanged. After owner exit, different process reads original tasks/task, retained reserve and unknown exposure equal original amount, exactly one RELEASE_INTENT, currentUNKNOWN/controlsfalse, no terminal or machine acceptance/ConditionEvidence. cold JSON is actual copy plus newline, not a byte seal.
+Independent High design and final changed-scope review: no new MUST. Original launched scope needs keeper kernel witness and transport reap to retire parent; missing transport remains an error. Full managed STOP still needs original manager job/Invocation/process-empty plus task/source proof.
+Next independently confirmed lifecycle gap: OriginalServiceManager._originals permanently holds closed managers -> source/runtime; process cumulative128 creates hit finite registration bound. Fix next at SUCCESSFUL source normal/safety retirement, not manager.close (original cleanup retries need registry). Partial failure must retain registry; no changing UNKNOWN/budget/Pool or raising limit.
+No product model/GPU, production/instinctRL writes, global configuration, new supervisor or paid resources. Original Goal ACTIVE; no full-autonomy claim or qualified another-window instinctRL Goal prompt.
+Final inputs:
+584dcecf639adee5437db63a0ca03ec6dc4f2dae10c05bbc3be3a3f019e6af01  rlflow/hybrid_local_cpu_runtime.py
+10d6033c69dc093649acb0b6c72e8d80aa1fead5afaaf72d27010715d22c4bdc  rlflow/hybrid_local_cpu_source.py
+405e3332c2bfd59cfa563bc4e8be0ba75529c5a2dd830456b0dfe60d73fa68e8  tests/test_hybrid_local_cpu_runtime.py
+USERlock unchanged/unstaged: becc7e2a36dfcad4ffe934b5ff2f0f68187611d6c0641bd63d81367651cfbf09.
+compileall and git diff --check exit0 after final test; no live test handles. No new installed/full-suite qualification claimed for84;83 unchanged public CLI run/history evidence retained at its own input version.
