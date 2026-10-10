@@ -47,6 +47,8 @@ def test_original_configured_cpu_grant_budget_pool_source_and_no_handoff_stop(tm
 
 def test_actual_configured_core_task_result_managed_stop_budget_and_free(tmp_path):
     import time
+    from rlflow.hybrid_local_cpu_manager import _originals
+    original_managers=set(_originals)
     tmp_path.chmod(0o700)
     spec=_spec();spec['code']="""import json,collections,os,time
 data=json.loads(open(WORK+'/payload.txt').read())
@@ -78,10 +80,22 @@ if not child:
         assert proof['original_manager_connection_closed'] and proof['original_protocol_closed']
         assert proof['manager']['MainPID']==0 and proof['manager']['ActiveState']=='inactive'
         assert all(fd is None for fd in row['fds'].values())
+        manager=row['manager']
+        assert manager.closed and _originals[id(manager)] is manager
+        # Alias corruption must fail BEFORE deleting any original manager;
+        # closed cached proofs still support the same owner's cleanup retry.
+        alias=object();runtime.sources._attempts[id(alias)]=row
+        try:
+            with pytest.raises(Conflict,match='retirement row alias'):runtime.sources.shutdown()
+            assert runtime.sources._live and _originals[id(manager)] is manager
+            assert manager.stop()==json.loads(manager.stopped_raw)
+        finally:del runtime.sources._attempts[id(alias)]
         (tmp_path/'actual-command.json').write_text(json.dumps(row['command']))
         (tmp_path/'actual-protocol.json').write_text(json.dumps(row['protocol_rows']))
         (tmp_path/'actual-terminal.json').write_text(json.dumps(attempt['terminal']))
         (tmp_path/'actual-result.json').write_text(json.dumps(result))
+    assert set(_originals)==original_managers
+    with pytest.raises(PermissionError):manager.close()
 
 
 def test_original_input_close_failure_retained_without_free_or_duplicate_source(tmp_path,monkeypatch):
@@ -393,6 +407,8 @@ print(json.dumps(detail))
 
 def test_actual_lost_stop_return_retires_only_parent_preserves_cold_exposure(tmp_path,monkeypatch):
     from rlflow.jobs import identity
+    from rlflow.hybrid_local_cpu_manager import _originals
+    original_managers=set(_originals)
     from rlflow.hybrid_budget_ledger import reservation_key
     tmp_path.chmod(0o700);spec=_spec()
     spec['code']='import os,time; child=os.fork(); print(os.getpid(),flush=True); time.sleep(9)'
@@ -423,6 +439,7 @@ def test_actual_lost_stop_return_retires_only_parent_preserves_cold_exposure(tmp
         original_witness=runtime.sources._kernel_terminals.pop(id(row))
         with pytest.raises(Conflict,match='partial cleanup retained'):runtime.shutdown_safety()
         assert runtime._live and runtime.sources._live and runtime.pool.snapshot()['occupied']==1
+        assert _originals[id(manager)] is manager
         runtime.sources._kernel_terminals[id(row)]=original_witness
         facts=runtime.shutdown_safety()
         assert facts['state']=='PHYSICAL_CLOSED_EXPOSURE_UNKNOWN'
@@ -430,6 +447,8 @@ def test_actual_lost_stop_return_retires_only_parent_preserves_cold_exposure(tmp
         assert facts['managed_scope_status']=='UNKNOWN'
         assert not facts['pool_slots_freed'] and not facts['refund_enabled'] and not facts['runtime_stopped']
         assert not runtime._live and not runtime.sources._live and calls==['StopUnit']
+        assert set(_originals)==original_managers
+        with pytest.raises(PermissionError):manager.close()
         assert runtime.pool.snapshot()['occupied']==1
         current=runtime.store.audit()
         assert runtime.store.replay()==current and runtime.store.recover()==current

@@ -391,6 +391,40 @@ class LocalCpuSourceOwner(FixtureUsageSourceOwner):
             for label,exc in errors:error.add_note(label+': '+repr(exc))
             raise error from errors[0][1]
 
+    def _retire_closed_managers(self):
+        """Release strong registrations only at whole-source retirement.
+
+        Closed managers remain registered during ordinary STOP/cleanup retry.
+        Validate every row before deleting any registration; no RPC or new
+        source capability, and no budget/Pool facts are changed here.
+        """
+        from .hybrid_local_cpu_manager import OriginalServiceManager,_originals
+        self._actual();managers=[];seen_rows=set();seen_managers=set()
+        for key,row in self._attempts.items():
+            if key!=id(row['claim']) or id(row) in seen_rows:
+                raise Conflict('original manager retirement row alias; registrations retained')
+            seen_rows.add(id(row))
+            manager=row.get('manager')
+            if manager is None:continue
+            if type(manager) is not OriginalServiceManager or manager.source is not self or manager.row is not row:
+                raise PermissionError('same original manager/source required for retirement')
+            manager._actual()
+            if manager.closed is not True or manager.fd is not None or manager.bus.value or manager.slot.value:
+                raise Conflict('original manager handles not closed; registration retained')
+            if id(manager) in seen_managers:
+                raise Conflict('original manager retirement duplicate; registrations retained')
+            seen_managers.add(id(manager))
+            managers.append(manager)
+        for manager in managers:del _originals[id(manager)]
+
+    def shutdown(self):
+        from .hybrid_usage_source import _registry,_owners
+        self._actual()
+        with _registry,self._lock:
+            for row in self._attempts.values():self._cleanup_attempt(row)
+            self._retire_closed_managers()
+            self._live=False;_owners.pop(id(self),None)
+
     def shutdown_safety(self):
         """Retire only original parent handles; UNKNOWN is never terminal/FREE."""
         from .hybrid_usage_source import _registry,_owners
@@ -414,6 +448,7 @@ class LocalCpuSourceOwner(FixtureUsageSourceOwner):
                                       self._kernel_terminals.get(id(row)) is row and process.poll() is not None)
                     if not parent_closed or not physically_known:errors.append(exc)
             if errors:raise errors[0]
+            self._retire_closed_managers()
             self._live=False;_owners.pop(id(self),None)
         return {'state':'ORIGINAL_PARENT_CLOSED_EXPOSURE_UNKNOWN','runtime_stopped':False,
                 'settlement_enabled':False,'refund_enabled':False,

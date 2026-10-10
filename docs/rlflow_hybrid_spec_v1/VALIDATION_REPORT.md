@@ -1,5 +1,7 @@
 # 需求包离线校验报告
 
+85 最终验证：原35937/fd486c exit0 3pass46.19s（before High alias MUST fix），冻结输入终态后增加原claimkey/row和manager唯一性全preflight与实际aliasnegative；原88250/577f43 exit0 3pass45.95s。实际正常任务/setsid后代managedSTOP/FREE完成后登记仍在供原cleanup重试，Source退出原registry keyset恢复；lostreturn缺kernel原登记保留/恢复同原witness仅parent退役后登记释放、UNKNOWN/cold不重放；manager-close partial同owner原重试成功。Alias拒绝Source仍live、原登记全保留/manager.stop原cache可用，去别名后正常退出。High新增MUST静态关闭，无新增确认问题、无live，compile/diff通过。源码/tests SHA及原输出见checkpoint-85-manager-retirement.txt。没有129次实机或24h8h/newinstalled/fullsuite新资格声明，83/82历史证据不改；USERlock未变/不stage。
+
 84 实证：原15443终456b15 exit0 1pass17.88s（显式scope字段前）；最终7090终12f8e2 exit0 3pass58.02s，实际StopUnit调用后注入原返回丢失，一次真实STOP；Core重试/version不增，无terminal/FREE。kernel-cache移除的负门拒安全退役；恢复同原witness后仅parent退役，BudgetUNKNOWN/STOP_REQUESTED、Pool1、refund/FREEfalse、managed_scopeUNKNOWN。owner退出后另进程tasks/task同原whole-event、预留/未知曝险同原amount、一次RELEASE、无start/stop/controls；audit/replay/recover等值。受影响report丢失/manager关闭故障重试一并通过。code/test SHA与原USERlock见checkpoint-84-stop-retirement.txt，compile/diff通过、High新门无MUST、无live测试。未重跑83无变化正例/公开installedCLI/全库；原82的4failed/2532passed/32skipped保持。85将修已确认manager登记128累计耗尽，不提高cap、不提前在close撤登记。
 
 83 staged 最终格式门：源码/tests/docs（排除原始 evidence）diff-check 通过。whole staged diff 仅报原 traceback 行尾空格及原 stdout/stderr/manager 输出末尾空行，保留原证据，不改其字节；不把整份证据归档称 whitespace-clean。详 installed-cli-final-checks.txt。

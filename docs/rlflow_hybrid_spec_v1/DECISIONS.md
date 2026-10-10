@@ -1,5 +1,7 @@
 # 开发决策记录
 
+85 manager登记生命周期：关闭连接不是撤销原cap时点，原STOP/cleanup重试可能仍读取缓存证明。仅整体Source正常shutdown或安全parent退役成功，全部manager exact/source/row/原登记与句柄关闭preflight通过后删除强引用，随后撤Sourceowner；部分失败全保留。High重复别名MUST要求删除前核原claimkey与row/manager唯一性，实际负例验证拒绝未部分撤登记、原cached STOP仍可用。128上限不变，UNKNOWN与Budget/Pool不变；不以增加cap掩盖累计泄漏，不声称长跑资格。最终必要3pass45.95s。
+
 84 决策：manager job完成证明是完整managed STOP/结算/FREE门，不是“仅原parent句柄退役”门。实际StopUnit成功但原返回丢失时，已held pidfd证明原keeper退出+原transport已reap+原所有parent句柄关闭，可以撤销parentowner而永久保留原Budget/PoolUNKNOWN曝险，不采纳name/PID/冷JSON重建cap、不补发STOP。缺kernel-cache或transport保持原owner报错。Source/Runtime显式retirement_scope与managed_scope_status，兼容旧PHYSICAL_CLOSED_EXPOSURE_UNKNOWN不解释为whole scope证明。真实丢返回与两个相关故障分支最终3pass，独立High无新增MUST。下一处理manager128累计登记泄漏：只在Source最终整体退役成功撤销exact closed登记，不能在close时撤销而破坏原重试。
 
 83 恢复决策：原可信报告丢失即使 manager/kernel/reap/FD清理真实完成，也不能合成 full terminal/FREE；持久 STOP_REQUESTED 保留 UNKNOWN 全预留曝险。冷 DTO 的未知曝险是 retained reserve 子集而非第二次收费，只报告原事件记录，不推断当前进程或接管原能力。实际退出后另一进程已验。公共本地 CLI 仅 fresh 显式批准的有限冻结 spec 执行；history 无 resume/STOP/G。最终 run 报告在 context 全收尾成功后发布，exit0仅机器比较 PASS，独立 Review/condition 与自主 Goal 均保持未证明。安装态实际依赖图任务及公开冷读通过，未调用模型/GPU；新增两次增量 High 无 MUST，不重审旧片。

@@ -1,5 +1,9 @@
 # 阻塞与证据缺口
 
+85 关闭此前确认的manager累计128登记泄漏：整体Source正常/安全退役成功才撤销exact closed登记，partial和close本身保留，原重试可用。首3pass46.19s仅MUST修前；High别名部分删除MUST统一原claimkey/唯一性preflight修复，最终88250/577f43 3pass45.95s，证据checkpoint-85-manager-retirement.txt，无live。未证明129次实机重复/长owner全部保留策略/24h8h，仍不得称长跑准入。
+
+下一本地可推进批准数值criteria的真实配置研究任务与原实验预算计额/STOP/cold消费；产品模型Reviewer/ConditionEvidence需原集中合同批准，当前合同未答不启模型/GPU。Strictquota/长期/完整自治与instinctRL准入仍缺，USERlock不动/不stage，无新增需用户决定的本地阻塞。
+
 84 已闭合具体恢复卡点：真实StopUnit效果后原返回丢失，原keeper/transport终止及FD全闭可仅退役parentowner；失去同原kernel witness仍报错保留owner。始终UNKNOWN/占槽，不假fullSTOP/FREE，跨进程cold不重放。最终7090/12f8e2 3pass58.02s，High新scope门无MUST，证据checkpoint-84-stop-retirement.txt，无live测试。不是全体回执丢失/所有owner崩溃/实机长跑完成。
 
 新增已确证长期缺口：manager._originals未随成功Source退役删除，强引用整条owner链，累计128次拒绝任务；85按安全生命周期撤销closed exact登记，不增加容量掩盖泄漏。未完成cleanup必须保留原登记与UNKNOWN。此本地修复无需新用户决定；真实模型/GPU合同仍未批，保持原权限，完整Goal/24h8h/strictquota/科研自治未完成。

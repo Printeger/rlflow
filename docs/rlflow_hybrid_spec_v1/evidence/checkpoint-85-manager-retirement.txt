@@ -1,0 +1,18 @@
+Checkpoint85: exact closed manager registration release ONLY on successful whole-source normal shutdown or parent-only safety retirement. No change to manager.close, 128 active-registration bound, budget/Pool settlement or UNKNOWN no-FREE semantics. Prevent permanently retaining manager->source->runtime chains across completed Source lifetimes.
+Original command (shell login=false): PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q tests/test_hybrid_local_cpu_runtime.py::test_actual_configured_core_task_result_managed_stop_budget_and_free tests/test_hybrid_local_cpu_runtime.py::test_actual_lost_stop_return_retires_only_parent_preserves_cold_exposure tests/test_hybrid_local_cpu_runtime.py::test_actual_bound_manager_stop_survives_other_participant_failure[manager_close]
+First input version, original35937 terminalfd486c exit0:
+...                                                                      [100%]
+3 passed in 46.19s
+Independent incremental High then identified confirmed MUST: duplicate mutable row alias allows preflight twice, first deletion succeeds then second KeyError leaves Source live with revoked manager. First passes are BEFORE this fix, not final qualification.
+Waited for first session terminal before edits. Final preflight validates map key==id(original claim), unique original row/manager, exact manager class/source/row registration and all manager handles closed; completes every check BEFORE deletion. Added real normal-task negative: alias same original row after STOP, Source.shutdown rejects before registration deletion, Source stays live, original manager cached STOP still callable; remove alias then original context cleanup retires registration.
+Final SAME necessary three changed-scope cases original88250 terminal577f43 exit0:
+...                                                                      [100%]
+3 passed in 45.95s
+Actual configured task with setsid descendant produces original result/full manager/kernel/source STOP/FREE; closed manager remains registered until original Source final shutdown, then original registry key set returns exactly to pre-session set; retired manager.close rejects original authority check.
+Actual lost StopUnit return after actual RPC: closed manager remains registered while original kernel witness missing and safety retirement rejects; restoring SAME original witness permits parent-only retirement and restores registry key set, without full terminal/FREE/settlement/refund. Cold separate process keeps original UNKNOWN budget/exposure and no replay. Original manager-close partial failure followed by same-owner retry still succeeds because close itself never deregisters.
+Final independent High confirmed duplicate-alias MUST statically closed; no related new confirmed issue, did not run test/re-review unchanged old modules. Main confirmed original final test terminal, no live test handles.
+No assertion of 129 real task executions, 24h soak, full installed requalification, hard disk quota, actual product Reviewer or full autonomous Goal completion. 128 active finite bound retained; successful Source lifetimes no longer accumulate manager registrations. Broader long-lived owner/task/archive retention remains a qualification requirement.
+Final inputs:
+03b50b45d95f58487153102228278d11e0db8ca6d9ec983c77f7885465a136c8  rlflow/hybrid_local_cpu_source.py
+1c090d5029fd12795aef9907d05d4817e66af0404e98e481cdc75e68ade6d9c3  tests/test_hybrid_local_cpu_runtime.py
+compileall and git diff --check exit0, original05e0a0. USER package-lock unchanged/unstaged SHA256 becc7e2a36dfcad4ffe934b5ff2f0f68187611d6c0641bd63d81367651cfbf09. No product model/GPU, production/instinctRL writes, global configuration or push.
