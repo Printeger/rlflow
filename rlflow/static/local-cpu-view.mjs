@@ -15,11 +15,21 @@ export function checkLocalDetail(v){
   const r=v.configured_result,t=v.task,u=v.recorded_settled_usage;
   if(t.recorded_phase==='FIXTURE_SCOPE_STOPPED' ? !vector(u) : u!==null)fail();
   if(r===null){if(t.local_result_status==='ARCHIVED' || t.machine_acceptance_status!=='UNKNOWN')fail();return;}
-  if(t.local_result_status!=='ARCHIVED' || t.recorded_phase!=='FIXTURE_SCOPE_STOPPED' || !closed(r,['outputs','approved_acceptance','machine_acceptance']) || !closed(r.outputs,['stdout','stderr']))fail();
+  const execution=Object.hasOwn(r,'execution');
+  if(t.local_result_status!=='ARCHIVED' || t.recorded_phase!=='FIXTURE_SCOPE_STOPPED' || !closed(r,['outputs','approved_acceptance','machine_acceptance',...(execution?['execution']:[])]) || !closed(r.outputs,['stdout','stderr']))fail();
+  if(execution && (!closed(r.execution,['status','wait_status','control_terminal_reason']) || !['SUCCEEDED','NONZERO_EXIT','SIGNAL_EXIT','DEADLINE'].includes(r.execution.status) || !count(r.execution.wait_status) || r.execution.wait_status>65535 || !['DEADLINE','PRODUCER_EXIT','CONTROL_EOF','CONTROL_STOP'].includes(r.execution.control_terminal_reason)))fail();
+  if(execution){
+    const low=r.execution.wait_status&127;
+    if(low===127)fail();
+    const expected=r.execution.control_terminal_reason==='DEADLINE'?'DEADLINE':low===0?(r.execution.wait_status>>>8===0?'SUCCEEDED':'NONZERO_EXIT'):'SIGNAL_EXIT';
+    if(r.execution.status!==expected)fail();
+  }
+  const failed=execution && r.execution.status!=='SUCCEEDED';
   for(const output of Object.values(r.outputs))if(!closed(output,['text','sha256']) || !text(output.text) || !hash(output.sha256))fail();
   const m=r.machine_acceptance,a=r.approved_acceptance;
   if(!closed(m,['status','criteria_sha256']) || m.status!==t.machine_acceptance_status || !['PASS','FAIL','NOT_CONFIGURED'].includes(m.status))fail();
-  if(a===null){if(m.status!=='NOT_CONFIGURED' || m.criteria_sha256!==null)fail();return;}
+  if(failed && m.status!=='FAIL')fail();
+  if(a===null){if(m.status!==(failed?'FAIL':'NOT_CONFIGURED') || m.criteria_sha256!==null)fail();return;}
   if(!hash(m.criteria_sha256) || m.status==='NOT_CONFIGURED' || typeof a.stderr_empty!=='boolean')fail();
   if(a.method==='EXACT_STDOUT_UTF8'){if(!closed(a,['method','stdout','stderr_empty']) || !text(a.stdout))fail();}
   else if(a.method==='JSON_METRICS_RANGE'){

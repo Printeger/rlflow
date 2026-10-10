@@ -100,4 +100,6 @@ class LocalCpuPublicTaskReader(LocalCpuTaskReader):
         result=None if proof is None else proof['configured_local_result']
         value['configured_result']=None if result is None else {
             name:result[name] for name in ('outputs','approved_acceptance','machine_acceptance')}
+        if result is not None and 'execution' in result:
+            value['configured_result']['execution']=result['execution']
         return self.output(value,256*1024)

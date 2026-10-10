@@ -1,5 +1,7 @@
 # 系统实施验收记录
 
+Checkpoint89 原失败实验stdout/stderr/waitpid/control原因归档+原Budget/fullmanagedSTOP/FREE/cold消费实装。初1pass/1fail41.03s保留，异常flush根因修后非零及必要正常/stub回归7pass60.49s；已过期限不重复，旧65s不重复、不冒称修改断言后的新长时通过。纯19pass、Node17pass+实际失败DTO1pass，High唯一前端状态MUST关闭，旧86实际Store当前公开history兼容读取通过。证据checkpoint-89-negative-evidence/及HYBRID_LOCAL_CPU_FAILURE_EVIDENCE.md，机器FAIL不是科学结论/独立Review/自治完成，无全库/新安装/长跑资格声明。
+
 Checkpoint88：新actual配置负任务原执行65s后非零退出，初始授权60s不延长；原全managedSTOP/SETTLED/Pool0、wall69/start1、退出后原cold相等，55052终fb8bd6 1pass81.80s。CLIFAILED_NO_RESULT/exit3报告须history/context门；原0/1/2及context失败无最终报告由4stub回归0.19s验证，不称stub执行资格。High窄审无新MUST，compile/diff/原USERlock检查通过，无live/新activeunit。证据checkpoint-88-negative-runner/及HYBRID_LOCAL_CPU_NEGATIVE_RUN.md，非失败科研证据完整（日志未归档）/自治模型/安装全库或长跑验收。
 
 Checkpoint87 本切片证据见HYBRID_LOCAL_CPU_DASHBOARD.md及evidence/checkpoint-87-public-dashboard/。真实批准配置统计任务→原Budget→fullmanagedSTOP/FREE→认证API/SSE/Chrome原DTO一致→logout通过；隐私只剥离私有managed身份，不过滤用户任务输出。独立读池MUST修后新容量/旧撤权/真实研究API定向3pass38.73s；首轮8pass/1fail/1setup error81.92s原终态保留，失败根因漏fixture与已关闭app复用，未重复8已过项。浏览器1pass24.13s和API初1pass16.26s是容量修复前证据，UI未改/不重复；旧Node16pass与新实际DTO负例1pass。增量High静态无剩余确证MUST，非产品独立Reviewer。模型GPU0、不迁移生产/instinctRL；不虚称全库全绿、自治科研完成、新安装或长跑准入。

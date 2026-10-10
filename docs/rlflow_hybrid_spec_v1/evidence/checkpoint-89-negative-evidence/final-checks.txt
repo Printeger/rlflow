@@ -1,0 +1,16 @@
+TAP version 13
+# Subtest: actual failed and deadline public evidence passes closed display contract without PASS
+ok 1 - actual failed and deadline public evidence passes closed display contract without PASS
+  ---
+  duration_ms: 2.510963
+  ...
+1..1
+# tests 1
+# suites 0
+# pass 1
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 67.750272
+becc7e2a36dfcad4ffe934b5ff2f0f68187611d6c0641bd63d81367651cfbf09  package-lock.json

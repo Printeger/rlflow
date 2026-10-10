@@ -1,5 +1,7 @@
 # 阻塞与证据缺口
 
+89 闭合非零/超时原日志与退出原因归档缺口，机器FAIL强制/Review仍NOT_PROVEN；真实非零/期限、STOP/FREE/starts1/cold已验证。首stderr丢失FAIL已修，最终受影响7pass60.49s，High前端状态MUST关闭。下一完整父崩溃后的安全恢复/strictquota仍缺；真实模型/GPU集中合同仍未答不调用，实机长跑及instinctRL准入未完成。没有新增需用户决定才能推进普通本地的阻塞。
+
 88 actual长时失败已证明原60s期限后全managedSTOP/SETTLED/PoolFREE/cold：wall69/start1，1pass81.80s；CLI负执行报告与context失败门实装，4stub合同回归通过，独立无新MUST。当前明确未解决实际失败任务输出与退出原因的持久归档，下一本地可补，不用再跑相同65s任务。真实模型/GPU集中合同仍未批准；strictquota/完整异常恢复/24h8h与instinctRL准入仍缺，无新增本地需用户决定事项。
 
 87 已闭合可配置实验原结果/计额到认证Dashboard的只读消费及独立有限读取容量。最终定向3pass38.73s、原未受影响8pass保留，真实Chrome与API、前端负例通过；独立增量容量MUST关闭。新应用完整安装/全库/长跑资格未由本片证明。模型Engineer/独立产品Reviewer条件接续仍待集中资源合同明确答复；strict diskquota、预算长时效、完整异常STOP/恢复及24h8h未完成，instinctRL只读HOLD。没有需要重复索权才能推进普通本地实现的新阻塞。固定统计任务机器PASS不算自主闭环。

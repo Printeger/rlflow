@@ -1,0 +1,95 @@
+TAP version 13
+# Subtest: sparse scanned page may advance; closed unsafe/wrong scope/execution claims rejected
+ok 1 - sparse scanned page may advance; closed unsafe/wrong scope/execution claims rejected
+  ---
+  duration_ms: 1.179356
+  ...
+# Subtest: timeline requires original one-way edges, distinct events and exact terminal linkage
+ok 2 - timeline requires original one-way edges, distinct events and exact terminal linkage
+  ---
+  duration_ms: 0.288871
+  ...
+# Subtest: new domain coalesces one read batch; no heartbeat/version duplicate writes or stale CAS
+ok 3 - new domain coalesces one read batch; no heartbeat/version duplicate writes or stale CAS
+  ---
+  duration_ms: 3.374977
+  ...
+# Subtest: new domain during held batch stays dirty; failure blocks automatic loops, scope clears timer
+ok 4 - new domain during held batch stays dirty; failure blocks automatic loops, scope clears timer
+  ---
+  duration_ms: 0.860345
+  ...
+# Subtest: in-flight command only accumulates domain high water; original UNKNOWN key/body unchanged
+ok 5 - in-flight command only accumulates domain high water; original UNKNOWN key/body unchanged
+  ---
+  duration_ms: 0.783324
+  ...
+# Subtest: validated snapshot floor rejects old page/timeline as fresh without waiting for a domain
+ok 6 - validated snapshot floor rejects old page/timeline as fresh without waiting for a domain
+  ---
+  duration_ms: 0.932265
+  ...
+# Subtest: clear cannot import old scope high version into lower-version new project
+ok 7 - clear cannot import old scope high version into lower-version new project
+  ---
+  duration_ms: 0.160791
+  ...
+# Subtest: same-project old epoch CONNECTING floor cannot contaminate new snapshot epoch
+ok 8 - same-project old epoch CONNECTING floor cannot contaminate new snapshot epoch
+  ---
+  duration_ms: 0.221551
+  ...
+# Subtest: actual reconnection permits one transport-failed read recovery, not heartbeat/error loops or POST
+ok 9 - actual reconnection permits one transport-failed read recovery, not heartbeat/error loops or POST
+  ---
+  duration_ms: 0.851554
+  ...
+# Subtest: old held GET failing after actual reconnect permits only one recovery in that generation
+ok 10 - old held GET failing after actual reconnect permits only one recovery in that generation
+  ---
+  duration_ms: 0.646873
+  ...
+# Subtest: readonly history survives absent control discovery; viewer/dead owner never enables writes
+ok 11 - readonly history survives absent control discovery; viewer/dead owner never enables writes
+  ---
+  duration_ms: 1.781139
+  ...
+# Subtest: late detail from prior task/scope cannot enable actions or repopulate cleared DOM
+ok 12 - late detail from prior task/scope cannot enable actions or repopulate cleared DOM
+  ---
+  duration_ms: 0.231201
+  ...
+# Subtest: uncertain command is manual original-body/key only; conflict never rebases or auto replays
+ok 13 - uncertain command is manual original-body/key only; conflict never rebases or auto replays
+  ---
+  duration_ms: 0.485293
+  ...
+# Subtest: late accepted command after logout never writes receipt or issues follow-up read
+ok 14 - late accepted command after logout never writes receipt or issues follow-up read
+  ---
+  duration_ms: 0.358282
+  ...
+# Subtest: held POST cannot be invalidated by refresh/task selection; UNKNOWN remains recoverable
+ok 15 - held POST cannot be invalidated by refresh/task selection; UNKNOWN remains recoverable
+  ---
+  duration_ms: 0.429492
+  ...
+# Subtest: STOP ACCEPTED retains immutable manual cleanup through STOP_REQUESTED and terminal, never auto retries
+ok 16 - STOP ACCEPTED retains immutable manual cleanup through STOP_REQUESTED and terminal, never auto retries
+  ---
+  duration_ms: 0.641263
+  ...
+# Subtest: actual authenticated local history satisfies display contract; inflated capabilities and malformed data rejected
+ok 17 - actual authenticated local history satisfies display contract; inflated capabilities and malformed data rejected
+  ---
+  duration_ms: 3.053106
+  ...
+1..17
+# tests 17
+# suites 0
+# pass 17
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 80.459936

@@ -146,13 +146,19 @@ class FiniteCpuKeeper:
         if not select.select([gate], [], [], seconds)[0] or os.read(gate, 1) != b'G':
             os._exit(126)
         os.close(gate)
-        exec(compiled, {'__name__': '__main__', 'WORK': str(work)})
-        # This fork child exits with os._exit to avoid inherited keeper cleanup.
-        # Preserve normal successful Python output semantics before that exit;
-        # the flush remains inside the task's sandbox and finite deadline.
         import sys
-        sys.stdout.flush()
-        sys.stderr.flush()
+        try:
+            exec(compiled, {'__name__': '__main__', 'WORK': str(work)})
+        except BaseException as error:
+            # Task-owned diagnostic only, after sandbox + G. Never print
+            # pre-G trusted setup exceptions or parent control identities.
+            sys.stderr.write('Task exception: '+type(error).__name__[:80]+': '+str(error)[:2048]+'\n')
+            raise
+        finally:
+            # os._exit in the fork wrapper does not flush Python streams.
+            # Preserve both success and failure logs inside the same deadline.
+            sys.stdout.flush()
+            sys.stderr.flush()
 
     def release_gate(self):
         # Kernel protocol only. Original Core authorization must be supplied

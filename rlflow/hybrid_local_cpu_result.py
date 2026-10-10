@@ -1,5 +1,6 @@
 """Historical original local result/managed terminal validation, never control."""
 import hashlib
+import os
 import re
 
 from .hybrid_goals import check_bytes,digest
@@ -48,24 +49,53 @@ ACCEPTANCE={'oneOf':[obj({'method':{'const':'EXACT_STDOUT_UTF8'},
             'propertyNames':{'pattern':'^[A-Za-z][A-Za-z0-9_]{0,79}$'},
             'additionalProperties':obj({'min':{'type':'number'},'max':{'type':'number'}})}})]}
 OUTPUT=obj({'text':{'type':'string','maxLength':65536},'sha256':HASH})
-RESULT=obj({'lease_id':ID,'source_id':ID,'task':TASK,'outputs':obj({'stdout':OUTPUT,'stderr':OUTPUT}),
+RESULT_FIELDS={'lease_id':ID,'source_id':ID,'task':TASK,'outputs':obj({'stdout':OUTPUT,'stderr':OUTPUT}),
     'machine_acceptance':obj({'criteria_sha256':{'oneOf':[HASH,{'type':'null'}]},
         'status':enum('PASS','FAIL','NOT_CONFIGURED')}),
     'approved_spec_sha256':HASH,'approved_acceptance':{'oneOf':[ACCEPTANCE,{'type':'null'}]},
-    'independent_review_status':{'const':'NOT_PROVEN'},'condition_evidence':FALSE})
+    'independent_review_status':{'const':'NOT_PROVEN'},'condition_evidence':FALSE}
+EXECUTION=obj({'status':enum('SUCCEEDED','NONZERO_EXIT','SIGNAL_EXIT','DEADLINE'),
+    'wait_status':{'type':'integer','minimum':0,'maximum':65535},
+    'control_terminal_reason':STOPPED['properties']['control_terminal_reason']})
+RESULT={'oneOf':[obj(RESULT_FIELDS),obj({**RESULT_FIELDS,'execution':EXECUTION})]}
+
+
+def execution_from_closed(task,stopped):
+    rows=[item for item in stopped['reaped'] if item['pid']==task['pid']]
+    if len(rows)!=1:raise Conflict('unique original configured task reap required')
+    status=rows[0]['status'];reason=stopped['control_terminal_reason']
+    if type(status) is not int or not 0<=status<=65535:
+        raise Conflict('original configured task wait status required')
+    if os.WIFEXITED(status):kind='SUCCEEDED' if os.WEXITSTATUS(status)==0 else 'NONZERO_EXIT'
+    elif os.WIFSIGNALED(status):kind='SIGNAL_EXIT'
+    else:raise Conflict('original configured task terminal wait status required')
+    if reason=='DEADLINE':kind='DEADLINE'
+    value={'status':kind,'wait_status':status,'control_terminal_reason':reason}
+    validate_schema(EXECUTION,value)
+    return value
+
+
+def evaluate_execution(rule,outputs,execution):
+    expected=evaluate_acceptance(rule,outputs)
+    if execution['status']!='SUCCEEDED':expected['status']='FAIL'
+    return expected
 
 
 def validate_result(value,origin,task,stopped,spec=None):
     check_bytes(value,128*1024)
     validate_schema(RESULT,value)
-    if (type(value) is not dict or set(value)!={'lease_id','source_id','task','outputs',
+    fields={'lease_id','source_id','task','outputs',
             'machine_acceptance','approved_spec_sha256','approved_acceptance',
-            'independent_review_status','condition_evidence'} or
+            'independent_review_status','condition_evidence'}
+    execution=value.get('execution')
+    if execution is not None and execution!=execution_from_closed(task,stopped):
+        raise Conflict('original configured CPU execution differs from trusted reap')
+    if (type(value) is not dict or set(value) not in (fields,fields|{'execution'}) or
             value['lease_id']!=origin['lease_id'] or value['task']!=task or
             value['approved_spec_sha256']!=origin['local_cpu']['spec_sha256'] or
             value['independent_review_status']!='NOT_PROVEN' or value['condition_evidence'] is not False or
             task['source_sha256']!=origin['local_cpu']['code_sha256'].removeprefix('sha256:') or
-            not any(item['pid']==task['pid'] and type(item['status']) is int and item['status']==0
+            execution is None and not any(item['pid']==task['pid'] and type(item['status']) is int and item['status']==0
                     for item in stopped['reaped'])):
         raise Conflict('original configured CPU result identity/exit differs')
     validate_schema(ID,value['source_id'])
@@ -78,12 +108,13 @@ def validate_result(value,origin,task,stopped,spec=None):
                 output['sha256']!='sha256:'+hashlib.sha256(output['text'].encode()).hexdigest()):
             raise Conflict('original configured CPU output hash differs')
     rule=value['approved_acceptance']
-    expected=evaluate_acceptance(rule,outputs)
+    expected=evaluate_acceptance(rule,outputs) if execution is None else evaluate_execution(rule,outputs,execution)
     if value['machine_acceptance']!=expected:raise Conflict('configured CPU machine result differs from raw output')
     if spec is not None:
         if (digest(spec)!=value['approved_spec_sha256'] or
                 value['approved_acceptance']!=spec.get('acceptance') or
-                value['machine_acceptance']!=evaluate_output(spec,outputs)):
+                value['machine_acceptance']!=(evaluate_output(spec,outputs) if execution is None else
+                    evaluate_execution(spec.get('acceptance'),outputs,execution))):
             raise Conflict('original approved configured CPU acceptance differs')
 
 

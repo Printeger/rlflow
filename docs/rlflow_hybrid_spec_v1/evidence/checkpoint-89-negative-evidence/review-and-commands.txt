@@ -1,0 +1,29 @@
+Original actual negative run:
+env PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q tests/test_hybrid_local_cpu_negative_result.py
+95039 -> d5f56b: 1 failed / 1 passed / 41.03s. See initial.txt.
+Failure: nonzero task stderr empty; fork wrapper os._exit suppressed diagnostic
+and failed execution did not run success-only flush. Fixed after terminal.
+
+Necessary affected verification:
+env PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q 'tests/test_hybrid_local_cpu_negative_result.py::test_actual_negative_result_archived_stopped_and_cold[nonzero]' tests/test_hybrid_local_cpu_runtime.py::test_actual_configured_machine_acceptance_runner_stop_and_original_cached_result tests/test_hybrid_local_cpu_cli_reporting.py
+96192 -> d10b1e: 7 passed / 60.49s (3 actual cases + 4 stub contracts).
+env PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q tests/test_hybrid_local_cpu_profile.py
+90fbd5: 19 passed / 0.08s, pure validation.
+node --test web_checks/local-cpu-view.test.mjs web_checks/fixture-panel.test.mjs
+b7ef7e: 17 passed / 80.459936ms.
+node --test web_checks/local-cpu-negative-view.test.mjs
+989707: 1 passed / 67.750272ms, two actual archived public DTOs.
+
+Independent read-only incremental review /root/finite_app_review_63:
+JS MUST: status enum was not compared against raw wait-status and DEADLINE;
+could accept SUCCEEDED + wait256 or SUCCEEDED + DEADLINE + machine PASS.
+Fixed exact recomputation, reject nonterminal127; new contradictory DTO tests.
+Final: MUST closed, no new confirmed MUST; no reviewer tests or writes.
+Exception diagnostic and flush occur only after sandbox+G, same alarm/limits.
+
+Compatibility: current public CLI history over original Checkpoint86 actual
+installed statistics Store, original session1301 terminal (recorded by tools),
+exit0; original PASS/start1/wall4, archived result has no execution field.
+No old execution replay, installation rebuild or new model/GPU call.
+All sessions terminal. Only three historical failed/failed timeout fixture
+units remain; no new active local unit. No reset-failed or adoption.

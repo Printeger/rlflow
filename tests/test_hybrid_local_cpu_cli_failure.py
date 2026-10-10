@@ -24,21 +24,21 @@ raise ArithmeticError('negative experiment: calibration invalid')
             confirmation_reader=lambda p,c:'APPROVE '+c['scope_hash'])
     monkeypatch.setattr(cli,'isolated_session',approved)
     status=cli.main(['run','--parent',str(tmp_path),'--spec',str(path),'--approve-isolated-local-cpu'])
-    assert status==3
+    assert status==1
     rows=[]
     for line in capsys.readouterr().out.splitlines():
         try:rows.append(json.loads(line))
         except ValueError:pass
-    report=rows[-1];assert report['execution_outcome']=='FAILED_NO_RESULT'
-    assert report['result'] is None and report['pool_after']['occupied']==0
+    report=rows[-1];assert report['execution_outcome']=='RESULT_ARCHIVED'
+    assert report['result']['execution']['status']=='NONZERO_EXIT' and report['pool_after']['occupied']==0
     view=report['history'];task=view['task'];proof=view['managed_terminal_proof']
     assert task['recorded_phase']=='FIXTURE_SCOPE_STOPPED' and task['recorded_budget_status']=='SETTLED'
     assert task['recorded_wall_seconds']>=65
-    assert task['machine_acceptance_status']=='UNKNOWN' and task['independent_review_status']=='NOT_PROVEN'
+    assert task['machine_acceptance_status']=='FAIL' and task['independent_review_status']=='NOT_PROVEN'
     assert not task['condition_evidence'] and not task['controls_available']
     assert view['recorded_settled_usage']['experiment_starts']==1
     assert view['recorded_settled_usage']['wall_seconds']==task['recorded_wall_seconds']
-    assert proof['configured_local_result'] is None
+    assert proof['configured_local_result']==report['result']
     assert proof['managed_service_proof']['job']['result']=='done'
     assert proof['managed_service_proof']['keeper_kernel_terminal']
     assert report['model_calls']==report['gpu_calls']==0 and not report['autonomous_goal_complete']

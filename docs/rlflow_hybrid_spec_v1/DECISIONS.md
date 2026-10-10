@@ -1,5 +1,7 @@
 # 开发决策记录
 
+89 负实验不由输出合格metric推出PASS：新原execution来自同task唯一waitpid与trusted control reason，非零/信号/期限机器FAIL，历史重算必须一致。旧success-onlyRESULT仍闭合兼容，不篡改旧事件。异常日志仅sandbox+G后有限type/message+finallyflush，task-owned不授评审；原所有缓存/归档/STOP/FREE界保留。PublicView同规则重算execution，独立前端矛盾PASS MUST关闭。分轮定向证据如实保留失败与源版本，不重复65s/期限已过场景。
+
 88 不为最长300s配置放宽既有60s新效应授权：G末门期限保留，原安全cleanup可在期限后执行，实际69s失败验证成立。CLI负执行结果区分FAILED_NO_RESULT/exit3与原机器0/1/2，最终report须原history+context退出成功；history/pool_after明确context前as-of，不升级晚期状态。非零退出stdout/stderr尚不归档，不能借打印合格metric伪PASS；下片按原task reaped/terminal证据保留有限失败诊断，不重新执行。
 
 87 公开实验原历史：新exact LocalCpuPublicTaskReader先走私有原whole-event验证，再仅投影outputs/approved_acceptance/machine_acceptance及原计额；managed proof不公开，HTTP无路径/控制/冷能力重建。固定动作必须匹配旧PROTOCOL_CONFORMANCE kind。本地输出不是Review或ConditionEvidence。独立审查确认默认executor无界MUST，最小修用独立ControlPool(2)，两个读步骤一个真实job、waiter取消仍占槽、lifespan真实drain，STOP池不共享；旧应用关闭后不重新打开其池。必要回归失败为测试接线，保留初失败，仅复验受影响项，不重复未变UI或全库。

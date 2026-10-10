@@ -1,5 +1,9 @@
 # Hybrid v1 开发进度
 
+Checkpoint89 收尾：88提交9302fb8。实际非零退出/期限终止现在归档原stdout/stderr、原唯一task waitpid状态与trusted控制原因；新execution闭schema、deadline覆盖、非成功强制machineFAIL（合格metric也不PASS），旧success-only事件兼容。失败异常打印/flush在原sandbox+G之后，前G控制身份不输出；原128KiB cache前门、fullmanagedSTOP/settlement/Pool门不放宽。PublicReader可选execution与JS原退出状态重算接通；不授Review/ConditionEvidence。首95039终d5f56b 1pass期限/1fail非零41.03s，根因keeper异常os._exit吞stderr。修后仅受影响非零+原EXACT PASS/FAIL+4CLIstub96192终d10b1e 7pass60.49s；期限passed保留/不重复，65s旧证据不重复，更新其新归档断言但不称新长时通过。profile19pass0.08s、Node17pass80.46ms+实际公开失败DTO1pass67.75ms，High前端状态MUST关闭，无新MUST；current公开history读取86旧实际Store验证兼容。证据checkpoint-89-negative-evidence/及HYBRID_LOCAL_CPU_FAILURE_EVIDENCE.md，进入提交。
+
+下一推进实验/资源在原父进程崩溃后的安全恢复：先核真实持久UNKNOWN/资源终态与不可重放边界，再补有效恢复行为，不增加固定演示。真实模型链集中合同仍未答不调用，strictquota/全部异常恢复/24h8h与instinctRL实机资格未满足，原Goal ACTIVE/USERlock不动。
+
 Checkpoint88 收尾：87提交5b01600。公开配置Runner异常不再只有traceback：原run不重试，resultNone/FAILED_NO_RESULT/exit3；只在原历史验证与context收尾成功后输出最终报告，不把异常升级机器FAIL/FREE/Review，原0/1/2不变。实测单次批准配置研究任务printmetric→实际65s等待→非零退出，过原60s Controller/workspace/Pool期后原安全STOP仍完整；实际wall69/start1/fullmanagedSTOP/SETTLED/Pool0，退出后cold同原history。55052终fb8bd6 exit0/1pass81.80s；报告合同stub4pass0.19s不算实际执行，High窄审无新增MUST，compile/diff/USERlockSHA检查通过，无live/新active unit，证据checkpoint-88-negative-runner/。不是科研结论/模型闭环/24h8h/全库或安装资格，进入归档提交。
 
 下一补非零退出与超时任务的原输出/退出原因持久诊断，保留机器UNKNOWN或失败而非将合格metric误判PASS；当前成功-only collector明确丢失败日志，是真实实验Runner缺口。真实模型链集中合同仍未批准不调用，instinctRL只读HOLD/strictquota/完整崩溃恢复/长跑准入未满足，原Goal ACTIVE。

@@ -160,9 +160,8 @@ class LocalCpuRunnerOwner(FixtureRuntimeOwner):
             closed=row['task_closed']
             if closed is None or not attempt['release_entered'] or not closed['stopped']['release_attempted']:
                 raise Conflict('original configured task terminal after G required')
-            if not any(item['pid']==closed['task']['pid'] and item['status']==0
-                       for item in closed['stopped']['reaped']):
-                raise Conflict('original configured task did not exit successfully')
+            from .hybrid_local_cpu_result import execution_from_closed,evaluate_execution
+            execution=execution_from_closed(closed['task'],closed['stopped'])
             output={}
             for name,key in (('stdout','task_read'),('stderr','task_error_read')):
                 raw=os.pread(row['fds'][key],65537,0)
@@ -174,7 +173,8 @@ class LocalCpuRunnerOwner(FixtureRuntimeOwner):
                     'task':closed['task'],'outputs':output,
                     'approved_spec_sha256':attempt['origin']['local_cpu']['spec_sha256'],
                     'approved_acceptance':spec.get('acceptance'),
-                    'machine_acceptance':evaluate_output(spec,output),
+                    'machine_acceptance':evaluate_execution(spec.get('acceptance'),output,execution),
+                    'execution':execution,
                     'independent_review_status':'NOT_PROVEN','condition_evidence':False}
             # Reserve room inside unchanged Budget/terminal envelopes for the
             # manager receipt and original references. UTF-8 byte bounds alone

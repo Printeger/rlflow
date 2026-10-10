@@ -24,4 +24,11 @@ test('actual authenticated local history satisfies display contract; inflated ca
     v=>v.events.at(-1).state_version--,
   ];
   for(const change of mutations){const value=structuredClone(original);change(value);assert.throws(()=>checkFixtureTimeline(value,scope,task));}
+  const withExecution=structuredClone(original);
+  withExecution.configured_result.execution={status:'SUCCEEDED',wait_status:0,control_terminal_reason:'PRODUCER_EXIT'};
+  assert.equal(checkFixtureTimeline(withExecution,scope,task),withExecution);
+  for(const changed of [{wait_status:256},{control_terminal_reason:'DEADLINE'},{wait_status:127}]){
+    const value=structuredClone(withExecution);Object.assign(value.configured_result.execution,changed);
+    assert.throws(()=>checkFixtureTimeline(value,scope,task));
+  }
 });

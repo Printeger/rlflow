@@ -1,0 +1,31 @@
+.                                                                       [100%]
+=================================== FAILURES ===================================
+________ test_actual_negative_result_archived_stopped_and_cold[nonzero] ________
+
+tmp_path = PosixPath('/tmp/pytest-of-mint/pytest-746/test_actual_negative_result_ar0')
+failure = 'nonzero'
+
+    @pytest.mark.parametrize('failure',['nonzero','deadline'])
+    def test_actual_negative_result_archived_stopped_and_cold(tmp_path,failure):
+        tmp_path.chmod(0o700)
+        code="import json,time; print(json.dumps({'loss':0.1}),flush=True); "
+        code+="raise ArithmeticError('invalid calibration')" if failure=='nonzero' else 'time.sleep(40)'
+        spec={'purpose':'research','code':code,'inputs':{},'seconds':10,
+            'limits':{'memory_max':67108864,'cpu_max':'100000 100000','pids_max':12},
+            'acceptance':{'method':'JSON_METRICS_RANGE','metrics':{'loss':{'min':0,'max':.2}},'stderr_empty':False}}
+        with isolated_session(tmp_path,spec,approved=True,confirmation_reader=lambda p,c:'APPROVE '+c['scope_hash']) as session:
+            runtime=session['runtime'];lease=session['lease'];attempt=runtime._issued(lease)
+            result=runtime.run_local_cpu(lease)
+            assert result['execution']['status'] in (('NONZERO_EXIT',) if failure=='nonzero' else ('DEADLINE','SIGNAL_EXIT'))
+            assert result['machine_acceptance']['status']=='FAIL'
+            assert json.loads(result['outputs']['stdout']['text'])=={'loss':.1}
+>           if failure=='nonzero':assert 'invalid calibration' in result['outputs']['stderr']['text']
+E           AssertionError: assert 'invalid calibration' in ''
+
+tests/test_hybrid_local_cpu_negative_result.py:26: AssertionError
+----------------------------- Captured stdout call -----------------------------
+{"proposal": {"schema_version": "1.1", "project_id": "isolated_local_cpu", "data_mode": "fixture", "goal_id": "isolated_goal", "contract_version": 1, "objective": "Original configured local CPU task with managed STOP", "goal_kind": "research", "global_conditions": [{"id": "C1", "description": "Configured local machine verification passes; not independent review", "required": true, "verification": {"method": "deterministic", "rule": "Original approved configured result; NOT_CONFIGURED is not PASS", "evidence_required": ["test_result"]}}, {"id": "C2", "description": "Independent product review passes", "required": true, "verification": {"method": "independent_review", "rule": "Separate read-only reviewer same candidate", "evidence_required": ["review_result"]}}], "scope": {"writable_paths": ["module/"], "protected_paths": [".rlflow/", "fixtures/acceptance/"], "allowed_command_templates": ["local_cpu"], "network_access": "none", "allowed_hosts": []}, "budget": {"model_sessions": 0, "model_input_tokens": 0, "model_output_tokens": 0, "model_token_enforcement": "hard_required", "gpu_device_seconds": 0, "experiment_starts": 3, "experiment_retries": 0, "wall_seconds": 300, "finalization_reserve_fraction": 0.2}, "stop_rules": ["Original configured CPU only; no model/GPU", "Keep UNKNOWN on missing original managed terminal proof"], "risk": "low", "approval_status": "UNAPPROVED", "allowed_tools": ["local_cpu"], "registry_bindings": {"tool_registry_hash": "sha256:d88a48336e1e58179919b004925fcafc026da85bed4d856903f8d752bbd5f25e", "command_registry_hash": "sha256:b9cdcb13557d83c87f5603f47e3c4a6080d3bc2c7035f680d77c9d7ec7a38965", "runtime_profile_hash": "sha256:fe5623d88e1800d618811756038c9735b0a4b5b5eaeaf209166bcf8ed54ec6ce", "resource_profile_hash": "sha256:5e4fe51485b19ffe7165434b090f5420ce4023fb64e908400dae80e9902b6226", "dataset_registry_hash": "sha256:25d66a17c446214a1669cff81e75bd21219e5a08e9c52ac476996f91652b7035"}, "evaluation_data": {"mode": "EXPLICIT_NONE", "datasets": [], "evaluation_rule": {"id": "local_cpu_rule", "version_hash": "sha256:470c4f9d5c1dcac476d3e5590a91611dc5d1621c104d6cc06d6d8d93910d9886"}}}, "approval_scope_hash": "sha256:3d3749e3992d47ae04dfe62abd0d85023a9a084d9f9526e34f794533c70038e8"}
+Type APPROVE sha256:3d3749e3992d47ae04dfe62abd0d85023a9a084d9f9526e34f794533c70038e8 for ONLY this isolated zero-model/GPU CPU spec:
+=========================== short test summary info ============================
+FAILED tests/test_hybrid_local_cpu_negative_result.py::test_actual_negative_result_archived_stopped_and_cold[nonzero]
+1 failed, 1 passed in 41.03s
