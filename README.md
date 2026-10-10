@@ -35,7 +35,7 @@ rlflow_standalone/
 
 ## Hybrid v1 开发中
 
-原命令在接纳后丢失机器阶段返回的显式恢复见 [原有限执行恢复](docs/hybrid-v1/HYBRID_UNIT_RECONCILIATION.md)。安装态 CPU 单次补决策、工程原事实读回及 STOP 已验证；Dashboard 已接入同 body/key 的人工恢复和 UNKNOWN 展示，不自动重启执行或清除曝露。预算余额尚未接入，界面明确显示未读取。
+原命令在接纳后丢失机器阶段返回的显式恢复见 [原有限执行恢复](docs/hybrid-v1/HYBRID_UNIT_RECONCILIATION.md)。安装态 CPU 单次补决策、工程原事实读回及 STOP 已验证；Dashboard 已接入同 body/key 的人工恢复和 UNKNOWN 展示，不自动重启执行或清除曝露。独立的[原预算与共享池面板](docs/hybrid-v1/HYBRID_FINITE_HOST_APP.md)读取真实账本余额和持久占槽，标明分源 as-of、权限和 UNKNOWN；恢复接口本身仍不读取余额。
 
 执行关闭后的原结果消费见 [安装态只读宿主](docs/hybrid-v1/HYBRID_COLD_RESULT_HOST.md)。新进程读取原机器结果和验收缺口，不恢复运行能力或注册写入口。
 

@@ -1,5 +1,9 @@
 # 阻塞与证据缺口
 
+Checkpoint80 FINAL：原 Goal 预算与共享池可信只读消费已接入 Dashboard。原事件/索引/派生 head/REGISTER 来源核验，七维 int64 十进制余额由 BigInt 精确校验；两个来源独立 as-of，不冒称当前进程、跨库原子快照或实际费用。所有历史池成员权限完整覆盖才显示全池占用与版本，否则两者均 null；坏源/迟到响应清空当前数值并显示 UNKNOWN，不退款。实际 CPU/工程执行消费、正常释放及 UNKNOWN STOP 保留占槽/曝露已由原浏览器链验证。后台三项 distinctcase 分轮通过、Node 六项通过、新 Chrome 两项及必要旧 Dashboard 一项通过；失败均先定位测试生命周期/来源假设，未重复已过执行链。High 差量隐私 MUST 已关闭。证据见 evidence/checkpoint-80-tests.txt；发行差量与最终输入核对随归档记录，不声明新全库或安装态执行。
+
+下一81按 T13 依赖核验真实独立产品 Reviewer 的只读隔离、可中断执行与可信用量来源，并提出具体有界验收合同；现有 fixture 模型/GPU 额度为零，不调用模型、不改既有批准。产品 Review/ConditionEvidence、native、strictOS、provider invoice、B1、长期及完整 M0–M5 仍未验收，Goal ACTIVE；代码 High 审查不替代产品 Review。无当前80代码阻塞；需要新的实际模型验收时必须先获具体权限/额度批准。USER package-lock.json 保持不改不暂存。下方保留历史。
+
 Checkpoint79 FINAL：本切片无剩余MUST/需用户决定阻塞；UI显式原命令恢复与真实故障/STOP消费已通过。当前预算只显示未读取，未交付Dashboard可信原账本余额和共享池当前占用，下一80按原来源补实际只读可观察闭环，拒无源零和unknown退款。浏览器原tests fixture使用合成native/catalog/clock，不是实装/realUTC恢复，High代码审查不是独立产品Review；78安装证据仍独立，79未重跑不变全库/后端。native/Condition门/产品Review/strictOS/provider invoice/B1/24h8h/T22T23/完整M0–M5保持缺口。详evidence/checkpoint-79-tests.txt；权限和USERlock不变，下方为历史。
 
 Checkpoint78 FINAL：本切片无未解决MUST或新增需用户决定阻塞。已安装原同进程保留能力的机器阶段失败恢复和可靠正常STOP已通过；真实Popen成功却丢返回的定向用例保留UNKNOWN预算/占槽，不允许cap/PID接管或虚假FREE。后者是原fixture测试，非安装宿主/活动worker崩溃后的自动恢复验收，不能计A22全覆盖。六新增case分轮与四受影响旧回归通过，所有注入/计数/示例失败保留；独立产品Review和Condition门、通用native产品执行、strictOS/provider invoice/B1/24h8h/T22T23/M0–M5仍未闭合。下一79交付Dashboard显式原key/body恢复及UNKNOWN曝露、独立STOP消费；不能把代码High审查当产品Review。当前无需新增paid/GPU/系统/生产权限；确需时给具体方案再问。详 evidence/checkpoint-78-tests.txt，USERlock原hash未变未stage，下方为历史。

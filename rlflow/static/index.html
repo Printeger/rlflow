@@ -125,6 +125,10 @@
         <div class="controls"><button id="fixture-start" type="button" disabled>明确启动固定 CPU Task</button><button id="fixture-stop" type="button" disabled>明确 STOP 原固定范围</button><button id="fixture-retry" type="button" hidden>手动重试原 body / 原 key</button><button id="fixture-abandon" type="button" hidden>清除本地意图（不取消执行）</button></div>
         <pre id="fixture-receipt" aria-label="原接收回执，不是当前执行状态"></pre>
       </section>
+      <section class="panel" aria-labelledby="finite-accounting-title">
+        <div class="panel-heading"><h2 id="finite-accounting-title">原预算与共享池 · 精确只读</h2><button id="finite-accounting-refresh" type="button">读取原余额 / 占槽</button></div>
+        <p id="finite-accounting-note" role="status"></p><pre id="finite-accounting-detail" aria-label="独立版本的原Goal预算与持久Pool占槽；非当前进程或供应商费用"></pre>
+      </section>
       <section class="panel" aria-labelledby="finite-stop-title">
         <div class="panel-heading"><h2 id="finite-stop-title">原共享池绑定全集 · 紧急 STOP</h2><button id="finite-stop-refresh">读取原范围</button></div>
         <p class="muted">仅可信宿主预先绑定的1–3个原固定 Unit；全部授权与 key 冲突预检后，先全部锁存取消，再逐项目原意图/强能力收尾。部分失败不能证明全部释放；不是任意树或整个 Goal STOP。</p>

@@ -1,5 +1,9 @@
 # 开发决策记录
 
+Checkpoint80 FINAL：原 Goal 预算与共享池可信只读消费已接入 Dashboard。原事件/索引/派生 head/REGISTER 来源核验，七维 int64 十进制余额由 BigInt 精确校验；两个来源独立 as-of，不冒称当前进程、跨库原子快照或实际费用。所有历史池成员权限完整覆盖才显示全池占用与版本，否则两者均 null；坏源/迟到响应清空当前数值并显示 UNKNOWN，不退款。实际 CPU/工程执行消费、正常释放及 UNKNOWN STOP 保留占槽/曝露已由原浏览器链验证。后台三项 distinctcase 分轮通过、Node 六项通过、新 Chrome 两项及必要旧 Dashboard 一项通过；失败均先定位测试生命周期/来源假设，未重复已过执行链。High 差量隐私 MUST 已关闭。证据见 evidence/checkpoint-80-tests.txt；发行差量与最终输入核对随归档记录，不声明新全库或安装态执行。
+
+下一81按 T13 依赖核验真实独立产品 Reviewer 的只读隔离、可中断执行与可信用量来源，并提出具体有界验收合同；现有 fixture 模型/GPU 额度为零，不调用模型、不改既有批准。产品 Review/ConditionEvidence、native、strictOS、provider invoice、B1、长期及完整 M0–M5 仍未验收，Goal ACTIVE；代码 High 审查不替代产品 Review。无当前80代码阻塞；需要新的实际模型验收时必须先获具体权限/额度批准。USER package-lock.json 保持不改不暂存。下方保留历史。
+
 Checkpoint79 FINAL：原RUN receipt不再丢掉body/key，独立immutable witness仅在202接纳、命令/body SHA核验及所有crypto后票据/任务/人类权限末门通过后建立。结果ID沿原Unit→CPU phase或工程intent/output/acceptance精确派生，拒合法格式foreign事实；cleanup两状态互斥，合法取消携fact/UNKNOWN仍保留。恢复独立PendingCommand，200封闭DTO；丢返回清本次显示、人工同key核对、不自动dispatch，STOP不等待恢复。app.request的expectedStatus是窄选项，默认其他API不变。无原余额字段则预算未读取，拒历史FREE/退款推断，不扩读域。High两MUST与测试crypto门诊断见evidence/checkpoint-79-tests.txt；下一80可信原预算/Pool消费，不从历史能力重建控制权，下方为历史。
 
 Checkpoint78 FINAL：普通START重试继续只读旧接纳回执，显式reconcile才进入原Unit.resume。先验证完整原HANDOFF、相同原actor/key/body/初始版本，再签发原human操作，原写guard决定缺失CPU机器事实能否补齐；工程不得自动重写，冷/关闭对象不得采纳cap。来源准备和结果核验都放独立有界真实future池，取消HTTP等待者不返还容量；原STOP通道保持独立。来源ProtocolError只在source域转503，非法外部请求仍400。返回原状态及全源核验后的fact ID/hash/版本，不从JSON恢复执行。安装验证用显式fixture-only失败选项，不改原审批/UTC；CPU缺决策/工程丢返回真实验收。测试撤权注入死锁改为原guard检查测试时钟过期，错计共享Pool及UNKNOWN teardown按原协议修；示例200覆盖202最小拆变量，不放宽检查。所有失败与High MUST关闭见 evidence/checkpoint-78-tests.txt；下一79显式Dashboard消费，不改变普通START语义，下方为历史。

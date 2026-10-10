@@ -1,5 +1,9 @@
 # 需求包离线校验报告
 
+Checkpoint80 FINAL：原 Goal 预算与共享池可信只读消费已接入 Dashboard。原事件/索引/派生 head/REGISTER 来源核验，七维 int64 十进制余额由 BigInt 精确校验；两个来源独立 as-of，不冒称当前进程、跨库原子快照或实际费用。所有历史池成员权限完整覆盖才显示全池占用与版本，否则两者均 null；坏源/迟到响应清空当前数值并显示 UNKNOWN，不退款。实际 CPU/工程执行消费、正常释放及 UNKNOWN STOP 保留占槽/曝露已由原浏览器链验证。后台三项 distinctcase 分轮通过、Node 六项通过、新 Chrome 两项及必要旧 Dashboard 一项通过；失败均先定位测试生命周期/来源假设，未重复已过执行链。High 差量隐私 MUST 已关闭。证据见 evidence/checkpoint-80-tests.txt；发行差量与最终输入核对随归档记录，不声明新全库或安装态执行。
+
+下一81按 T13 依赖核验真实独立产品 Reviewer 的只读隔离、可中断执行与可信用量来源，并提出具体有界验收合同；现有 fixture 模型/GPU 额度为零，不调用模型、不改既有批准。产品 Review/ConditionEvidence、native、strictOS、provider invoice、B1、长期及完整 M0–M5 仍未验收，Goal ACTIVE；代码 High 审查不替代产品 Review。无当前80代码阻塞；需要新的实际模型验收时必须先获具体权限/额度批准。USER package-lock.json 保持不改不暂存。下方保留历史。
+
 Checkpoint79 FINAL：原需求/验收不改。43项Node distinct分轮通过，包含来源闭包、不同actor/key/body/结果派生拒绝、迟到HTTP/crypto/同epoch任务变化和viewer/closed零发送。原Chrome两case终0；High修后仅受影响机器事实链再次终0，原UNKNOWN不重跑。实际CPU缺决策+1事件/repeat+0，工程commit丢返回+0，恢复增量worker/write/G/collect0；阻塞恢复时原STOP接纳和scope切换迟到DOM隔离，正常Pool0。Popen成功丢返回保留unknown_exposure1/reserved1/consumed0/Pool1，UI预算未读取，不称FREE。两MUST已关闭，失败/合成与复用边界见HYBRID_UNIT_RECONCILIATION.md/evidence/checkpoint-79-tests.txt。不是新全库/安装资格/产品Review/A22全面或完整Goal；下一80可信原预算/Pool只读消费，下方为历史。
 
 Checkpoint78 FINAL：原需求/标准保持。六新增恢复case分轮通过（R1双已提交丢返回、R2缺决策和真实坏源503、R5末次expiry/STOP/UNKNOWN/held容量4pass117.80s），四原control/sharedSTOP/cleanup必要回归4pass92.77s；无新增full/UI重复声明。最终安装61178终99baea exit0：CPU384新增一次决策、工程3/21只读原接纳，各启动1次、pwrite0/1；恢复禁止run/start/G/collect/Popen/pwrite且重复不写，otherproject不变，原console/HTTPSTOP/reap/全FD/Pool0。原UNKNOWN用例budget曝露1/占槽1真实保留，物理labreap不代替FREE；测试末次过期/STOP不冒称并发HTTP撤权。sdist→wheel4194511d…6049c实装，337原文件逐字节相同，380终态输入全match，High两控制与示例变量MUST关闭。所有真实失败及诊断见 HYBRID_UNIT_RECONCILIATION.md/evidence/checkpoint-78-tests.txt。不是冷能力接管/原生产品Review/A22全面或M0–M5完成；下一79接入现有Dashboard显式恢复，下方为历史。

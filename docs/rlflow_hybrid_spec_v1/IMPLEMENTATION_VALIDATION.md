@@ -1,5 +1,9 @@
 # 系统实施验收记录
 
+Checkpoint80 FINAL：原 Goal 预算与共享池可信只读消费已接入 Dashboard。原事件/索引/派生 head/REGISTER 来源核验，七维 int64 十进制余额由 BigInt 精确校验；两个来源独立 as-of，不冒称当前进程、跨库原子快照或实际费用。所有历史池成员权限完整覆盖才显示全池占用与版本，否则两者均 null；坏源/迟到响应清空当前数值并显示 UNKNOWN，不退款。实际 CPU/工程执行消费、正常释放及 UNKNOWN STOP 保留占槽/曝露已由原浏览器链验证。后台三项 distinctcase 分轮通过、Node 六项通过、新 Chrome 两项及必要旧 Dashboard 一项通过；失败均先定位测试生命周期/来源假设，未重复已过执行链。High 差量隐私 MUST 已关闭。证据见 evidence/checkpoint-80-tests.txt；发行差量与最终输入核对随归档记录，不声明新全库或安装态执行。
+
+下一81按 T13 依赖核验真实独立产品 Reviewer 的只读隔离、可中断执行与可信用量来源，并提出具体有界验收合同；现有 fixture 模型/GPU 额度为零，不调用模型、不改既有批准。产品 Review/ConditionEvidence、native、strictOS、provider invoice、B1、长期及完整 M0–M5 仍未验收，Goal ACTIVE；代码 High 审查不替代产品 Review。无当前80代码阻塞；需要新的实际模型验收时必须先获具体权限/额度批准。USER package-lock.json 保持不改不暂存。下方保留历史。
+
 Checkpoint79 FINAL：原17717终0：Chrome2pass85.15s，CPU缺决策+1事件/repeat+0、工程commit丢返回+0，恢复launch/write/G/collect均0，正常STOP/Pool0；真实Popen返回丢失recover/全集STOP UNKNOWN保持Pool1/unknown_exposure1/reserved1/consumed0。High窄修命令派生fact ID与cleanup闭包后，68556终9ad075 exit0受影响Chrome1pass64.97s/1名称filter skip，UNKNOWN不重复。43项Node distinctcase分轮通过，初旧fake摘要1fail及新增crypto门1cancelled均明确诊断最小测试修复；两High MUST关闭。未改后端，不重复全库/原安装执行；browser原tests fixture不是实装/realUTC证据。383终态输入及失败/边界归档evidence/checkpoint-79-tests.txt；下一80补可信预算/Pool只读可观察消费，完整Goal未完成，下方为历史。
 
 Checkpoint78 FINAL：最后installed61178终99baea exit0（打印summary后完整finally已结束），真实CPU原384/机器verified恢复新增1事件，工程3/AST21机器待Review原提交恢复新增0；各worker1/pwrite0与1，恢复中不新启动/G/采集/文件写入，重复DTO/版本同一、另一原project不变。installedconsole/原HTTP全集STOP、原returncode已reap、全部source/slot/input/write FD关闭、Pool0。六新case分轮和四旧必要回归通过，High两控制与example覆盖变量MUST关闭；未重跑不变全库/UI。finalsdist205a5cfe…8f10→wheel4194511d…6049c实装337原字节相同、380终态输入匹配；失败/诊断完整保留于 evidence/checkpoint-78-tests.txt。真实UNKNOWN测试留budget曝露1/占槽1，非安装宿主执行崩溃接管；无native模型/付费/GPU/生产迁移/产品Review/完整Goal声明。下一79交付Dashboard原显式恢复与UNKNOWN/独立STOP消费，下方为历史。

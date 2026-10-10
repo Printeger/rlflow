@@ -15,7 +15,7 @@ from tests import test_hybrid_finite_host_app as shared_app
 
 def main():
     mode=sys.argv[2] if len(sys.argv)>2 else None
-    if mode not in (None,'machine-failures','unknown-start'):raise ValueError('closed fixture fault mode')
+    if mode not in (None,'machine-failures','unknown-start','accounting'):raise ValueError('closed fixture fault mode')
     root=Path(sys.argv[1]).resolve();sock=socket.socket();sock.bind(('127.0.0.1',0))
     origin=f'http://127.0.0.1:{sock.getsockname()[1]}'
     patch=pytest.MonkeyPatch();patch.setattr(shared_app,'ORIGIN',origin)
@@ -73,6 +73,14 @@ def main():
                 return result
             patch.setattr(service,'execute_reconcile_prepared',verified)
     server=uvicorn.Server(uvicorn.Config(app,log_level='error',access_log=False,proxy_headers=False))
+    if mode is not None:
+        accounting=app.state.finite_accounting_source;original_budget=accounting._budget
+        def held_budget(service):
+            if hold_index[0]==2 and service is services[0]:
+                entered.set()
+                if not release.wait(12):raise TimeoutError('bounded private accounting gate')
+            return original_budget(service)
+        patch.setattr(accounting,'_budget',held_budget)
     def inspect():
         return {'launches':len(launches),'writes':len(writes),'occupied':host.pool.snapshot()['occupied'],
             'faults':faults,'held':entered.is_set(),'reconciliations':reconciliations,'G_count':len(releases),'collect_count':len(collections),
@@ -89,6 +97,8 @@ def main():
                 if op=='stop':break
                 if mode is not None and op=='hold_engineering':
                     hold_index[0]=1;entered.clear();release.clear();print(json.dumps({'armed':True}),flush=True);continue
+                if mode is not None and op=='hold_accounting':
+                    hold_index[0]=2;entered.clear();release.clear();print(json.dumps({'armed':True}),flush=True);continue
                 if mode is not None and op=='release':
                     hold_index[0]=None;release.set();print(json.dumps({'released':True}),flush=True);continue
                 if mode is not None and op=='close_engineering':

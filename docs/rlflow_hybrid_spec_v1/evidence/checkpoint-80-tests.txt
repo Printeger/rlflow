@@ -1,0 +1,139 @@
+Checkpoint80 FINAL / trusted original accounting consumed by Dashboard
+2026-10-10; base c7171d8a7d79bafe8da096b1018209f03b1bfc2a.
+Reconstructed index of actual tool outputs, NOT one combined raw run.
+Full original M0-M5 Goal ACTIVE; original acceptance and authority unchanged.
+
+DELIVERY
+New closed authenticated finite-accounting GET reads original Goal ledger entry,
+indexed tip, derived head and reservation/task binding; seven dimensions x six
+fields are canonical int64 decimal strings with exact UI BigInt conservation.
+Source entry/hash, epoch, identities, independent Core/Pool as-of/read times.
+Pool counts original durable claims, including UNKNOWN/dead/expired unreleased
+claims. Complete bounded original REGISTER proof includes FREE historical members.
+Only permission for ALL durable member projects exposes global occupied AND
+global Pool version; PROJECT_ONLY both null, own project count remains visible.
+No root/PID/member/claim keys exposed. Reader captured bindings and physical
+identity reject rebound/drift, corruption503, no zero/refund.
+Original Pool connector uses writer lock/BEGIN IMMEDIATE/COMMIT: business read
+only, NOT filesystem-pure read-only. No event/claim/free mutation; no nested
+Store-to-Pool transaction. Independent two-future executor does not share STOP
+slots/latch; canceled HTTP futures retain capacity until actual completion.
+Physical STOP may still wait original Pool lock, not a zero-wait guarantee.
+UI manual GET + bounded current-project SSE version coalescing; foreign-project
+Pool changes require explicit reread. Separate as-of, no continuous global
+current-process claim. Bad source clears current numbers UNKNOWN; private
+identity/version anchors retained. Auth/project/epoch/logout clears anchors;
+late HTTP does not repopulate DOM. No execution POST or new settlement.
+
+BACKEND / ALL TERMINAL; 3 DISTINCT CASES SPLIT
+Prefix: env PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q
+Module: tests/test_hybrid_finite_accounting.py
+R0 original77803 -> b19896 exit1,2 setup errors/1 existing Starlette warning,
+34.96s: active Store constructor lacks cold-only store_epoch attribute.
+Actual constructor/attach inspected; use captured reader epoch and optional
+Store attr plus physical identity pins. No relaxed source guard/blind retry.
+R1 source case75195 ->4b3a9b exit1,1fail/1warning19.16s:
+actual GET already200/matching ledger; test issue_bearer returns tuple, not
+string. Fix only test unpacking.
+R2 module6017 ->3862a8 exit1,1pass/1fail/1teardownerror/1warning36.85s.
+real_read_futures_hold_capacity_cancel_waiters_and_STOP_independent PASSED:
+actual two held futures, canceled HTTP waiters pending2, third429; original
+CPU STOP202 + cancel latch; release gates pending0; expired token401;
+actual revoke while held fresh read -> final401; jobs drain closed.
+Source negatives passed until test left sqlite3 connection FD open:
+connection context commits but does not close. Original native Pool FD guard
+correctly refused uncertain target, including teardown. Use contextlib.closing
+and explicit commit; no product guard relaxation. Passed capacity not repeated.
+R3 only source case94757 ->f20c9e exit0,1pass/1warning21.90s.
+Exact original balances/read audits unchanged;401/closed query400; viewer
+project privacy/foreign404; Goal/reservation projection damage503/restored;
+same Store root/db rebound and foreign registration403 before IO; actual Pool
+head corruption503/restored; original audits restored; untouched Eng STOP202
+Pool2->1; historical FREE member still requires permission. No worker execution.
+R6 only new privacy case:
+tests/test_hybrid_finite_accounting.py::test_project_only_hides_global_version_even_when_other_scope_frees
+original42825 ->c36d4e exit0,1pass/1warning18.67s.
+Actual own-project bearer before/after foreign original Eng STOP202:
+full-auth Pool version rises/2->1, restricted global occupied/version both
+null, own project count1 and own budget balances/Core as-of unchanged.
+
+NODE / ALL TERMINAL
+node --test web_checks/finite-accounting.test.mjs
+a25260 exit0 initial5pass67.779967ms; aeb267 exit0 anchor5pass68.237456ms.
+Final561d1c exit0,6pass68.096245ms after privacy-null-version fix.
+Canonical exact integers beyond JS safe range + MAX int64, conservation,
+closed DTO/false authority/null/source/rounding negatives; only GET,
+current-project version coalescing/no heartbeat growth; badsource UNKNOWN
+clear/no loop/refund; late Auth/project/epoch/logout fences; private identity/
+Pool version anchor regressions; GLOBAL->PROJECT_ONLY retains private floor,
+both public global values null, later old GLOBAL version rejected.
+
+ACTUAL CHROME / ALL TERMINAL
+R4 node --test web_checks/finite-accounting-browser.test.mjs
+original17090 ->d99e34 ->9ea834 exit0,2pass/0fail/0skip77057.163686ms,
+cases54976.406742ms and21878.453532ms.
+Retained /tmp/rlflow-accounting-browser-VAfYnx (accounting mode):
+initial Pool2/project1/CPU reserve1; repeated GET original inspector unchanged.
+Actual CPU RUN machine verified, experiment balance available2/consumed1/
+limit3/overrun0/reserved0/unknown_exposure0 exact original DB; own Pool0/global1,
+Core20/Pool10. Switch Eng: distinct original limit0, project1/global1.
+Actual Eng RUN machine accepted pending review/write1 -> Pool0.
+Original Unit normal cleanup released before machine result, NOT a claim
+that human STOP caused completed-run releases. Injected unavailable503 clears
+numeric DOM UNKNOWN; original manual reread restores source.
+Held actual accounting future via private bounded12s gate; original whole
+STOP succeeds ASOFRETURN, logout before release prevents DOM refill.
+Workers already completed here, NOT active-worker STOP competition.
+Launches2/write1/Pool0, Unit POST exactly2; all accounting requests GET.
+Retained /tmp/rlflow-accounting-browser-Ve0MF3 (unknown-start):
+actual Popen CPU child then lost return before producer G registration.
+Original UNKNOWN reservation/exposure1/reserved1/project1/global2.
+Original whole HTTP STOP PARTIAL_OR_UNKNOWN releases untouched Eng -> Pool1,
+balances available2/consumed0/limit3/overrun0/reserved1/unknown_exposure1.
+Launch1/paid0/GPU0, actualcostUNKNOWN. Logout clears DOM. Finally child wait
+and original shutdown_safety do NOT adopt/free/refund unknown execution.
+Original server/browser processes exited via original finally; no restart.
+R5 necessary old Dashboard:
+node --test web_checks/browser.test.mjs
+original70685 ->3006ca exit0,1pass/0fail/0skip9715.51098ms.
+SSE/offline catchup/Auth/private clearing/native POST/log/XSS/telemetry idle;
+absent finite GET404 gracefully UNKNOWN, no fake zero.
+Retained web_checks/artifacts/run-zV1YiF.
+Three DISTINCT Chrome cases across two invocations, NOT one claimed3pass run.
+
+INDEPENDENT HIGH DELTA REVIEW / REUSE
+Authorized existing finite_app_review_63 read-only, no tests/edits.
+Concrete privacy MUST: global version still exposed after occupied redaction.
+Both hidden null; DTO/UI reject partial redaction; actual R6 foreign STOP proves
+no cross-scope version leak. Static MUST closed/no remaining MUST; unchanged
+full-authorized worker/browser branch not repeated after narrow fix.
+Code High is NOT product Review or ConditionEvidence.
+Original Checkpoint78 installed CPU384/Eng3 AST21/reconcile/console/physical STOP
+and79 recovery guards unchanged, reused not rerun. This is NOT a new full suite
+or installed execution qualification. Browser uses original fixed approval/
+test catalog/clock fixtures, not realUTC production. No native-model/product
+Reviewer/strictOS/invoice/B1/long soak/A22/T22T23/full M0-M5 completion claim.
+No paid model/GPU/global dependencies/push/production migration.
+USER root package-lock.json untouched/unstaged, SHA
+becc7e2a36dfcad4ffe934b5ff2f0f68187611d6c0641bd63d81367651cfbf09.
+
+NEXT
+81: check actual readonly independent Reviewer dependencies and concrete bounded
+isolation/model/token/cost/time/usage/STOP acceptance contract before any call.
+
+FINAL PACKAGING / CHECKS
+264c14 sdist exit0; 6b16aa tar extraction exit0;98437b wheel exit0 from that
+exact extracted sdist; aec348 isolated --no-deps --no-compile target install0.
+5860d3 exit0: ALL341 wheel payload files byte-equal to checkout and actual
+installed target, including new backend/static/test assets. No worker execution.
+Retained /tmp/rlflow-cp80-package-X18HOJ; final-sdist, final-wheel and site.
+sdist SHA fe279b5940f8dfbb661ab769317d7fa53cbd55aa5a77995f81c340679053fc12
+wheel SHA 2c01bea4ece2adf021bf845ca342a3cc4d118f127e626fc2d519a76a2561653f
+388 final input hashes: checkpoint-80-inputs.sha256, inventory SHA
+158fc3757e740fafe1b49b567cc93eb379e161e95c937375404dcd3d9cb58b31.
+Final set-e compileall/pip check/JS syntax/quiet388 hash check/diff check exit0.
+d1ac14 exact process-pattern pgrep exit1/no matches; no browser/server/CPU
+worker remains live, no kill/restart. USER lock hash unchanged and unstaged.
+Current fixture model/GPU budgets zero, never reuse/expand original approvals.
+Independent product Review, native, credible provider usage and full Goal gaps
+remain; preparing a proposal or development High review is not authorization.

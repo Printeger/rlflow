@@ -94,6 +94,8 @@ def create_finite_host_app(host,controls,auth,*,origin,observers=(),max_streams=
             fixed_unit_telemetry=telemetry,delivery_evidence_readers=delivery,
             control_services=pairs,agent_request_services=requests)
         install(app,coordinator)
+        from .hybrid_finite_accounting import FiniteAccounting, install as install_accounting
+        install_accounting(app,FiniteAccounting(host,controls),auth)
         return app
     except BaseException:
         coordinator.close()
