@@ -1,5 +1,7 @@
 # 实施计划与依赖
 
+Checkpoint78 FINAL：原HTTP显式恢复已实装验收：同actor/key/body/初始版本、可信HANDOFF/原结果，CPU缺机器决策单次补写、工程丢返回原事实读回、不重复执行/效果，原正常STOP闭环。未知启动保持预算曝露和Pool占槽，不能从child死亡或历史JSON恢复能力。证据见 HYBRID_UNIT_RECONCILIATION.md。下一Checkpoint79依赖此原接口，将显式恢复接入现有Dashboard；交付行为是同body/key人工核对原命令、机器阶段/UNKNOWN/未释放曝露如实展示、恢复读取阻塞时原STOP独立。验收包括真实原失败→UI恢复→原来源事实/版本一致→STOP，拒不同actor/key/已关闭来源，不让START重试自动派发；不是仅准备组件或测试数增加。原native/产品Reviewer/Condition门/strictOS/invoice/B1/长期/全T22T23/M0–M5仍待后续依赖闭合，权限不扩，无新增用户决定阻塞，下方为历史。
+
 Checkpoint77 FINAL：已交付安装态原结果冷读→相同console→真实只读宿主kill/reopen，新token/项目范围/无写入口/原业务事实不变均验收。它不完成执行崩溃恢复：下一Checkpoint78必须先核原UNKNOWN、提交身份、预算预留与reconcile协议，再用全新隔离安装态实际失败交付保留预留、无重复worker/结算、迟到旧权/结果拒绝的可观察闭环；恢复只使用原可信身份，不从JSON/PID构造cap。先确认依赖与已有原失败证据，选择必要差量验证，禁止再叠仅准备组件或重复正常执行。原native/独立产品Reviewer/strictOS/invoice/B1/长期与完整T22T23/M0–M5保持；无新权限决定阻塞，paid/GPU/生产预算边界未变。77交付与37分轮/实装证据见 HYBRID_COLD_RESULT_HOST.md，下方为历史。
 
 Checkpoint76 FINAL：已交付安装后的原固定CPU实验/工程执行→原机器结果→request-only console→可靠STOP消费链，不再依赖测试导入。验收是实际执行数值/状态、原source保护、working修补、进程/FD/Pool物理证据以及完整退出，最终72246 exit0和必要64pass已满足；详细范围见 HYBRID_INSTALLED_FIXTURE.md。下一Checkpoint77明确交付安装态关闭后可信原历史读取与异常状态呈现；验收包括冷读保留原结果及Review缺口、拒绝坏来源、无worker重启或重复RUN、未知清理不虚假FREE/退款、不重建历史能力。不新增Supervisor或只叠准备组件。native/独立产品Reviewer/严格OS/费用账单及长期验收仍需按原依赖单独闭合；无新增阻塞决策，本轮收尾不扩功能。原权限/预算和USERlock保持，下方为历史。

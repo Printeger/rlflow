@@ -5,6 +5,7 @@ real model metadata already present. --approve-isolated-fixed-fixture consents
 ONLY to existing model-free CPU profiles. No test imports, fake clocks or probes.
 """
 import argparse,hashlib,json,os,secrets,socket,subprocess,threading,time
+from contextlib import contextmanager
 from pathlib import Path
 from http.cookiejar import CookieJar
 from urllib.request import Request,build_opener,ProxyHandler,HTTPCookieProcessor
@@ -44,6 +45,16 @@ from rlflow.hybrid_finite_host_app import create_finite_host_app
 from rlflow.hybrid_cpu_assessment_reads import CpuAssessmentReader
 from rlflow.hybrid_candidate_output_reads import CandidateOutputReader
 from rlflow.web_auth import AuthStore,Credential,Principal
+
+@contextmanager
+def _replace_methods(rows):
+ originals=[]
+ try:
+  for owner,name,method in rows:
+   originals.append((owner,name,getattr(owner,name)));setattr(owner,name,method)
+  yield
+ finally:
+  for owner,name,method in reversed(originals):setattr(owner,name,method)
 
 def profile(project,kind):
  package=Path(rlflow.__file__).resolve().parent
@@ -110,6 +121,8 @@ def main():
  parser=argparse.ArgumentParser(description=__doc__)
  parser.add_argument('--parent',type=Path,required=True)
  parser.add_argument('--approve-isolated-fixed-fixture',action='store_true')
+ parser.add_argument('--verify-original-reconciliation',action='store_true',
+  help='Inject bounded fixture-only lost machine stage; explicitly reconcile the original HTTP command')
  args=parser.parse_args()
  if not args.approve_isolated_fixed_fixture:parser.error('explicit fixture-only consent required')
  parent=args.parent.resolve(strict=True)
@@ -200,13 +213,45 @@ def main():
   csrf=login['csrf_token']
   request_token,_=auth.issue_request_token(Principal('fixture_report_agent','agent',{'viewer'},projects))
   site=Path(rlflow.__file__).resolve().parent.parent
-  results=[]
+  results=[];reconciliations=[]
   for index,service in enumerate(controls):
    cpu=index==0;kind='CPU_TRIAL' if cpu else 'ENGINEERING'
    endpoint='cpu-unit' if cpu else 'engineering-unit'
-   code,result=post('/api/v1/projects/'+service.project_id+'/'+endpoint+'/commands',
-    {'action':'START_FIXED_CPU' if cpu else 'START_FIXED_ENGINEERING','task_id':service.task_id,
-    'expected_state_version':service.store.version()},csrf,'actual_fixed_start')
+   route='/api/v1/projects/'+service.project_id+'/'+endpoint+'/commands'
+   start_body={'action':'START_FIXED_CPU' if cpu else 'START_FIXED_ENGINEERING','task_id':service.task_id,
+    'expected_state_version':service.store.version()}
+   if args.verify_original_reconciliation:
+    unit=units[index];method='decide' if cpu else 'accept_machine';original=getattr(unit.output,method)
+    launches=[];writes=[];spawn=subprocess.Popen;pwrite=os.pwrite;faults=[]
+    def counted_spawn(*a,**kw):launches.append(a[0]);return spawn(*a,**kw)
+    def counted_write(*a,**kw):writes.append((a[1],a[2]));return pwrite(*a,**kw)
+    def missing_return(*a,**kw):
+     if not cpu:original(*a,**kw)
+     faults.append('BEFORE_DECISION_WRITE' if cpu else 'AFTER_MACHINE_COMMIT')
+     raise OSError('explicit disposable fixture machine-stage return failure')
+    with _replace_methods([(unit.output,method,missing_return),(subprocess,'Popen',counted_spawn),(os,'pwrite',counted_write)]):
+     code,result=post(route,start_body,csrf,'actual_fixed_start')
+    assert code==202 and faults and unit._last is None
+    assert len(launches)==1 and len(writes)==(0 if cpu else 1)
+    before=service.store.version();other=controls[1-index].store.audit()
+    duplicate_code,duplicate=post(route,start_body,csrf,'actual_fixed_start')
+    assert duplicate_code==202 and duplicate['duplicate'] and unit._last is None and service.store.version()==before
+    def forbidden(*a,**kw):raise AssertionError('original reconciliation must never repeat execution/effect')
+    with _replace_methods([(host,'run',forbidden),(unit.runtime,'start',forbidden),
+      (unit.runtime.sources,'_runtime_release',forbidden),(unit,'_collect',forbidden),
+      (subprocess,'Popen',forbidden),(os,'pwrite',forbidden)]):
+     recovery_code,recovered=post(route+'/'+result['command_id']+'/reconcile',start_body,csrf,'actual_fixed_start')
+     assert recovery_code==200 and recovered['result_fact'] is not None
+     assert recovered['result']['status']==('EXPERIMENT_MACHINE_VERIFIED_PENDING_REVIEW' if cpu else 'MACHINE_ACCEPTED_PENDING_REVIEW')
+     assert not recovered['new_dispatch_enabled'] and not recovered['automatic_effect_retry_enabled']
+     assert service.store.version()==before+int(cpu)
+     repeat_code,again=post(route+'/'+result['command_id']+'/reconcile',start_body,csrf,'actual_fixed_start')
+     assert repeat_code==200 and again==recovered and service.store.version()==before+int(cpu)
+    assert controls[1-index].store.audit()==other
+    reconciliations.append({'kind':kind,'fault':faults[0],'worker_starts':len(launches),
+     'pwrites':len(writes),'new_machine_events':int(cpu),'repeat_unchanged':True,'result_fact':recovered['result_fact']})
+   else:
+    code,result=post(route,start_body,csrf,'actual_fixed_start')
    assert code==202
    reader=(CpuAssessmentReader if cpu else CandidateOutputReader)(service.store,service.runtime.plans.registry,
     project_id=service.project_id,store_epoch=service.store_epoch)
@@ -241,7 +286,7 @@ def main():
   assert units[1].runtime._engineering_grants[id(units[1].runtime._issued(units[1].lease)['engineering_grant'])]['fd'] is None
   assert not any(n=='tests' or n.startswith('tests.') for n in __import__('sys').modules)
   print(json.dumps({'installed_package':str(site),'tests_imported':False,'real_clocks':True,
-   'real_native_version_only':True,'results':results,'original_STOP':True,'pool_occupied':0,
+   'real_native_version_only':True,'results':results,'original_reconciliations':reconciliations,'original_STOP':True,'pool_occupied':0,
    'model_calls':0,'GPU_starts':0,'product_review':'NOT_PERFORMED','Goal_completed':False}),flush=True)
  finally:
   primary=__import__('sys').exception()

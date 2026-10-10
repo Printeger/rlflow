@@ -1,0 +1,184 @@
+Checkpoint78 FINAL original human-command reconciliation
+2026-10-10; base41c70392a82f161ca25e8a6e37f27a77105d0350.
+Reconstructed index of actual tool results; not one combined raw test log.
+Original M0-M5 acceptance, permissions and Goal ACTIVE unchanged.
+
+CANDIDATE DELIVERY
+Explicit POST original CPU/engineering command /reconcile uses same original
+actor/key/body/initial-version and verified HANDOFF_UNKNOWN source. Human session,
+CSRF and original final owned-write guards remain required. Original unit.resume
+only, never new run/start/G/collect/pwrite, historical-cap/PID adoption or approval
+renewal. Bounded dedicated realFuture pool holds source preparation+resume+proof;
+original full CPU/Candidate result source is proven before returning bounded fact
+identity/hash/version. Lost original START return is not automatically resumed.
+
+TEST RESULTS SO FAR
+Common argv prefix:
+env PYTHONPATH=/home/mint/rl_dev/rlflow_standalone PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q
+R0 module collection/setup failed because application fixture's native_setup
+dependency was not imported. No original worker run. Added original test fixture
+import only; did not fabricate native catalog/version acceptance.
+R1 exact case tests/test_hybrid_unit_reconciliation.py::test_actual_dual_lost_machine_return_reconcile_without_effect_retry
+original80508 terminal4594d8 exit0:1pass/1 old anyio warning/64.51s.
+Two real original CPU/engineering workers, machine commit succeeds then original
+method returns OSError. Ordinary duplicateSTART still only old HANDOFF receipt;
+explicit original reconcile recovers same facts; no new run/start/G/collect/
+Popen/pwrite, repeated response identical/noCorewrite, STOP body400 without latch,
+differentkey409/changedinitialversion503, otherprojectunchanged, actuallaunch2/Pool0.
+This preceded the two narrow pool/source-error MUST fixes, not final installed proof.
+R2 exact case tests/test_hybrid_unit_reconciliation.py::test_missing_CPU_decision_written_once_and_corrupt_sources_503
+original9123 terminal305565 exit0:1pass/1oldwarning/33.18s. Continued the existing
+running handle to terminal, no restart or duplicate. CPU RUN assessment succeeds,
+decision fails BEFORE write; explicit original HTTP reconcile adds exactly one
+machine event/fact through original guards. Actual source projection={} damage in
+new throwaway fixture only returns503 for HANDOFF and result, restored each time.
+Original run/start/G/collect/Popen/pwrite forbidden during reconcile, otherproject
+unchanged. Source87385e50b5b8c1711b875d45871b74e244120cb98af463be322f0467001c1361;
+test d3062fa963728ab039d24f2f07bf5ad6f9cbf147ea031a05c6ff16b6bca1bb46.
+
+R3 new boundary batch73878 startd91659: test-only deadlock. Test injection called
+AuthStore.revoke while original writer guard already held its non-reentrant Lock.
+Read-only diagnosis79c236: exactpytestPID1575305 four threads (main futex,portal
+epoll,twofutex), nochildprocess,104s. Scoped TERM7f8d68 -> original93f66b exit143.
+No claim product recovery/no-deadlock evidence from this aborted test. Original
+worker had already ended; OS closes this terminated test process's descriptors;
+no claim durable exposure refunded or product STOP proven. Replace the wrong
+injection by advancing only test Auth.clock, so original held guard checks expiry.
+No runtime/source/authority production changes. Not an identical retry.
+
+R4 original9522 startf73edc terminalcf8d0e exit1:4failed,1teardownerror,1oldwarning,
+113.80s. Actual final expiry/STOP write guards passed before each final wrong
+pool assertion; actual UNKNOWN spawned real child then Popen return lost, reply
+UNKNOWN_RESULT_UNAVAILABLE/noresult/noCorewrite, failed expectedoccupied1 vs2.
+Held preparation canceledwaiters429 and independentHTTPSTOP202 passed before
+wrongexpectedPool0 vs1. Shared application provisions BOTH original claims;
+untouched unstarted engineering still holds one. Diagnosed original sharedfixture
+claim loop and actual logs, not retrying the same assertion. UNKNOWN also needs
+explicit original shutdown_safety before sharedfixture ordinary teardown, as
+original UNKNOWN regression does; physical cleanup is not durable FREE.
+Only test assertions/cleanup corrected: snapshot original other claim unchanged,
+explicit host.cancel_all leaves CPU UNKNOWN1 after engineering STOP, check original
+budget consumed0/unknown_exposure1, test-owned lost Popen child reaped separately
+and pipe closed, runtime.shutdown_safety retires original FDs without refund.
+
+R5 original batch13563 start0b0a22, -o faulthandler_timeout=120 plus exact cases:
+tests/test_hybrid_unit_reconciliation.py::test_missing_decision_final_original_guard_blocks_write
+tests/test_hybrid_unit_reconciliation.py::test_uncertain_real_spawn_reconcile_preserves_UNKNOWN_exposure
+tests/test_hybrid_unit_reconciliation.py::test_held_reconcile_preparation_keeps_capacity_and_STOP_channel
+Terminal35ee81 exit0:4pass/1oldwarning/117.80s. Source87385e...1361 unchanged;
+test0b2ea6f6486bf0d42bda867ddf33c5a758908562a243c06e824c9698a41d9db1 frozen.
+Actual final session expiry and memory STOP both block missingdecision COMMIT.
+Real child starts then return lost; noG/noidentityadoption, original budget
+consumed0/unknown_exposure1, explicit otherproject STOP leaves CPU UNKNOWN Pool1,
+test-owned physicalreap+originalFDsafetyclose does not free it. Held preparation
+two actual futures retain capacity after HTTPwaitercancel; third429/independent
+STOP202/otheroriginalclaim unchanged, drainwaits actualfuture pending2->0.
+
+R6 necessary affected old regression original97887 start866b7f terminale8ca21
+exit0:4pass/1oldwarning/92.77s. Common prefix plus exact cases:
+tests/test_hybrid_cpu_unit_control.py::test_actual_HTTP_STOP_during_original_spawn_before_G_separate_channel
+tests/test_hybrid_engineering_unit_control.py::test_actual_HTTP_single_write_AST21_receipt_retry_STOP_and_recovery
+tests/test_hybrid_finite_host_app.py::test_actual_shared_app_CPU_STOP_before_G_leaves_other_original_project_executable
+tests/test_isolated_finite_example.py
+Original CPU/engineering commoncontrol START/STOP/lifespan, sharedPool scope and
+independent error cleanup covered; unchanged fullrepository/UI/77cold tests reused,
+not repeated. Six distinct new cases across R1/R2/R5 plus four old affected cases
+are composite pass evidence, not a new once-through full suite.
+
+R7 first installed candidate:sdist1b4a88 exit0/wheelbe2b7f exit0/install508f3c exit0.
+site /tmp/rlflow-cp78-installed-9Fjzp2/site.
+sdist SHAe65c4ad6dfdacb75e756bc1002a49be14232240cc32d48b01bf1216dcfed083d;
+wheel SHA2efef21c93107939d21e6267981f0e527b8a9c2ed9c2410326f7610a656576ac,
+size1111793,337originalrelease files3816194bytes exactly match ZIP(b803b6).
+Original44055 starte0d524 terminaldad05f exit1, cwd /tmp/rlflow-cp78-installed-9Fjzp2:
+env PYTHONPATH=/tmp/rlflow-cp78-installed-9Fjzp2/site PYTHONDONTWRITEBYTECODE=1 /home/mint/rl_dev/rlflow_standalone/.venv/bin/python -m rlflow.isolated_finite_example --parent /tmp/rlflow-cp78-installed-9Fjzp2 --approve-isolated-fixed-fixture --verify-original-reconciliation
+Initial two read diagnostics had wrongcwd and sed path failures, unrelated to
+consumer. Both exact scope confirmations e20023/f6f3a8 after original complete
+proposal/TTL300. CPU real missingdecision recovery and repeatedproof/forbidden
+effect assertions completed, then example's code variable overwritten by recovery
+HTTP200 caused common assertcode202 failure. High independently found controlflow
+before terminal; inputs unchanged until actual terminal/finally, nocleanuperror
+notes. This is incomplete acceptance, not a successful installed consumer.
+Old installed site/roots remain frozen. Minimal fix separates duplicate202/
+recovery200/repeat200 from originalSTART202. No repeated newunit/oldregressions.
+
+R8 final installed candidate:newparent /tmp/rlflow-cp78-final-wxr2Jz.
+finalexample9d99fc80080537dd195122e4d3d1db02c7fb58ffabf4eb8c6feb910616a46a61.
+sdistfb7354 exit0/wheelaa7b1b exit0/install39734b exit0:
+sdist /tmp/rlflow-cp78-final-wxr2Jz/sdist/rlflow_standalone-0.2.0.tar.gz
+SHA205a5cfe5ea1c06557198bcc2e04156a7104aa4823487f54a8930ef12cb58f10;
+wheel /tmp/rlflow-cp78-final-wxr2Jz/wheels/rlflow_standalone-0.2.0-py3-none-any.whl
+SHA4194511d4765a07c4e92018e07516abe1f09f83f9087b1b3a1ad853e94e6049c,
+size1111822. Real installation into NEW private site; fixed existing dependency
+environment, not pristine dependencyresolution/arbitrary mixedsite qualification.
+Originalrelease comparison19897d exit0:337files/3816280bytes individually equal.
+380final input paths recorded checkpoint-78-inputs.sha256; source/test bytes frozen.
+Original61178 startd59420, cwd /tmp/rlflow-cp78-final-wxr2Jz:
+env PYTHONPATH=/tmp/rlflow-cp78-final-wxr2Jz/site PYTHONDONTWRITEBYTECODE=1 /home/mint/rl_dev/rlflow_standalone/.venv/bin/python -m rlflow.isolated_finite_example --parent /tmp/rlflow-cp78-final-wxr2Jz --approve-isolated-fixed-fixture --verify-original-reconciliation
+OriginalCPU confirmationb2e7cd and engineering86dfa5; exactscope hashes unchanged
+e6de7d...40812/1924c2...d918, fullproposal/initialconsentTTL300 before each input.
+Native CLI0.161.0/realmodelmetadata gpt-6.1-sol/medium preparationonly verified
+b67992; noCodexexec/generation/fakeUTC/clock/version/metadata and no test imports.
+Terminal99baea exit0 AFTER full independent finally cleanup. No duplicate/restart
+of either live consumer. Source/site/approval/UTC remain those of this final run.
+Actual output:
+installed_package=/tmp/rlflow-cp78-final-wxr2Jz/site; tests_imported=false;
+real_clocks=true; real_native_version_only=true;
+CPU raw384/cases0/MACHINE_VERIFIED, engineering raw3/cases21/
+MACHINE_ACCEPTED_PENDING_REVIEW. CPU BEFORE_DECISION_WRITE fault -> newmachine1;
+engineering AFTER_MACHINE_COMMIT fault -> newmachine0. Workerstarts1 each,
+pwrites0 CPU/1engineering. Original HTTP duplicate202 leaves _lastNone and noCore
+write; reconcile200+repeat200 equalDTO/versions, forbidden run/start/G/collect/
+Popen/pwrite and otherprojectaudit unchanged. Console reports through actual
+installed executable in target cwd; report creates noCorewrite and lacks Review.
+CPU result_fact id/source_id:
+cpu_assessment_3c203cb8e2284e5f3ad9b3e031e162c7614a72ee7d0b08522d29fb791e7f7998
+sha256:ffecfb8c1f00eab91d6754e0bf30e2abe2db75c1e20e384380e68494297d51b1
+recorded_state_version20.
+Engineering result_fact id:
+candidate_output_acceptance_80fef5f995c8e596883ae74a22e534060d47b8344ed9ebc4421b51da1b682684
+source_id:
+candidate_output_result_76296da64fd352d79f1e39c6e5a77318cbf40b9fe7782ef689d6b22014d877ec
+sha256:fff2ef6604d64902d28bdd09fda5f92eb9b9d790c37032b6a7a518d42a422f42
+recorded_state_version21.
+Original accepted newfixture roots (from actual file census5001f8):
+CPU /tmp/rlflow-cp78-final-wxr2Jz/rlflow-host-fixture-q0i4vh68/projects/isolated_cpu/rlflow-guarded-fixture-jzocj3iz/store
+Engineering /tmp/rlflow-cp78-final-wxr2Jz/rlflow-host-fixture-q0i4vh68/projects/isolated_engineering/rlflow-guarded-fixture-_nr9iz2q/store
+Original wholeHTTPSTOP -> ORIGINAL_SCOPES_STOPPED_AS_OF_RETURN, allunitlatches,
+Pool0. Direct proof reads original producer.returncode already set (no poll to
+make it true), all source FDs/pidfd/PoolslotFD/Enginput/writeFD closed, engineering
+working AFTER and originalsource BEFORE. Full independent finally has no errors;
+no newwork/coldadoption. Model_calls0/GPU_starts0/product_reviewNOT_PERFORMED/
+Goal_completedfalse. Not a provider invoice/strictOS/completeA22/M0-M5 claim.
+
+INDEPENDENT HIGH
+Existing authorized finite_app_review_63 read-only/no tests or writes.
+Two initial MUST: heavy sourceprepare on ASGI event loop before pool and persisted
+ProtocolError misclassified400. Candidate fixes static closed: entire prepare+
+execute inside real bounded future, source-only _source_errors wraps HANDOFF/
+CPU/Candidate/check_current while externalrequesterrors400 remain outside.
+Current narrow control candidate no additional code MUST. New boundary scope must say
+final session expiry, not concurrent revoke; final memory STOP, not concurrent
+HTTPSTOP at commit. Held read STOP response is on already safe stopped CPU, not
+new live worker reaping evidence. Existing live STOP evidence retained separately.
+Review static counts are not runtime results. R4 poolcounts contradicted initial
+test assertions; actual evidence remains controlling.
+Final example codevariable MUST found in R7 and statically closed in R8; no other
+new example security MUST. Finalconsumer R8 terminal now satisfies that evidence.
+
+FINAL CHECKS AND REMAINING GOAL GAPS
+Compileall79e4f5 exit0; explicit py_compile controls/example/testff7afb exit0;
+pipcheck9b94c7 exit0 no broken requirements; original337release files match19897d;
+380finalruntime/test/build/JS hashes check92fc63 exit0 quiet allmatch.
+Final post-doccheck7d9805 exit0:git diff --check and all380 hashes quietmatch;
+inventoryfileSHA581266d10dd6b7564f53ba4ccaeeb6583eb639ab88508ea03c7efe958bcedded.
+USERlock original becc...1cfbf09 unchanged/untracked, no live test/consumer remains.
+No full repository/UI repeated run. New unit tests use original test
+fixture clocks/native metadata, not installed real UTC qualification. Original
+76/77 installed historical sources unchanged/read-only. USERpackage-lock remains
+becc7e2a36dfcad4ffe934b5ff2f0f68187611d6c0641bd63d81367651cfbf09 untracked/unstaged.
+No paid model/GPU/prod migration/global install/push. Original native/product
+Reviewer/strictOS/providerinvoice/B1/24h8h/T22T23/fullGoal gaps remain.
+Next79 deliver original explicit reconciliation in existing Dashboard: samebody/key,
+real UNKNOWN/exposure and independent STOP, no automatic START/reexecution. This
+does not manufacture independent product Review or complete the whole Goal.

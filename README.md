@@ -35,6 +35,8 @@ rlflow_standalone/
 
 ## Hybrid v1 开发中
 
+原命令在接纳后丢失机器阶段返回的显式恢复见 [原有限执行恢复](docs/hybrid-v1/HYBRID_UNIT_RECONCILIATION.md)。安装态 CPU 单次补决策、工程原事实读回及 STOP 已验证；不自动重启执行或清除 UNKNOWN 曝露，Dashboard 恢复入口仍待接入。
+
 执行关闭后的原结果消费见 [安装态只读宿主](docs/hybrid-v1/HYBRID_COLD_RESULT_HOST.md)。新进程读取原机器结果和验收缺口，不恢复运行能力或注册写入口。
 
 安装后的 model-free 固定工程/实验与原 STOP 验证见 [安装态固定执行](docs/hybrid-v1/HYBRID_INSTALLED_FIXTURE.md)。入口为 `python -m rlflow.isolated_finite_example`，仅创建全新私有 fixture，并逐项目确认原 scope；不等于通用项目、独立产品 Review、冷重启执行或完整发布验收。

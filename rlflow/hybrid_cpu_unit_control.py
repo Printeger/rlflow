@@ -279,6 +279,93 @@ class _OriginalUnitControl(FixtureRuntimeControlService):
         with self._intent_lock:
             self._issued.pop(id(operation),None);self._operation_raw.pop(id(operation),None)
 
+    def _reconcile_source(self,command):
+        """Exact original HANDOFF and retained request, never a new dispatch."""
+        self._pure()
+        if (command['action']!=self._start_action or self.unit._request!={
+                'idempotency_key':command['command_id'],
+                'expected_state_version':command['expected_state_version']}):
+            raise Conflict('original retained unit reconciliation request differs')
+        with self._source_errors(),self.reader.snapshot() as (db,meta):
+            read=ReadBudget(db,16*1024**2)
+            value=self.reader._point(db,read,self._source_key(command['command_id']),meta['as_of_state_version'])
+            if (value is None or value['request']['fixture_runtime']['phase']!='HANDOFF_UNKNOWN' or
+                    canonical(value['request']['fixture_runtime'].get('start_command'))!=canonical(command)):
+                raise Conflict('original complete HANDOFF reconciliation source differs')
+        receipt=self.receipt(command['command_id'])
+        if receipt is None or receipt['request_hash']!=command['request_hash']:
+            raise Conflict('original reconciliation acceptance unavailable')
+        return receipt
+
+    def prepare_reconcile(self,command_id,body,*,token,csrf,origin,idempotency_key):
+        self._pure();check_bytes(body,4096)
+        body=json.loads(canonical(body));validate_schema(self._start_body,body)
+        # Never pass CANCEL into generic prepare: it latches immediately.
+        if body['action']!=self._start_action:raise ValueError('original START reconciliation only')
+        validate_schema(ID,command_id);validate_schema(ID,idempotency_key)
+        if origin!=self.origin:raise PermissionError('same-origin reconciliation required')
+        access=self._session(token,csrf)
+        expected=control_command_id({'project_id':self.project_id,'data_mode':'fixture','store_epoch':self.store_epoch},
+            access.principal.id,idempotency_key)
+        if expected!=command_id:raise Conflict('original reconciliation command idempotency differs')
+        command={**body,'actor_id':access.principal.id,'idempotency_key':idempotency_key,
+            'command_id':command_id,'request_hash':digest(body)}
+        self._reconcile_source(command)
+        return self.prepare(body,token=token,csrf=csrf,origin=origin,idempotency_key=idempotency_key)
+
+    def execute_reconcile_prepared(self,operation):
+        self._pure()
+        if (self._issued.get(id(operation)) is not operation or
+                self._operation_raw.get(id(operation))!=canonical(operation.command)):
+            raise PermissionError('actual original reconciliation operation required')
+        operation.thread=threading.get_ident()
+        if self._operation() is not None:raise Conflict('nested reconciliation refused')
+        self._local.operation=operation
+        try:
+            self._session(operation.token,operation.csrf)
+            receipt=self._reconcile_source(operation.command)
+            result=self.unit.resume()  # Never host.run/start/G/collect or new engineering apply.
+            # A status with a fact must survive the original cold source proof.
+            fact=result['fact'];proof=None
+            if fact is not None:
+                if self._unit_type is CpuTrialExecutionUnit:
+                    from .hybrid_cpu_assessment import fact_key
+                    from .hybrid_cpu_assessment_reads import CpuAssessmentReader
+                    key=fact_key(fact['request']);reader=CpuAssessmentReader(self.store,self.runtime.plans.registry,
+                        project_id=self.project_id,store_epoch=self.store_epoch)
+                    with self._source_errors(),reader.snapshot() as (db,meta):
+                        read=ReadBudget(db,16*1024**2)
+                        original=reader._point(db,read,key,meta['as_of_state_version'])
+                        if original is None or canonical(original[0])!=canonical(fact):
+                            raise Conflict('original CPU reconciliation result differs')
+                    source_key=key
+                else:
+                    from .hybrid_candidate_output import result_key
+                    from .hybrid_candidate_output_reads import CandidateOutputReader
+                    key=result_key(fact['request']);reader=CandidateOutputReader(self.store,self.runtime.plans.registry,
+                        project_id=self.project_id,store_epoch=self.store_epoch)
+                    from .hybrid_candidate_output import SECTIONS as OUTPUT
+                    source_key=fact['request'].get('prior_output_key',key)
+                    with self._source_errors(),reader.snapshot() as (db,meta):
+                        read=ReadBudget(db,16*1024**2)
+                        reader._domains(db,read,meta['as_of_state_version'])
+                        original=reader._point(db,read,source_key,meta['as_of_state_version'])
+                        if original is None:raise Conflict('original engineering reconciliation result absent')
+                        if source_key!=key:
+                            reader._acceptance(db,read,source_key,original[0],meta['as_of_state_version'],original[2])
+                        if canonical(read.object(OUTPUT[1],key))!=canonical(fact):
+                            raise Conflict('original engineering reconciliation result differs')
+                with self._source_errors():reader.check_current(meta['as_of_state_version'])
+                proof={'id':key,'source_id':source_key,'sha256':digest(fact),'recorded_state_version':fact['accepted_state_version']}
+            self._pure();self._session(operation.token,operation.csrf)
+            return {'schema_version':'1.0','profile':'ORIGINAL_UNIT_RECONCILIATION',
+                'original_acceptance':receipt,'result':{k:result[k] for k in
+                    ('status','lease_id','cancel_requested','goal_completed','independent_review_status',
+                     'dispatch_enabled','execution_scope','cleanup_error')},'result_fact':proof,
+                'new_dispatch_enabled':False,'automatic_effect_retry_enabled':False}
+        finally:
+            self._local.operation=None;self._issued.pop(id(operation),None);self._operation_raw.pop(id(operation),None)
+
     def execute_prepared(self,operation,*,_stop_details=False):
         self._pure()
         if (self._issued.get(id(operation)) is not operation or
@@ -386,13 +473,15 @@ def _install_units(app,services,projects,auth,*,origin,max_jobs,service_type,pat
         service._pure()
         with service.reader.snapshot():pass
     starts,stops=ControlPool(max_jobs),ControlPool(2)
+    reconciles=ControlPool(2)
     setattr(app.state,state_prefix+'_start_pool',starts);setattr(app.state,state_prefix+'_stop_pool',stops)
+    setattr(app.state,state_prefix+'_reconcile_pool',reconciles)
     original_lifespan=app.router.lifespan_context
     @asynccontextmanager
     async def lifespan(current):
         async with original_lifespan(current):
             try:yield
-            finally:await starts.close();await stops.close()
+            finally:await starts.close();await reconciles.close();await stops.close()
     app.router.lifespan_context=lifespan
 
     def authorize(request,project_id,*,write=False):
@@ -464,6 +553,29 @@ def _install_units(app,services,projects,auth,*,origin,max_jobs,service_type,pat
             except ControlError:
                 service.discard_unsubmitted(operation);raise
             return JSONResponse(result,status_code=202)
+        except Exception as exc:return failure(exc)
+
+    @app.post('/api/v1/projects/{project_id}/'+path+'/commands/{command_id}/reconcile')
+    async def reconcile(request:Request,project_id:str,command_id:str):
+        try:
+            if project_id in services:services[project_id]._pure()
+            if request.query_params:raise ValueError('closed reconciliation query required')
+            counts={}
+            for key,value in request.scope['headers']:counts[key]=counts.get(key,0)+1
+            if any(counts.get(k,0)>1 for k in (b'x-csrf-token',b'idempotency-key',b'content-type')):
+                raise ControlError(403,'PERMISSION_DENIED','ambiguous reconciliation headers')
+            if request.headers.get('origin')!=origin or not request.headers.get('x-csrf-token'):
+                raise ControlError(403,'PERMISSION_DENIED','same-origin session CSRF required')
+            payload=await body(request);service,token=authorize(request,project_id,write=True)
+            csrf=request.headers['x-csrf-token'];key=request.headers.get('idempotency-key')
+            def call():
+                # Source SQL/proof and operation issuance are inside this real
+                # bounded future; no expensive preparation on the event loop.
+                operation=service.prepare_reconcile(command_id,payload,token=token,csrf=csrf,
+                    origin=origin,idempotency_key=key)
+                return service.execute_reconcile_prepared(operation)
+            result=await reconciles.run(call)
+            return JSONResponse(result)
         except Exception as exc:return failure(exc)
 
 
