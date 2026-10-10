@@ -251,7 +251,7 @@ def create_app(projects, auth, *, origin="http://127.0.0.1:8765", max_streams=8,
             raise ValueError('agent requests require original protected core controls')
         from .hybrid_agent_requests import install as install_agent_requests
         install_agent_requests(app,agent_request_services,control_services,registry,auth,
-                               origin=origin,max_jobs=max_control_jobs)
+                               origin=origin,max_jobs=max_control_jobs,delivery_readers=delivery_evidence_readers)
 
     if fixture_task_readers is not None:
         from .hybrid_fixture_runtime_reads import install as install_fixture_reads

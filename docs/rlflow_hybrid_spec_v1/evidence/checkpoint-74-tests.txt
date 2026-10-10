@@ -1,0 +1,48 @@
+Checkpoint74 evidence (STANDARD; original full M0–M5 ACTIVE).
+Baseline f6ac9742f2550c46da1a94efd09bf76571a9b215.
+This file reconstructs retained tool output and diagnosis; it is not a byte-exact combined pytest stdout log.
+All pytest commands use env PYTHONPATH=/home/mint/rl_dev/rlflow_standalone PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest.
+R1 -q -s tests/test_client_execution_report.py
+ original72774 terminal2528ef exit1: 1 failed, 1 passed, 1 existing warning, 58.35s.
+ Actual both original executions completed and both HTTP reports returned200; test expected engineering raw_item_count21, original DeliveryReader returns len(actual_tests)=3.
+ Corrected raw expectation3, preserving actual AST machine_case_count21. No changed workload or weakened gate.
+ Failed fixture repr contains synthetic human token; omitted here. No credentials archived.
+ High identified original conditions max200/required minimum and CPU result_hash nullable; fixed new DTO to preserve original contracts.
+ R2 -q -s tests/test_client_execution_report.py::test_actual_dual_execution_target_client_report_and_original_STOP tests/test_client_execution_report_codec.py
+ original83206 terminal586f2a exit0: 19 passed, 1 existing warning, 67.71s.
+ actual_client_execution_reports {'CPU_raw':384,'engineering_cases':21,'reports':2,'report_Core_writes':0,'independent_review':'NOT_PERFORMED','Goal_completed':False,'original_STOP':True}
+ Source checkout real loopback SDK and actual CLI child; two original project scopes, explicit source IDs.
+ High remaining findings fixed only new report/codec: source projection ProtocolError ->503 (invalid key stays400), machinekind/count/state relations and activation/consent/hash/blocker consistency, TIME+Z.
+ R3 necessary affected regression:
+ -q -s tests/test_client_execution_report_guards.py tests/test_client_execution_report_codec.py tests/test_agent_client.py tests/test_hybrid_agent_requests.py tests/test_contract_discovery.py
+ original95697 terminald07e8f exit0: 91 passed, 1 existing warning, 46.17s.
+ actual_report_guards {'source_damage':503,'late_revoke':403,'missing':404,'cancelled_capacity_retained':True,'original_STOP':True,'pool_occupied':0}
+ CPU original accepted projection damaged without corresponding original source; server refuses report503, restored exact fixture bytes.
+ True read-phase revocation refuses result403.
+ Two blocked report workers, cancelled route waiters, third429; direct original two-scope STOP completes/Pool0 while reads remain held.
+ Route coroutine cancellation, not browser TCP disconnect. CPU executed; engineering undispatched in this guard test.
+ actual_full_config_discovery_DRAFT {'source':'original registered contract','Core_version':1,'discovery_Core_writes':0,'workers':0,'approvals':0}
+ Codec23 cases are synthetic transport/contract boundaries, not original200-condition or negative-result physical evidence.
+ Reuse unaffected Dashboard/cold-reader/old metadata lifecycle evidence; no duplicate whole-repository regression or new full suite claim.
+ High read-only final: four MUST closed, no remaining MUST; no reviewer tests or file edits.
+ Skill creator quick_validate.py rlflow/skills/rlflow: Skill is valid!
+ Offline .venv/bin/python -m pip wheel --no-index --no-deps --no-build-isolation -w /tmp/rlflow-cp74-final-wheel-inydRL .
+ terminal67fb99 exit0. wheel SHA256 c6cc7df4fc86ffbbee1e09022507f16c474f242d8f8a1ee21204736cc5923bf1.
+ .venv/bin/python -m pip install --no-index --no-deps --target /tmp/rlflow-cp74-final-wheel-inydRL/site exact wheel
+ exit0.
+ .venv/bin/python /tmp/rlflow-cp74-final-wheel-inydRL/probe.py
+ original70693 terminalda5da9 exit0:
+ actual_client_execution_reports {'CPU_raw':384,'engineering_cases':21,'reports':2,'report_Core_writes':0,'independent_review':'NOT_PERFORMED','Goal_completed':False,'original_STOP':True}
+ {"installed_console":true,"outside_checkout_import":true,"complete_original_config":true,"projects":2,"CPU_raw":384,"engineering_worker_groups":3,"engineering_machine_cases":21,"report_Core_writes":0,"review":"NOT_PERFORMED","original_STOP":true,"packaged_skill":true,"Goal_completed":false}
+ Probe server and original trusted fixture use checkout test assembly, while actual CLI children import exclusively installed site outside checkout from two complete YAML target roots.
+ This proves installed consumer against actual original execution, NOT a test-module-independent documented end-user bootstrap or full T23.
+ SDK reads source checkout; installed-console proof is separate real subprocesses, not replaced with a mock opener.
+ Final installed proof after final runtime validators and packaged skill updates; no further runtime/test/skill edits.
+ 337 final runtime/test/web hashes in checkpoint-74-inputs.sha256; final-identity and installed-proof input, not a pre-R1 all-input frozen manifest.
+ compileall/pipcheck/diffcheck and final SHA audit separately completed; original existing anyio deprecation warning unchanged.
+ USER package-lock.json SHA becc7e2a36dfcad4ffe934b5ff2f0f68187611d6c0641bd63d81367651cfbf09 unchanged/not staged.
+ Build output created by this build moved recoverably to /tmp/rlflow-cp74-final-wheel-inydRL/checkout-build; not deleted.
+ All relevant tests/probe terminal; no paid model/GPU/global skill install/sysfs/production state migration/push.
+ Remaining: target-scope reports not execution authority/fullproposal/self-recomputed sourcehash; snapshot ASOF not exact current version; current execution UNKNOWN/resource NOT_OBSERVED.
+ Original native/Reviewer contract+budget/strictOS/quota/invoice/B1/T22/T23/24h8h/fullGoal gates retained.
+ Next75: trusted installed startup/role/config assembly, so documented new local installation can consume actual delivered chain without importing test modules; keep original approvals/no paid resource boundary.

@@ -93,7 +93,7 @@ class AgentClient:
         self.data_mode = config_mode
         self._opener = build_opener(ProxyHandler({}), _NoRedirect())
 
-    def _call(self, suffix, *, payload=None, key=None, contract=False):
+    def _call(self, suffix, *, payload=None, key=None, contract=False, execution=None):
         headers = {'Authorization': 'Bearer ' + self._token, 'Origin': self.origin, 'Accept': 'application/json'}
         raw = None
         if payload is not None:
@@ -105,6 +105,7 @@ class AgentClient:
                 raise ClientError('proposal request exceeds bounds')
             headers.update({'Content-Type': 'application/json', 'Idempotency-Key': key})
         endpoint='proposal-contract' if contract else 'agent-requests'+suffix
+        if execution is not None:endpoint='execution-report/'+execution[0]+'/'+execution[1]
         url = f'{self.origin}/api/v1/projects/{self.project_id}/{endpoint}'
         limit=512*1024 if contract else MAX_BYTES
         try:
@@ -123,6 +124,10 @@ class AgentClient:
             from .hybrid_contract_discovery import validate_public
             try:return validate_public(value,self.project_id,self.data_mode)
             except ValueError:raise ClientError('closed original proposal contract required') from None
+        if execution is not None:
+            from .hybrid_client_execution_report import validate_public
+            try:return validate_public(value,self.project_id,*execution,self.data_mode)
+            except ValueError:raise ClientError('closed original execution report required') from None
         if type(value) is dict and value.get('action') == 'request_finite_stop':
             from .hybrid_agent_stop_requests import validate_public
             try:return validate_public(value, self.project_id)
@@ -197,6 +202,13 @@ class AgentClient:
     def describe(self):
         return self._call('',contract=True)
 
+    def execution_report(self,kind,source_id):
+        prefix='cpu_assessment_' if kind=='CPU_TRIAL' else 'candidate_output_result_'
+        if (kind not in ('CPU_TRIAL','ENGINEERING') or self.data_mode not in (None,'fixture') or
+                not isinstance(source_id,str) or ID.fullmatch(source_id) is None or not source_id.startswith(prefix)):
+            raise ClientError('explicit original finite result scope required')
+        return self._call('',execution=(kind,source_id))
+
     def request_finite_stop(self, stop_scope, *, key):
         from .hybrid_agent_stop_requests import validate_scope
         if self.data_mode not in (None,'fixture'):
@@ -221,6 +233,9 @@ def arguments(parser):
     actions = parser.add_subparsers(dest='client_action', required=True)
     actions.add_parser('skill-path', help='print the packaged single rlflow skill location')
     actions.add_parser('describe',help='read original registered proposal schema/catalog; never authority')
+    execution=actions.add_parser('execution-report',help='read original machine result and unresolved delivery gates; never RUN')
+    execution.add_argument('--kind',choices=('CPU_TRIAL','ENGINEERING'),required=True)
+    execution.add_argument('--source',required=True)
     submit = actions.add_parser('submit-goal')
     submit.add_argument('--proposal', type=Path, required=True)
     submit.add_argument('--key', required=True)
@@ -240,6 +255,8 @@ def main(args):
         client = AgentClient()
         if args.client_action == 'describe':
             result=client.describe()
+        elif args.client_action == 'execution-report':
+            result=client.execution_report(args.kind,args.source)
         elif args.client_action == 'submit-goal':
             value = closed_json(read_regular(args.proposal, MAX_BYTES))
             result = client.submit_goal(value, key=args.key)

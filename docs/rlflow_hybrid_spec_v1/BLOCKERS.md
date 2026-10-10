@@ -1,5 +1,7 @@
 # 阻塞与证据缺口
 
+Checkpoint74 FINAL：原CPU384/工程worker3与机器AST21→目标cwd request-only SDK/CLI可信原结果与条件缺口→原直接STOP已交付，报告零Core写，不授执行权。实际双项目R2+codec19pass67.71s，末source/codec及旧client/inbox/discovery必要R3 91pass46.17s；来源坏503/晚撤权403/缺404，两阻塞报告waiter取消容量保留429且原STOP Pool0通过。High条件范围/CPU nullable/来源分类/摘要一致性四MUST关闭。最终wheel c6cc7df4…923bf1隔离实际安装console、checkout外导入、双完整yaml、原真实两执行/报告/STOP/skill通过；服务器fixture仍借原测试装配，非按文档新安装启动/T23完成。337 final输入及证据见HYBRID_CLIENT_EXECUTION_REPORT.md/evidence/checkpoint-74-tests.txt。首raw21误断言按原来源改3，不篡执行。报告为版本/时间ASOF，当前执行UNKNOWN/资源NOT_OBSERVED，机器不是Review/ConditionEvidence；完整Goal仍active。下一75可信安装启动/原角色配置装配，摆脱用户运行链对测试模块依赖；无新增用户决定阻塞，原paid/native产品Reviewer/strictOS/invoice/B1/T22/T23/长期M5缺口保留。USERlock未改未stage，下方为历史。
+
 Checkpoint72 FINAL：本切片无新增未解决故障或用户决定阻塞，无live测试，真实客户端→human→原有限STOP→物理清理/来源回执及必要15项回归通过。剩余原整个Goal/任意树STOP、自然语言全局skill、完整配置/catalog发现、native/独立产品Reviewer/严格cgroup-quota/invoice/B1/T21/T22/T23/24h-8h/M5缺口保留，不把有限原固定执行成功当完整验收。cgroup及模型/Reviewer权限问题仍按原问题等待用户决定，不能自行调用paid/GPU或迁移生产。下一73先对齐原注册项目配置及schema/catalog发现行为；72进入归档提交，USERlock未改未stage。下方72 WIP为历史。
 
 72实施中：无新增需用户决定的权限阻塞。已修71嵌套skill实际封存目录权限缺陷，封存断言与必要回归通过；原有限STOP source read及immutable snapshot已通过、High差量关闭。尚未接通显式whole scope的client/inbox/human/UI；不能用这些读回测试证明完整STOP请求链。先耐久claim与零inbox I/O前latch不可同时承诺：请求inbox坏则尚未转交，原直接紧急STOP仍可用，不静默扩大权限/弃持久绑定。cold无原cache/owner不能从Core intent证明physical STOP，closedowner只历史AS_OF_RETURN。下一继续实际请求闭环，不把scope组件数量当完成。原paid/native/产品Reviewer/cgroup/OS/invoice/B1/长期/M5缺口全部保持；USERlock未改未stage，完整Goal active。

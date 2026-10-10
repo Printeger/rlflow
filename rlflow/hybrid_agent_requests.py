@@ -363,7 +363,7 @@ class AgentRequestService:
         return self.get(rid, token=token, method='session')
 
 
-def install(app, services, controls, projects, auth, *, origin, max_jobs):
+def install(app, services, controls, projects, auth, *, origin, max_jobs, delivery_readers=None):
     """Explicit trusted hosting only; no HTTP service/path/credential provision."""
     from fastapi import Request
     from .hybrid_control import ControlPool, body, error_response
@@ -383,6 +383,13 @@ def install(app, services, controls, projects, auth, *, origin, max_jobs):
     pool = ControlPool(max_jobs)
     from .hybrid_contract_discovery import ContractDiscovery
     discoveries={key:ContractDiscovery(service,controls[key]) for key,service in services.items()}
+    from .hybrid_client_execution_report import ExecutionReport
+    reports={}
+    for (project,kind),reader in dict(delivery_readers or {}).items():
+        if project in discoveries:
+            if kind not in ('CPU_TRIAL','ENGINEERING') or reader.kind!=kind:
+                raise ValueError('original client report kind required')
+            reports[(project,kind)]=ExecutionReport(discoveries[project],reader)
     discovery_pool=ControlPool(2)
     stop_prepare_pool = ControlPool(2)
     stop_read_pool = ControlPool(2)
@@ -484,6 +491,17 @@ def install(app, services, controls, projects, auth, *, origin, max_jobs):
             closed(request)
             _,token,method=scoped(request,project_id)
             return discoveries[project_id].read(token=token,method=method)
+        return await response(call,jobs=discovery_pool)
+
+    @app.get('/api/v1/projects/{project_id}/execution-report/{kind}/{source_id}')
+    async def execution_report(request:Request,project_id:str,kind:str,source_id:str):
+        def call():
+            closed(request)
+            _,token,method=scoped(request,project_id)
+            report=reports.get((project_id,kind))
+            if report is None:
+                raise ControlError(409,'UNSUPPORTED_CAPABILITY','original delivery report not hosted')
+            return report.read(source_id,token=token,method=method)
         return await response(call,jobs=discovery_pool)
 
     @app.post('/api/v1/projects/{project_id}/agent-requests/{request_id}/forward-stop')

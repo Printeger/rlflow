@@ -1,5 +1,7 @@
 # Agent 目标请求与人类转交
 
+Checkpoint74 更新：原有限工程/科研结果可通过 request-only `client execution-report --kind … --source …` 读取来源绑定的机器结果和条件缺口，不接受PASS或派发。实际双项目、最终安装console与原STOP通过，详 [HYBRID_CLIENT_EXECUTION_REPORT.md](HYBRID_CLIENT_EXECUTION_REPORT.md)。73完整静态配置/目录已交付；T15仍不是完整自然语言自动调用。
+
 Checkpoint73 更新：客户端也接受原完整 `project.example.yaml` 静态profile，新增 `rlflow client describe` 从原注册权威读取schema/catalog供显式提案消费，不接执行配置/预算。完整配置→发现→建议→human原DRAFT→report已通过实际安装console。详 [HYBRID_CONTRACT_DISCOVERY.md](HYBRID_CONTRACT_DISCOVERY.md)；下方三字段限制和“下一72/配置discovery未验收”是71–72历史阶段，不再是73当前缺口。完整A01、全GoalSTOP及原native/OS/Reviewer/长期缺口保持。
 
 Checkpoint71 已交付结构化目标请求闭环。Checkpoint72 已验收显式原有限全集 STOP 建议的实际客户端、人类 Dashboard 转交与物理清理链，必要回归和最终发行检查通过，归档后提交。两者均为 T15 的部分实现，不是完整自然语言入口或整个 Goal STOP。原 M0–M5 Goal 保持 active；Checkpoint71 提交为 `3836e7b`。
