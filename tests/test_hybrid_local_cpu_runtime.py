@@ -480,6 +480,65 @@ print(json.dumps(view))
     (tmp_path/'lost-stop-return-cold.json').write_text(result.stdout)
 
 
+@pytest.mark.parametrize('expected_status',['PASS','FAIL'])
+def test_actual_configured_research_metrics_budget_stop_and_cold(tmp_path,expected_status):
+    from rlflow.hybrid_budget_ledger import reservation_key
+    from rlflow.hybrid_local_cpu_reads import LocalCpuTaskReader
+    tmp_path.chmod(0o700);spec=_spec()
+    spec['code']="""import json,math
+data=json.loads(open(WORK+'/observations.json').read())
+x=[p[0] for p in data];y=[p[1] for p in data]
+mx=sum(x)/len(x);my=sum(y)/len(y)
+slope=sum((a-mx)*(b-my) for a,b in data)/sum((a-mx)**2 for a in x)
+intercept=my-slope*mx
+mse=sum((b-(intercept+slope*a))**2 for a,b in data)/len(data)
+print(json.dumps({'slope':slope,'mse':mse,'samples':len(data)},sort_keys=True))
+"""
+    spec['inputs']={'observations.json':'[[0,0.1],[1,1.9],[2,4.2],[3,5.8],[4,8.1]]'}
+    spec['acceptance']={'method':'JSON_METRICS_RANGE','stderr_empty':True,
+        'metrics':{'slope':{'min':1.8,'max':2.2},'mse':{'min':0,'max':.1 if expected_status=='PASS' else .0001},
+                   'samples':{'min':5,'max':5}}}
+    with isolated_session(tmp_path,spec,approved=True,confirmation_reader=_confirm) as session:
+        runtime=session['runtime'];lease=session['lease'];attempt=runtime._issued(lease)
+        reservation=reservation_key(session['reserve']);epoch=runtime.plans.workspace.store_epoch
+        reader=LocalCpuTaskReader(runtime.store,project_id='isolated_local_cpu',store_epoch=epoch)
+        assert reader.task(reservation)['recorded_settled_usage'] is None
+        result=runtime.run_local_cpu(lease)
+        assert result['machine_acceptance']['status']==expected_status
+        metrics=json.loads(result['outputs']['stdout']['text'])
+        assert 1.8<metrics['slope']<2.2 and .0001<metrics['mse']<.1 and metrics['samples']==5
+        assert runtime.pool.snapshot()['occupied']==0 and runtime._current(attempt)['status']=='SETTLED'
+        view=reader.task(reservation,timeline=True)
+        assert view['recorded_settled_usage']['experiment_starts']==1
+        assert view['recorded_settled_usage']['wall_seconds']==attempt['terminal']['wall_seconds']
+        assert view['recorded_settled_usage']['model_sessions']==view['recorded_settled_usage']['gpu_device_seconds']==0
+        version=runtime.store.version();state=runtime.store.audit()
+        assert runtime.run_local_cpu(lease)==result
+        assert runtime.store.replay()==state and runtime.store.recover()==state and runtime.store.version()==version
+        assert reader.task(reservation,timeline=True)==view
+        root=str(runtime.store.root)
+        (tmp_path/'research-result.json').write_text(json.dumps(result))
+        (tmp_path/'research-history.json').write_text(json.dumps(view))
+    import subprocess,sys
+    script="""import json,sys
+from rlflow.store import Store
+from rlflow.hybrid_local_cpu_reads import LocalCpuTaskReader
+store=Store.attach_existing(sys.argv[1],project_id='isolated_local_cpu',data_mode='fixture')
+version=store.version()
+reader=LocalCpuTaskReader(store,project_id='isolated_local_cpu',store_epoch=sys.argv[2])
+view=reader.task(sys.argv[3],timeline=True)
+assert store.version()==version and not hasattr(reader,'start') and not hasattr(reader,'stop')
+print(json.dumps(view))
+"""
+    cold=subprocess.run([sys.executable,'-c',script,root,epoch,reservation],
+        capture_output=True,text=True,timeout=15,check=True)
+    assert json.loads(cold.stdout)==view
+    assert view['task']['machine_acceptance_status']==expected_status
+    assert not view['task']['condition_evidence'] and view['task']['independent_review_status']=='NOT_PROVEN'
+    assert view['task']['current_execution_status']=='UNKNOWN' and not view['task']['controls_available']
+    (tmp_path/'research-cold.json').write_text(cold.stdout)
+
+
 def test_approved_trusted_module_pins_cannot_be_replaced_during_allocation(tmp_path,monkeypatch):
     tmp_path.chmod(0o700);allocate=LocalCpuSourceOwner._runtime_allocate;captured=[]
     def changed_modules(source,owner,lease):

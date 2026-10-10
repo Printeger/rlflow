@@ -80,4 +80,10 @@ class LocalCpuTaskReader(FixtureTaskReader):
                 raise Conflict('configured CPU cold snapshot changed; retry read only')
             proof=head['fixture_runtime'].get('local_cpu_terminal_proof')
             value['managed_terminal_proof']=proof
+            value['recorded_settled_usage']=None
+            if head['fixture_runtime']['phase']=='FIXTURE_SCOPE_STOPPED':
+                from .hybrid_budget_ledger import derived_heads,SECTIONS
+                from .hybrid_budget import subtract
+                project=next(iter(derived_heads(entry)[SECTIONS[3]].values()))
+                value['recorded_settled_usage']=subtract(project['consumed'],entry['prior_project']['consumed'])
             return self.output(value,256*1024)

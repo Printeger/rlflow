@@ -1,0 +1,11 @@
+Full original Goal remains ACTIVE. This slice delivers configurable numeric machine acceptance, original conservative experiment G accounting, managed STOP/FREE and historical same-source usage/result cold read. No scientific conclusion, independent product Review, ConditionEvidence, model/GPU authority, long-run admission or full autonomy claim.
+CLI synthetic development confirmation exact original scope hash via stdin, not product human/Reviewer evidence. Installation no-deps/no-build-isolation, original50fa03 exit0 wheelSHA651d0fa371daa4f6ddf2675004cc4c4b2b924e196ef7aa7aaf3172d62e37c19e. Public run cwd/tmp installedPYTHONPATH target /tmp/rlflow-86-local-install-1yUpJaAQ, original15424/e92542 exit0. Configurable sample measurements mean/CV criteria, task1612955, original full managed terminal, machinePASS/start1/wall4/Pool0/modelGPU0.
+Public history after owner exit original74085/602a2e exit0, JSON equals original run history exactly, one experiment charge/no cold controls, currentUNKNOWN. JSON evidence copies have normalized trailing newline, not byte seals.
+Final source/test SHA256:
+3c140c65b750a614e5a21205fa1ea244731d5b9a1a54b3f9d09cdd0e09f7a1cd  rlflow/hybrid_local_cpu_profile.py
+46175f27a6d0f4ee25e6a6f72036ca72f87c8350508b0db18c9b07effbe20b9c  rlflow/hybrid_local_cpu_result.py
+0e023bc241c88040df9efb65421e54a421fa5ee5e512493bbf0bb2de178f6e29  rlflow/hybrid_local_cpu_reads.py
+d3bbc61e72513779a2917a4b0e5a4e102e468968a80ca81ce33194545e824aa9  tests/test_hybrid_local_cpu_profile.py
+45412efbf7ef1f8850f6ea89e90afb030be4da4e7f5900456c2c29b583f19e1f  tests/test_hybrid_local_cpu_runtime.py
+Originalf680d6 exit0: all top-level rlflow Python source cmp-equal installedpayload, compileall successful, pipcheck No broken requirements found, gitdiffcheck0. USERlock unchanged/unstagedSHAbecc7e2a36dfcad4ffe934b5ff2f0f68187611d6c0641bd63d81367651cfbf09.
+21pass and2pass are separate necessary changed-input runs, not a new whole-repository full green run. No live test handles or re-execution solely for observation timeout. Prior independent review is static, not product Review or duplicate tests.

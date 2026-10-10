@@ -1,5 +1,9 @@
 # 阻塞与证据缺口
 
+86 关闭数值实验验收与原计额cold消费缺口：JSON_METRICS_RANGE完整批准阈值→实际研究指标→原机器PASS/FAIL→G保守计experiment1/STOP/FREE→历史原Budget消费差量与cold重算。37907/fec1c4 21pass47.85s，必要原EXACT回归44715/1d8dbd 2pass43.33s。安装CLI统计任务15424/e92542 exit0/机器PASS/start1/wall4/Pool0，公开cold74085/602a2e exit0同原history；High无MUST，源码同wheel/compile/pipcheck/diff通过，无live。不是独立科研Review/科学结论/自主闭环，证据checkpoint-86-metrics/。
+
+仍缺：可配置local任务原结果/计额的认证Dashboard接线（现fixture Task startup reader要求exact旧类）、真实模型Engineer/Reviewer条件接续（集中资源合同未批准）、strict diskquota/全部崩溃恢复/24h8h实机资格。先做已授权原数据Dashboard消费，不把历史升当前或授cold执行权；instinctRL保持只读HOLD，无新增用户决定才能继续本地的阻塞。
+
 85 关闭此前确认的manager累计128登记泄漏：整体Source正常/安全退役成功才撤销exact closed登记，partial和close本身保留，原重试可用。首3pass46.19s仅MUST修前；High别名部分删除MUST统一原claimkey/唯一性preflight修复，最终88250/577f43 3pass45.95s，证据checkpoint-85-manager-retirement.txt，无live。未证明129次实机重复/长owner全部保留策略/24h8h，仍不得称长跑准入。
 
 下一本地可推进批准数值criteria的真实配置研究任务与原实验预算计额/STOP/cold消费；产品模型Reviewer/ConditionEvidence需原集中合同批准，当前合同未答不启模型/GPU。Strictquota/长期/完整自治与instinctRL准入仍缺，USERlock不动/不stage，无新增需用户决定的本地阻塞。

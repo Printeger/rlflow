@@ -5,6 +5,8 @@ bind task code, private input manifest, exact trusted modules and kernel limits.
 """
 from copy import deepcopy
 import hashlib
+import json
+import math
 from pathlib import Path
 import re
 
@@ -59,21 +61,60 @@ def validate_spec(spec):
     if type(spec['seconds']) is not int or not 1<=spec['seconds']<=300:
         raise Conflict('finite original CPU wall limit required')
     if 'acceptance' in spec:
-        rule=spec['acceptance']
-        if (type(rule) is not dict or set(rule)!={'method','stdout','stderr_empty'} or
-                rule['method']!='EXACT_STDOUT_UTF8' or type(rule['stdout']) is not str or
-                len(rule['stdout'].encode())>65536 or type(rule['stderr_empty']) is not bool):
-            raise Conflict('closed bounded configured CPU acceptance required')
+        validate_acceptance(spec['acceptance'])
     return deepcopy(spec)
 
 
-def evaluate_output(spec,outputs):
+def _finite_number(value):
+    if type(value) not in (int,float):return False
+    try:return math.isfinite(value)
+    except OverflowError:return False
+
+
+def validate_acceptance(rule):
+    if type(rule) is not dict or type(rule.get('stderr_empty')) is not bool:
+        raise Conflict('closed bounded configured CPU acceptance required')
+    if rule.get('method')=='EXACT_STDOUT_UTF8':
+        if (set(rule)!={'method','stdout','stderr_empty'} or type(rule['stdout']) is not str or
+                len(rule['stdout'].encode())>65536):
+            raise Conflict('closed bounded configured CPU acceptance required')
+    elif rule.get('method')=='JSON_METRICS_RANGE':
+        if set(rule)!={'method','metrics','stderr_empty'} or type(rule['metrics']) is not dict or not 1<=len(rule['metrics'])<=16:
+            raise Conflict('bounded configured CPU metric ranges required')
+        for name,bounds in rule['metrics'].items():
+            if (type(name) is not str or not re.fullmatch('[A-Za-z][A-Za-z0-9_]{0,79}',name) or
+                    type(bounds) is not dict or set(bounds)!={'min','max'} or
+                    not all(_finite_number(value) for value in bounds.values()) or bounds['min']>bounds['max']):
+                raise Conflict('finite ordered configured CPU metric range required')
+    else:raise Conflict('closed bounded configured CPU acceptance required')
+    return deepcopy(rule)
+
+
+def evaluate_acceptance(rule,outputs):
     """Approved deterministic comparison only; NOT independent product Review."""
-    rule=validate_spec(spec).get('acceptance')
     if rule is None:return {'status':'NOT_CONFIGURED','criteria_sha256':None}
-    passed=(outputs['stdout']['text']==rule['stdout'] and
-            (not rule['stderr_empty'] or outputs['stderr']['text']==''))
+    rule=validate_acceptance(rule);text=outputs['stdout']['text']
+    if rule['method']=='EXACT_STDOUT_UTF8':passed=text==rule['stdout']
+    else:
+        def unique_fields(pairs):
+            value={}
+            for key,item in pairs:
+                if key in value:raise ValueError('duplicate metric output field')
+                value[key]=item
+            return value
+        def nonfinite(value):raise ValueError('nonfinite metric output')
+        try:
+            metrics=json.loads(text,object_pairs_hook=unique_fields,parse_constant=nonfinite)
+            passed=(type(metrics) is dict and set(metrics)==set(rule['metrics']) and
+                all(_finite_number(metrics[name]) and bounds['min']<=metrics[name]<=bounds['max']
+                    for name,bounds in rule['metrics'].items()))
+        except (ValueError,RecursionError):passed=False
+    passed=passed and (not rule['stderr_empty'] or outputs['stderr']['text']=='')
     return {'status':'PASS' if passed else 'FAIL','criteria_sha256':digest(rule)}
+
+
+def evaluate_output(spec,outputs):
+    return evaluate_acceptance(validate_spec(spec).get('acceptance'),outputs)
 
 
 def module_pins():

@@ -3,7 +3,7 @@ import hashlib
 import re
 
 from .hybrid_goals import check_bytes,digest
-from .hybrid_local_cpu_profile import evaluate_output
+from .hybrid_local_cpu_profile import evaluate_output,evaluate_acceptance
 from .store import Conflict
 from .hybrid_protocol import obj,ID,HASH,enum,validate_schema
 
@@ -41,8 +41,12 @@ MANAGED=obj({'job':obj({'id':PID,'path':{'type':'string','pattern':r'^/org/freed
     'unit_reference_held':TRUE,'keeper_kernel_terminal':TRUE,'transport_reaped':TRUE,
     'transport_status':{'type':'integer','minimum':-2**31,'maximum':2**31-1},
     'original_protocol_closed':TRUE,'original_manager_connection_closed':TRUE,'task_closed':TASK_CLOSED})
-ACCEPTANCE=obj({'method':{'const':'EXACT_STDOUT_UTF8'},
-    'stdout':{'type':'string','maxLength':65536},'stderr_empty':BOOL})
+ACCEPTANCE={'oneOf':[obj({'method':{'const':'EXACT_STDOUT_UTF8'},
+    'stdout':{'type':'string','maxLength':65536},'stderr_empty':BOOL}),
+    obj({'method':{'const':'JSON_METRICS_RANGE'},'stderr_empty':BOOL,
+        'metrics':{'type':'object','minProperties':1,'maxProperties':16,
+            'propertyNames':{'pattern':'^[A-Za-z][A-Za-z0-9_]{0,79}$'},
+            'additionalProperties':obj({'min':{'type':'number'},'max':{'type':'number'}})}})]}
 OUTPUT=obj({'text':{'type':'string','maxLength':65536},'sha256':HASH})
 RESULT=obj({'lease_id':ID,'source_id':ID,'task':TASK,'outputs':obj({'stdout':OUTPUT,'stderr':OUTPUT}),
     'machine_acceptance':obj({'criteria_sha256':{'oneOf':[HASH,{'type':'null'}]},
@@ -74,10 +78,7 @@ def validate_result(value,origin,task,stopped,spec=None):
                 output['sha256']!='sha256:'+hashlib.sha256(output['text'].encode()).hexdigest()):
             raise Conflict('original configured CPU output hash differs')
     rule=value['approved_acceptance']
-    expected={'status':'NOT_CONFIGURED','criteria_sha256':None}
-    if rule is not None:
-        passed=outputs['stdout']['text']==rule['stdout'] and (not rule['stderr_empty'] or outputs['stderr']['text']=='')
-        expected={'status':'PASS' if passed else 'FAIL','criteria_sha256':digest(rule)}
+    expected=evaluate_acceptance(rule,outputs)
     if value['machine_acceptance']!=expected:raise Conflict('configured CPU machine result differs from raw output')
     if spec is not None:
         if (digest(spec)!=value['approved_spec_sha256'] or

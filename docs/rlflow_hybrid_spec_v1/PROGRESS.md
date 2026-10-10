@@ -1,5 +1,11 @@
 # Hybrid v1 开发进度
 
+Checkpoint86 收尾：85实际提交e81c2c4。已交付 JSON_METRICS_RANGE 批准数值验收（≤16有限区间，精确平坦 metric 键集、重复键/非有限/bool/extra/缺值/嵌套/坏JSON均FAIL，stderr按批准规则），旧EXACT/NOT_CONFIGURED保留；结果闭schema及归档raw重算同原函数，完整spec/hash/原审批源仍绑定阈值。cold同snapshot原终态Budget项目consumed差量给recorded_settled_usage，非终态None，不升级current status。原37907终fec1c4 exit0 21pass47.85s（全changed profile+真实噪声OLS研究PASS/FAIL，G计1/STOP/FREE/cached不多计/audit/replay/recover/退出后cold）；必要旧文本PASS/FAIL44715终1d8dbd 2pass43.33s。High增量无MUST，无重复无变化生命周期/全库。
+
+86新wheel651d0fa371daa4f6ddf2675004cc4c4b2b924e196ef7aa7aaf3172d62e37c19e，无deps/build-isolation网络安装；checkout外公开CLI实际另一配置统计任务：原15424终e92542 exit0、task1612955、机器PASS、原settled experiment_starts1/wall4/模型GPU0、Pooloccupied0/fullmanagedSTOP/FREE，公开history原74085终602a2e exit0与原history完全相同、controlsfalse/currentUNKNOWN。全部顶层rlflow Python同installedpayload，compile/pipcheck/diff通过、无live，证据checkpoint-86-metrics/。不是科学结论/独立产品Review/ConditionEvidence/自主科研Goal或长跑准入；JSON副本有末尾newline不称byte seal。86进入归档提交，USERlock不变不stage。
+
+下一接可配置实验原结果与计额到认证Dashboard消费链：只报告同源机器结果、历史用量和Review/condition缺口，不由历史JSON重建执行/STOP能力；先核既有Task reader startup白名单与source闭包，保持未启动/未知的真实状态。真实模型Engineer→独立Reviewer→条件证据→自主接续仍待此前集中资源合同批准；严格diskquota/完整异常受管范围恢复/24h8h与实机instinctRL准入仍缺，instinctRL只读HOLD，paid/GPU/生产边界不变，完整Goal ACTIVE。下方85/84/83收尾为已提交历史。
+
 Checkpoint85 收尾：84实际提交bebb8624e2fa63f5af19c52005230158c145c431。manager128累计登记泄漏已修：Source正常shutdown或仅parent安全退役整体成功时核exact/closed/全部句柄关闭后撤销强登记；close本身/部分失败保留原登记、原cleanup重试。容量上限未提高，UNKNOWN/预算/Pool不变。首35937终fd486c 3pass46.19s；High随后确认重复原row别名导致部分删除MUST，终态后修统一preflight原claimkey/row与manager唯一性，真实别名拒绝后仍登记且原cached STOP可用。最终同必要三case88250终577f43 exit0 3pass45.95s：实际正常task+setsid后代/fullSTOP/FREE后Source退出释放登记、真实lostreturn缺kernel拒退役仍登记→恢复同原witness仅parent退役释放登记并coldUNKNOWN、managerclose故障同owner原重试。High静态关闭MUST、compile/diff通过，无live测试，证据checkpoint-85-manager-retirement.txt；不称129次真实运行/24h/8h或新installed全资格。85进入提交，原USERlock SHA不变/不stage。
 
 下一按用户科研优先补可配置数值实验验收与可信实验计额：不仅固定输出比对，将批准的有限数值criteria接真实本地研究任务→原机器结果→原Budget experiment_starts/STOP/FREE→原历史cold重算；机器条件仍非独立Review/ConditionEvidence。先核原result/protocol闭schema与Budget来源，科学阈值由spec批准，不改旧方法或硬编码目标。真实模型链待此前集中模型/GPU/时间/实验合同批准；strict diskquota、全部受管崩溃恢复与长期资格仍缺，instinctRL只读HOLD，完整Goal ACTIVE。下方84/83收尾为已提交历史。

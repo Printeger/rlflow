@@ -1,0 +1,3 @@
+Original37907 terminalfec1c4 exit0:21 passed in 47.85s. Full changed profile module plus actual research PASS/FAIL/STOP/budget/cold cases.
+Original44715 terminal1d8dbd exit0:2 passed in 43.33s. Necessary changed acceptance/result/cold code affects prior exact-text PASS/FAIL cases; unchanged lifecycle/full-suite cases not repeated.
+Independent High increment: no new confirmed MUST. Criteria bound to approved full spec, finite numeric gates/exact JSON fields, same function raw recomputation, same-snapshot original terminal Budget event consumed delta only, current status UNKNOWN and no Review/ConditionEvidence upgrade.

@@ -13,6 +13,27 @@ from rlflow.store import Conflict
 HASH='sha256:'+'a'*64
 
 
+def test_configured_metric_ranges_are_finite_closed_and_recomputed():
+    from rlflow.hybrid_local_cpu_profile import validate_acceptance,evaluate_acceptance
+    rule={'method':'JSON_METRICS_RANGE','metrics':{'loss':{'min':0,'max':.1}},'stderr_empty':True}
+    def compare(text,stderr=''):
+        return evaluate_acceptance(rule,{'stdout':{'text':text},'stderr':{'text':stderr}})['status']
+    assert compare('{"loss":0.1}')=='PASS'
+    assert compare('{"loss":0}')=='PASS'
+    for text in ('{"loss":0.2}','{"loss":true}','{"loss":NaN}','{"loss":Infinity}',
+                 '{"loss":1e400}','{"loss":0.1,"loss":0}', '{"loss":0,"extra":1}',
+                 '{}','[]','{"loss":"0"}','{"loss":{"value":0}}','not-json'):
+        assert compare(text)=='FAIL'
+    assert compare('{"loss":0}',stderr='warning')=='FAIL'
+    for bounds in ({'min':True,'max':1},{'min':0,'max':float('inf')},
+                   {'min':float('nan'),'max':1},{'min':2,'max':1},{'min':0,'max':10**400}):
+        bad=deepcopy(rule);bad['metrics']['loss']=bounds
+        with pytest.raises(Conflict):validate_acceptance(bad)
+    for metrics in ({},{'bad.name':{'min':0,'max':1}},dict.fromkeys(['metric'+str(i) for i in range(17)],{'min':0,'max':1})):
+        bad=deepcopy(rule);bad['metrics']=metrics
+        with pytest.raises(Conflict):validate_acceptance(bad)
+
+
 def approved_sources(purpose='research'):
     spec=dict(purpose=purpose,code="import json; print(json.dumps({'sample_count':len([3,5,9])}))",
               inputs={'parameters.json':'{"threshold": 2}'},seconds=10,
