@@ -1,5 +1,7 @@
 # 首个真实工程自主闭环：最小交付清单
 
+2026-10-11 第2项原后验issuer条件接线已补，不再恒None：原release witness+Source独立kernel origin→原ACK/STARTED→自然exit0/full audit/完整usage/candidate exactcap→scope STOP原Budget消费。当前仅真Python拦G负例/纯数学，正向真实Source与known settlement待授权实证。最小剩余新增已确认直接阻断：BaseOwner仍硬fixture域、result候选仅内存；先显式REAL域与持久原result/candidate事实，不升级fixture历史。再同workflow未知candidate CPU、新不同Evaluator派生/原Review、条件CAS及未完成需求一次接续。首非预设task NOT_EXECUTED；固定加法/π/合成输入不计闭环，小额A模型运行待既有合同批准，GPU/B/C/HOLD保持。
+
 2026-10-11 第1项原批准启动接线已本地实现（原samelease launch cap→HANDOFF/Pool/gate/ready/原最后G门），不依赖先假定后验account资格；原V1/无cap仍拒。当前只拦截G的实际Python测试，真实调用未获批、首task NOT_EXECUTED。最小剩余优先：执行后原source+账户/完整stdout/EOF与可信usage cap发行及原结算→同workflow未知candidate CPUgrant→新不同Evaluator派生/原Review→条件CAS接纳→未完成需求一次接续。实际auth refresh清理只能在确证阻断首次运行时前移，不扩大其他恢复；小额A合同待批，GPU/B/C/HOLD不变。
 
 2026-10-11 第1项原同PID ELF/stdio观测已本地接线，但仅数据；实际批准启动/G、账户后验资格/完整stdout/真实EOF仍缺。优先剩余最小纵向实现：原批准启动→原成功/失败来源及usage cap→同workflow未知candidate受管CPU→新独立Evaluator→条件CAS接纳→依据未完成需求一次接续。须区分启动权限与后验资格，不能借缓存/JSON预授来源，也不能把A运行授权作为这些本地代码的前提。首真实非预设任务NOT_EXECUTED；当前仅Python noG与内核数据测试，小额A合同未经批准不调用，GPU/B/C/HOLD不变。

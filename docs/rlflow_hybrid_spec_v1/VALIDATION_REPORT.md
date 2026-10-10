@@ -1,5 +1,7 @@
 # 需求包离线校验报告
 
+2026-10-11 后验发行负例：原62131/output158771自然exit0，1pass/1deselected22.90s；独立发现helper缓存升ACK、ACK首行audit绑定、末STOP/audit三MUST。修后仅受影响原87667/output1ea71d自然exit0，1pass/1deselected22.96s：实际Python/TEST拦G后fake thread/继承ACK/failed capture._raw伪非None都不发ACK/result/usage，STOP全部FD/Pool0/UNKNOWN/audit=replay。原23261/output89251f自然exit0，25pass/1第三方deprecation warning2.13s，既有native usage消费/拒caller数学分支回归。末MUST检查移至cap完整canonical之后，窄复核确认3项全部源码闭合；不重复不受影响测试。编译/diff/USERlock通过，证据evidence/a-native-result-issuer-20261011.txt。正向真ELF/账户/EOF/result/known settlement/REAL域尚未实机证明，无全库/A/实任务完成声明。
+
 2026-10-11 原launch接线：37314/output176cfe自然exit0，2pass37.66s，真fixed Python sandbox但stdin.write TEST拦截G，zero模型/真实账户。cap copy拒、cache变化前handoff拒、lostG不重发；STOP原reap/allFD/copy闭合/Pool0/UNKNOWN，nohandoff分支SETTLED；audit=replay。12071/outputa57d67自然exit0，受影响cache+noG13pass/20deselected65.87s；72244/outputdbdd04自然exit0，V1拒新cap1pass/19deselected11.67s。独立只读原finite_app_review_63无确证MUST；编译/diff/USERlock通过，无重复测试/全库声明。证据evidence/a-native-launch-wiring-20261011.txt；非真实task/账户资格/产品Reviewer/usage settlement/条件/A完成。
 
 2026-10-11 执行映像观测：原34073终态4pass/1fail14.87s（新增负例漏Conflict import）；修后66413终态5pass20.37s。新增异步启动readiness后原60612终态1fail17.41s，定位_HeldPacketReader无offset，修为transcript.offset；仅受影响38015自然exit0，1pass20.20s。纯测试观测当前pytest进程，不新起模型；原集成只fixed Python noG，空stdout不创建probe、合成thread事件被实际ELF拒、重复失败拒、STOP allFDclosed/Pool0/UNKNOWN全预留/audit=replay。独立窄复核无新增MUST，证据evidence/a-native-exec-observation-20261011.txt。没有全库或真实task/产品Review/条件接续/A完成声明。

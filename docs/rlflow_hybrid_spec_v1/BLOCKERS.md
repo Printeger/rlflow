@@ -1,5 +1,7 @@
 # 阻塞与证据缺口
 
+2026-10-11 原后验ACK/result/usage publisher条件路径本地已实现，但仅零模型负例和纯账务验证，真实生成与known settlement仍NOT_VERIFIED。确认真实闭环还受BaseOwner硬要求fixture域及候选cap仅内存限制，下一优先显式REAL域与持久原candidate/result事实，再同workflowCPU、新独立Reviewer和条件CAS/接续。非新增恢复扩展，首真实task NOT_EXECUTED。本地无权限阻塞，实际G/model调用待已有小额A合同；GPU/B/C/instinctRL HOLD保持。
+
 2026-10-11 原A first Engineer批准启动接线本地已实现，未携原launch cap仍拒，旧V1不升级；小额A合同待批仅阻工具实际G/model调用，不阻代码。真实来源/账户后验、完整stdout/EOF/usage issuer与同workflowCPU/新独立Evaluator/条件CAS/接续仍是开发缺口，首task NOT_EXECUTED。其他恢复增强后置，GPU/B/C/instinctRL HOLD未变，无新增用户决定。
 
 2026-10-11 原ELF/stdio观测与空stdout就绪门已实现且本地验证；它只是必要来源数据，不解决实际批准启动/G、服务端账户、完整stdout/真实EOF和原usage cap发行。首实任务NOT_EXECUTED，产品独立Reviewer/条件CAS/自主接续仍未完成。本地开发无新权限前置；仅实际模型调用等待既有小额A合同批准。GPU/B/C/instinctRL HOLD保持，其他恢复增强不前移。

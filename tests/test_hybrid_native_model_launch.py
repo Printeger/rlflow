@@ -54,12 +54,30 @@ def test_original_start_reaches_intercepted_g_never_retries_and_stops(account_or
     assert result['release_attempted'] and not result['source_authenticated']
     assert not result['account_qualified'] and not result['usage_qualified']
     assert writes==[b'G']
+    # Original release witness proves intent, NOT a sent G or model exec.
+    # Fake held events and an inherited ACK cannot turn Python into Codex.
+    from rlflow.hybrid_usage_source import _RuntimeStartedObservation
+    from rlflow.store import canonical
+    row['runtime_ack']=_RuntimeStartedObservation(attempt['source'],canonical({'fake':True}))
+    assert owner.sources._runtime_started(owner,lease) is None
+    os.write(row['fds']['write'],b'{"type":"thread.started","thread_id":"synthetic_not_a_model"}\n')
+    with pytest.raises(Conflict,match='approved ELF'):owner.poll_native(lease)
+    capture=owner.sources._exec_observations[id(attempt['source'])]
+    assert id(attempt['source']) not in owner.sources._exec_origins
+    capture._raw=canonical({'forged':'non-null data cannot supply original exec provenance'})
+    with pytest.raises(Conflict,match='registered successful native ELF'):
+        owner.sources.observe_native_started(owner,lease)
+    assert owner.sources._runtime_started(owner,lease) is None
+    assert owner.sources._runtime_usage_publication(owner,lease) is None
+    with pytest.raises(Conflict,match='observed native start'):owner.collect_native_result(lease)
+    assert not owner.sources._model_results and not owner.sources._model_started
     result=owner.stop_to_terminal(lease)
     assert result['scope']=='FIXED_NATIVE_SINGLE_TGID' and not result['fixed_cpu_scope_only']
     assert row['producer'].poll() is not None and row['producer'].stdin.closed
     assert owner.pool.snapshot()['occupied']==0 and owner._current(attempt)['status']=='UNKNOWN'
     assert all(fd is None for fd in row['fds'].values())
     assert not owner.sources._account_caches[id(attempt['source'])].descriptors()
+    assert not owner.sources._exec_observations[id(attempt['source'])].descriptors()
     assert (home/'auth.json').read_bytes()==b'{"synthetic":"NOT_A_TOKEN"}'
     with pytest.raises((Conflict,PermissionError,OSError)):owner.start(lease,launch=launch)
     assert owner.store.audit()==owner.store.replay()

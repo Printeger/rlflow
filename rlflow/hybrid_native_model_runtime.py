@@ -48,6 +48,7 @@ class NativeModelLaunch:
 class NativeModelOwner(FixtureRuntimeOwner):
     def __init__(self,*args,**kwargs):
         self._native_launches={}
+        self._native_releases={}
         self._launch_active=None
         super().__init__(*args,**kwargs)
 
@@ -328,7 +329,31 @@ class NativeModelOwner(FixtureRuntimeOwner):
         self._check_launch(attempt,active[1])
         self.sources._check_launch_ready(self,attempt['lease'])
         # Original Controller/STOP/deadline is still the LAST IO/sample fence.
-        return super()._check_release_gate(attempt)
+        super()._check_release_gate(attempt)
+        # Pure original witness after the last IO/sample, immediately before
+        # the Source latches its uncertain write. NOT proof that G was sent.
+        self._native_releases[id(attempt['lease'])]=(attempt,active[1],active[1].raw,
+            attempt['source'],canonical(attempt['producer_identity']),
+            self.sources._model_ready[id(attempt['source'])][1])
+
+    def poll_native(self,lease):
+        """Finite original observation; no model call, caller receipt or refund."""
+        attempt=self._issued(lease)
+        state=self.sources.poll_packet_data(attempt['source'])
+        source=self.sources._issued(attempt['source'])
+        if source['producer'] is not None and source['producer'].poll() is None and state['offset']:
+            self.sources.observe_native_started(self,lease)
+        ack=self.sources._runtime_started(self,lease)
+        if ack is not None and self._current(attempt)['fixture_runtime']['phase']=='RELEASE_INTENT':
+            with self.pool._lock:
+                if self._current(attempt)['fixture_runtime']['phase']=='RELEASE_INTENT':
+                    attempt['started_ack']=ack
+                    self._write_phase(attempt,'STARTED_AS_OBSERVED',cleanup=True)
+        return {**state,'lease_id':lease.id,'started_observed':ack is not None}
+
+    def collect_native_result(self,lease):
+        """Original completed result capability, or None for a finite pending step."""
+        return self.sources.collect_native_result(self,lease)
 
     def _terminal_scope(self):return 'FIXED_NATIVE_SINGLE_TGID'
 

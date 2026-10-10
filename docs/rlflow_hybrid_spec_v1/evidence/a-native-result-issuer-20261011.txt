@@ -1,0 +1,60 @@
+Base commit d333262. Scope: local original postexecution source/usage issuer.
+ZERO actual G, native Codex/model/API, real credentials, GPU or production IO.
+All process tests actual fixed Python gate; G write intercepted by TEST.
+Actual first nonpreset engineering task NOT_EXECUTED. Goal ACTIVE.
+
+Official OpenAI Docs skill used: searched exact auth/usage topic, fetched
+https://learn.chatgpt.com/docs/auth
+https://learn.chatgpt.com/docs/non-interactive-mode
+Forced ChatGPT/workspace mismatch exits; JSONL includes completion usage.
+Trusted fixed CLI successful pipeline is an inferred account binding, not
+JWT parsing, provider money attestation or total backend request guarantee.
+
+Local path:
+Owner last G fence -> retained original release-intent witness (NOT sent G).
+Source actual same-PID ELF/stdio -> independent exact immutable exec origin.
+Original held thread event -> strong ACK -> original STARTED transaction.
+Natural exit0 + same original pidfd + full held stdout prefix audit +
+complete successful CLI usage + role output -> exact NativeModelResult.
+First audited line must match original ACK event/hash. Final STOP check occurs
+AFTER complete canonical cap freezing and immediately before registration.
+Final packet audit before FD closure invalidates issuer on changed output,
+but does NOT prevent independent physical STOP/FD cleanup.
+After scope terminal/reap/all original FDs closed, exact result publication
+enters existing native Budget processing; missing/invalid stays UNKNOWN.
+No caller receipt, mutable helper data, runtime_ack, packet data or copied
+cap may be upgraded. Failed/missing ACK/EOF/result never refunds exposure.
+Positive native result/known settlement remains NOT_VERIFIED on actual model.
+
+Command:
+env -u PYTHONPATH PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q tests/test_hybrid_native_model_launch.py -k intercepted_g
+Original62131/output158771 natural exit0:1passed,1deselected22.90s.
+Original fake thread and inherited ACK cannot qualify real Python after lost G.
+Read-only independent /root/finite_app_review_63 found3direct MUST:
+1 helper mutable DATA cache must not be Source's authenticated ELF origin;
+2 final independent first line must match original ACK;
+3 last STOP after cap construction and last audit before actual FD closure.
+Fixed exactly these. Original87667/output1ea71d natural exit0:
+1passed,1deselected22.96s. Added forged non-null failed capture._raw negative:
+no registered real ELF -> no ACK, result or usage; all probe/gate/cache FDs
+closed and actual Python reaped at STOP/Pool0/UNKNOWN/audit==replay.
+Only affected test repeated after code changes; no original running test reset.
+Last STOP ordering amendment affects previously unreachable positive branch,
+independently reviewed, not claimed runtime-tested by the negative case.
+Final narrow read-only review confirms all3MUST source-closed, no duplicate tests.
+
+Command:
+env -u PYTHONPATH PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest -q tests/test_hybrid_native_model_usage.py tests/test_hybrid_native_model_budget.py
+Original23261/output89251f natural exit0:25passed1warning2.13s.
+Warning third-party starlette anyio BlockingPortal deprecation; no failure.
+Pure format/native consumption math and caller-runtime-deny, NOT actual issuer.
+Compile/diff/user lock checks passed; original handles all terminal.
+USER package-lock SHA unchanged:
+becc7e2a36dfcad4ffe934b5ff2f0f68187611d6c0641bd63d81367651cfbf09.
+
+Direct remaining discovery: BaseOwner currently requires data_mode fixture;
+NativeModelResult candidate is memory-only. Must implement original REAL-domain
+and durable result/candidate facts, never retroactively upgrade fixture history.
+Then same-workflow CPU, genuinely different product Evaluator, condition CAS
+and one unmet-demand continuation. No A/98/full-Goal/full-suite acceptance.
+Actual model calls await existing small A contract. GPU/B/C/instinctRL HOLD.

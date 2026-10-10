@@ -4,11 +4,18 @@ import json
 import os
 import stat
 import time
+from dataclasses import dataclass
 from pathlib import Path
 
 from .hybrid_fixture_materials import _write_new
 from .hybrid_usage_source import FixtureUsageSourceOwner, FixtureUsageSource, SOURCE_FILES
 from .store import Conflict, canonical
+
+
+@dataclass(frozen=True,eq=False)
+class NativeModelResult:
+    source: FixtureUsageSource
+    raw: bytes
 
 
 class NativeModelSourceOwner(FixtureUsageSourceOwner):
@@ -26,6 +33,9 @@ class NativeModelSourceOwner(FixtureUsageSourceOwner):
         self._account_home = os.path.abspath(os.environ.get('CODEX_HOME',str(Path.home()/'.codex')))
         self._account_caches = {}
         self._exec_observations = {}
+        self._exec_origins = {}
+        self._model_started = {}
+        self._model_results = {}
         super().__init__(pool)
 
     def _actual(self):
@@ -93,6 +103,12 @@ class NativeModelSourceOwner(FixtureUsageSourceOwner):
 
     def _cleanup_attempt(self, attempt):
         errors=[]
+        if id(attempt['source']) in self._model_results and attempt['status']!='CLOSED':
+            # Preserve raw FD audit through the very last pre-close boundary.
+            # Bad late data invalidates financial publication, but must never
+            # prevent independent physical STOP/FD cleanup.
+            try:self.packet_result_data(attempt['source'])
+            except Exception:self._packet_failures.add(id(attempt['source']))
         cache=self._account_caches.get(id(attempt['source']))
         try:super()._cleanup_attempt(attempt)
         except (OSError,Conflict) as error:errors.append(error)
@@ -161,6 +177,11 @@ class NativeModelSourceOwner(FixtureUsageSourceOwner):
                 binary_identity=attempt['binary']['stamp'][:2],
                 stdout_identity=attempt['identities']['events.jsonl'],
                 stderr_identity=attempt['identities']['stderr.log'],check_live=live)
+            # Separate Source-owned immutable origin from the helper's DATA
+            # cache. A failed/replaced/mutated helper can never mint an ACK.
+            self._exec_origins[id(source)]=(source,owner,lease,capture,canonical(value),
+                canonical(runtime['producer_identity']),attempt['binary']['stamp'][:2],
+                tuple(attempt['identities']['events.jsonl']),tuple(attempt['identities']['stderr.log']))
             return {**value,'source_id':source.id,'lease_id':lease.id,
                 'elf_observed':True,'source_authenticated':False,'account_qualified':False,
                 'usage_qualified':False,'condition_evidence_enabled':False}
@@ -467,16 +488,174 @@ class NativeModelSourceOwner(FixtureUsageSourceOwner):
     def _runtime_usage_publication(self, owner, lease):
         """Original writer hook, NOT an audited-data or caller receipt API.
 
-        The native account/producer/G/EOF qualification issuer is not yet
-        implemented. Consequently there is no issued usage publication. Do
-        not use source fields, packet_result_data or complete=true as a cap.
+        Only an exact natural-exit/full-audit result can issue after physical
+        terminal proof. Missing/failed data still returns None; packet fields,
+        packet_result_data or complete=true cannot substitute for a cap.
         """
         from .hybrid_native_model_runtime import NativeModelOwner
         self._actual()
         if type(owner) is not NativeModelOwner or owner.sources is not self:
             raise PermissionError('original native usage publisher owner required')
-        owner._issued(lease)
-        return None
+        runtime=owner._issued(lease);source=runtime['source']
+        if id(source) in self._packet_failures:return None
+        original=self._model_results.get(id(source))
+        if original is None or runtime['terminal'] is None:return None
+        cap=self._issued_native_result(owner,lease,original[2])
+        attempt=self._issued(source);terminal=runtime['terminal']
+        if (attempt['status']!='CLOSED' or any(fd is not None for fd in attempt['fds'].values()) or
+                self._extra_fork_descriptors(attempt) or attempt['producer'] is None or
+                attempt['producer'].poll()!=0 or not attempt['producer'].stdin.closed or
+                terminal['scope']!='FIXED_NATIVE_SINGLE_TGID' or terminal['lease_id']!=lease.id or
+                terminal['producer']!=runtime['producer_identity'] or
+                not terminal['all_original_source_fds_closed'] or not terminal['original_participant_reaped']):
+            raise Conflict('complete original native terminal required for usage issue')
+        from .hybrid_goals import digest
+        from .hybrid_native_model_usage import PUBLICATION
+        from .hybrid_protocol import validate_schema
+        data=json.loads(cap.raw);binding=runtime['origin']['native_model']
+        ack=self._runtime_started(owner,lease)
+        if ack is None or ack is not runtime['started_ack']:
+            raise Conflict('original native result ACK lineage differs')
+        value={'profile':'ORIGINAL_NATIVE_CLI_USAGE_V1','source_id':source.id,
+            **{k:runtime['origin'][k] for k in ('lease_id','task_id','attempt_id','nonce')},
+            'grant_id':binding['grant_id'],'grant_sha256':digest(binding),
+            'producer':runtime['producer_identity'],
+            **{k:binding[k] for k in ('workspace_id','packet_sha256','output_schema_sha256','candidate_sha256')},
+            **{k:data[k] for k in ('stream_sha256','output_sha256','usage','ready_sha256')},
+            'stream_bytes':data['bytes'],'started_ack_sha256':digest(json.loads(ack.raw)),
+            'terminal_proof_sha256':digest(terminal),'producer_exit_code':0}
+        validate_schema(PUBLICATION,value)
+        return value
+
+    def _released_original(self,owner,lease):
+        from .hybrid_native_model_runtime import NativeModelOwner
+        self._actual()
+        if type(owner) is not NativeModelOwner or owner.sources is not self:
+            raise PermissionError('original native result owner required')
+        runtime=owner._issued(lease);source=runtime['source'];attempt=self._issued(source)
+        witness=owner._native_releases.get(id(lease));launch=owner._native_launches.get(id(lease))
+        if (witness is None or launch is None or witness[0] is not runtime or witness[1] is not launch[0] or
+                witness[2]!=launch[1] or witness[1].raw!=witness[2] or witness[3] is not source or
+                witness[4]!=canonical(runtime['producer_identity']) or
+                not runtime['release_entered'] or attempt['runtime'] is not runtime or
+                self._model_ready.get(id(source))!=(source,witness[5])):
+            raise PermissionError('original native final release witness required')
+        return runtime,source,attempt,witness
+
+    def observe_native_started(self,owner,lease):
+        """Original ELF/stdio + first held thread event; not account/usage proof."""
+        from .hybrid_usage_source import _RuntimeStartedObservation
+        from .hybrid_usage_stream import parse_line,MAX_LINE
+        from .hybrid_goals import digest
+        with self._lock:
+            runtime,source,attempt,witness=self._released_original(owner,lease)
+            old=self._model_started.get(id(source))
+            if old is not None:return self._runtime_started(owner,lease)
+            capture=self._exec_observations.get(id(source))
+            if capture is None:self.observe_native_exec(owner,lease)
+            capture=self._exec_observations[id(source)]
+            origin=self._exec_origins.get(id(source))
+            if (origin is None or origin[0] is not source or origin[1] is not owner or origin[2] is not lease or
+                    origin[3] is not capture or canonical(capture.value)!=origin[4] or
+                    origin[5]!=canonical(runtime['producer_identity']) or origin[6]!=attempt['binary']['stamp'][:2] or
+                    origin[7]!=tuple(attempt['identities']['events.jsonl']) or
+                    origin[8]!=tuple(attempt['identities']['stderr.log'])):
+                raise Conflict('original registered successful native ELF observation required')
+            self._physical(attempt)
+            self._check_pidfd(attempt,live=True)
+            from .jobs import identity
+            if (attempt['producer'].poll() is not None or
+                    identity(attempt['producer'].pid)!=runtime['producer_identity']):
+                raise Conflict('original live native ACK producer required')
+            raw=os.pread(attempt['fds']['read'],MAX_LINE+1,0)
+            end=raw.find(b'\n')
+            if end<0:raise Conflict('complete first native thread event required')
+            line=raw[:end+1];event=parse_line(line)
+            if event['type']!='thread.started':raise Conflict('original first native thread required')
+            ack=_RuntimeStartedObservation(source,canonical({'source_id':source.id,
+                'lease_id':lease.id,'producer':runtime['producer_identity'],'event':event,
+                'line_sha256':'sha256:'+hashlib.sha256(line).hexdigest(),
+                'elf_observation':capture.value,'ready_sha256':digest(json.loads(witness[5]))}))
+            self._model_started[id(source)]=(owner,lease,ack,ack.raw)
+            return ack
+
+    def _runtime_started(self,owner,lease):
+        runtime=owner._issued(lease);source=runtime['source']
+        original=self._model_started.get(id(source))
+        if original is None:return None  # Ignore inherited caller-mutable runtime_ack.
+        self._released_original(owner,lease)
+        if (original[0] is not owner or original[1] is not lease or
+                original[2].source is not source or original[2].raw!=original[3]):
+            raise Conflict('original native started capability changed')
+        return original[2]
+
+    def _issued_native_result(self,owner,lease,cap):
+        runtime,source,attempt,_=self._released_original(owner,lease)
+        row=self._model_results.get(id(source))
+        if (id(source) in self._packet_failures or
+                type(cap) is not NativeModelResult or row is None or row[0] is not owner or row[1] is not lease or
+                row[2] is not cap or cap.source is not source or cap.raw!=row[3] or
+                row[4] is not runtime['native_model_grant'] or row[4].raw!=row[5]):
+            raise PermissionError('original same-lease native result capability required')
+        if attempt['status']!='CLOSED':self.packet_result_data(source)
+        return cap
+
+    def collect_native_result(self,owner,lease):
+        """Natural exit0 + full prefix audit under original no-new-TGID scope.
+
+        The fixed trusted CLI enforces ChatGPT/workspace settings. Successful
+        completion under that pipeline is the account binding, not JWT parsing
+        or a provider-price/total-backend-request attestation. No condition CAS.
+        """
+        from .hybrid_goals import digest
+        with self._lock:
+            runtime,source,attempt,witness=self._released_original(owner,lease)
+            old=self._model_results.get(id(source))
+            if old is not None:return self._issued_native_result(owner,lease,old[2])
+            if runtime.get('source_stop_latched'):
+                raise Conflict('STOP prohibits a new native result')
+            self._physical(attempt)
+            ack=self._runtime_started(owner,lease)
+            if (ack is None or runtime['started_ack'] is not ack or
+                    owner._current(runtime)['fixture_runtime']['phase']!='STARTED_AS_OBSERVED'):
+                raise Conflict('original observed native start required before result')
+            process=attempt['producer']
+            if process is None or process.poll() is None:return None
+            if process.poll()!=0:raise Conflict('original native result requires natural exit0')
+            self._check_pidfd(attempt,live=False)
+            state=self.poll_packet_data(source);reader=self._packet_origins[id(source)][1]
+            stamp=reader._stamp()
+            if reader.transcript.offset<stamp[2] and reader.transcript.state not in ('DONE','FAILURE_OBSERVED'):
+                return None
+            state=self.finish_packet_data(source)
+            if not state['data_complete']:return None
+            data=self.packet_result_data(source)
+            if 'failure_event' in data or not data['usage']['complete']:
+                raise Conflict('original successful complete native usage required')
+            from .hybrid_usage_stream import MAX_LINE,parse_line
+            first=os.pread(attempt['fds']['read'],MAX_LINE+1,0)
+            end=first.find(b'\n')
+            if end<0:raise Conflict('original native ACK line missing at audit')
+            line=first[:end+1];started=json.loads(ack.raw)
+            if ('sha256:'+hashlib.sha256(line).hexdigest()!=started['line_sha256'] or
+                    parse_line(line)!=started['event']):
+                raise Conflict('original native ACK differs from final audited first line')
+            # Validate the role-specific structured output before issuing.
+            binding=json.loads(runtime['native_model_grant'].raw)
+            if binding['role']=='Engineer':
+                candidate=self.candidate_data(source)
+                output={'candidate_sha256':candidate.output_sha256,'files':candidate.files()}
+            else:output={'review':self.review_data(source)}
+            cap=NativeModelResult(source,canonical({**data,**output,
+                'ready_sha256':digest(json.loads(witness[5])),
+                'source_authenticated':True,'account_qualified':True,
+                'account_binding':'TRUSTED_CLI_FORCED_CHATGPT_WORKSPACE',
+                'condition_evidence_enabled':False}))
+            if runtime.get('source_stop_latched'):
+                raise Conflict('STOP raced original native result; no issue')
+            self._model_results[id(source)]=(owner,lease,cap,cap.raw,
+                runtime['native_model_grant'],runtime['native_model_grant'].raw)
+            return cap
 
     def poll(self, source):
         self._issued(source)
