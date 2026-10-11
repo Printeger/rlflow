@@ -1,5 +1,7 @@
 # 阻塞与证据缺口
 
+2026-10-11 非预设真实任务来源与外部验收已冻结，实际基线FAIL已可重复；尚需fresh-live原安装/批准材料与有限总入口任务接线、统一原事实交付包，继续本地实现。无新增需用户选择事项；真实模型仍仅待原小额A合同批准，首task NOT_EXECUTED。GPU/B/C/HOLD保持，其他恢复增强后置。不能将开发期评审、基线测试或task JSON当作产品批准/自主成功；详HYBRID_A_FIRST_REAL_TASK.md。
+
 2026-10-11 有限 A 总入口及失败终态/跨交接 STOP 本地实现完成、差量独立问题关闭；无新增用户决定阻塞本地工作。尚缺真实仓库任务来源/外部验收冻结与统一真实交付包，继续开发。首非预设真实模型任务 NOT_EXECUTED，原小额A未批准只阻真实调用；GPU/B/C/instinctRL HOLD保持，恢复增强后置。不因本片测试通过宣称真实正向总入口、A或完整Goal完成。证据 evidence/a-engineering-sequence-20261011.txt。
 
 2026-10-11 A 原接纳事实消费及明确需求一次接续已通过本地实际接线验收，已确认成功ACK、准备原事件出处与30s重复闭包问题均关闭；没有新增用户决定阻塞本地开发。首非预设真实模型工程任务仍 NOT_EXECUTED，尚需有限 A 总入口、真实仓库任务/外部可配置验收/统一修改-测试-独立Reviewer-条件接纳-接续交付包，FAIL/REVISE 明确未接纳终态或有限修复；repair quota 不冒称已实现派发。实际模型调用仅待原小额 A 合同批准，GPU/B/C/instinctRL HOLD 保持，其他恢复增强后置。用户请求继续，get_goal仍报告历史blocked且无resume写接口；此标记不当本地实现阻塞、不重建原Goal。证据 evidence/a-workflow-continuation-20261011.txt。

@@ -1,0 +1,51 @@
+A first actual repository task baseline — 2026-10-11
+Source commit: 761862fab6ef0cbbc403da8f9799371dc8511e6f, hybrid-v1.
+Actual rlflow/web_auth.py unchanged sha256:
+45784a12cc8d310e959796705164d5dad12b065fc398ac1359cc73b7c276bea0
+Readonly rlflow/__init__.py:
+667d4a15b970b851e20d17510224670c14646cfb6d5a1e388ca6b9cc6da8bf41
+Final operator checks sha256:
+eef3f7d7eb2e914d1f13645e0a9a6e404df7b5dd03faa4a300fecc926ca6e68a
+Input: validation/a_dashboard_auth_task.json, explicitly UNAPPROVED DATA.
+No real credential/model/account/GPU/API access, no product fix, no push.
+
+Actual readonly bug reproduction chunk 308af0, exit1:
+PYTHONPATH=. .venv/bin/python -c 'from rlflow.web_auth import AuthStore; auth=AuthStore(); token="a"*20+chr(0xd800); auth.resolve(token,"bearer")'
+Traceback AuthStore.resolve -> _key -> token.encode -> UnicodeEncodeError.
+This is a Python API result, NOT evidence of HTTP surrogate reachability.
+
+Initial external checks baseline exec71996 / 988e3d exit0:
+PYTHONPATH=. PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest tests/test_hybrid_a_real_task_baseline.py -q -x
+1 passed in 20.87s; actual CPU reported cases17/passed15/failed2,
+machine acceptance FAIL with successful measurement process, STOP/SETTLED/Pool0.
+Independent MUST: invalid input could clear sessions without failing old checks.
+No change while original live; after terminal, updated operator rule to verify
+same original bearer/request/session Access plus roles/projects after every invalid.
+
+Changed rule/probe final actual baseline exec98664 / 1fd02a exit0:
+same command, 2 passed in 20.91s.
+Actual CPU original source cases27/passed25/failed2, machine FAIL.
+Negative rule harness rejects surrogate handler clearing all sessions; NOT model output.
+
+Freeze task JSON and wire actual test to its externally frozen checks/range:
+pure task protocol/no-consent/hash/negative-rule verification chunk479413, exit0:
+PYTHONPATH=. PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest tests/test_hybrid_a_real_task_baseline.py -k 'not managed_cpu' -q -x
+2 passed, 1 deselected in 0.26s.
+Required actual JSON wiring delta exec35474 / 409b64, exit0:
+PYTHONPATH=. PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest tests/test_hybrid_a_real_task_baseline.py -k managed_cpu -q -x
+1 passed, 2 deselected in 21.00s.
+Assertions: actual untouched repository snapshot, exact source/check hashes,
+operator rule read from task JSON, cases27/passed25/failed2, process SUCCEEDED,
+machine FAIL, no condition evidence, full STOP/SETTLED/Pool0/all FDs closed,
+audit=replay, original source hashes unchanged after task closure.
+No live fixture restart or source/test edit, no repeat of passed A full chains.
+
+Independent finite_app_review_63 final narrow review:
+old MUST closed, per-invalid original bearer/request/session retained checks;
+destructive clearing rejected. Input explicitly not execution/Goal approval,
+no HTTP reachability or second accepted-task claim. No new confirmed MUST.
+Reviewer did not run tests/edit files; development review != product Reviewer.
+
+First real model task NOT_EXECUTED, no actual Engineer patch or Reviewer result.
+Next: original fresh-live task wiring and unified original delivery facts.
+A contract unapproved; GPU/B/C/instinctRL HOLD unchanged.

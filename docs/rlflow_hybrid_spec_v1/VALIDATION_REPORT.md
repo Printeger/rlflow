@@ -1,5 +1,7 @@
 # 需求包离线校验报告
 
+2026-10-11 真实仓库任务诊断验收：web_auth原hash未改，readonly repro UnicodeEncodeError exit1。初17项baseline原71996自然terminal1pass20.87s；独立rule MUST修后原98664终态2pass20.91s，actualCPU27/25/2、机器FAIL和反清会话拒伪。外部JSON冻结后纯2pass.26s，末actual接线35474/output409b64 exit0 1pass/2deselected21.00s，含fullSTOP/SETTLED/Pool0/全FD/audit=replay。独立窄审MUST关闭无新增确证MUST；不相加作资格、不重复A链、不宣称HTTP可达或真实Engineer/Reviewer闭环通过。证据evidence/a-real-task-baseline-20261011.txt。
+
 2026-10-11 有限 A 总入口差量验收：新增原95535/outputa52c9b exit0，16pass/1显式多线程fork warning40.19s（13 DATA harness+3实际原Owner/本地进程）；实际G截断零model，fullSTOP/reap/全FD/UNKNOWN/Pool0/不重派，正常无handoff STOP/SETTLED原ACK重复，fork继承被他线程持有admission锁时先拒无latch。必要旧 native桥41248/output3a1845 exit0，19pass22.68s。独立窄审四 MUST 关闭、无新增确证 MUST；未重跑已过完整接续链，不作全库或真实模型验收声明。原命令/范围/结果见 evidence/a-engineering-sequence-20261011.txt；首任务NOT_EXECUTED，原权限限制不变。
 
 2026-10-11 A 原条件接纳→唯一明确后续任务 FINAL：原2265/output0e0c70自然exit0，`PYTHONPATH=. PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest tests/test_hybrid_a_condition_acceptance.py -k next_task -q -x`，1pass/17deselected/1既有warning382.45s。含实际受管CPU PASS、显式合成不同 Engineer/Reviewer、条件CAS、三处原关闭/正常退休/安装失返同child、新CONT original G截获、fullSTOP/UNKNOWN/Pool0/不重派及cold recover=audit=replay。独立原MUST均关闭，真实模型/任务未运行。准备原事件/历史Goal出处损坏且投影不变拒绝及ACK harness原31956/outputb8b2e0 8pass5.85s；末旧实际Gate原68309/output63d35c 1pass17.55s。此前纯24pass0.24s与必要回归/全部失败/诊断逐项归档 evidence/a-workflow-continuation-20261011.txt，不累加作资格，不声明全库/新安装/整个A完成。原30s和64MiB门未放宽；首非预设真实任务NOT_EXECUTED，下一有限总入口与真实任务交付，原运行合同和GPU/B/C/HOLD不变。

@@ -1,0 +1,42 @@
+{
+  "schema_version": "a-repository-task-input/1",
+  "task_id": "a_dashboard_auth_invalid_token",
+  "execution_consent": "UNAPPROVED",
+  "source_commit": "761862fab6ef0cbbc403da8f9799371dc8511e6f",
+  "source_files_sha256": {
+    "rlflow/web_auth.py": "45784a12cc8d310e959796705164d5dad12b065fc398ac1359cc73b7c276bea0",
+    "rlflow/__init__.py": "667d4a15b970b851e20d17510224670c14646cfb6d5a1e388ca6b9cc6da8bf41"
+  },
+  "candidate_paths": ["rlflow/web_auth.py"],
+  "objective": "Fix the actual repository AuthStore.resolve API so malformed external bearer-token inputs are rejected as None instead of raising UnicodeEncodeError. Preserve valid bearer, session and request tokens in the same AuthStore, their roles/projects, purpose separation, revocation and expiration behavior. Do not log tokens, weaken authentication or change public APIs. Use the operator-owned external checks; do not edit acceptance, source pins or this task input. The HTTP reachability of surrogate inputs is not established and is not a claim required by this task.",
+  "checks_path": "validation/a_dashboard_auth_checks.py",
+  "checks_sha256": "eef3f7d7eb2e914d1f13645e0a9a6e404df7b5dd03faa4a300fecc926ca6e68a",
+  "cpu_acceptance": {
+    "method": "JSON_METRICS_RANGE",
+    "metrics": {
+      "cases": {"min": 27, "max": 27},
+      "passed": {"min": 27, "max": 27},
+      "failed": {"min": 0, "max": 0}
+    },
+    "stderr_empty": true
+  },
+  "cpu_seconds": 10,
+  "continuation_task": {
+    "task_id": "a_dashboard_auth_resolve_contract_doc",
+    "objective": "After original condition acceptance of the malformed-token fix, improve the AuthStore.resolve method docstring to describe valid token purposes, invalid-token None behavior and retention of other live sessions. Only edit rlflow/web_auth.py, retain the accepted behavior and all operator-owned checks, and do not invent further feature work. Return an original patch under the same account and cumulative A budget. This run alone does not establish a second reviewed/accepted task."
+  },
+  "required_evidence": [
+    "original_engineer_session_and_usage",
+    "original_patch_and_candidate_files",
+    "actual_managed_cpu_result_and_complete_stop",
+    "distinct_original_reviewer_session_and_accept_verdict",
+    "original_three_parent_condition_acceptance_event",
+    "one_original_explicit_continuation_session_and_result"
+  ],
+  "limitations": [
+    "Task data is not a Goal approval, execution capability or model consent.",
+    "Installation, Registry, workspace identity, runtime pins, Controller and original A approval must be bound by protected services before execution.",
+    "The first real task remains NOT_EXECUTED; a CPU baseline or synthetic Review does not close it.",
+    "GPU, B/C and instinctRL HOLD remain unchanged."
+  ]
+}

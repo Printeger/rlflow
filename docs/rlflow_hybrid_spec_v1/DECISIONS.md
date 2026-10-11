@@ -1,5 +1,7 @@
 # 开发决策记录
 
+2026-10-11 首真实任务选本仓库AuthStore.resolve实际输入崩溃，不预置修复、不以parser演示代替。冻结原commit/filehash、独立外部checks及范围；task JSON明确非权威/UNAPPROVED，须原安装/Registry/批准服务接线才能执行。规则每个invalid后检查其他合法purpose/角色/项目保留，防清会话伪修；仅证明Python接口缺陷不推断HTTP可达。实际CPU基线FAIL属于诊断，不是首任务完成；明确接续只文档原已接纳行为，无第二次Review/CAS不算第二任务接纳。
+
 2026-10-11 有限总入口只组合原 API，不新增 Supervisor、运行批准或模型重试。失败明确未接纳，repair quota 不作派发承诺。外部发行回调锁外、返回重核；跨退休初始 Owner 强留原根 STOP，永久 latch 先于锁，fork PID 拒绝先于 Event/IO。只有正常 shutdown 成功后的 exact root/current/source ACK 才确认正常退休，safe-retired/lost return 无 ACK 为 UNKNOWN。见 HYBRID_A_ENGINEERING_SEQUENCE.md；开发期独立审查不替代产品真实 Reviewer。
 
 2026-10-11 A 接续由完整批准中的明确 continuation_task 触发，配额不等于需求；原 condition CAS 不改为 dispatch/Goal 完成标记。唯一新 Engineer Owner/plan/reservation 保留原预算 start/high/费用/窗口。正常退休强留 root+原 Source/完整 close 摘要授唯一 child；自冻结只续办原关闭，不创建新任务。重复闭包超30s后使用同 active writer/db/ReadBudget 的已成功历史证明，factory/context/完成 tuple 精确身份缺一不可；当前投影/Controller/物理期限不缓存。Store bound transition lookup 保持 exact Guard，不改变 current projection 读取。替代 ConditionService._point 仍认证 preparation intent/result 原事件与 intent.sources 历史 Goal/Approval。见 HYBRID_A_CONTINUATION.md 与原分轮证据；真实产品模型资格不由合成链或开发期审查升级。
