@@ -1,5 +1,7 @@
 # 开发决策记录
 
+2026-10-11 A 接续由完整批准中的明确 continuation_task 触发，配额不等于需求；原 condition CAS 不改为 dispatch/Goal 完成标记。唯一新 Engineer Owner/plan/reservation 保留原预算 start/high/费用/窗口。正常退休强留 root+原 Source/完整 close 摘要授唯一 child；自冻结只续办原关闭，不创建新任务。重复闭包超30s后使用同 active writer/db/ReadBudget 的已成功历史证明，factory/context/完成 tuple 精确身份缺一不可；当前投影/Controller/物理期限不缓存。Store bound transition lookup 保持 exact Guard，不改变 current projection 读取。替代 ConditionService._point 仍认证 preparation intent/result 原事件与 intent.sources 历史 Goal/Approval。见 HYBRID_A_CONTINUATION.md 与原分轮证据；真实产品模型资格不由合成链或开发期审查升级。
+
 2026-10-11 A 条件接纳采用原三父事实的 protected append-only CAS，而非调用者上传 PASS、相同候选哈希或开发期审查替代真实独立会话。原 ACK thread_id 进入 Source usage；历史缺 ID/显式条件绑定不回填。接纳保留 goal_completed=false/dispatch_enabled=false，同请求重复只历史返回。最后新鲜 Controller/原 A 总窗口/STOP 门及历史 recorded_at 窗口一致；空 marker 必须有原事件。实际链暴露重复不可变证明的 30s/64MiB 开销，采用仅原事务 ReadBudget 的原始依赖复用，全部当前预算/Goal/Authority/Controller heads 逐次新读，不放宽上限或期限。独立窄审确认无新增 MUST。详见 HYBRID_A_CONDITION_ACCEPTANCE.md；需求驱动唯一接续仍待本地实装，真实任务资格不由 synthetic 测试升级。
 
 2026-10-11 A 执行桥复用原 Source/launch/STOP/结算，不引入另一个 Supervisor、caller receipt 或自动重试。固定原序列 deadline 在观察与 Source 发行末门重核；异常仍 STOP，历史结果不能升级为条件。上轮同A readonly Evaluator 已登记，受审候选 frozen stdin 与 baseline 明确区分；本轮将已有原入口接成有限执行及持久归档闭包。见 HYBRID_A_NATIVE_EXECUTION_BRIDGE.md。

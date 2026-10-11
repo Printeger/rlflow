@@ -76,3 +76,25 @@ def independent_reviewer(proposal,config,program_sha256,intent,ready,cpu,enginee
     from .hybrid_native_model_runtime import bind_packet
     bind_packet(material['packet'],binding,intent,proposal)
     return binding,material['packet'],material['schema']
+
+
+def continuation(proposal,config,program_sha256,intent,ready,acceptance,parents):
+    from .hybrid_a_workflow_continuation import from_acceptance
+    material=from_acceptance(proposal,config,acceptance,parents)
+    spec=config['tools']['native_model']['definition']['spec']
+    if (program_sha256!=spec['model_gate_sha256'] or intent['plan']['packet']['role']!='Engineer' or
+            ready['request']['intent_key']!=intent_key(intent['request']) or
+            ready['request']['intent_hash']!=digest(intent) or ready['plan_hash']!=digest(intent['plan'])):
+        raise Conflict('original continuation Engineer plan/gate required')
+    binding={**material['spec'],'command_sha256':digest(config['commands']['native_model']),
+        'resource_sha256':digest(config['resource_profile']),
+        'workflow':{'profile':spec['profile'],'stage':'CONTINUATION','task_id':material['task_id'],
+            'acceptance':material['acceptance'],'parents':material['parents'],
+            'envelope_sha256':material['envelope_sha256'],
+            'intent':{'key':intent_key(intent['request']),'hash':digest(intent)},
+            'ready':{'key':result_key(ready['request']),'hash':digest(ready)},
+            'files':material['packet']['files'],'accounting_version':'A_REGISTRATION_CEILINGS_V1',
+            'limits':{k:spec[k] for k in ('medium_sessions','high_sessions','controlled_seconds','wall_seconds')}}}
+    from .hybrid_native_model_runtime import bind_packet
+    bind_packet(material['packet'],binding,intent,proposal,continuation_task=spec['continuation_task'])
+    return binding,material['packet'],material['schema']

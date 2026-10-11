@@ -18,6 +18,10 @@ HEAD=obj({'envelope_sha256':HASH,'approval_sha256':HASH,'first_engineer_entry':I
     'started_at':TIME})
 HEAD['properties']['candidate_cpu_entry']=ID
 HEAD['properties']['review_entries']={'type':'object','maxProperties':2,'propertyNames':ID,'additionalProperties':ID}
+HEAD['properties']['continuation_entry']=ID
+HEAD['properties']['continuation_acceptance']=obj({'key':ID,'hash':HASH})
+HEAD['dependentRequired']={'continuation_entry':['continuation_acceptance'],
+    'continuation_acceptance':['continuation_entry']}
 
 
 def advance(value, prior):
@@ -35,6 +39,23 @@ def advance(value, prior):
         raise Conflict('closed original workflow accounting version required')
     validate_schema(LIMITS,workflow['limits']);limits=workflow['limits']
     if any(type(n) is not int for n in limits.values()):raise Conflict('exact workflow limits required')
+    if workflow['stage']=='CONTINUATION':
+        from .hybrid_native_model_profile import BINDING,KIND
+        from .hybrid_budget_ledger import entry_key
+        binding=origin['native_model'];validate_schema(BINDING,binding)
+        if (origin.get('kind')!=KIND or prior is None or 'continuation_entry' in prior or
+                prior['approval_sha256']!=value['policy_source']['approval_hash'] or
+                binding['role']!='Engineer' or binding['effort']!='medium' or
+                not prior.get('candidate_cpu_entry') or not prior.get('review_entries')):
+            raise Conflict('original unique accepted continuation stage required')
+        check_window(prior,workflow,timestamp(value['recorded_at']))
+        charge=value['prior_reservation']['amount']['wall_seconds']
+        if (charge<binding['seconds']+10 or prior['medium_sessions']+1>limits['medium_sessions'] or
+                prior['controlled_seconds_charged']+charge>limits['controlled_seconds']):
+            raise Conflict('workflow continuation quota exceeded')
+        return {**prior,'medium_sessions':prior['medium_sessions']+1,
+            'controlled_seconds_charged':prior['controlled_seconds_charged']+charge,
+            'continuation_entry':entry_key(request),'continuation_acceptance':workflow['acceptance']}
     if workflow['stage']=='INDEPENDENT_REVIEW':
         from .hybrid_native_model_profile import BINDING,KIND
         from .hybrid_budget_ledger import entry_key

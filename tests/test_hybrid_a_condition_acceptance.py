@@ -43,6 +43,17 @@ def condition_bound(config):
     return registry,proposal
 
 
+def continuation_bound(config):
+    registry,proposal=condition_bound(config);row=json.loads(registry._raw)
+    spec=row['tools']['native_model']['definition']['spec']
+    spec['continuation_task']={'task_id':'next_task','objective':'Handle the next explicitly approved edge case in the accepted component'}
+    rows=registration(spec)
+    row.update(tools=rows['tools'],commands=rows['commands'],evaluation_rules={'workflow_rule':rows['rule']},resource_profile=rows['resources'])
+    registry=Registry(row);proposal['registry_bindings']=registry.bindings
+    proposal['evaluation_data']['evaluation_rule']['version_hash']=digest(rows['rule'])
+    return registry,proposal
+
+
 @pytest.mark.parametrize('damage',['none','missing','extra','hash','method','optional'])
 def test_exact_condition_mapping_no_historical_upgrade(damage):
     registry,proposal=workflow();config=json.loads(registry._raw)
@@ -207,7 +218,9 @@ def synthetic_reviewer(reviewer,lease,home,monkeypatch):
     return attempt
 
 
-@pytest.mark.parametrize('original',[{'data_mode':'live','project_id':'project_live','bound':condition_bound}],indirect=True)
+@pytest.mark.parametrize('original',[
+    pytest.param({'data_mode':'live','project_id':'project_live','bound':condition_bound},id='conditions'),
+    pytest.param({'data_mode':'live','project_id':'project_live','bound':continuation_bound},id='next_task')],indirect=True)
 def test_actual_cpu_synthetic_model_chain_condition_cas_and_replay(original,native_setup,monkeypatch):
     owner,bundle,token,obs,claim=original
     import tests.test_hybrid_a_workflow_cpu_runtime as parent_helpers
@@ -217,7 +230,7 @@ def test_actual_cpu_synthetic_model_chain_condition_cas_and_replay(original,nati
     lease=synthetic_engineer_parent(owner,bundle,token,obs,claim,native_setup[4],monkeypatch)
     cap=owner.prepare_workflow_cpu_input(lease)
     token=owner.controller.renew(token,'condition_cpu',expected_version=owner.store.version(),ttl_seconds=60)['token']
-    cpu=owner.handoff_workflow_cpu(lease,cap,token=token);reviewer=None
+    cpu=owner.handoff_workflow_cpu(lease,cap,token=token);reviewer=None;next_owner=None
     def actual_cpu_only(argv,*args,**kwargs):
         assert argv[0]=='/usr/bin/systemd-run' and 'hybrid_local_runner_service' in argv[-1]
         return ACTUAL_POPEN(argv,*args,**kwargs)
@@ -278,7 +291,89 @@ def test_actual_cpu_synthetic_model_chain_condition_cas_and_replay(original,nati
                 runtime['native_model_usage']['output_sha256']='sha256:'+hashlib.sha256(model_result['message_utf8'].encode()).hexdigest()
             model_result['usage_publication_sha256']=digest(runtime['native_model_usage'])
             with pytest.raises(Conflict):derive(proposal,config,parents['cpu'],parents['engineer'],bad)
+        if config['tools']['native_model']['definition']['spec'].get('continuation_task'):
+            from rlflow.hybrid_native_model_runtime import NativeContinuationInput
+            token=reviewer.controller.renew(token,'next_input',expected_version=reviewer.store.version(),ttl_seconds=60)['token']
+            cap=reviewer.prepare_workflow_continuation_input(lease,token)
+            assert reviewer.prepare_workflow_continuation_input(lease,token) is cap
+            assert json.loads(cap.raw)['material']['packet']['files']==parents['engineer']['request']['fixture_runtime']['native_model_result']['files']
+            with pytest.raises(PermissionError):
+                reviewer.handoff_workflow_continuation(lease,NativeContinuationInput(cap.raw),token=token)
+            old_run=reviewer._workflow_native_run;old_done=reviewer._workflow_native_completed
+            # One original chain exercises all original-request ACK losses;
+            # no second CPU/model task is started for these cleanup checks.
+            token=reviewer.controller.renew(token,'next_close',expected_version=reviewer.store.version(),ttl_seconds=60)['token']
+            record=reviewer.workspace.record
+            def lost_close(request,*args,**kwargs):
+                result=record(request,*args,**kwargs)
+                if request['operation']=='complete_close':raise OSError('TEST lost continuation close return')
+                return result
+            with monkeypatch.context() as lost:
+                lost.setattr(reviewer.workspace,'record',lost_close)
+                with pytest.raises(OSError,match='TEST lost continuation close'):
+                    reviewer.handoff_workflow_continuation(lease,cap,token=token)
+            assert reviewer._safety_freeze and reviewer._continuation_handoffs[id(cap)]['child'] is None
+            token=reviewer.controller.renew(token,'next_retire',expected_version=reviewer.store.version(),ttl_seconds=60)['token']
+            shutdown=reviewer.shutdown
+            def lost_shutdown():shutdown();raise OSError('TEST lost continuation normal retirement return')
+            with monkeypatch.context() as lost:
+                lost.setattr(reviewer,'shutdown',lost_shutdown)
+                with pytest.raises(OSError,match='TEST lost continuation normal retirement'):
+                    reviewer.handoff_workflow_continuation(lease,cap,token=token)
+            from rlflow.hybrid_native_model_runtime import NativeModelOwner
+            init=NativeModelOwner.__init__
+            def lost_install(self,*args,**kwargs):
+                init(self,*args,**kwargs);raise OSError('TEST lost continuation install return')
+            with monkeypatch.context() as lost:
+                lost.setattr(NativeModelOwner,'__init__',lost_install)
+                with pytest.raises(OSError,match='TEST lost continuation install'):
+                    reviewer.handoff_workflow_continuation(lease,cap,token=token)
+            next_owner=reviewer._continuation_handoffs[id(cap)]['child']
+            assert reviewer.handoff_workflow_continuation(lease,cap,token=token) is next_owner
+            assert reviewer._workflow_native_run is old_run and reviewer._workflow_native_completed is old_done
+            assert not reviewer._live and not reviewer.sources._live
+            token=next_owner.controller.renew(token,'next_plan',expected_version=next_owner.store.version(),ttl_seconds=60)['token']
+            next_bundle,next_obs=next_owner.prepare_workflow_continuation_plan(token)
+            with pytest.raises(Conflict,match='no remint'):next_owner.prepare_workflow_continuation_plan(token)
+            grant=next_owner.issue_workflow_continuation_grant(next_bundle,token,next_obs)
+            binding=json.loads(grant.raw);assert binding['workflow']['stage']=='CONTINUATION'
+            assert binding['workflow']['acceptance']=={'key':__import__('rlflow.hybrid_a_condition_acceptance',fromlist=['fact_key']).fact_key(fact['request']),'hash':digest(fact)}
+            claim=next_owner.pool.claim(next_owner.membership,expected_version=next_owner.pool.snapshot()['version'],request_key='next_claim',seconds=60)
+            next_lease=next_owner.register(next_bundle,token,next_obs,claim,request_key='next_register',scenario='native_model',native_model_grant=grant)
+            next_attempt=next_owner._issued(next_lease)
+            prior=attempt['entries']['FIXTURE_SCOPE_STOPPED']
+            from rlflow.hybrid_budget_ledger import derived_heads,SECTIONS as BUDGET,scope
+            from rlflow.hybrid_budget import account_key
+            registered=next_attempt['entries']['REGISTER_NO_HANDOFF']
+            head=derived_heads(registered)[BUDGET[1]][account_key(scope(registered['request']))]['workflow']
+            assert head['started_at']==prior['prior_goal']['workflow']['started_at']
+            assert head['medium_sessions']==2 and head['high_sessions']==1
+            assert head['controlled_seconds_charged']==prior['prior_goal']['workflow']['controlled_seconds_charged']+310
+            # Actual protected gate is started, but product model G is intercepted.
+            next_owner.prepare_current_account_cache(next_lease);launch=next_owner.prepare_native_launch(next_lease)
+            class StopG:
+                def __init__(self,pipe):self.pipe=pipe
+                def fileno(self):return self.pipe.fileno()
+                @property
+                def closed(self):return self.pipe.closed
+                def close(self):return self.pipe.close()
+                def write(self,data):assert data==b'G';raise PermissionError('TEST continuation G intercepted')
+                def flush(self):pytest.fail('no continuation model G')
+            def next_process(argv,*args,**kwargs):
+                assert argv[1:4]==['-B','-I','-S'] and argv[7]=='native_model'
+                process=ACTUAL_POPEN(argv,*args,**kwargs);process.stdin=StopG(process.stdin);return process
+            monkeypatch.setattr(subprocess,'Popen',next_process)
+            with pytest.raises(PermissionError,match='TEST continuation G intercepted'):
+                next_owner.run_workflow_native(next_lease,launch=launch)
+            assert next_owner.pool.snapshot()['occupied']==0
+            assert next_owner._current(next_attempt)['fixture_runtime']['phase']=='FIXTURE_SCOPE_STOPPED'
+            with pytest.raises(Conflict,match='outcome unresolved'):
+                next_owner.run_workflow_native(next_lease,launch=launch)
         reviewer.store.snapshot();assert reviewer.store.recover()==reviewer.store.audit()==reviewer.store.replay()
     finally:
+        if next_owner is None and reviewer is not None and 'cap' in locals():
+            row=reviewer._continuation_handoffs.get(id(cap))
+            if row is not None:next_owner=row['child']
+        if next_owner is not None and next_owner._live:next_owner.shutdown()
         if reviewer is not None and reviewer._live:reviewer.shutdown()
         if cpu._live:cpu.shutdown()

@@ -813,6 +813,9 @@ class Store:
             def budget_lookup(section,objkey):
                 if objkey=='':return {} if db.execute('SELECT 1 FROM projection WHERE section=? LIMIT 1',(section,)).fetchone() else None
                 return _authorization.budget.object(section,objkey)
+            from .hybrid_fixture_runtime import _FixtureRuntimeGuard
+            if type(_authorization) is _FixtureRuntimeGuard:
+                budget_lookup=_authorization.transition_lookup
             budget_transition(payload,budget_lookup,event_type=event_type,key=key,object_id=object_id,
                 producer=producer,version=ver,registration=self._goal_registration(db))
             service.check_live_write(db,payload,inputs,_authorization)

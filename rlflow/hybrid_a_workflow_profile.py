@@ -38,6 +38,9 @@ SPEC = obj({'profile':{'const':PROFILE},
     'account_switch':{'const':False},'gpu_enabled':{'const':False}})
 from .hybrid_a_condition_rules import BINDINGS as CONDITION_BINDINGS
 SPEC['properties']['condition_bindings']=CONDITION_BINDINGS
+from .hybrid_protocol import ID
+SPEC['properties']['continuation_task']=obj({'task_id':ID,
+    'objective':{'type':'string','minLength':1,'maxLength':4000}})
 
 
 def validate_spec(spec):
@@ -52,6 +55,9 @@ def validate_spec(spec):
             spec['repair_sessions']+2>spec['medium_sessions'] or spec['high_sessions']<2):
         raise Conflict('workflow must budget first Engineer, continuation and independent reviews')
     for name in spec['candidate_paths']:_path(name)
+    if 'continuation_task' in spec and (not spec['continuation_task']['objective'].strip() or
+            len(spec['continuation_task']['objective'].encode('utf-8'))>4000):
+        raise Conflict('explicit bounded approved continuation demand required')
     if len(spec['checks'].encode('utf-8'))>8192:raise Conflict('bounded trusted workflow checks required')
     # Syntax/limits/rule validation only, NEVER executes trusted or candidate code.
     cpu_spec({'purpose':'engineering','code':spec['checks'],'inputs':{},

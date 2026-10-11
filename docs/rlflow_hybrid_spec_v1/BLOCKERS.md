@@ -1,5 +1,7 @@
 # 阻塞与证据缺口
 
+2026-10-11 A 原接纳事实消费及明确需求一次接续已通过本地实际接线验收，已确认成功ACK、准备原事件出处与30s重复闭包问题均关闭；没有新增用户决定阻塞本地开发。首非预设真实模型工程任务仍 NOT_EXECUTED，尚需有限 A 总入口、真实仓库任务/外部可配置验收/统一修改-测试-独立Reviewer-条件接纳-接续交付包，FAIL/REVISE 明确未接纳终态或有限修复；repair quota 不冒称已实现派发。实际模型调用仅待原小额 A 合同批准，GPU/B/C/instinctRL HOLD 保持，其他恢复增强后置。用户请求继续，get_goal仍报告历史blocked且无resume写接口；此标记不当本地实现阻塞、不重建原Goal。证据 evidence/a-workflow-continuation-20261011.txt。
+
 2026-10-11 A 条件接纳本地链已通过：实际 CPU PASS→不同 SYNTHETIC 模型会话/Reviewer→完整 STOP/SETTLED/FREE→原 condition CAS→丢 COMMIT 返回后幂等→recover=audit=replay。首非预设真实任务仍 NOT_EXECUTED；开发期只读独立审查与 synthetic 产品 Reviewer 均不能作为真实模型评审资格。剩余直接本地缺口是原接纳事实的当前消费、唯一接续及同 A 额度/Owner/候选接线和有限执行，不是运行授权阻塞。原小额 A 合同未批准只阻实际模型调用；GPU/B/C/instinctRL HOLD 不变，完整 Goal ACTIVE，其他恢复增强后置。证据 evidence/a-condition-acceptance-20261011.txt。
 
 2026-10-11 当前直接缺口更新：同A readonly Evaluator登记和原 native有限执行/归档桥已本地接通；未执行真实模型，首非预设任务 NOT_EXECUTED。小额A运行合同未批准仅阻真实调用；本地条件接纳CAS、一次需求驱动接续仍可开发，不作为整个Goal阻塞。GPU/B/C/instinctRL HOLD不变，完整目标ACTIVE。原G截断/纯synthetic测试不作真实来源资格，证据见 HYBRID_A_NATIVE_EXECUTION_BRIDGE.md。

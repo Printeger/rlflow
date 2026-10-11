@@ -307,7 +307,7 @@ def validate_original_links(value, lookup):
         if record is None or approval is None:raise Conflict('generating model original approval missing')
         frozen=origin['native_model']
         if 'workflow' in frozen:
-            from .hybrid_a_workflow_derivation import first_engineer,independent_reviewer
+            from .hybrid_a_workflow_derivation import first_engineer,independent_reviewer,continuation
             intent=lookup(SECTIONS[0],origin['working_plan_intent']['key'])
             ready=lookup(SECTIONS[1],origin['working_plan_ready']['key'])
             if intent is None or ready is None:raise Conflict('original workflow plans missing')
@@ -323,6 +323,32 @@ def validate_original_links(value, lookup):
                     budget_record(BUDGET[0],ref['key'],parent);budget_links(parent,lookup);parents[name]=parent
                 binding,_,_=independent_reviewer(record['contract']['proposal'],approval['registry_witness'],
                     origin['program_sha256'],intent,ready,parents['cpu'],parents['engineer'])
+            elif frozen['workflow']['stage']=='CONTINUATION':
+                from .hybrid_a_condition_acceptance import SECTION as CONDITIONS,validate_links as condition_links,validate_record as condition_record
+                from .hybrid_budget_ledger import validate_record as budget_record,validate_links as budget_links
+                ref=frozen['workflow']['acceptance'];accepted=lookup(CONDITIONS,ref['key'])
+                if (accepted is None or digest(accepted)!=ref['hash'] or
+                        accepted['accepted_state_version']>=value['accepted_state_version'] or
+                        any(accepted['request'][k]!=request[k] for k in ('project_id','data_mode','goal_ref','store_epoch')) or
+                        any(accepted['sources'][k]!=sources[k] for k in
+                            ('proposal_hash','approval_hash','config_hash','scope_hash'))):
+                    raise Conflict('original earlier continuation acceptance scope required')
+                condition_record(ref['key'],accepted)
+                proof=getattr(lookup,'_condition_proof',None)
+                if type(proof) is _ConditionLookupProof and proof.lookup is lookup:proof(accepted)
+                else:
+                    from .hybrid_fixture_runtime import _FixtureRuntimeGuard
+                    guard=getattr(lookup,'__self__',None)
+                    if type(guard) is _FixtureRuntimeGuard:guard._condition_links(accepted)
+                    else:condition_links(accepted,lookup)
+                parents={}
+                for name,parent_ref in accepted['parents'].items():
+                    parent=lookup(BUDGET[0],parent_ref['key'])
+                    if parent is None or digest(parent)!=parent_ref['hash']:
+                        raise Conflict('original accepted continuation parent changed')
+                    parents[name]=parent
+                binding,_,_=continuation(record['contract']['proposal'],approval['registry_witness'],
+                    origin['program_sha256'],intent,ready,accepted,parents)
             else:
                 binding,_,_=first_engineer(record['contract']['proposal'],approval['registry_witness'],
                     origin['program_sha256'],intent,ready,frozen['workflow']['files'],
@@ -446,6 +472,22 @@ def validate_original_links(value, lookup):
     # Original predecessor derived HEAD verification stays in Budget links.
 
 
+_CONDITION_LOOKUP_FACTORY=object()
+
+
+class _ConditionLookupProof:
+    """Factory-held same-read historical closure, never current authorization."""
+    def __init__(self,store,db,read,state,lookup,*,_factory=None):
+        import threading
+        self.store,self.db,self.read,self.state,self.lookup=store,db,read,state,lookup
+        self.thread=threading.get_ident()
+        self._factory=_factory
+        self._completed=None
+    def __call__(self,value):
+        from .hybrid_a_continuation_runtime import prove_historical_links
+        return prove_historical_links(self,value)
+
+
 def dependency_lookup(store, db, read, state):
     """Bounded original-event reads for plan's immutable historical closure.
 
@@ -456,13 +498,33 @@ def dependency_lookup(store, db, read, state):
     from .hybrid_runtime_installation import SECTIONS as INSTALLATION, EVENTS as INSTALL_EVENTS, expected_objects as install_objects, event_inputs as install_inputs
     from .hybrid_workspace import SECTIONS as WORKSPACE, EVENT as WORKSPACE_EVENT, expected_objects as workspace_objects
     from .hybrid_controller import SECTIONS as CONTROLLER, EVENT as CONTROLLER_EVENT, head as controller_head
-    from .hybrid_preparation import SECTIONS as PREPARATION
+    from .hybrid_preparation import SECTIONS as PREPARATION,EVENTS as PREPARATION_EVENTS,validate_record as preparation_record
     from .hybrid_budget_ledger import SECTIONS as BUDGET, EVENT as BUDGET_EVENT, expected_objects as budget_objects
+    from .hybrid_a_condition_acceptance import SECTION as CONDITIONS,original_event as condition_event
     def lookup(section, key):
         if key in state.get(section, {}): return state[section][key]
         value = read.object(section, key)
         if value is None: return None
-        if section in PLANS:
+        if section==CONDITIONS:
+            if condition_event(store,db,key,read)!=value:
+                raise Conflict('continuation acceptance original whole event differs')
+            proof=expected=None
+        elif section in PREPARATION:
+            preparation_record(section,key,value)
+            proof=store._preparation_event(db,key,max_bytes=min(read.remaining,5*1024**2),
+                _parse=read.parse,_decode=read.decode)
+            expected=((PREPARATION_EVENTS[PREPARATION.index(section)],'hybrid-core',digest(value),
+                value['accepted_state_version']),[(section,key,digest(value))])
+            if proof!=expected:raise Conflict('fixture original preparation event differs')
+            if section==PREPARATION[0]:
+                from .hybrid_preparation_sources import historical_sources
+                for source_section,rows in historical_sources(store,db,value['sources'],read).items():
+                    target=state.setdefault(source_section,{})
+                    for source_key,item in rows.items():
+                        if source_key in target and target[source_key]!=item:
+                            raise Conflict('fixture original preparation historical sources disagree')
+                        target[source_key]=item
+        elif section in PLANS:
             index = PLANS.index(section)
             proof = store._working_plan_event(db, key, _parse=read.parse, _decode=read.decode)
             expected = ((PLAN_EVENTS[index], 'hybrid-core', value['request']['plan_id'], value['accepted_state_version']),
@@ -493,4 +555,6 @@ def dependency_lookup(store, db, read, state):
         if proof != expected: raise Conflict('fixture runtime immutable dependency original event differs')
         state.setdefault(section, {})[key] = value
         return value
+    proof=_ConditionLookupProof(store,db,read,state,lookup,_factory=_CONDITION_LOOKUP_FACTORY)
+    lookup._condition_proof=proof
     return lookup

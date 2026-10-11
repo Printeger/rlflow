@@ -18,7 +18,7 @@ from .store import Conflict, canonical, PREPARATION_READ_BYTES
 from .hybrid_engineering_candidate import _snapshot
 
 
-def bind_packet(packet, binding, intent, proposal):
+def bind_packet(packet, binding, intent, proposal,*,continuation_task=None):
     """Data equality against already-proven original plan; NOT provenance."""
     if type(packet) is not dict or set(packet) != {'role','files','objective','conditions'}:
         raise Conflict('closed approved engineering packet required')
@@ -26,13 +26,21 @@ def bind_packet(packet, binding, intent, proposal):
     manifest = [{'name':name, 'bytes':len(text.encode('utf-8')),
         'sha256':'sha256:'+hashlib.sha256(text.encode('utf-8')).hexdigest(), 'mode':0o600}
         for name,text in sorted(files.items())]
-    review=binding.get('workflow',{}).get('stage')=='INDEPENDENT_REVIEW'
+    stage=binding.get('workflow',{}).get('stage');review=stage=='INDEPENDENT_REVIEW'
+    continuation=stage=='CONTINUATION'
+    objective=proposal['objective']
+    if continuation:
+        if (continuation_task is None or binding['role']!='Engineer' or binding['effort']!='medium' or
+                binding['workflow']['task_id']!=continuation_task['task_id']):
+            raise Conflict('explicit approved continuation task required')
+        objective=continuation_task['objective']
     # Tools disabled: authoritative reviewed files are original CPU-parent
     # bytes on held stdin. The readonly Working tree is only a baseline.
     manifest_matches=(files==binding['workflow']['files'] and binding['role']=='Evaluator' and
         not plan['write_roots']) if review else manifest==plan['working_tree']['files']
+    if continuation:manifest_matches=files==binding['workflow']['files']
     if (packet['role'] != binding['role'] or plan['packet']['role'] != binding['role'] or
-            packet['objective'] != proposal['objective'] or packet['conditions'] != proposal['global_conditions'] or
+            packet['objective'] != objective or packet['conditions'] != proposal['global_conditions'] or
             digest(files) != binding['candidate_sha256'] or not manifest_matches or
             digest(packet) != binding['packet_sha256']):
         raise Conflict('actual packet differs from original plan/task/candidate role')
@@ -57,6 +65,12 @@ class NativeCpuInput:
     raw: bytes
 
 
+@dataclass(frozen=True,eq=False)
+class NativeContinuationInput:
+    """Original accepted task demand; no model execution consent."""
+    raw: bytes
+
+
 class NativeModelOwner(FixtureRuntimeOwner):
     def shutdown(self):
         self._actual();self._safety_freeze=True
@@ -73,6 +87,12 @@ class NativeModelOwner(FixtureRuntimeOwner):
         self._native_cpu_handoffs={}
         self._native_cpu_handoff_roots={}
         self._native_cpu_retirements={}
+        self._continuation_inputs={}
+        self._continuation_handoffs={}
+        self._continuation_roots={}
+        self._continuation_retirements={}
+        self._continuation_parent=None
+        self._continuation_plan_sequence=None
         self._launch_active=None
         self._workflow_native_run_lock=threading.Lock()
         self._workflow_native_run=None
@@ -206,6 +226,14 @@ class NativeModelOwner(FixtureRuntimeOwner):
 
     def _binding(self, loaded, *, workflow=None, intent=None, ready=None):
         if workflow is not None:
+            if workflow['stage']=='CONTINUATION':
+                from .hybrid_a_workflow_derivation import continuation
+                from .hybrid_a_continuation_runtime import material
+                _,accepted,parents=material(self,loaded)
+                binding,_,_=continuation(loaded['record']['contract']['proposal'],
+                    json.loads(self.plans.registry._raw),self.program_hash,intent,ready,accepted,parents)
+                if binding['workflow']!=workflow:raise Conflict('original continuation derivation changed')
+                return binding
             if workflow['stage']=='INDEPENDENT_REVIEW':
                 from .hybrid_a_workflow_derivation import independent_reviewer
                 _,cpu,engineer=self._review_material(loaded)
@@ -232,7 +260,14 @@ class NativeModelOwner(FixtureRuntimeOwner):
         with self.pool._lock, self.store.read_connection() as db:
             db.execute('BEGIN'); read = ReadBudget(db, PREPARATION_READ_BYTES)
             loaded = self.budget._load(db, self._ready_for_bundle(bundle)['request']['goal_ref'], read)
-            if _workflow=='reviewer':
+            if _workflow=='continuation':
+                from .hybrid_a_workflow_derivation import continuation
+                from .hybrid_a_continuation_runtime import material
+                _,accepted,parents=material(self,loaded)
+                binding,derived,schema=continuation(loaded['record']['contract']['proposal'],
+                    json.loads(self.plans.registry._raw),self.program_hash,intent,ready,accepted,parents)
+                if packet!=derived or output_schema!=schema:raise Conflict('original continuation packet/schema required')
+            elif _workflow=='reviewer':
                 from .hybrid_a_workflow_derivation import independent_reviewer
                 _,cpu,engineer=self._review_material(loaded)
                 binding,derived,schema=independent_reviewer(loaded['record']['contract']['proposal'],
@@ -247,7 +282,9 @@ class NativeModelOwner(FixtureRuntimeOwner):
             else:binding = self._binding(loaded)
             if digest(packet) != binding['packet_sha256'] or digest(output_schema) != binding['output_schema_sha256']:
                 raise Conflict('actual packet/schema differs from original generating approval')
-            packet_raw = bind_packet(packet, binding, intent, loaded['record']['contract']['proposal'])
+            task=(json.loads(self.plans.registry._raw)['tools']['native_model']['definition']['spec'].get('continuation_task')
+                if binding.get('workflow',{}).get('stage')=='CONTINUATION' else None)
+            packet_raw = bind_packet(packet, binding, intent, loaded['record']['contract']['proposal'],continuation_task=task)
             binding.update({k: loaded[k] for k in ('proposal_hash','approval_hash','config_hash','scope_hash')})
             with self._lock:
                 if len(self._native_model_grants) >= 32:
@@ -495,6 +532,25 @@ class NativeModelOwner(FixtureRuntimeOwner):
         return self.workspace.record(request,token,progress['observation'])['fact']
 
     def handoff_workflow_cpu(self,lease,cap,*,token=None):
+        return self._handoff_workflow(lease,cap,token=token)
+
+    def prepare_workflow_continuation_input(self,lease,token):
+        from .hybrid_a_continuation_runtime import prepare_input
+        return prepare_input(self,lease,token)
+
+    def handoff_workflow_continuation(self,lease,cap,*,token):
+        if type(cap) is not NativeContinuationInput:raise PermissionError('original continuation input required')
+        return self._handoff_workflow(lease,cap,token=token,continuation=True)
+
+    def prepare_workflow_continuation_plan(self,token):
+        from .hybrid_a_continuation_runtime import prepare_plan
+        return prepare_plan(self,token)
+
+    def issue_workflow_continuation_grant(self,bundle,token,observation):
+        from .hybrid_a_continuation_runtime import grant
+        return grant(self,bundle,token,observation)
+
+    def _handoff_workflow(self,lease,cap,*,token=None,continuation=False):
         """Retire original settled model owner, then install ONE same-Budget CPU owner.
 
         CPU still needs a fresh reservation, observation, plan and grant. No
@@ -505,10 +561,26 @@ class NativeModelOwner(FixtureRuntimeOwner):
         from .hybrid_workspace import fact_key
         import os
         from .jobs import identity
+        if continuation:
+            from .hybrid_a_continuation_runtime import issued_input,cleanup_material
+            handoffs,roots,retirements=self._continuation_handoffs,self._continuation_roots,self._continuation_retirements
+            child_type=NativeModelOwner
+            def construct():return child_type(self.pool,self.membership,self.plans,_continuation_handoff=(self,cap))
+            def validate_child(child,row,root):
+                return child._continuation_parent==(self,cap,row,root)
+            get_material=lambda:(cleanup_material(self,lease,cap,token) if id(cap) in roots
+                else issued_input(self,lease,cap,token))
+        else:
+            handoffs,roots,retirements=self._native_cpu_handoffs,self._native_cpu_handoff_roots,self._native_cpu_retirements
+            child_type=LocalCpuRunnerOwner
+            def construct():return child_type(self.pool,self.membership,self.plans,_handoff=(self,cap))
+            def validate_child(child,row,root):
+                return child._workflow_handoff is row and child._workflow_handoff_parent==(self,cap) and child._workflow_handoff_raw==(root[4],root[5])
+            get_material=lambda:self._issued_workflow_cpu_input(lease,cap)
         if type(self) is not NativeModelOwner or os.getpid()!=self.process['pid'] or identity(os.getpid())!=self.process:
             raise PermissionError('original creator process required for CPU handoff')
         self.pool._actual()
-        root=self._native_cpu_handoff_roots.get(id(cap))
+        root=roots.get(id(cap))
         if (root is not None and root[6] is not self or
                 root is None and _owners.get(id(self)) is not self):
             raise PermissionError('original registered handoff owner required')
@@ -516,32 +588,30 @@ class NativeModelOwner(FixtureRuntimeOwner):
         # Never hold the Runtime lock across a project writer. Pool serializes
         # original scope transitions; registry serializes the sole owner swap.
         with self._workflow_cpu_admission_lock,self.pool._lock,_registry:
-            old=self._native_cpu_handoffs.get(id(cap))
+            old=handoffs.get(id(cap))
             if old is not None:
                 if old['cap'] is not cap or old['lease'] is not lease or cap.raw!=old['raw']:
                     raise PermissionError('original CPU handoff identity required')
-                root=self._native_cpu_handoff_roots.get(id(cap))
+                root=roots.get(id(cap))
                 if (root is None or root[0] is not old or root[1] is not lease or root[2] is not cap or
                         root[3:6]!=(old['raw'],old['material'],old['parent'])):
                     raise PermissionError('original frozen CPU handoff binding required')
-                retirement=self._native_cpu_retirements.get(id(cap))
+                retirement=retirements.get(id(cap))
                 if retirement is not None and retirement[0] is root and retirement[1] is self.sources:
                     old['retired']=True  # Original normal-retirement ACK only.
                 if old['child'] is not None:
                     child=old['child']
-                    if (type(child) is not LocalCpuRunnerOwner or child.pool is not self.pool or
+                    if (type(child) is not child_type or child.pool is not self.pool or
                             child.membership is not self.membership or child.plans is not self.plans or
-                            child.budget is not self.budget or child._workflow_handoff is not old or
-                            child._workflow_handoff_parent!=(self,cap) or
-                            child._workflow_handoff_raw!=(root[4],root[5]) or self._live or self.sources._live):
+                            child.budget is not self.budget or not validate_child(child,old,root) or self._live or self.sources._live):
                         raise PermissionError('original same-Budget CPU handoff child required')
                     child._actual()
                     return child
                 if old['retired']:
-                    child=LocalCpuRunnerOwner(self.pool,self.membership,self.plans,_handoff=(self,cap))
+                    child=construct()
                     old['child']=child
                     return child
-            material=self._issued_workflow_cpu_input(lease,cap)
+            material=get_material()
             cleanup_token=self._issued(lease)['token'] if token is None else token
             self.controller.check_token(cleanup_token)
             for attempt in self._attempts.values():
@@ -562,8 +632,8 @@ class NativeModelOwner(FixtureRuntimeOwner):
                 row={'lease':lease,'cap':cap,'raw':cap.raw,'material':canonical(material),
                     'parent':canonical(self._issued(lease)['entries']['FIXTURE_SCOPE_STOPPED']),
                     'retired':False,'child':None,'closes':{}}
-                self._native_cpu_handoffs[id(cap)]=row
-                self._native_cpu_handoff_roots[id(cap)]=(row,lease,cap,row['raw'],row['material'],row['parent'],self)
+                handoffs[id(cap)]=row
+                roots[id(cap)]=(row,lease,cap,row['raw'],row['material'],row['parent'],self)
             elif row['material']!=canonical(material):
                 raise Conflict('original CPU handoff material changed')
             # These are the original Workspace close writers, not a synthetic
@@ -610,14 +680,14 @@ class NativeModelOwner(FixtureRuntimeOwner):
                 # retirement after a lost return. Safety/UNKNOWN is not used.
                 if (not self._live and not self.sources._live and id(self) not in _owners and
                         row['closes'] and all(p['receipt'] is not None for p in row['closes'].values())):
-                    roots=self._native_cpu_handoff_roots[id(cap)]
+                    original_root=roots[id(cap)]
                     closed=canonical({json.loads(p['observation'].raw)['workspace_id']:digest(json.loads(p['receipt']))
                         for p in row['closes'].values()})
-                    self._native_cpu_retirements[id(cap)]=(roots,self.sources,closed)
+                    retirements[id(cap)]=(original_root,self.sources,closed)
                     row['retired']=True
             if self._live or self.sources._live or id(self) in _owners:
                 raise Conflict('original model owner retirement incomplete')
-            child=LocalCpuRunnerOwner(self.pool,self.membership,self.plans,_handoff=(self,cap))
+            child=construct()
             row['child']=child
             return child
 
@@ -837,7 +907,7 @@ class NativeModelOwner(FixtureRuntimeOwner):
         self.controller._refuse_nested_writer()
         workflow=attempt['origin']['native_model'].get('workflow',{})
         if (workflow.get('accounting_version')!='A_REGISTRATION_CEILINGS_V1' or
-                workflow.get('stage') not in ('FIRST_ENGINEER','INDEPENDENT_REVIEW')):
+                workflow.get('stage') not in ('FIRST_ENGINEER','INDEPENDENT_REVIEW','CONTINUATION')):
             raise PermissionError('original accounted A native workflow required')
         if not self._workflow_native_run_lock.acquire(blocking=False):
             raise Conflict('original native workflow sequence already active')

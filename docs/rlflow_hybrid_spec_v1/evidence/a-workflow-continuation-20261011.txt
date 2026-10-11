@@ -1,0 +1,121 @@
+A original accepted fact -> one explicitly approved continuation, 2026-10-11
+Base 8ff3a2e / branch hybrid-v1. Original full Goal/acceptance unchanged.
+User requests continued local development; get_goal still reports historical
+blocked and exposes no resume update. No replacement/reduced Goal was created.
+No real product model/API/G/GPU execution, real credential access, production
+migration or push. Synthetic isolated NOT_A_TOKEN cache only; model G intercepted.
+A execution contract remains unapproved. GPU/B/C/instinctRL HOLD unchanged.
+USER package-lock.json preserved and not staged:
+becc7e2a36dfcad4ffe934b5ff2f0f68187611d6c0641bd63d81367651cfbf09
+
+Delivered behavior:
+Explicit continuation_task is approval/Registry-bound, bounded and not invented
+from quota alone. Original settled Engineer/CPU/independent Reviewer and original
+condition whole-event -> current original token/approval/untouched settled Budget
+head -> strong continuation input -> all original Workspace closes -> normal
+Source/Owner retirement -> unique new Native Owner/Engineer plan/reservation/grant.
+Original candidate files feed stdin, not the baseline WorkingCopy. CONT REGISTER
+preserves started_at/high/history, medium +1, full 310s reserved charge; no reset,
+second continuation, lost-preparation remint or uncertain run retry.
+Safety/UNKNOWN is not a retirement/authority substitute; original retained cleanup
+can close its self-frozen handoff without authorizing new work.
+
+Final actual local chain, original session 2265 / output 0e0c70, naturally exit0:
+PYTHONPATH=. PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest tests/test_hybrid_a_condition_acceptance.py -k next_task -q -x
+1 passed, 17 deselected, 1 existing Starlette/AnyIO warning in 382.45s.
+Actual managed CPU PASS; EXPLICIT synthetic separate Engineer/Reviewer sessions,
+Reviewer ACCEPT, protected original condition CAS/idempotency. Original close
+COMMIT, normal retirement and constructor installation lose returns sequentially;
+all reuse original handles and return same child. Actual protected Python gate
+starts, G write is intercepted before product model execution; complete original
+STOP/reaped Source/all FDs/Pool0/UNKNOWN, repeat refuses no redispatch. Snapshot,
+recover, audit and replay agree. No real nonpreset task/Review qualification.
+Original fixture path:
+/tmp/pytest-of-mint/pytest-912/test_actual_cpu_synthetic_mode0/rlflow-host-fixture-312lnx19/projects/installation-parent/rlflow-guarded-fixture-zujb6ak8/store
+
+Final preparation provenance + ACK harness, session 31956/output b8b2e0, exit0:
+PYTHONPATH=. PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest tests/test_hybrid_a_continuation_preparation_events.py tests/test_hybrid_a_continuation_proof.py -q -x
+8 passed in 5.85s. One original prepared fixture, no task/model execution: valid
+intent/result then unchanged projection with missing intent event, corrupt result
+payload hash and missing intent historical Goal event all reject. Corruption is
+ONLY in isolated fixture transactions; rollback restores data and event triggers.
+Seven narrow harness cases include first full success ACK, cache-only preload,
+failed first authentication, foreign context, copied ACK, changed first context,
+and current heads freshly read / inactive transition Guard refused. Harnesses do
+not prove execution/account/Source qualification.
+First two provenance fixture attempts failed 5.81s and 5.79s: read-only connection,
+then append-only trigger. Diagnosed fixture boundaries; trusted temporary writer
+and transaction-local fault injection/rollback, no production guard relaxed.
+
+Final old actual Gate regression, session 68309/output 63d35c, naturally exit0:
+PYTHONPATH=. PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest tests/test_hybrid_fixture_runtime.py -k real_gated_child_ack_stop_reap_and_slot_reuse -q -x
+1 passed, 28 deselected in 17.55s. Real old fixed participant/STOP/Pool slot reuse.
+
+Pure continuation data/ceilings/schema/preparation/ACK, output 0be357, exit0:
+PYTHONPATH=. PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest tests/test_hybrid_a_continuation_proof.py tests/test_hybrid_a_continuation.py tests/test_hybrid_a_continuation_preparation.py -q
+24 passed, 1 existing warning in 0.24s. Earlier same set output217343 24pass0.25s.
+This precedes final added preparation event branch; final source delta covered by
+8-case provenance/harness plus final actual chain and old Gate above.
+
+Earlier necessary affected regressions retained; not a final full-suite claim:
+session76367/outputb6c5aa profile/accounting/session publication 37pass3.79s;
+session12599/output551a75 initial pure + original FIRST derivation 9pass28.77s;
+outpute936f5 continuation demand/quota/schema 14pass0.20s;
+outputa2df38 preparation original reserve result/no-remint 3pass0.06s;
+session97514/outputa7931d old Native runtime/Budget/usage/result 64pass +1 fixture
+ERROR131.59s: source inventory changed while source/tests were edited. Inputs
+frozen, ONLY errored case session93108/output01ff46 1pass9.60s; all65 now covered.
+session58300/outputd2d356 profile/Budget ledger/protocol 53pass25.31s;
+session88151/outpute56789 original terminal/cold Pool join 1pass12.49s;
+session13876/output16487d after Store lookup change old actual Gate/atomic batch
+rollback-no-G/original borrowed deadline:6pass73.07s. Final added preparation
+branch then only affected old actual Gate rerun (68309 above).
+One nonexistent filename invocation exited4/no tests; corrected actual filenames.
+
+Integration failures and changed diagnosis, all original sessions terminal:
+21441/output6782e4 FAIL161.93s: Budget.scope lacks store_epoch for fact_key. Added
+explicit original epoch at consumption/reserve/acquire, never changed schema.
+98141/output1046b8 FAIL238.54s: test treated reservation _current as Budget entry;
+actual handoff/plan/REGISTER succeeded. Assert original REGISTER derived head.
+91958/output34536b FAIL299.11s, then original running34591/outputa3f0f9
+FAIL296.52s: original 30s material witness exceeded during PROCESS/RELEASE.
+Second same failure triggered different readonly diagnosis, NOT identical rerun.
+Readonly original Store profile session92633/outputed34eb:4.607s/19,562,720 calls;
+latest readonly profile session18337/outputab761f:4.753s/20,007,053 calls,
+condition links4.053s,3,804 schema calls. This is diagnostic, not performance
+qualification; no CPU/model task execution. Two initial diagnostic SQL attempts
+used nonexistent columns; PRAGMA/source confirmed exact column value before fix.
+Root: repeatedly expanding immutable condition parent closure and preparation
+graphs, NOT lack of 30s budget. Never raised 30s,64MiB,policy or model ceilings.
+7296/outputc8b0d1 FAIL299.94s: fixed Store wrapper now commits PROCESS/RELEASE but
+material._point still independently expands same parents; expiry at last G gate.
+76054/output8719a4 PASS379.75s after shared material closure, BEFORE independently
+found preparation provenance MUST; not accepted as final safety evidence. Added
+complete preparation event/source proof, final2265 PASS382.45s above.
+
+Independent readonly reviewer /root/finite_app_review_63, no writes/test/model
+execution: original reserve result must use ['entry'] not ['fact']; retained
+handoff cleanup must tolerate its own safety freeze without reissuing new input;
+historical memo must bind original factory/context and exact completion tuple
+created ONLY after original whole-event + full links succeeded (registration is
+not ACK); replacing ConditionService._point must retain preparation original
+events and intent.sources historical Goal/Approval proofs. All MUSTs fixed and
+final narrow source review reports no new confirmed MUST. Store transition
+lookup retains exact Guard but current projections/Controller/approval/physical
+materials/witness/deadline still freshly validated. Historical reuse is same
+active writer/db/ReadBudget only; foreign/cold/replay retain full validation.
+
+Remaining minimal A delivery: finite Engineer->CPU->independent Reviewer->condition
+CAS->explicit one continuation entry; real repository source and nonpreset task
+with externally configured acceptance/unified artifacts; CPUFAIL/ReviewerREVISE
+bounded repair OR explicit NOT_ACCEPTED terminal (repair dispatch not implemented);
+then actual real Engineer/Reviewer/continuation under approved original small A
+contract. First actual nonpreset task remains NOT_EXECUTED. No whole A/98/full
+Goal/new installation/full regression/GPU/research/long-run completion claim.
+
+Final output96a884: git diff --check and compileall rlflow + all five affected
+continuation/condition test modules exit0. No live pytest process remained (ps
+matched only its diagnostic shell/rg). USER lock SHA256 above unchanged.
+All original test sessions naturally terminal; no restart of the running audit.
+Commit contains only this slice's implementation/tests/documentation/evidence;
+USER lock excluded, no push. Commit identity is reported at checkpoint handoff.

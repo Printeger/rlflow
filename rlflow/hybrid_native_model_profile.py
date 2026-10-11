@@ -33,7 +33,7 @@ BINDING = obj({**SPEC['properties'], 'grant_id': ID, 'proposal_hash': HASH,
     'command_sha256': HASH, 'resource_sha256': HASH})
 # Explicit new derivation, not an automatic widening of packet V1 approval.
 BINDING['properties']['workflow'] = obj({'profile':{'const':'A_ENGINEERING_WORKFLOW_V2'},
-    'stage':enum('FIRST_ENGINEER','INDEPENDENT_REVIEW'),'envelope_sha256':HASH,
+    'stage':enum('FIRST_ENGINEER','INDEPENDENT_REVIEW','CONTINUATION'),'envelope_sha256':HASH,
     'intent':obj({'key':ID,'hash':HASH}),'ready':obj({'key':ID,'hash':HASH}),
     'files':{'type':'object','minProperties':1,'maxProperties':32,
              'additionalProperties':{'type':'string','maxLength':49152}}})
@@ -45,12 +45,20 @@ BINDING['properties']['workflow']['properties']['accounting_version']={'const':'
 BINDING['properties']['workflow']['dependentRequired']={
     'limits':['accounting_version'],'accounting_version':['limits']}
 BINDING['properties']['workflow']['properties'].update(
-    parents=obj({'engineer':obj({'key':ID,'hash':HASH}),'cpu':obj({'key':ID,'hash':HASH})}),
-    machine_result_sha256=HASH,cpu_registration=ID)
+    parents={'oneOf':[obj({k:obj({'key':ID,'hash':HASH}) for k in names})
+        for names in (('engineer','cpu'),('engineer','cpu','reviewer'))]},
+    machine_result_sha256=HASH,cpu_registration=ID,task_id=ID,acceptance=obj({'key':ID,'hash':HASH}))
 BINDING['properties']['workflow']['allOf']=[{
     'if':{'properties':{'stage':{'const':'INDEPENDENT_REVIEW'}}},
-    'then':{'required':['parents','machine_result_sha256','cpu_registration','accounting_version','limits']},
-    'else':{'not':{'anyOf':[{'required':[k]} for k in ('parents','machine_result_sha256','cpu_registration')]}}}]
+    'then':{'required':['parents','machine_result_sha256','cpu_registration','accounting_version','limits'],
+        'properties':{'parents':obj({k:obj({'key':ID,'hash':HASH}) for k in ('engineer','cpu')})},
+        'not':{'anyOf':[{'required':[k]} for k in ('task_id','acceptance')]}},
+    'else':{'if':{'properties':{'stage':{'const':'CONTINUATION'}}},
+        'then':{'required':['parents','task_id','acceptance','accounting_version','limits'],
+            'properties':{'parents':obj({k:obj({'key':ID,'hash':HASH}) for k in ('engineer','cpu','reviewer')})},
+            'not':{'anyOf':[{'required':[k]} for k in ('machine_result_sha256','cpu_registration')]}},
+        'else':{'not':{'anyOf':[{'required':[k]} for k in
+            ('parents','machine_result_sha256','cpu_registration','task_id','acceptance')]}}}}]
 
 
 def validate_spec(spec):

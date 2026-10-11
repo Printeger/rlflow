@@ -95,10 +95,30 @@ class _FixtureRuntimeGuard:
             return {} if self.db.execute('SELECT 1 FROM projection WHERE section=? LIMIT 1', (section,)).fetchone() else None
         return dependency_lookup(self.owner.store, self.db, self.read, self.dependencies)(section, key)
 
+    def transition_lookup(self,section,key):
+        """Store's current projection lookup, retaining the exact writer identity.
+
+        This never reuses mutable heads. Only the separate historical condition
+        callback can borrow a successfully authenticated same-read closure.
+        """
+        if (self.owner._active is not self or self.thread!=threading.get_ident() or
+                self.read.db is not self.db or not self.db.in_transaction):
+            raise PermissionError('original active transition guard required')
+        if key=='':
+            return {} if self.db.execute('SELECT 1 FROM projection WHERE section=? LIMIT 1',(section,)).fetchone() else None
+        return self.budget.object(section,key)
+
+    def _condition_links(self,value):
+        if (self.owner._active is not self or self.thread!=threading.get_ident() or
+                self.read.db is not self.db or not self.db.in_transaction):
+            raise PermissionError('original active condition proof guard required')
+        lookup=dependency_lookup(self.owner.store,self.db,self.read,self.dependencies)
+        return lookup._condition_proof(value)
+
 
 class FixtureRuntimeOwner:
     """Protected startup profile: exact fixed local CPU protocol participant."""
-    def __init__(self, pool, membership, plans,*,_handoff=None,_review_handoff=None):
+    def __init__(self, pool, membership, plans,*,_handoff=None,_review_handoff=None,_continuation_handoff=None):
         from .hybrid_native_diagnostic import NativeDiagnosticOwner
         from .hybrid_local_cpu_runtime import LocalCpuRunnerOwner
         from .hybrid_native_model_runtime import NativeModelOwner
@@ -107,6 +127,12 @@ class FixtureRuntimeOwner:
         if type(pool) is not HostPoolOwner or type(plans) is not WorkingPlanService:
             raise TypeError('fixed original Pool/WorkingPlan owners required')
         with pool._lock, _registry:
+            continuation_parent=None
+            if _continuation_handoff is not None:
+                if type(self) is not NativeModelOwner or _handoff is not None or _review_handoff is not None:
+                    raise PermissionError('closed original continuation handoff required')
+                from .hybrid_a_continuation_runtime import constructor_parent
+                continuation_parent=constructor_parent(_continuation_handoff,pool,membership,plans)
             handoff=None
             review_handoff=None
             if _review_handoff is not None:
@@ -162,7 +188,7 @@ class FixtureRuntimeOwner:
                     ((type(self) is NativeModelOwner or handoff is not None) and plans.workspace.data_mode=='live') or
                     plans.controller.owner['process'] != pool.process):
                 raise Conflict('fixed original fixture runtime process and scope required')
-            if len(_owners) >= 16 or handoff is None and review_handoff is None and getattr(plans.workspace.budget, '_fixture_runtime', None) is not None:
+            if len(_owners) >= 16 or handoff is None and review_handoff is None and continuation_parent is None and getattr(plans.workspace.budget, '_fixture_runtime', None) is not None:
                 raise Conflict('finite fixed fixture runtime owner cannot be rebound')
             pool._physical(); self.pool, self.membership, self.plans = pool, membership, plans
             self.workspace = plans.workspace; self.budget = self.workspace.budget
@@ -218,6 +244,9 @@ class FixtureRuntimeOwner:
             self.budget._fixture_runtime = self; _owners[id(self)] = self
             if handoff is not None:handoff['child']=self
             if review_handoff is not None:review_handoff['child']=self
+            if continuation_parent is not None:
+                self._continuation_parent=continuation_parent
+                continuation_parent[2]['child']=self
 
     def _actual(self):
         if (not self._live or os.getpid() != self.process['pid'] or identity(os.getpid()) != self.process or
