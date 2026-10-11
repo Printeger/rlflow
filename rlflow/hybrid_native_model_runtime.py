@@ -98,6 +98,12 @@ class NativeModelOwner(FixtureRuntimeOwner):
         self._workflow_native_run=None
         self._workflow_native_completed=None
         self._workflow_native_deadline=None
+        self._workflow_engineering_lock=threading.Lock()
+        self._workflow_engineering_sequence=None
+        self._workflow_engineering_completed=None
+        self._workflow_engineering_root=None
+        self._workflow_engineering_stop=threading.Event()
+        self._workflow_engineering_stop_ack=None
         super().__init__(*args,**kwargs)
 
     def _actual(self):
@@ -978,6 +984,16 @@ class NativeModelOwner(FixtureRuntimeOwner):
                 sequence['complete']=completed;sequence['phase']='COMPLETE'
                 return json.loads(completed[4])
         finally:self._workflow_native_run_lock.release()
+
+    def run_workflow_engineering(self,lease,*,launch,launch_issuer):
+        """Finite original A chain; execution permission/launches remain external."""
+        from .hybrid_a_engineering_sequence import run
+        return run(self,lease,launch=launch,launch_issuer=launch_issuer)
+
+    def stop_workflow_engineering(self):
+        """Permanent original-sequence STOP, including normally retired root."""
+        from .hybrid_a_engineering_sequence import stop
+        return stop(self)
 
     def _terminal_scope(self):return 'FIXED_NATIVE_SINGLE_TGID'
 

@@ -28,9 +28,9 @@ REGISTER CAS 和历史重放核原接纳事件/三父/新 plan 与批准：`CONT
 
 ## 首个真实任务闭环剩余最小项
 
-1. 把已有原 API 接成一个有限 A 任务入口：Engineer 原 run → 实际 CPU → 独立 Reviewer 原 run → 条件 CAS → 有明确需求时一次接续。原句柄/阶段、STOP 与 UNKNOWN 保留，不另建长期 Supervisor。
+1. 有限 A 总入口已本地接通，见 [总入口](HYBRID_A_ENGINEERING_SEQUENCE.md)；真实模型正向端到端资格仍待证明。
 2. 冻结真实仓库来源和非预设工程任务、外部配置的机器验收与明确后续需求；产出原任务修改、实际测试、不同会话 Reviewer、接纳与接续事实的统一交付包。不能用固定加法/π/parser 代替。
-3. 对首任务的 CPU FAIL/Reviewer REVISE 明确有限修复或未接纳的终态；声明的 repair quota 目前不是已实现的修复派发。UNKNOWN/STOP 不得靠修复重开会话。
+3. CPU FAIL/Reviewer REVISE 已有明确未接纳终态；声明的 repair quota 不是已实现的修复派发。UNKNOWN/STOP 不得靠修复重开会话。
 4. 原小额 A 合同批准后才做真实 Engineer/Reviewer/接续调用和上述证据验收；本地代码开发不以前置运行批准为条件。
 
 真实运行保持当前 ChatGPT 工作区、不换账户/API 付费、不购额度；最多 8 会话（6 Medium/2 High）、每会话 300s、输入 400k/输出 32k soft、总 wall 90min/受管 CPU+模型 60min。缺可信 usage 或未解决 STOP 不开新会话。不把 soft token 或本地会话数宣称为供应商硬收费/重试上限。该合同当前仍未批准。

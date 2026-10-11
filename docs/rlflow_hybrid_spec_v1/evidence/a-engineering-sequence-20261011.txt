@@ -1,0 +1,44 @@
+A finite engineering sequence — 2026-10-11
+Base: 1aa1df7, branch hybrid-v1. Single source writer; finite_app_review_63 readonly.
+Sources: hybrid_native_model_runtime.py (new fields/entry wrappers),
+         hybrid_a_engineering_sequence.py; two new sequence test files.
+No real model/credential/account/GPU/API/production access, no push.
+Runtime fixtures use isolated auth.json {synthetic: NOT_A_TOKEN}; all G intercepted.
+No fixed example, synthetic Reviewer or development review promoted to first-task success.
+
+Final original exec 95535, initial chunk ed7334; final chunk a52c9b, exit 0:
+PYTHONPATH=. PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest tests/test_hybrid_a_engineering_sequence.py tests/test_hybrid_a_engineering_sequence_runtime.py -q -x
+16 passed, 1 warning in 40.19s.
+Warning: explicit multithreaded os.fork test (DeprecationWarning).
+13 flow/thread DATA harness tests, not runtime/model qualification.
+3 actual original-owner tests:
+  protected Python producer actual spawn, TEST G write interception;
+  original full STOP/reap/all FDs and synthetic-cache descriptors closed;
+  reservation UNKNOWN, Pool occupied=0, no Reviewer dispatch, no repeated spawn;
+  exception cleanup has no root normal ACK -> STOP returns UNKNOWN;
+  original preentry normal STOP SETTLED/Pool0, exact ACK repeats without new event;
+  fork while another thread owns admission lock -> PermissionError before latch/lock;
+  child no ACK/latch, parent live unchanged; audit=replay.
+
+Necessary original NativeModelOwner regression exec 41248, final 3a1845, exit 0:
+PYTHONPATH=. PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 .venv/bin/python -m pytest tests/test_hybrid_a_workflow_native_run.py -q -x
+19 passed in 22.68s. Old intercepted-G physical STOP and source/deadline/freeze gates.
+No duplicate running test, no source/test edit during final live fixtures.
+Prior quick flow harness 13 passed in 0.09s (b7f17d); not added as disjoint coverage.
+
+Independent differential reviews, no source edits or duplicate tests:
+1. MUST: issuer under admission lock blocks STOP; retired root lacks sequence STOP.
+   Closed: callback lock-free + return recheck, original root permanent STOP.
+2. MUST: retained-root fork accesses inherited Event/lock; safe-retired bool promoted
+   to normal shutdown confirmation. Closed: pure PID early refusal, exact successful
+   normal shutdown root/current/source ACK; missing ACK explicitly UNKNOWN.
+3. Final finite_app_review_63 static narrow review: both remaining MUST closed;
+   issuer remains lock-free and cross-handoff permanent latch not regressed;
+   no new confirmed MUST. Actual fork and threading evidence above remains distinct.
+
+Actual first nonpreset model task: NOT_EXECUTED.
+Positive full finite-entry real model qualification: NOT_PROVEN.
+Existing original condition/continuation integration evidence retained at prior checkpoint;
+no unnecessary repeat, no full-repository regression claim.
+Next: repository task/provenance + external acceptance + unified original evidence delivery.
+A contract still unapproved; GPU/B/C/instinctRL HOLD unchanged.
